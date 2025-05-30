@@ -1,0 +1,8 @@
+{
+  "maparthelper.is_holding_filled_map": "Убедитесь, что в руке есть непустая карта",
+  "maparthelper.is_looking_at_frame_with_map": "Убедитесь, что вы смотрите на рамку с непустой картой",
+  "maparthelper.pos1_selecting": "Выделите 1-ую точку выделения с помощью ЛКМ",
+  "maparthelper.pos2_selecting": "Выделите 2-ую точку выделения с помощью ЛКМ",
+  "maparthelper.selection_not_flat": "Выделение не является плоским",
+  "maparthelper.selection_hsa_no_maps": "Выделение не содержит ни одной рамки с непустой картой"
+}

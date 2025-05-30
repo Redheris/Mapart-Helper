@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "mapart-helper",
+	"version": "${version}",
+	"name": "Mapart Helper",
+	"description": "Aims to improve the experience of working with maparts in the game: convert an image to a schematic, save a map texture as an image, quick map creation, etc.",
+	"authors": [
+		"Redheris"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/mapart-helper",
+		"sources": "https://github.com/Redheris/MapartHelper"
+	},
+	"license": "MIT",
+	"icon": "assets/maparthelper/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"rh.maparthelper.MapartHelper"
+		],
+		"client": [
+			"rh.maparthelper.MapartHelperClient"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*",
+		"cloth-config": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
