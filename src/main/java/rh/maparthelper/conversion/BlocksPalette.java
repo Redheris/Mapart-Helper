@@ -1,75 +1,28 @@
 package rh.maparthelper.conversion;
 
 import net.minecraft.block.*;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import rh.maparthelper.MapartHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 public class BlocksPalette {
     // Lists of block classes for blocking/enabling by configs
-    private static final Class<?>[] NEED_WATER_BLOCKS = {
-            CoralBlock.class,
-            CoralBlockBlock.class,
-            CoralFanBlock.class,
-            CoralWallFanBlock.class,
-            KelpBlock.class,
-            SeagrassBlock.class,
-            TallSeagrassBlock.class,
-            KelpPlantBlock.class
-    };
-    private static final Class<?>[] MEANINGLESS_BLOCKS = {
-            BedBlock.class,
-            DoorBlock.class,
-            FrostedIceBlock.class,
-            BubbleColumnBlock.class,
-            FrogspawnBlock.class,
-            SnifferEggBlock.class,
-            FlowerPotBlock.class,
-            WeepingVinesBlock.class,
-            CaveVines.class,
-            SporeBlossomBlock.class,
-            PistonHeadBlock.class,
-            PistonExtensionBlock.class,
-            CactusBlock.class,
-            CocoaBlock.class,
-            FireBlock.class,
-            SoulFireBlock.class,
-            ChorusPlantBlock.class,
-            ChorusFlowerBlock.class,
-            BigDripleafStemBlock.class,
-            HangingMossBlock.class,
-            HangingRootsBlock.class,
-            LeveledCauldronBlock.class
-    };
-    private static final Class<?>[] CREATIVE_BLOCKS = {
-            OperatorBlock.class,
-            StructureVoidBlock.class,
-            SpawnerBlock.class,
-            TrialSpawnerBlock.class,
-            VaultBlock.class,
-            EndPortalFrameBlock.class,
-            Portal.class,
-            BuddingAmethystBlock.class
-    };
-    private static final Class<?>[] GROWABLE_BLOCKS = {
-            PlantBlock.class,
-            AbstractPlantPartBlock.class,
-            BambooBlock.class,
-            BambooShootBlock.class,
-            SugarCaneBlock.class
-    };
-    private static final Class<?>[] GRASS_BLOCKS = {
-            GrassBlock.class,
-            PlantBlock.class
-    };
+    private static final Class<?>[] NEED_WATER_BLOCKS;
+    private static final Class<?>[] MEANINGLESS_BLOCKS;
+    private static final Class<?>[] CREATIVE_BLOCKS;
+    private static final Class<?>[] GROWABLE_BLOCKS;
+    private static final Class<?>[] GRASS_LIKE_BLOCKS;
+    private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    private static HashMap<MapColor, Set<Block>> palette = new HashMap<>();
+    private static HashMap<MapColor, ArrayList<Block>> palette = new HashMap<>();
 
     public static void initColors() {
         palette = new HashMap<>();
@@ -80,59 +33,181 @@ public class BlocksPalette {
                 continue;
             if (color != null) {
                 if (!palette.containsKey(color))
-                    palette.put(color, new HashSet<>());
+                    palette.put(color, new ArrayList<>());
                 if (useBlockInPalette(block) && block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE)
                     palette.get(color).add(block);
             }
         }
-        // Debug output of the palette
-//        System.out.println(palette);
-//        for (var s : palette.entrySet())
-//            System.out.println(s);
+
+        ItemStack[] toolItems = {
+                new ItemStack(Items.NETHERITE_SWORD),
+                new ItemStack(Items.NETHERITE_AXE),
+                new ItemStack(Items.NETHERITE_PICKAXE),
+                new ItemStack(Items.NETHERITE_SHOVEL),
+                new ItemStack(Items.NETHERITE_HOE),
+                new ItemStack(Items.SHEARS)
+        };
+        for (MapColor key : palette.keySet()) {
+            palette.get(key).sort((b1, b2) ->
+                    Float.compare(getRoughMinBreakingSpeed(b1, toolItems), getRoughMinBreakingSpeed(b2, toolItems))
+            );
+        }
     }
 
     private static boolean useBlockInPalette(Block block) {
-        if (Arrays.stream(CREATIVE_BLOCKS).anyMatch(blockClass -> blockClass.isInstance(block)))
-            return false;
-        if (Arrays.stream(NEED_WATER_BLOCKS).anyMatch(blockClass -> blockClass.isInstance(block)))
-            return false;
-        if (Arrays.stream(MEANINGLESS_BLOCKS).anyMatch(blockClass -> blockClass.isInstance(block)))
-            return false;
-        if (Arrays.stream(GROWABLE_BLOCKS).anyMatch(blockClass -> blockClass.isInstance(block)))
-            return false;
-        return Arrays.stream(GRASS_BLOCKS).noneMatch(blockClass -> blockClass.isInstance(block));
+        var useInPalette = MapartHelper.config.commonConfiguration.useInPalette;
+
+        if (useInPalette.anyBlocks) return true;
+        if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;
+
+        if (useInPalette.onlySolid) return block.getClass() == Block.class;
+        if (useInPalette.onlyCarpets) return matchesAny(block, CarpetBlock.class, PaleMossCarpetBlock.class);
+
+        if (!useInPalette.blocksWithEntities && block instanceof BlockWithEntity) return false;
+        if (!useInPalette.buildDecorBlocks && matchesAny(block, BUILD_DECOR_BLOCKS)) return false;
+        if (!useInPalette.creativeBlocks && matchesAny(block, CREATIVE_BLOCKS)) return false;
+        if (!useInPalette.needWaterBlocks && matchesAny(block, NEED_WATER_BLOCKS)) return false;
+        if (!useInPalette.growableBlocks && matchesAny(block, GROWABLE_BLOCKS)) return false;
+        return useInPalette.grassLikeBlocks || !matchesAny(block, GRASS_LIKE_BLOCKS);
     }
 
+
     public static Block[] getBlocksOfColor(MapColor color) {
-        Object[] array = palette.keySet().stream().map(key -> key.id).toArray();
-        System.out.println(array.length);
-        System.out.println(Arrays.toString(array));
         return palette.get(color).toArray(new Block[0]);
     }
 
     public static void setBlocksFromPalette(World world) {
         int startX = 64;
-        BlockPos pos = new BlockPos(startX, -61, -64);
         for (int x = startX; x < startX + 128; x++)
             for (int z = -64; z < 64; z++)
                 world.setBlockState(new BlockPos(x, -61, z), Blocks.GRASS_BLOCK.getDefaultState());
+        BlockPos pos = new BlockPos(startX, -61, -64);
         for (MapColor color : palette.keySet()) {
             if (color == MapColor.CLEAR)
                 continue;
             for (Block block : palette.get(color)) {
-//                System.out.print(block.getTranslationKey() + " ");
-                BlockState blockState = block.getDefaultState().withIfExists(Properties.WATERLOGGED, false).withIfExists(Properties.DOWN, true);
-                world.setBlockState(pos, blockState, Block.FORCE_STATE);
+                world.setBlockState(pos, getDefaultPaletteState(block), 18);
                 pos = pos.east();
                 if (pos.getX() == startX + 128) {
                     pos = pos.west(128);
                     pos = pos.south();
-//                    System.out.println();
                 }
             }
             pos = pos.west(pos.getX() - startX);
             pos = pos.south();
-//            System.out.println();
         }
+    }
+
+    public static BlockState getDefaultPaletteState(Block block) {
+        BlockState state = block.getDefaultState();
+        state = state.withIfExists(Properties.WATERLOGGED, false);
+        state = state.withIfExists(Properties.DOWN, true);
+        state = state.withIfExists(Properties.PERSISTENT, true);
+        return state;
+    }
+
+    private static float getRoughMinBreakingSpeed (Block block, ItemStack[] tools) {
+        BlockState state = block.getDefaultState();
+        float hardness = block.getHardness();
+        if (hardness < 0) return Float.POSITIVE_INFINITY;
+
+        double[] toolsSpeed = Arrays.stream(tools).mapToDouble(t -> t.getMiningSpeedMultiplier(state)).toArray();
+        float maxSpeed = (float) Arrays.stream(toolsSpeed).max().orElse(0.0);
+        if (maxSpeed <= 0) return Float.POSITIVE_INFINITY;
+
+        return hardness / maxSpeed;
+    }
+
+    private static boolean matchesAny(Block block, Class<?>... classes) {
+        for (Class<?> clazz : classes) {
+            if (clazz.isInstance(block)) return true;
+        }
+        return false;
+    }
+
+    static {
+        NEED_WATER_BLOCKS = new Class[]{
+                CoralBlockBlock.class,
+                CoralBlock.class,
+                CoralFanBlock.class,
+                CoralWallFanBlock.class,
+                KelpBlock.class,
+                SeagrassBlock.class,
+                TallSeagrassBlock.class,
+                KelpPlantBlock.class
+        };
+        MEANINGLESS_BLOCKS = new Class[]{
+                BedBlock.class,
+                DoorBlock.class,
+                FrostedIceBlock.class,
+                BubbleColumnBlock.class,
+                FrogspawnBlock.class,
+                LilyPadBlock.class,
+                SnifferEggBlock.class,
+                TurtleEggBlock.class,
+                FlowerPotBlock.class,
+                WeepingVinesBlock.class,
+                CaveVines.class,
+                SporeBlossomBlock.class,
+                PistonHeadBlock.class,
+                PistonExtensionBlock.class,
+                CactusBlock.class,
+                CocoaBlock.class,
+                FireBlock.class,
+                SoulFireBlock.class,
+                ChorusPlantBlock.class,
+                ChorusFlowerBlock.class,
+                BigDripleafStemBlock.class,
+                HangingMossBlock.class,
+                HangingRootsBlock.class,
+                LavaCauldronBlock.class,
+                LeveledCauldronBlock.class,
+                FarmlandBlock.class,
+                DirtPathBlock.class,
+                HeavyCoreBlock.class
+        };
+        CREATIVE_BLOCKS = new Class[]{
+                OperatorBlock.class,
+                StructureVoidBlock.class,
+                SpawnerBlock.class,
+                TrialSpawnerBlock.class,
+                VaultBlock.class,
+                EndPortalFrameBlock.class,
+                Portal.class,
+                BuddingAmethystBlock.class,
+                DragonEggBlock.class,
+                InfestedBlock.class
+        };
+        GROWABLE_BLOCKS = new Class[]{
+                PlantBlock.class,
+                AbstractPlantPartBlock.class,
+                BambooBlock.class,
+                BambooShootBlock.class,
+                SugarCaneBlock.class
+        };
+        GRASS_LIKE_BLOCKS = new Class[]{
+                GrassBlock.class,
+                PlantBlock.class,
+                CoralBlock.class,
+                CoralFanBlock.class,
+                CoralWallFanBlock.class,
+                DeadCoralBlock.class,
+                DeadCoralFanBlock.class,
+                DeadCoralWallFanBlock.class,
+                BigDripleafBlock.class,
+                PointedDripstoneBlock.class
+        };
+        BUILD_DECOR_BLOCKS = new Class[]{
+                FenceBlock.class,
+                FenceGateBlock.class,
+                WallBlock.class,
+                BannerBlock.class,
+                StairsBlock.class,
+                TrapdoorBlock.class,
+                LanternBlock.class,
+                CandleBlock.class,
+                LightningRodBlock.class,
+                CarvedPumpkinBlock.class
+        };
     }
 }

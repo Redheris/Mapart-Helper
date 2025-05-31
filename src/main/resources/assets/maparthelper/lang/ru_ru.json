@@ -4,5 +4,23 @@
   "maparthelper.pos1_selecting": "Выделите 1-ую точку выделения с помощью ЛКМ",
   "maparthelper.pos2_selecting": "Выделите 2-ую точку выделения с помощью ЛКМ",
   "maparthelper.selection_not_flat": "Выделение не является плоским",
-  "maparthelper.selection_hsa_no_maps": "Выделение не содержит ни одной рамки с непустой картой"
+  "maparthelper.selection_has_no_maps": "Выделение не содержит ни одной рамки с непустой картой",
+
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "на основании которой можно будет удобнее настроить пользовательскую палитру,",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.anyBlocks": "§cВСЕ §rсуществующие блоки §3(Наведите для подробностей) §c(Игнорирует следующие)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.anyBlocks.@Tooltip[0]": "Используйте, только если понимаете, зачем.",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.anyBlocks.@Tooltip[1]": "Многие из этих блоков бывает невозможно даже поставить",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.onlySolid": "Только плотные твёрдые блоки §c(Игнорирует следующие)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.onlyCarpets": "Только ковры §c(Игнорирует следующие)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.blocksWithEntities": "Блоки с сущностями (BlockWithEntity)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.buildDecorBlocks": "Декоративные блоки",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.buildDecorBlocks.@Tooltip": "Ступеньки, ограды, заборы, люки, лампы, свечи и др.",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.needWaterBlocks": "Требующие нахождения в воде",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.needWaterBlocks.@Tooltip": "Кораллы и ламинария имеют свои цвета, однако на карте отображается цвет воды",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.creativeBlocks": "Блоки из креатива",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.growableBlocks": "Растущие блоки",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.growableBlocks.@Tooltip": "Саженцы, бамбук и др. блоки могут создавать другие блоки, что портит цвета на карте",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.grassLikeBlocks": "Неполные блоки по типу травы"
 }

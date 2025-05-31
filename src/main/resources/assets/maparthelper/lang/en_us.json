@@ -4,5 +4,23 @@
   "maparthelper.pos1_selecting": "",
   "maparthelper.pos2_selecting": "",
   "maparthelper.selection_not_flat": "",
-  "maparthelper.selection_hsa_no_maps": ""
+  "maparthelper.selection_has_no_maps": "",
+
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.anyBlocks": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.anyBlocks.@Tooltip[0]": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.anyBlocks.@Tooltip[1]": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.onlySolid": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.onlyCarpets": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.blocksWithEntities": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.buildDecorBlocks": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.buildDecorBlocks.@Tooltip": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.needWaterBlocks": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.needWaterBlocks.@Tooltip": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.creativeBlocks": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.growableBlocks": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.growableBlocks.@Tooltip": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.grassLikeBlocks": ""
 }

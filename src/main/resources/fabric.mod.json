@@ -3,15 +3,15 @@
 	"id": "mapart-helper",
 	"version": "${version}",
 	"name": "Mapart Helper",
-	"description": "Aims to improve the experience of working with maparts in the game: convert an image to a schematic, save a map texture as an image, quick map creation, etc.",
+	"description": "Aims to improve the experience of working with maparts in the game: flexibly generate a schematic, edit the image, save a map textures as an image, and more",
 	"authors": [
 		"Redheris"
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/mapart-helper",
-		"sources": "https://github.com/Redheris/MapartHelper"
+		"sources": "https://github.com/Redheris/Mapart-Helper"
 	},
-	"license": "MIT",
+	"license": "GPL-3.0",
 	"icon": "assets/maparthelper/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"rh.maparthelper.MapartHelperClient"
+		],
+		"modmenu": [
+			"rh.maparthelper.config.ModMenuIntegration"
 		]
 	},
 	"depends": {
