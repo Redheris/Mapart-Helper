@@ -83,8 +83,6 @@ public class BlocksPalette {
                 world.setBlockState(new BlockPos(x, -61, z), Blocks.GRASS_BLOCK.getDefaultState());
         BlockPos pos = new BlockPos(startX, -61, -64);
         for (MapColor color : palette.keySet()) {
-            if (color == MapColor.CLEAR)
-                continue;
             for (Block block : palette.get(color)) {
                 world.setBlockState(pos, getDefaultPaletteState(block), 18);
                 pos = pos.east();
