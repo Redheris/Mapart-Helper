@@ -1,10 +1,11 @@
 package rh.maparthelper;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
 import rh.maparthelper.conversion.BlocksPalette;
 
+import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 
@@ -23,19 +24,18 @@ public class Commands {
                             BlocksPalette.initColors();
                             return 1;
                         }))
-                    .then(literal("blank")
+                    .then(literal("place").then(argument("height", IntegerArgumentType.integer())
                         .executes(ctx -> {
-                            // May be temporary testing code... But also may be some kind of debug feature to see
-                            // a complete blocks palette in-world
-//                                            ((ServerPlayerEntity)ctx.getSource().getEntity()).sendMessage(Text.literal(String.valueOf(ctx.getSource().getEntity().getWorld().isClient())), false);
+                            // Some kind of debug feature to place and see the complete blocks palette in the world
                             if (ctx.getSource().getEntity() == null || ctx.getSource().getWorld() == null)
                                 return 0;
+
+                            int y = IntegerArgumentType.getInteger(ctx, "height");
                             Entity source = ctx.getSource().getEntity();
-                            ctx.getSource().sendFeedback(() -> Text.literal(String.valueOf(source.getWorld().isClient())), false);
-                            BlocksPalette.setBlocksFromPalette(source.getWorld());
-                            System.out.println("Set completed");
+
+                            BlocksPalette.placeBlocksFromPalette(source.getWorld(), source.getBlockX(), y, source.getBlockZ());
                             return 1;
-                        }))
+                        })))
                 )
             ));
     }

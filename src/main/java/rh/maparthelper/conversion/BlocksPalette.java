@@ -6,7 +6,10 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.joml.Vector2i;
+import rh.maparthelper.MapUtils;
 import rh.maparthelper.MapartHelper;
 
 import java.util.ArrayList;
@@ -76,23 +79,32 @@ public class BlocksPalette {
         return palette.get(color).toArray(new Block[0]);
     }
 
-    public static void setBlocksFromPalette(World world) {
-        int startX = 64;
-        for (int x = startX; x < startX + 128; x++)
-            for (int z = -64; z < 64; z++)
-                world.setBlockState(new BlockPos(x, -61, z), Blocks.GRASS_BLOCK.getDefaultState());
-        BlockPos pos = new BlockPos(startX, -61, -64);
+    public static void placeBlocksFromPalette(World world, int playerX, int y, int playerZ) {
+        Vector2i startPos = MapUtils.getMapAreaStartPos(playerX, playerZ);
+        int startX = startPos.x;
+        int startZ = startPos.y;
+
+        int maxLen = palette.values().stream().mapToInt(ArrayList::size).max().orElse(0);
+
+        BlockPos.Mutable pos = new BlockPos.Mutable(startX, y, startZ);
+        for (int x = 0; x < maxLen; x++) {
+            for (int z = -1; z < palette.size(); z++) {
+                world.setBlockState(pos.add(x, 0, z), Blocks.GRASS_BLOCK.getDefaultState());
+            }
+        }
+
+        pos.set(startX, y, startZ);
         for (MapColor color : palette.keySet()) {
             for (Block block : palette.get(color)) {
                 world.setBlockState(pos, getDefaultPaletteState(block), 18);
-                pos = pos.east();
+                pos = pos.move(Direction.EAST);
                 if (pos.getX() == startX + 128) {
-                    pos = pos.west(128);
-                    pos = pos.south();
+                    pos = pos.move(Direction.WEST, 128);
+                    pos = pos.move(Direction.SOUTH);
                 }
             }
-            pos = pos.west(pos.getX() - startX);
-            pos = pos.south();
+            pos = pos.move(Direction.WEST, pos.getX() - startX);
+            pos = pos.move(Direction.SOUTH);
         }
     }
 
