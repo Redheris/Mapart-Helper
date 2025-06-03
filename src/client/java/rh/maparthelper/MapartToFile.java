@@ -21,8 +21,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -32,9 +32,13 @@ public class MapartToFile {
     private final static Path SAVE_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
     public static void initializeSavesDir() {
-        File dir = SAVE_MAPS_DIR.toFile();
-        if (dir.mkdirs()) {
-            MapartHelper.LOGGER.info("Created folder for saved maps: \"{}\"", dir);
+        try {
+            if (Files.exists(SAVE_MAPS_DIR)) return;
+
+            Files.createDirectory(SAVE_MAPS_DIR);
+            MapartHelper.LOGGER.info("Created a directory for saved maps: \"{}\"", SAVE_MAPS_DIR);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -139,15 +143,15 @@ public class MapartToFile {
     }
 
     private static void saveMapartFile(PlayerEntity player, String filename, NativeImage image) throws IOException {
-        if (SAVE_MAPS_DIR.resolve(filename + ".png").toFile().exists()) {
+        if (Files.exists(SAVE_MAPS_DIR.resolve(filename + ".png"))) {
             int suffix = 1;
-            while (SAVE_MAPS_DIR.resolve(filename + " (" + suffix + ").png").toFile().exists())
+            while (Files.exists(SAVE_MAPS_DIR.resolve(filename + " (" + suffix + ").png")))
                 suffix++;
             filename = filename + " (" + suffix + ")";
         }
 
         Path filePath = SAVE_MAPS_DIR.resolve(filename + ".png");
-        image.writeTo(filePath.toFile());
+        image.writeTo(filePath);
 
         Text mapartFile = Text.literal(filename + ".png")
                 .styled(style -> style
