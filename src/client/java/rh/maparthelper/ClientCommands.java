@@ -4,7 +4,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.block.MapColor;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
@@ -12,8 +11,6 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.conversion.BlocksPalette;
-
-import java.util.Arrays;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -53,12 +50,7 @@ public class ClientCommands {
                             }))
                         .then(literal("test")
                             .executes(ctx -> {
-                                // Also just a temporary testing code :)
-                                MapColor color = MapColor.BLACK;
-                                String list = Arrays.toString(BlocksPalette.getBlocksOfColor(color));
-                                System.out.println(list);
-                                ClientPlayerEntity player = (ClientPlayerEntity) ctx.getSource().getEntity();
-                                player.sendMessage(Text.literal(list), false);
+                                // Just a temporary testing code :)
                                 return 1;
                             })
                         )

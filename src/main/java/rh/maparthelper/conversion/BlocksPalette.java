@@ -5,12 +5,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.joml.Vector2i;
 import rh.maparthelper.MapUtils;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.conversion.colors.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,10 +27,11 @@ public class BlocksPalette {
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    private static HashMap<MapColor, ArrayList<Block>> palette = new HashMap<>();
+    private final static HashMap<MapColor, ArrayList<Block>> palette = new HashMap<>();
 
     public static void initColors() {
-        palette = new HashMap<>();
+        palette.clear();
+
         for (Block block : Registries.BLOCK) {
             BlockState state = block.getDefaultState();
             MapColor color = state.getMapColor(null, null);
@@ -75,8 +78,47 @@ public class BlocksPalette {
     }
 
 
-    public static Block[] getBlocksOfColor(MapColor color) {
-        return palette.get(color).toArray(new Block[0]);
+    public static ArrayList<Block> getBlocksOfColor(MapColor color) {
+        return palette.get(color);
+    }
+
+    public static Pair<MapColor, MapColor.Brightness> getClosestColor3D(int argb) {
+        Pair<MapColor, MapColor.Brightness> closest = new Pair<>(MapColor.CLEAR, MapColor.Brightness.NORMAL);
+        double minDist = Integer.MAX_VALUE;
+
+        for (MapColor color : palette.keySet()) {
+            for (int brightId = 0; brightId < 3; brightId++) {
+                MapColor.Brightness brightness = MapColor.Brightness.validateAndGet(brightId);
+                int current = color.getRenderColor(brightness);
+
+                if (current == argb) return new Pair<>(color, brightness);
+
+                double dist = ColorUtils.colorDistance(argb, current);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = new Pair<>(color, brightness);
+                }
+            }
+        }
+
+        return closest;
+    }
+
+    public static MapColor getClosestColor2D(int argb) {
+        MapColor closest = MapColor.CLEAR;
+        double minDist = Integer.MAX_VALUE;
+
+        for (MapColor color : palette.keySet()) {
+            int current = color.getRenderColor(MapColor.Brightness.NORMAL);
+            if (current == argb) return color;
+            double dist = ColorUtils.colorDistance(argb, current);
+            if (dist < minDist) {
+                minDist = dist;
+                closest = color;
+            }
+        }
+
+        return closest;
     }
 
     public static void placeBlocksFromPalette(World world, int playerX, int y, int playerZ) {
@@ -116,7 +158,7 @@ public class BlocksPalette {
         return state;
     }
 
-    private static float getRoughMinBreakingSpeed (Block block, ItemStack[] tools) {
+    private static float getRoughMinBreakingSpeed(Block block, ItemStack[] tools) {
         BlockState state = block.getDefaultState();
         float hardness = block.getHardness();
         if (hardness < 0) return Float.POSITIVE_INFINITY;
