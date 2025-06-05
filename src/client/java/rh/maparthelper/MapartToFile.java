@@ -33,9 +33,9 @@ public class MapartToFile {
 
     public static void initializeSavesDir() {
         try {
-            if (Files.exists(SAVE_MAPS_DIR)) return;
+            if (Files.exists(SAVE_MAPS_DIR.resolve("temp"))) return;
 
-            Files.createDirectory(SAVE_MAPS_DIR);
+            Files.createDirectories(SAVE_MAPS_DIR.resolve("temp"));
             MapartHelper.LOGGER.info("Created a directory for saved maps: \"{}\"", SAVE_MAPS_DIR);
         } catch (IOException e) {
             throw new RuntimeException(e);
