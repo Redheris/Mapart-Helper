@@ -3,7 +3,6 @@ package rh.maparthelper.conversion;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
 import net.minecraft.util.Pair;
-import org.apache.commons.io.FilenameUtils;
 import rh.maparthelper.MapartHelper;
 
 import javax.imageio.ImageIO;
@@ -14,15 +13,12 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class ConvertedImage {
-    private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
-    private final String filename;
+    private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps").resolve("temp");
     private BufferedImage image;
 
     public ConvertedImage(Path path) {
-        this.filename = FilenameUtils.getBaseName(path.toString()) + ".png";
-
         try {
-            Files.copy(path, TEMP_ARTS_DIR.resolve(filename));
+            Files.copy(path, TEMP_ARTS_DIR.resolve("original.png"));
             BufferedImage readImage = ImageIO.read(path.toFile());
             image = new BufferedImage(readImage.getWidth(), readImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = image.createGraphics();
@@ -35,14 +31,13 @@ public class ConvertedImage {
         }
     }
 
-    public ConvertedImage(Path path, BufferedImage image) {
-        this.filename = FilenameUtils.getBaseName(path.toString()) + ".png";
+    public ConvertedImage(BufferedImage image) {
         this.image = image;
     }
 
-    public void saveImage() {
+    public void saveImage(String filename) {
         try {
-            Path imagePath = TEMP_ARTS_DIR.resolve(filename);
+            Path imagePath = TEMP_ARTS_DIR.getParent().resolve(filename + ".png");
             ImageIO.write(image, "png", imagePath.toFile());
             MapartHelper.LOGGER.info("Image successfully saved as {}", imagePath);
         }
@@ -52,6 +47,21 @@ public class ConvertedImage {
         }
     }
 
+    // Saves temporary file of the image after converting image colors
+    private void saveTemp() {
+        try {
+            Path imagePath = TEMP_ARTS_DIR.resolve("converted.png");
+            ImageIO.write(image, "png", imagePath.toFile());
+            MapartHelper.LOGGER.info("Temporary image successfully saved as {}", imagePath);
+        }
+        catch (Exception e) {
+            MapartHelper.LOGGER.error("Error occurred while saving an image:\n{}", e.toString());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Creates new Thread for computing new image with pixels adapted to the current blocks palette colors
+     * */
     public void convertToBlocksPalette(boolean use3D, Consumer<ConvertedImage> callback) {
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
@@ -72,11 +82,11 @@ public class ConvertedImage {
                 }
             }
             double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-            MapartHelper.LOGGER.info("[{}] Conversion of \"{}\" took {} seconds", use3D ? "3D" : "2D", filename, timeLeft);
+            MapartHelper.LOGGER.info("[{}] Conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
 
-            String newFilename = filename + "_CONVERTED.png";
-            ConvertedImage result = new ConvertedImage(TEMP_ARTS_DIR.resolve(newFilename), converted);
+            ConvertedImage result = new ConvertedImage(converted);
             callback.accept(result);
+            result.saveTemp();
         }).start();
     }
 
