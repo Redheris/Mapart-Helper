@@ -2,6 +2,7 @@ package rh.maparthelper.conversion;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.util.Pair;
 import rh.maparthelper.MapartHelper;
 
@@ -18,12 +19,12 @@ public class ConvertedImage {
 
     public ConvertedImage(Path path) {
         try {
-            Files.copy(path, TEMP_ARTS_DIR.resolve("original.png"));
-            BufferedImage readImage = ImageIO.read(path.toFile());
-            image = new BufferedImage(readImage.getWidth(), readImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = image.createGraphics();
-            g.drawImage(readImage, 0, 0, null);
-            g.dispose();
+            Path originalImagePath = TEMP_ARTS_DIR.resolve("original.png");
+            Files.deleteIfExists(originalImagePath);
+            Files.deleteIfExists(TEMP_ARTS_DIR.resolve("converted.png"));
+            Files.copy(path, originalImagePath);
+
+            image = ImageIO.read(path.toFile());
         }
         catch (Exception e) {
             MapartHelper.LOGGER.error("Error occurred while reading an image:\n{}", e.toString());
@@ -90,7 +91,7 @@ public class ConvertedImage {
         }).start();
     }
 
-    public ConvertedImage scaleToMapSize(int mapsX, int mapsY, int stretchingMode) {
+    public void scaleToMapSize(int mapsX, int mapsY, int stretchingMode) {
         int width = 128 * mapsX;
         int height = 128 * mapsY;
 
@@ -100,6 +101,10 @@ public class ConvertedImage {
         g2d.drawImage(scaled, 0, 0, null);
         g2d.dispose();
 
-        return this;
     }
+
+    public NativeImage getNativeImage() {
+        return NativeImageUtils.convertBufferedImageToNativeImage(image);
+    }
+
 }
