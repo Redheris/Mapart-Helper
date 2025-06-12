@@ -16,12 +16,13 @@ public class CurrentConversionSettings {
 
     // Crop settings
     public static double conversionScale = 1.0;
+    public static int cropMode = -1;
     public static int xShift = 0;
     public static int yShift = 0;
 
     // Preview settings
     public static boolean doShowGrid = false;
-    public static double previewScale = 1.0;
+    public static double previewScale = 0.5;
 
     // Image preprocessing
     public static double brightness = 0.5;

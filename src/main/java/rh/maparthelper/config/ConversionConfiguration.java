@@ -12,4 +12,8 @@ public class ConversionConfiguration implements ConfigData {
     public String auxBlock = "block.minecraft.netherrack";
     public DitherAlgorithms ditherAlgorithm = DitherAlgorithms.NONE;
     public String currentPalette = "Default palette";
+
+    public boolean use3D() {
+        return this.staircaseStyle != StaircaseStyles.FLAT_2D;
+    }
 }
