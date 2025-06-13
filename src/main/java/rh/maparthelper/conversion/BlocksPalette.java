@@ -16,7 +16,9 @@ import rh.maparthelper.conversion.colors.ColorUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.TreeMap;
+
 
 public class BlocksPalette {
     // Lists of block classes for blocking/enabling by configs
@@ -27,7 +29,7 @@ public class BlocksPalette {
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    private final static HashMap<MapColor, ArrayList<Block>> palette = new HashMap<>();
+    private final static TreeMap<MapColor, ArrayList<Block>> palette = new TreeMap<>(Comparator.comparingInt(o -> o.id));
 
     public static void initColors() {
         palette.clear();
@@ -40,7 +42,8 @@ public class BlocksPalette {
             if (color != null) {
                 if (!palette.containsKey(color))
                     palette.put(color, new ArrayList<>());
-                if (useBlockInPalette(block) && block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE)
+                boolean useCreativeBlocks = MapartHelper.config.commonConfiguration.useInPalette.creativeBlocks;
+                if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE))
                     palette.get(color).add(block);
             }
         }
@@ -80,6 +83,10 @@ public class BlocksPalette {
 
     public static ArrayList<Block> getBlocksOfColor(MapColor color) {
         return palette.get(color);
+    }
+
+    public static MapColor[] getMapColors() {
+        return palette.keySet().toArray(new MapColor[0]);
     }
 
     public static Pair<MapColor, MapColor.Brightness> getClosestColor3D(int argb) {
