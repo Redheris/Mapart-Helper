@@ -4,8 +4,11 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
 
+import java.nio.file.Path;
+
 public class CurrentConversionSettings {
     // GUI image
+    public static Path imagePath;
     public static NativeImageBackedTexture guiMapartImage = new NativeImageBackedTexture("mapart_gui_texture", 128, 128, true);
     public static Identifier guiMapartId = Identifier.of(MapartHelper.MOD_ID, "mapart_gui_texture");
 
@@ -25,7 +28,7 @@ public class CurrentConversionSettings {
     public static double previewScale = 0.5;
 
     // Image preprocessing
-    public static double brightness = 0.5;
-    public static double saturation = 0.5;
-    public static double contrast = 0.5;
+    public static float brightness = 1.0f;
+    public static float contrast = 0.0f;
+    public static float saturation = 1.0f;
 }

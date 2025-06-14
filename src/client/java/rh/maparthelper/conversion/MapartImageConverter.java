@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Pair;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
+import rh.maparthelper.conversion.colors.ColorUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,9 +21,12 @@ public class MapartImageConverter {
     private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps").resolve("temp");
 
     public static void readAndUpdateMapartImage(Path path) {
+        CurrentConversionSettings.imagePath = path;
         new Thread(() -> {
             try {
                 BufferedImage bufferedImage = ImageIO.read(path.toFile());
+
+                bufferedImage = preprocessImage(bufferedImage);
 
                 bufferedImage = scaleToMapSize(
                         bufferedImage,
@@ -41,6 +45,14 @@ public class MapartImageConverter {
                 throw new RuntimeException(e);
             }
         }).start();
+    }
+
+    private static BufferedImage preprocessImage(BufferedImage image) {
+        float brightness = CurrentConversionSettings.brightness;
+        float contrast = CurrentConversionSettings.contrast;
+        float saturation = CurrentConversionSettings.saturation;
+
+        return ColorUtils.preprocessImage(image, brightness, contrast, saturation);
     }
 
     public static void saveMapartImage(Path imagePath) {
