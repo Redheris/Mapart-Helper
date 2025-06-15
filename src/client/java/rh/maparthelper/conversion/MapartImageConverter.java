@@ -27,13 +27,7 @@ public class MapartImageConverter {
                 BufferedImage bufferedImage = ImageIO.read(path.toFile());
 
                 bufferedImage = preprocessImage(bufferedImage);
-
-                bufferedImage = scaleToMapSize(
-                        bufferedImage,
-                        CurrentConversionSettings.width,
-                        CurrentConversionSettings.height,
-                        CurrentConversionSettings.cropMode
-                );
+                bufferedImage = cropAndScale(bufferedImage);
                 BufferedImage finalBufferedImage = convertToBlocksPalette(
                         bufferedImage,
                         MapartHelperClient.conversionConfig.use3D()
@@ -82,7 +76,7 @@ public class MapartImageConverter {
 
     /** Computes new image with the original pixels adapted to the current blocks palette colors
      * */
-    public static BufferedImage convertToBlocksPalette(BufferedImage image, boolean use3D) {
+    public static BufferedImage convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
         long startTime = System.currentTimeMillis();
 
         BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -101,31 +95,80 @@ public class MapartImageConverter {
             converted.setRGB(x, y, newArgb);
             }
         }
-        double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-        MapartHelper.LOGGER.info("[{}] Conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
+
+        if (logExecutionTime) {
+            double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
+            MapartHelper.LOGGER.info("[{}] Conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
+        }
 
         return converted;
     }
 
-    public static BufferedImage scaleToMapSize(BufferedImage image, int mapsX, int mapsY, int cropMode) {
-        int width = 128 * mapsX;
-        int height = 128 * mapsY;
+    public static BufferedImage convertToBlocksPalette(BufferedImage image, boolean use3D) {
+        return convertToBlocksPalette(image, use3D, false);
+    }
 
-        switch (cropMode) {
-            case USER_CROP, AUTO_CROP -> {
-                // CASES PLUG. DON'T LEAVE IT LIKE THIS
-                return new BufferedImage(0, 0, BufferedImage.TYPE_INT_ARGB);
-            }
-            case NO_CROP -> {
-                Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D g2d = image.createGraphics();
-                g2d.drawImage(scaled, 0, 0, null);
-                g2d.dispose();
-                return image;
-            }
-        }
+    public static BufferedImage scaleToMapSize(BufferedImage image, int mapsX, int mapsY) {
+        int width = mapsX * 128;
+        int height = mapsY * 128;
+
+        Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
+        g2d.drawImage(scaled, 0, 0, null);
+        g2d.dispose();
+
         return image;
+    }
+
+    public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int mapsX, int mapsY, int frameX, int frameY, int frameWidth, int frameHeight) {
+        BufferedImage subimage = image.getSubimage(frameX, frameY, frameWidth, frameHeight);
+        return scaleToMapSize(subimage, mapsX, mapsY);
+    }
+
+    public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int mapsX, int mapsY) {
+        int mapartWidth = mapsX * 128;
+        int mapartHeight = mapsY * 128;
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+
+        double mapartAspect = (double) mapartWidth / mapartHeight;
+        double imageAspect = (double) imageWidth / imageHeight;
+
+        int frameWidth, frameHeight;
+        int frameX, frameY;
+
+        if (imageAspect > mapartAspect) {
+            frameHeight = imageHeight;
+            frameY = 0;
+            frameWidth = (int) (frameHeight * mapartAspect);
+            frameX = (imageWidth - frameWidth) / 2;
+        } else {
+            frameWidth = imageWidth;
+            frameX = 0;
+            frameHeight = (int) (frameWidth / mapartAspect);
+            frameY = (imageHeight - frameHeight) / 2;
+        }
+
+        return cropAndScaleToMapSize(image, mapsX, mapsY, frameX, frameY, frameWidth, frameHeight);
+    }
+
+    private static BufferedImage cropAndScale(BufferedImage image) {
+        int mapsX = CurrentConversionSettings.width;
+        int mapsY = CurrentConversionSettings.height;
+
+        return switch (CurrentConversionSettings.cropMode) {
+            case NO_CROP -> scaleToMapSize(image, mapsX, mapsY);
+            case AUTO_CROP -> cropAndScaleToMapSize(image, mapsX, mapsY);
+            case USER_CROP -> {
+                int frameX = CurrentConversionSettings.croppingFrameX;
+                int frameY = CurrentConversionSettings.croppingFrameY;
+                int frameWidth = CurrentConversionSettings.croppingFrameWidth;
+                int frameHeight = CurrentConversionSettings.croppingFrameHeight;
+                yield cropAndScaleToMapSize(image, mapsX, mapsY, frameX, frameY, frameWidth, frameHeight);
+            }
+            default -> throw new IllegalArgumentException("Invalid cropping mode");
+        };
     }
 
 }

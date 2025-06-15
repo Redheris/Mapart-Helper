@@ -17,11 +17,12 @@ public class CurrentConversionSettings {
     public static int width = 1;
     public static int height = 1;
 
-    // Crop settings
-    public static double conversionScale = 1.0;
+    // Cropping settings
     public static int cropMode = -1;
-    public static int xShift = 0;
-    public static int yShift = 0;
+    public static int croppingFrameX = 0;
+    public static int croppingFrameY = 0;
+    public static int croppingFrameWidth = 0;
+    public static int croppingFrameHeight = 0;
 
     // Preview settings
     public static boolean doShowGrid = false;
