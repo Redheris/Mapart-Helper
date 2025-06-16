@@ -33,8 +33,7 @@ public class MapartImageConverter {
                         MapartHelperClient.conversionConfig.use3D()
                 );
                 MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(finalBufferedImage));
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 MapartHelper.LOGGER.error("Error occurred while reading an image:\n{}", e.toString());
                 throw new RuntimeException(e);
             }
@@ -54,12 +53,10 @@ public class MapartImageConverter {
             if (CurrentConversionSettings.guiMapartImage.getImage() == null)
                 throw new NullPointerException();
             CurrentConversionSettings.guiMapartImage.getImage().writeTo(imagePath);
-        }
-        catch (NullPointerException e) {
+        } catch (NullPointerException e) {
             MapartHelper.LOGGER.error("Mapart texture is null:\n{}", e.toString());
             throw new RuntimeException(e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             MapartHelper.LOGGER.error("Error occurred while saving an image:\n{}", e.toString());
             throw new RuntimeException(e);
         }
@@ -74,8 +71,9 @@ public class MapartImageConverter {
         saveMapartImage(TEMP_ARTS_DIR.resolve("converted.png"));
     }
 
-    /** Computes new image with the original pixels adapted to the current blocks palette colors
-     * */
+    /**
+     * Computes new image with the original pixels adapted to the current blocks palette colors
+     **/
     public static BufferedImage convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
         long startTime = System.currentTimeMillis();
 
@@ -92,7 +90,7 @@ public class MapartImageConverter {
                     MapColor color = BlocksPalette.getClosestColor2D(argb);
                     newArgb = color.getRenderColor(MapColor.Brightness.NORMAL);
                 }
-            converted.setRGB(x, y, newArgb);
+                converted.setRGB(x, y, newArgb);
             }
         }
 

@@ -14,6 +14,7 @@
   "maparthelper.too_many_maps": "Слишком большая область. Максимум - 300 блоков",
   "maparthelper.saving_error": "Произошла неизвестная ошибка при сохранении мапарта. Для подробностей обратитесь к логам",
   "maparthelper.saving_path_error": "Получен некорректный путь для сохранения файла. Убедитесь в корректности названия файла",
+  "maparthelper.blocks_palette_generated": "Палитра блоков успешно сгенерирована",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",

@@ -14,11 +14,7 @@ import rh.maparthelper.MapUtils;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.colors.ColorUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.TreeMap;
-
+import java.util.*;
 
 public class BlocksPalette {
     // Lists of block classes for blocking/enabling by configs
@@ -29,10 +25,12 @@ public class BlocksPalette {
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    private final static TreeMap<MapColor, ArrayList<Block>> palette = new TreeMap<>(Comparator.comparingInt(o -> o.id));
+    private final static Map<MapColor, ArrayList<Block>> palette = new TreeMap<>(Comparator.comparingInt(o -> o.id));
+    private static final Map<Integer, MapColorEntry> argbToMapColor = new HashMap<>();
 
     public static void initColors() {
         palette.clear();
+        argbToMapColor.clear();
 
         for (Block block : Registries.BLOCK) {
             BlockState state = block.getDefaultState();
@@ -48,6 +46,11 @@ public class BlocksPalette {
             }
         }
 
+        for (MapColor color : palette.keySet()) {
+            if (!palette.get(color).isEmpty())
+                addARGBMapColorEntries(color);
+        }
+
         ItemStack[] toolItems = {
                 new ItemStack(Items.NETHERITE_SWORD),
                 new ItemStack(Items.NETHERITE_AXE),
@@ -61,6 +64,30 @@ public class BlocksPalette {
                     Float.compare(getRoughMinBreakingSpeed(b1, toolItems), getRoughMinBreakingSpeed(b2, toolItems))
             );
         }
+    }
+
+    private static void addARGBMapColorEntries(MapColor mapColor) {
+        if (mapColor == MapColor.WATER_BLUE) {
+            argbToMapColor.put(
+                    mapColor.getRenderColor(MapColor.Brightness.NORMAL),
+                    new MapColorEntry(mapColor, MapColor.Brightness.NORMAL)
+            );
+        } else {
+            MapColor.Brightness[] brightnesses = new MapColor.Brightness[] {
+                    MapColor.Brightness.LOW,
+                    MapColor.Brightness.NORMAL,
+                    MapColor.Brightness.HIGH
+            };
+            for (MapColor.Brightness brightness : brightnesses) {
+                int argb = mapColor.getRenderColor(brightness);
+                MapColorEntry entry = new MapColorEntry(mapColor, brightness);
+                argbToMapColor.put(argb, entry);
+            }
+        }
+    }
+
+    public static MapColorEntry getMapColorEntryFromARGB(int argb) {
+        return argbToMapColor.get(argb);
     }
 
     private static boolean useBlockInPalette(Block block) {
@@ -242,7 +269,8 @@ public class BlocksPalette {
                 AbstractPlantPartBlock.class,
                 BambooBlock.class,
                 BambooShootBlock.class,
-                SugarCaneBlock.class
+                SugarCaneBlock.class,
+                VineBlock.class
         };
         GRASS_LIKE_BLOCKS = new Class[]{
                 GrassBlock.class,
@@ -269,4 +297,6 @@ public class BlocksPalette {
                 CarvedPumpkinBlock.class
         };
     }
+
+    public record MapColorEntry(MapColor mapColor, MapColor.Brightness brightness) {}
 }
