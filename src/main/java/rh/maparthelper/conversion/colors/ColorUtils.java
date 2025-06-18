@@ -28,7 +28,6 @@ public class ColorUtils {
         int height = image.getHeight();
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        // Правильный коэффициент контраста
         float contrastFactor = (259 * (contrastLevel + 255)) / (255f * (259 - contrastLevel));
 
         for (int y = 0; y < height; y++) {
@@ -39,7 +38,6 @@ public class ColorUtils {
             }
         }
 
-        // Насыщенность (опционально)
         if (Float.compare(saturationFactor, 1.0f) != 0) {
             result = changeSaturation(result, saturationFactor);
         }
@@ -53,12 +51,10 @@ public class ColorUtils {
         int green = (argb >> 8) & 0xFF;
         int blue = argb & 0xFF;
 
-        // Яркость (просто умножение)
         red = clamp((int) (red * brightnessFactor), 0, 255);
         green = clamp((int) (green * brightnessFactor), 0, 255);
         blue = clamp((int) (blue * brightnessFactor), 0, 255);
 
-        // Контраст
         red = clamp((int) (contrastFactor * (red - 128) + 128), 0, 255);
         green = clamp((int) (contrastFactor * (green - 128) + 128), 0, 255);
         blue = clamp((int) (contrastFactor * (blue - 128) + 128), 0, 255);
@@ -86,12 +82,9 @@ public class ColorUtils {
                 float saturation = hsb[1];
                 float brightness = hsb[2];
 
-                // Изменяем насыщенность (clamp от 0 до 1)
                 saturation = Math.max(0f, Math.min(1f, saturation * saturationFactor));
 
                 int rgb = Color.HSBtoRGB(hue, saturation, brightness);
-
-                // HSBtoRGB возвращает значение с альфа-каналом = 0xFF
                 int newArgb = (alpha << 24) | (rgb & 0x00FFFFFF);
                 result.setRGB(x, y, newArgb);
             }

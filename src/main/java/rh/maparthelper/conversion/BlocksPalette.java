@@ -5,7 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -25,12 +24,13 @@ public class BlocksPalette {
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    private final static Map<MapColor, ArrayList<Block>> palette = new TreeMap<>(Comparator.comparingInt(o -> o.id));
-    private static final Map<Integer, MapColorEntry> argbToMapColor = new HashMap<>();
+    private static final Map<MapColor, ArrayList<Block>> palette = new TreeMap<>(Comparator.comparingInt(o -> o.id));
+    private static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
+    private static final Map<Integer, MapColorEntry> cachedClosestColors = new HashMap<>();
 
     public static void initColors() {
         palette.clear();
-        argbToMapColor.clear();
+        argbMapColors.clear();
 
         for (Block block : Registries.BLOCK) {
             BlockState state = block.getDefaultState();
@@ -68,7 +68,7 @@ public class BlocksPalette {
 
     private static void addARGBMapColorEntries(MapColor mapColor) {
         if (mapColor == MapColor.WATER_BLUE) {
-            argbToMapColor.put(
+            argbMapColors.put(
                     mapColor.getRenderColor(MapColor.Brightness.NORMAL),
                     new MapColorEntry(mapColor, MapColor.Brightness.NORMAL)
             );
@@ -81,13 +81,13 @@ public class BlocksPalette {
             for (MapColor.Brightness brightness : brightnesses) {
                 int argb = mapColor.getRenderColor(brightness);
                 MapColorEntry entry = new MapColorEntry(mapColor, brightness);
-                argbToMapColor.put(argb, entry);
+                argbMapColors.put(argb, entry);
             }
         }
     }
 
-    public static MapColorEntry getMapColorEntryFromARGB(int argb) {
-        return argbToMapColor.get(argb);
+    public static MapColorEntry getMapColorEntryByARGB(int argb) {
+        return argbMapColors.get(argb);
     }
 
     private static boolean useBlockInPalette(Block block) {
@@ -116,8 +116,8 @@ public class BlocksPalette {
         return palette.keySet().toArray(new MapColor[0]);
     }
 
-    public static Pair<MapColor, MapColor.Brightness> getClosestColor3D(int argb) {
-        Pair<MapColor, MapColor.Brightness> closest = new Pair<>(MapColor.CLEAR, MapColor.Brightness.NORMAL);
+    private static MapColorEntry getClosestColor3D(int argb) {
+        MapColorEntry closest = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
         double minDist = Integer.MAX_VALUE;
 
         for (MapColor color : palette.keySet()) {
@@ -125,12 +125,12 @@ public class BlocksPalette {
                 MapColor.Brightness brightness = MapColor.Brightness.validateAndGet(brightId);
                 int current = color.getRenderColor(brightness);
 
-                if (current == argb) return new Pair<>(color, brightness);
+                if (current == argb) return new MapColorEntry(color, brightness);
 
                 double dist = ColorUtils.colorDistance(argb, current);
                 if (dist < minDist) {
                     minDist = dist;
-                    closest = new Pair<>(color, brightness);
+                    closest = new MapColorEntry(color, brightness);
                 }
             }
         }
@@ -138,13 +138,13 @@ public class BlocksPalette {
         return closest;
     }
 
-    public static MapColor getClosestColor2D(int argb) {
+    private static MapColorEntry getClosestColor2D(int argb) {
         MapColor closest = MapColor.CLEAR;
         double minDist = Integer.MAX_VALUE;
 
         for (MapColor color : palette.keySet()) {
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);
-            if (current == argb) return color;
+            if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL);
             double dist = ColorUtils.colorDistance(argb, current);
             if (dist < minDist) {
                 minDist = dist;
@@ -152,7 +152,17 @@ public class BlocksPalette {
             }
         }
 
-        return closest;
+        return new MapColorEntry(closest, MapColor.Brightness.NORMAL);
+    }
+
+    public static MapColorEntry getClosestColor(int argb, boolean use3D) {
+        if (use3D)
+            return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor3D);
+        return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor2D);
+    }
+
+    public static void clearColorCache(){
+        cachedClosestColors.clear();
     }
 
     public static void placeBlocksFromPalette(World world, int playerX, int y, int playerZ) {

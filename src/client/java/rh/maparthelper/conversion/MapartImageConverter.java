@@ -1,9 +1,7 @@
 package rh.maparthelper.conversion;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Pair;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.ColorUtils;
@@ -11,6 +9,7 @@ import rh.maparthelper.conversion.colors.ColorUtils;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.nio.file.Path;
 
 public class MapartImageConverter {
@@ -28,10 +27,11 @@ public class MapartImageConverter {
 
                 bufferedImage = preprocessImage(bufferedImage);
                 bufferedImage = cropAndScale(bufferedImage);
-                BufferedImage finalBufferedImage = convertToBlocksPalette(
+                convertToBlocksPalette(
                         bufferedImage,
                         MapartHelperClient.conversionConfig.use3D()
                 );
+                BufferedImage finalBufferedImage = bufferedImage;
                 MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(finalBufferedImage));
             } catch (Exception e) {
                 MapartHelper.LOGGER.error("Error occurred while reading an image:\n{}", e.toString());
@@ -74,42 +74,34 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    public static BufferedImage convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
+    public static void convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
         long startTime = System.currentTimeMillis();
 
-        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
-                int argb = image.getRGB(x, y);
+                int argb = pixels[x + y * image.getWidth()];
                 int newArgb;
-                if (use3D) {
-                    Pair<MapColor, MapColor.Brightness> color = BlocksPalette.getClosestColor3D(argb);
-                    newArgb = color.getLeft().getRenderColor(color.getRight());
-                } else {
-                    MapColor color = BlocksPalette.getClosestColor2D(argb);
-                    newArgb = color.getRenderColor(MapColor.Brightness.NORMAL);
-                }
-                converted.setRGB(x, y, newArgb);
+                BlocksPalette.MapColorEntry color = BlocksPalette.getClosestColor(argb, use3D);
+                newArgb = color.mapColor().getRenderColor(color.brightness());
+                pixels[x + y * image.getWidth()] = newArgb;
             }
         }
+
+        BlocksPalette.clearColorCache();
 
         if (logExecutionTime) {
             double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
             MapartHelper.LOGGER.info("[{}] Conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
         }
-
-        return converted;
     }
 
-    public static BufferedImage convertToBlocksPalette(BufferedImage image, boolean use3D) {
-        return convertToBlocksPalette(image, use3D, false);
+    public static void convertToBlocksPalette(BufferedImage image, boolean use3D) {
+        convertToBlocksPalette(image, use3D, false);
     }
 
-    public static BufferedImage scaleToMapSize(BufferedImage image, int mapsX, int mapsY) {
-        int width = mapsX * 128;
-        int height = mapsY * 128;
-
+    public static BufferedImage scaleToMapSize(BufferedImage image, int width, int height) {
         Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
@@ -124,13 +116,11 @@ public class MapartImageConverter {
         return scaleToMapSize(subimage, mapsX, mapsY);
     }
 
-    public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int mapsX, int mapsY) {
-        int mapartWidth = mapsX * 128;
-        int mapartHeight = mapsY * 128;
+    public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int targetWidth, int targetHeight) {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        double mapartAspect = (double) mapartWidth / mapartHeight;
+        double mapartAspect = (double) targetWidth / targetHeight;
         double imageAspect = (double) imageWidth / imageHeight;
 
         int frameWidth, frameHeight;
@@ -148,22 +138,22 @@ public class MapartImageConverter {
             frameY = (imageHeight - frameHeight) / 2;
         }
 
-        return cropAndScaleToMapSize(image, mapsX, mapsY, frameX, frameY, frameWidth, frameHeight);
+        return cropAndScaleToMapSize(image, targetWidth, targetHeight, frameX, frameY, frameWidth, frameHeight);
     }
 
     private static BufferedImage cropAndScale(BufferedImage image) {
-        int mapsX = CurrentConversionSettings.width;
-        int mapsY = CurrentConversionSettings.height;
+        int targetWidth = CurrentConversionSettings.width * 128;
+        int targetHeight = CurrentConversionSettings.height * 128;
 
         return switch (CurrentConversionSettings.cropMode) {
-            case NO_CROP -> scaleToMapSize(image, mapsX, mapsY);
-            case AUTO_CROP -> cropAndScaleToMapSize(image, mapsX, mapsY);
+            case NO_CROP -> scaleToMapSize(image, targetWidth, targetHeight);
+            case AUTO_CROP -> cropAndScaleToMapSize(image, targetWidth, targetHeight);
             case USER_CROP -> {
                 int frameX = CurrentConversionSettings.croppingFrameX;
                 int frameY = CurrentConversionSettings.croppingFrameY;
                 int frameWidth = CurrentConversionSettings.croppingFrameWidth;
                 int frameHeight = CurrentConversionSettings.croppingFrameHeight;
-                yield cropAndScaleToMapSize(image, mapsX, mapsY, frameX, frameY, frameWidth, frameHeight);
+                yield cropAndScaleToMapSize(image, targetWidth, targetHeight, frameX, frameY, frameWidth, frameHeight);
             }
             default -> throw new IllegalArgumentException("Invalid cropping mode");
         };
