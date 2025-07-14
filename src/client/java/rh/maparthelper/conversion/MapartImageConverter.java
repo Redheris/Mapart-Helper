@@ -2,6 +2,7 @@ package rh.maparthelper.conversion;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.ColorUtils;
@@ -11,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.file.Path;
+import java.util.concurrent.*;
 
 public class MapartImageConverter {
     public static final int NO_CROP = -1;
@@ -19,25 +21,15 @@ public class MapartImageConverter {
 
     private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps").resolve("temp");
 
+    private static final ExecutorService convertingExecutor = new ScheduledThreadPoolExecutor(1);
+    private static Future<?> currentConvertingFuture;
+
     public static void readAndUpdateMapartImage(Path path) {
         CurrentConversionSettings.imagePath = path;
-        new Thread(() -> {
-            try {
-                BufferedImage bufferedImage = ImageIO.read(path.toFile());
-
-                bufferedImage = preprocessImage(bufferedImage);
-                bufferedImage = cropAndScale(bufferedImage);
-                convertToBlocksPalette(
-                        bufferedImage,
-                        MapartHelperClient.conversionConfig.use3D()
-                );
-                BufferedImage finalBufferedImage = bufferedImage;
-                MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(finalBufferedImage));
-            } catch (Exception e) {
-                MapartHelper.LOGGER.error("Error occurred while reading an image:\n{}", e.toString());
-                throw new RuntimeException(e);
-            }
-        }).start();
+        FutureTask<Void> fut = new FutureTask<>(new ConvertImageFileRunnable(path), null);
+        if (currentConvertingFuture != null)
+            currentConvertingFuture.cancel(true);
+        currentConvertingFuture = convertingExecutor.submit(fut);
     }
 
     private static BufferedImage preprocessImage(BufferedImage image) {
@@ -66,11 +58,6 @@ public class MapartImageConverter {
         saveMapartImage(TEMP_ARTS_DIR.getParent().resolve(filename + ".png"));
     }
 
-    // Saves temporary file of the image after converting image colors
-    private static void saveTemp() {
-        saveMapartImage(TEMP_ARTS_DIR.resolve("converted.png"));
-    }
-
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
@@ -81,6 +68,10 @@ public class MapartImageConverter {
 
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
+                if (Thread.currentThread().isInterrupted()) {
+                    BlocksPalette.clearColorCache();
+                    return;
+                }
                 int argb = pixels[x + y * image.getWidth()];
                 int newArgb;
                 BlocksPalette.MapColorEntry color = BlocksPalette.getClosestColor(argb, use3D);
@@ -159,4 +150,42 @@ public class MapartImageConverter {
         };
     }
 
+    private static class ConvertImageFileRunnable implements Runnable {
+        private final Path imagePath;
+
+        public ConvertImageFileRunnable(Path path) {
+            this.imagePath = path;
+        }
+
+        @Override
+        public void run() {
+            try {
+                long startTime = System.currentTimeMillis();
+                BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
+                if (Thread.currentThread().isInterrupted()) return;
+
+                bufferedImage = preprocessImage(bufferedImage);
+                if (Thread.currentThread().isInterrupted()) return;
+
+                bufferedImage = cropAndScale(bufferedImage);
+                if (Thread.currentThread().isInterrupted()) return;
+
+                convertToBlocksPalette(bufferedImage, MapartHelperClient.conversionConfig.use3D());
+                if (Thread.currentThread().isInterrupted()) return;
+
+                try (NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage)) {
+                    if (Thread.currentThread().isInterrupted()) return;
+
+                    MinecraftClient.getInstance().execute(() ->
+                        NativeImageUtils.updateMapartImageTexture(image)
+                    );
+                    double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
+                    MapartHelper.LOGGER.info("Entire conversion took {} seconds", timeLeft);
+                }
+            } catch (Exception e) {
+                MapartHelper.LOGGER.error("Error occurred while reading and converting an image:\n{}", e.toString());
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

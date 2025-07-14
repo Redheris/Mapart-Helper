@@ -9,16 +9,11 @@ import java.awt.image.BufferedImage;
 
 public class NativeImageUtils {
 
-    public static void updateMapartImageTexture(BufferedImage bufferedImage) {
-        NativeImage image = convertBufferedImageToNativeImage(bufferedImage);
+    public static void updateMapartImageTexture(NativeImage image) {
         CurrentConversionSettings.guiMapartImage = new NativeImageBackedTexture(
-                "mapart_gui_texture",
-                bufferedImage.getWidth(),
-                bufferedImage.getHeight(),
-                false);
-        CurrentConversionSettings.guiMapartImage.setImage(image);
-        CurrentConversionSettings.guiMapartImage.upload();
-
+                () -> "mapart_gui_texture",
+                image
+        );
         TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
         textureManager.registerTexture(CurrentConversionSettings.guiMapartId, CurrentConversionSettings.guiMapartImage);
     }
