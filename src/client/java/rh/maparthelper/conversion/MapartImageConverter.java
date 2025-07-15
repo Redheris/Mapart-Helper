@@ -173,15 +173,16 @@ public class MapartImageConverter {
                 convertToBlocksPalette(bufferedImage, MapartHelperClient.conversionConfig.use3D());
                 if (Thread.currentThread().isInterrupted()) return;
 
-                try (NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage)) {
-                    if (Thread.currentThread().isInterrupted()) return;
+                NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
+                if (Thread.currentThread().isInterrupted()) return;
 
-                    MinecraftClient.getInstance().execute(() ->
+                MinecraftClient.getInstance().execute(() ->
                         NativeImageUtils.updateMapartImageTexture(image)
-                    );
-                    double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-                    MapartHelper.LOGGER.info("Entire conversion took {} seconds", timeLeft);
-                }
+                );
+                double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
+                MapartHelper.LOGGER.info("Entire conversion took {} seconds", timeLeft);
+
+
             } catch (Exception e) {
                 MapartHelper.LOGGER.error("Error occurred while reading and converting an image:\n{}", e.toString());
                 throw new RuntimeException(e);
