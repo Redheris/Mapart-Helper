@@ -93,13 +93,30 @@ public class MapartImageConverter {
     }
 
     public static BufferedImage scaleToMapSize(BufferedImage image, int width, int height) {
-        Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
-        g2d.drawImage(scaled, 0, 0, null);
-        g2d.dispose();
+        boolean scaleUp = width > image.getWidth() || height > image.getHeight();
+        if (scaleUp) {
+            BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = resized.createGraphics();
 
-        return image;
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR); // или BICUBIC
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2.drawImage(image, 0, 0, width, height, null);
+            g2.dispose();
+
+            return resized;
+        } else {
+            Image scaled = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g2d = image.createGraphics();
+            g2d.drawImage(scaled, 0, 0, null);
+            g2d.dispose();
+
+            return image;
+
+        }
     }
 
     public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int mapsX, int mapsY, int frameX, int frameY, int frameWidth, int frameHeight) {
