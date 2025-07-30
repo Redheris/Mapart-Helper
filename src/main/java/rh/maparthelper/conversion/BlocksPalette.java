@@ -14,6 +14,7 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.colors.ColorUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BlocksPalette {
     // Lists of block classes for blocking/enabling by configs
@@ -116,13 +117,22 @@ public class BlocksPalette {
         return palette.keySet().toArray(new MapColor[0]);
     }
 
+    public static Map<MapColor, Block> getDefaultPalette() {
+        return palette.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().getFirst()
+                ));
+    }
+
     private static MapColorEntry getClosestColor3D(int argb) {
         MapColorEntry closest = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
         double minDist = Integer.MAX_VALUE;
 
         for (MapColor color : palette.keySet()) {
             for (int brightId = 0; brightId < 3; brightId++) {
-                MapColor.Brightness brightness = MapColor.Brightness.validateAndGet(brightId);
+                MapColor.Brightness brightness;
+                brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.NORMAL : MapColor.Brightness.validateAndGet(brightId);
                 int current = color.getRenderColor(brightness);
 
                 if (current == argb) return new MapColorEntry(color, brightness);
@@ -132,6 +142,8 @@ public class BlocksPalette {
                     minDist = dist;
                     closest = new MapColorEntry(color, brightness);
                 }
+
+                if (color == MapColor.WATER_BLUE) break;
             }
         }
 
