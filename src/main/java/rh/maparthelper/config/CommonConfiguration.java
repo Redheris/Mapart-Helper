@@ -7,6 +7,10 @@ import rh.maparthelper.MapartHelper;
 
 @Config(name = MapartHelper.MOD_ID)
 public class CommonConfiguration implements ConfigData {
+    @ConfigEntry.Gui.Tooltip
+    @ConfigEntry.ColorPicker
+    public int frameColor = 0x9900ff;
+
     @ConfigEntry.Gui.Tooltip(count = 2)
     @ConfigEntry.Gui.CollapsibleObject
     public UseInBlockPalette useInPalette = new UseInBlockPalette();

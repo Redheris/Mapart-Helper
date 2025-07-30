@@ -5,6 +5,7 @@ import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import rh.maparthelper.MapartHelper;
 
 public class ParticleUtils {
 
@@ -31,7 +32,7 @@ public class ParticleUtils {
     public static void drawSelectionBox(ClientWorld world, Vec3d pos1, Vec3d pos2, Direction direction, double step) {
         if (world == null) return;
 
-        DustParticleEffect particle = new DustParticleEffect(0xbb00aa, 0.3f);
+        DustParticleEffect particle = new DustParticleEffect(MapartHelper.config.commonConfiguration.frameColor, 0.3f);
         double xMin = Math.min(pos1.x, pos2.x) - 0.5;
         double xMax = Math.max(pos1.x, pos2.x) + 0.5;
         double yMin = Math.min(pos1.y, pos2.y) - 0.5;

@@ -16,6 +16,8 @@
   "maparthelper.saving_path_error": "",
   "maparthelper.blocks_palette_generated": "",
 
+  "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor.@Tooltip": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor": "",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "",

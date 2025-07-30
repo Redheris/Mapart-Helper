@@ -16,6 +16,8 @@
   "maparthelper.saving_path_error": "Получен некорректный путь для сохранения файла. Убедитесь в корректности названия файла",
   "maparthelper.blocks_palette_generated": "Палитра блоков успешно сгенерирована",
 
+  "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor.@Tooltip": "Для /mart save selection",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor": "Цвет рамки выделения",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "на основании которой можно будет удобнее настроить пользовательскую палитру,",
