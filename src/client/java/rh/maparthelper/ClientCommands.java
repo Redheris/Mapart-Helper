@@ -42,10 +42,14 @@ public class ClientCommands {
                     )
                 )
                 .then(literal("palette")
-                        .then(literal("generate")
+                        .then(literal("regenerate")
                             .executes(ctx -> {
                                 // Regenerates blocks palette to correspond to the configs and game's blocks list
                                 BlocksPalette.initColors();
+                                ctx.getSource().getPlayer().sendMessage(Text.translatable(
+                                        "maparthelper.blocks_palette_generated").formatted(Formatting.GREEN),
+                                        true
+                                );
                                 return 1;
                             }))
                         .then(literal("test")
