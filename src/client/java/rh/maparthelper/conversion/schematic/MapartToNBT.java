@@ -13,7 +13,7 @@ public class MapartToNBT {
     private static final Path SCHEMATICS = FabricLoader.getInstance().getGameDir().resolve("schematics");
     
     public static void saveNBT() {
-        NbtCompound base = NbtSchematicUtils.createMapArtBaseNbt(CurrentConversionSettings.width, CurrentConversionSettings.height);
+        NbtCompound base = NbtSchematicUtils.createMapArtNbt();
         try {
             String filename = CurrentConversionSettings.mapartName;
             if (Files.exists(SCHEMATICS.resolve(filename + ".nbt"))) {

@@ -4,9 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import rh.maparthelper.conversion.BlocksPalette;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PalettePresetsConfig {
     private int currentPreset;
@@ -48,6 +46,10 @@ public class PalettePresetsConfig {
             this.name = name;
             this.id = id;
             this.colors = colors;
+        }
+
+        public List<Block> getBlocks() {
+            return new ArrayList<>(colors.values().stream().toList());
         }
 
         public Block getBlockByMapColor(MapColor color) {
