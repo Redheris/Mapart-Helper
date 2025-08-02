@@ -1,5 +1,6 @@
 package rh.maparthelper.conversion;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
@@ -21,7 +22,7 @@ public class MapartImageConverter {
 
     private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps").resolve("temp");
 
-    private static final ExecutorService convertingExecutor = new ScheduledThreadPoolExecutor(1);
+    private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Image-%d").build());
     private static Future<?> currentConvertingFuture;
 
     public static void readAndUpdateMapartImage(Path path) {

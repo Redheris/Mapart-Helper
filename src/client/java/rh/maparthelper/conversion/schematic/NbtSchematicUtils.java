@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class NbtSchematicUtils {
-    private static NbtCompound createMapArtBaseNbt(int mapWidth, int mapHeight) {
+    private static NbtCompound createMapartBaseNbt(int mapWidth, int mapHeight) {
         NbtCompound nbt = new NbtCompound();
         int width = mapWidth * 128;
         int height = mapHeight * 128;
@@ -88,10 +88,10 @@ public class NbtSchematicUtils {
         addBlockToNbt(nbt, x, y, z, block);
     }
 
-    protected static NbtCompound createMapArtNbt() {
+    protected static NbtCompound createMapartNbt() {
         int mapWidth = CurrentConversionSettings.width;
         int mapHeight = CurrentConversionSettings.height;
-        NbtCompound nbt = createMapArtBaseNbt(mapWidth, mapHeight);
+        NbtCompound nbt = createMapartBaseNbt(mapWidth, mapHeight);
 
         if (CurrentConversionSettings.guiMapartImage.getImage() != null) {
             int[] colorsRaw = CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb();
