@@ -17,16 +17,35 @@ import rh.maparthelper.conversion.pallete.gson.PaletteConfigManager;
 import rh.maparthelper.conversion.staircases.Flat2DStaircase;
 import rh.maparthelper.conversion.staircases.IMapartStaircase;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class NbtSchematicUtils {
+    private static final Map<Integer, Integer> material_list = new HashMap<>();
+    private static final List<Block> blocks_list = new ArrayList<>();
+
+    public static List<Map.Entry<Block, Integer>> getMaterialList(boolean fromMostFreq) {
+        Map<Block, Integer> blocksCount = new HashMap<>();
+        material_list.forEach((k, v) -> blocksCount.put(blocks_list.get(k), v));
+        List<Map.Entry<Block, Integer>> list = blocksCount.entrySet().stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                .toList();
+        return fromMostFreq ? list.reversed() : list;
+    }
+
+    private static int getBlockMaterialId(Block block) {
+        int ind = blocks_list.indexOf(block);
+
+        if (ind != -1) return ind;
+
+        blocks_list.add(block);
+        return blocks_list.size() - 1;
+
+    }
+
     private static NbtCompound createMapartBaseNbt(int mapWidth, int mapHeight) {
         NbtCompound nbt = new NbtCompound();
         int width = mapWidth * 128;
         int height = mapHeight * 128;
-
-        addPaletteToNbt(nbt);
 
         NbtList size = new NbtList();
         size.add(NbtInt.of(width));
@@ -47,13 +66,7 @@ public class NbtSchematicUtils {
     private static void addPaletteToNbt(NbtCompound nbt) {
         NbtList palette = new NbtList();
 
-        // TODO: Not very hard-coding, but it's not very nice to save the whole palette
-        List<Block> blocks = PaletteConfigManager.palettePresetsConfig.getCurrentPreset().getBlocks();
-        Block auxBlock = Registries.BLOCK.get(Identifier.of(MapartHelperClient.conversionConfig.auxBlock));
-        if (!blocks.contains(auxBlock))
-            blocks.addFirst(auxBlock);
-
-        for (Block block : blocks) {
+        for (Block block : blocks_list) {
             BlockState blockState = BlocksPalette.getDefaultPaletteState(block);
             NbtCompound blockEntry = NbtHelper.fromBlockState(blockState);
             palette.add(blockEntry);
@@ -64,7 +77,6 @@ public class NbtSchematicUtils {
 
     protected static void addBlockToNbt(NbtCompound nbt, int x, int y, int z, Block block) {
         NbtList blocks = Objects.requireNonNull(nbt.get("blocks")).asNbtList().orElse(new NbtList());
-        List<Block> blockIds = PaletteConfigManager.palettePresetsConfig.getCurrentPreset().getBlocks();
 
         NbtCompound entry = new NbtCompound();
         NbtList pos = new NbtList();
@@ -72,8 +84,11 @@ public class NbtSchematicUtils {
         pos.add(NbtInt.of(y));
         pos.add(NbtInt.of(z));
         entry.put("pos", pos);
-        entry.put("state", NbtInt.of(blockIds.indexOf(block)));
+        int blockId = getBlockMaterialId(block);
+        entry.put("state", NbtInt.of(blockId));
         blocks.add(entry);
+
+        material_list.merge(blockId, 1, Integer::sum);
 
         nbt.put("blocks", blocks);
     }
@@ -89,6 +104,7 @@ public class NbtSchematicUtils {
     }
 
     protected static NbtCompound createMapartNbt() {
+        material_list.clear();
         int mapWidth = CurrentConversionSettings.width;
         int mapHeight = CurrentConversionSettings.height;
         NbtCompound nbt = createMapartBaseNbt(mapWidth, mapHeight);
@@ -118,6 +134,7 @@ public class NbtSchematicUtils {
                 }
             }
         }
+        addPaletteToNbt(nbt);
         return nbt;
     }
 }
