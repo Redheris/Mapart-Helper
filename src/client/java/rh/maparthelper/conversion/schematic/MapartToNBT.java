@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class MapartToNBT {
                     filename = filename + " (" + suffix + ")";
                 }
                 NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(filename + ".nbt"));
+                MapartHelper.LOGGER.info("NBT file \"{}\" successfully saved", filename);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

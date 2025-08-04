@@ -24,8 +24,8 @@ public class Waves3DStaircase implements IMapartStaircase {
             staircase.add(row);
         }
 
-        for (int z = height - 2; z >= 0; z--) {
-            for (int x = 0; x < width; x++) {
+        for (int x = 0; x < width; x++) {
+            for (int z = height - 2; z >= 0; z--) {
                 int y = staircase.get(z + 1).get(x) + getHeightAlt(colors, x, z);
                 staircase.get(z).set(x, y);
                 negativeHeights[x] = Math.min(negativeHeights[x], y);
@@ -41,9 +41,9 @@ public class Waves3DStaircase implements IMapartStaircase {
         return staircase;
     }
 
-    private static int getHeightAlt(int[][] colors, int x, int y) {
-        if (y == colors.length) return 0;
-        MapColor.Brightness brightness = BlocksPalette.getMapColorEntryByARGB(colors[y][x]).brightness();
+    private static int getHeightAlt(int[][] colors, int x, int z) {
+        if (z == colors.length) return 0;
+        MapColor.Brightness brightness = BlocksPalette.getMapColorEntryByARGB(colors[z][x]).brightness();
         if (brightness == MapColor.Brightness.LOW) return 1;
         if (brightness == MapColor.Brightness.HIGH) return -1;
         return 0;
