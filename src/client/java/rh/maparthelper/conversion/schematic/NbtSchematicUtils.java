@@ -14,8 +14,8 @@ import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.BlocksPalette;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.pallete.gson.PaletteConfigManager;
-import rh.maparthelper.conversion.staircases.Flat2DStaircase;
 import rh.maparthelper.conversion.staircases.IMapartStaircase;
+import rh.maparthelper.conversion.staircases.Waves3DStaircase;
 
 import java.util.*;
 
@@ -121,26 +121,29 @@ public class NbtSchematicUtils {
             }
 
             // TODO: Hard-coded :p
-            IMapartStaircase staircase = new Flat2DStaircase();
+            IMapartStaircase staircase = new Waves3DStaircase();
             var converted = staircase.getStaircase(colors);
 
             int useAux = MapartHelperClient.conversionConfig.useAuxBlocks != -1 ? 1 : 0;
+            int maxHeight = 1;
 
             for (int x = 0; x < converted.getFirst().size(); x++) {
-                addBlockToNbt(nbt, x, converted.getFirst().get(x) + useAux, 0, MapartHelperClient.conversionConfig.auxBlock);
-            }
+                int y = converted.getFirst().get(x) + useAux;
+                maxHeight = Math.max(y, maxHeight);
 
-            int maxHeight = 1;
+                addBlockToNbt(nbt, x, y, 0, MapartHelperClient.conversionConfig.auxBlock);
+            }
 
             for (int z = 1; z < converted.size(); z++) {
                 for (int x = 0; x < converted.getFirst().size(); x++) {
                     int y = converted.get(z).get(x) + useAux;
-                    if (y > maxHeight) maxHeight = y;
+                    maxHeight = Math.max(y, maxHeight);
+
                     MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
                     addColorToNbt(nbt, x, y, z, color);
                 }
             }
-            addSizeToNbt(nbt, converted.getFirst().size(), maxHeight + 1, converted.size());
+            addSizeToNbt(nbt, converted.getFirst().size(), maxHeight + 3, converted.size());
         }
         addPaletteToNbt(nbt);
         return nbt;
