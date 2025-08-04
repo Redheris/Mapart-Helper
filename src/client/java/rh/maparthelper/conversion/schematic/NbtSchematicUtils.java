@@ -42,25 +42,22 @@ public class NbtSchematicUtils {
 
     }
 
-    private static NbtCompound createMapartBaseNbt(int mapWidth, int mapHeight) {
+    private static NbtCompound createMapartBaseNbt() {
         NbtCompound nbt = new NbtCompound();
-        int width = mapWidth * 128;
-        int height = mapHeight * 128;
-
-        NbtList size = new NbtList();
-        size.add(NbtInt.of(width));
-        size.add(NbtInt.of(MapartHelperClient.conversionConfig.useAuxBlocks == 1 ? 2 : 1));
-        size.add(NbtInt.of(height + 1));
-        nbt.put("size", size);
-
-        NbtList blocks = new NbtList();
-        nbt.put("blocks", blocks);
 
         String author = MinecraftClient.getInstance().getSession().getUsername() + " // by Mapart Helper";
         nbt.putString("author", author);
         NbtHelper.putDataVersion(nbt);
 
         return nbt;
+    }
+
+    private static void addSizeToNbt(NbtCompound nbt, int x, int y, int z) {
+        NbtList size = new NbtList();
+        size.add(NbtInt.of(x));
+        size.add(NbtInt.of(y));
+        size.add(NbtInt.of(z));
+        nbt.put("size", size);
     }
 
     private static void addPaletteToNbt(NbtCompound nbt) {
@@ -76,7 +73,7 @@ public class NbtSchematicUtils {
     }
 
     protected static void addBlockToNbt(NbtCompound nbt, int x, int y, int z, Block block) {
-        NbtList blocks = Objects.requireNonNull(nbt.get("blocks")).asNbtList().orElse(new NbtList());
+        NbtList blocks = nbt.contains("blocks") ? Objects.requireNonNull(nbt.get("blocks")).asNbtList().orElse(new NbtList()) : new NbtList();
 
         NbtCompound entry = new NbtCompound();
         NbtList pos = new NbtList();
@@ -101,6 +98,9 @@ public class NbtSchematicUtils {
     protected static void addColorToNbt(NbtCompound nbt, int x, int y, int z, MapColor color) {
         Block block = PaletteConfigManager.palettePresetsConfig.getCurrentPreset().getBlockByMapColor(color);
         addBlockToNbt(nbt, x, y, z, block);
+        int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;
+        if (usingAuxMode == 0 && !block.getDefaultState().isOpaque())
+            addBlockToNbt(nbt, x, y - 1, z, MapartHelperClient.conversionConfig.auxBlock);
     }
 
     protected static NbtCompound createMapartNbt() {
@@ -108,7 +108,7 @@ public class NbtSchematicUtils {
         blocks_list.clear();
         int mapWidth = CurrentConversionSettings.width;
         int mapHeight = CurrentConversionSettings.height;
-        NbtCompound nbt = createMapartBaseNbt(mapWidth, mapHeight);
+        NbtCompound nbt = createMapartBaseNbt();
 
         if (CurrentConversionSettings.guiMapartImage.getImage() != null) {
             int[] colorsRaw = CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb();
@@ -124,16 +124,23 @@ public class NbtSchematicUtils {
             IMapartStaircase staircase = new Flat2DStaircase();
             var converted = staircase.getStaircase(colors);
 
+            int useAux = MapartHelperClient.conversionConfig.useAuxBlocks != -1 ? 1 : 0;
+
             for (int x = 0; x < converted.getFirst().size(); x++) {
-                addBlockToNbt(nbt, x, converted.getFirst().get(x), 0, MapartHelperClient.conversionConfig.auxBlock);
+                addBlockToNbt(nbt, x, converted.getFirst().get(x) + useAux, 0, MapartHelperClient.conversionConfig.auxBlock);
             }
+
+            int maxHeight = 1;
 
             for (int z = 1; z < converted.size(); z++) {
                 for (int x = 0; x < converted.getFirst().size(); x++) {
+                    int y = converted.get(z).get(x) + useAux;
+                    if (y > maxHeight) maxHeight = y;
                     MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
-                    addColorToNbt(nbt, x, converted.get(z).get(x), z, color);
+                    addColorToNbt(nbt, x, y, z, color);
                 }
             }
+            addSizeToNbt(nbt, converted.getFirst().size(), maxHeight + 1, converted.size());
         }
         addPaletteToNbt(nbt);
         return nbt;
