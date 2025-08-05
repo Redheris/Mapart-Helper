@@ -1,8 +1,6 @@
 package rh.maparthelper.conversion.schematic;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.MapColor;
+import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
@@ -10,6 +8,7 @@ import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.BlocksPalette;
 import rh.maparthelper.conversion.CurrentConversionSettings;
@@ -97,8 +96,9 @@ public class NbtSchematicUtils {
     protected static void addColorToNbt(NbtCompound nbt, int x, int y, int z, MapColor color) {
         Block block = PaletteConfigManager.palettePresetsConfig.getCurrentPreset().getBlockByMapColor(color);
         addBlockToNbt(nbt, x, y, z, block);
+        if (y == 0) return;
         int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;
-        if (usingAuxMode == 0 && !block.getDefaultState().isOpaque())
+        if (usingAuxMode == 0 && (block instanceof FallingBlock || block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty()))
             addBlockToNbt(nbt, x, y - 1, z, MapartHelperClient.conversionConfig.auxBlock);
     }
 
@@ -119,40 +119,38 @@ public class NbtSchematicUtils {
                 System.arraycopy(colorsRaw, y * width, colors[y], 0, width);
             }
 
-            int useAux = MapartHelperClient.conversionConfig.useAuxBlocks != -1 ? 1 : 0;
-
             StaircaseStyles staircase = MapartHelperClient.conversionConfig.staircaseStyle;
             if (staircase == StaircaseStyles.FLAT_2D) {
                 for (int x = 0; x < width; x++) {
-                    addBlockToNbt(nbt, x, useAux, 0, MapartHelperClient.conversionConfig.auxBlock);
+                    addBlockToNbt(nbt, x, 0, 0, MapartHelperClient.conversionConfig.auxBlock);
                 }
                 for (int z = 1; z < height + 1; z++) {
                     for (int x = 0; x < width; x++) {
                         MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
-                        addColorToNbt(nbt, x, useAux, z, color);
+                        addColorToNbt(nbt, x, 0, z, color);
                     }
                 }
-                addSizeToNbt(nbt, width, 1 + useAux, height + 1);
+                addSizeToNbt(nbt, width, 1, height + 1);
             } else {
                 int maxHeight = 1;
                 List<List<Integer>> converted = staircase.getStaircase(colors);
 
                 for (int x = 0; x < converted.getFirst().size(); x++) {
-                    int y = converted.getFirst().get(x) + useAux;
+                    int y = converted.getFirst().get(x);
                     maxHeight = Math.max(y, maxHeight);
 
                     addBlockToNbt(nbt, x, y, 0, MapartHelperClient.conversionConfig.auxBlock);
                 }
                 for (int z = 1; z < converted.size(); z++) {
                     for (int x = 0; x < converted.getFirst().size(); x++) {
-                        int y = converted.get(z).get(x) + useAux;
+                        int y = converted.get(z).get(x);
                         maxHeight = Math.max(y, maxHeight);
 
                         MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
                         addColorToNbt(nbt, x, y, z, color);
                     }
                 }
-                addSizeToNbt(nbt, width, maxHeight + 1 + useAux, height + 1);
+                addSizeToNbt(nbt, width, maxHeight + 1, height + 1);
             }
         }
 

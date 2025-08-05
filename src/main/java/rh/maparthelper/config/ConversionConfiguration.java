@@ -8,7 +8,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 @Config(name = "conversion-settings")
 public class ConversionConfiguration implements ConfigData {
     public StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
-    public int useAuxBlocks = -1;
+    public int useAuxBlocks = 0;
     public String auxBlock = "minecraft:netherrack";
     public DitherAlgorithms ditherAlgorithm = DitherAlgorithms.NONE;
 
