@@ -13,7 +13,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.BlocksPalette;
 import rh.maparthelper.conversion.CurrentConversionSettings;
-import rh.maparthelper.conversion.pallete.gson.PaletteConfigManager;
+import rh.maparthelper.conversion.pallete.PaletteConfigManager;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
 import java.util.*;
@@ -90,7 +90,7 @@ public class NbtSchematicUtils {
     }
 
     protected static void addColorToNbt(NbtCompound nbt, int x, int y, int z, MapColor color) {
-        Block block = PaletteConfigManager.palettePresetsConfig.getCurrentPreset().getBlockByMapColor(color);
+        Block block = PaletteConfigManager.palettePresetsConfig.getBlockOfMapColor(color);
         addBlockToNbt(nbt, x, y, z, block);
         if (y == 0) return;
         int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;
