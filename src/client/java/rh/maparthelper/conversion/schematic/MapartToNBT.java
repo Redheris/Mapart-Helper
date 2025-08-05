@@ -2,8 +2,13 @@ package rh.maparthelper.conversion.schematic;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 
@@ -30,6 +35,17 @@ public class MapartToNBT {
                     filename = filename + " (" + suffix + ")";
                 }
                 NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(filename + ".nbt"));
+                PlayerEntity player = MinecraftClient.getInstance().player;
+                if (player != null) {
+                    Text file = Text.literal("schematics").styled(style -> style
+                            .withClickEvent(new ClickEvent.OpenFile(SCHEMATICS))
+                            .withUnderline(true)
+                    );
+                    player.sendMessage(
+                            Text.translatable("maparthelper.nbt_saved", file, filename)
+                                    .formatted(Formatting.GREEN),
+                            false);
+                }
                 MapartHelper.LOGGER.info("NBT file \"{}\" successfully saved", filename);
             } catch (IOException e) {
                 throw new RuntimeException(e);

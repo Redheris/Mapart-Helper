@@ -15,6 +15,7 @@
   "maparthelper.saving_error": "Произошла неизвестная ошибка при сохранении мапарта. Для подробностей обратитесь к логам",
   "maparthelper.saving_path_error": "Получен некорректный путь для сохранения файла. Убедитесь в корректности названия файла",
   "maparthelper.blocks_palette_generated": "Палитра блоков успешно сгенерирована",
+  "maparthelper.nbt_saved": "NBT файл мапарта успешно сохранён в папку \"%s\" как \"%s\"",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor.@Tooltip": "Для /mart save selection",
   "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor": "Цвет рамки выделения",
