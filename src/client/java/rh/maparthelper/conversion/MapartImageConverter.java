@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.ColorUtils;
@@ -27,7 +28,7 @@ public class MapartImageConverter {
 
     public static void readAndUpdateMapartImage(Path path) {
         CurrentConversionSettings.imagePath = path;
-        FutureTask<Void> fut = new FutureTask<>(new ConvertImageFileRunnable(path), null);
+        FutureTask<Void> fut = new FutureTask<>(new ConvertImageFileRunnable(path, false), null);
         if (currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
         currentConvertingFuture = convertingExecutor.submit(fut);
@@ -41,16 +42,13 @@ public class MapartImageConverter {
         return ColorUtils.preprocessImage(image, brightness, contrast, saturation);
     }
 
-    public static void saveMapartImage(Path imagePath) {
+    private static void saveMapartImage(Path imagePath) {
         try {
-            if (CurrentConversionSettings.guiMapartImage.getImage() == null)
-                throw new NullPointerException();
-            CurrentConversionSettings.guiMapartImage.getImage().writeTo(imagePath);
-        } catch (NullPointerException e) {
-            MapartHelper.LOGGER.error("Mapart texture is null:\n{}", e.toString());
-            throw new RuntimeException(e);
+            NativeImageBackedTexture mapartTexture = CurrentConversionSettings.guiMapartImage;
+            if (mapartTexture != null && mapartTexture.getImage() != null)
+                mapartTexture.getImage().writeTo(imagePath);
         } catch (Exception e) {
-            MapartHelper.LOGGER.error("Error occurred while saving an image:\n{}", e.toString());
+            MapartHelper.LOGGER.error("Error occurred while saving an image: {}", e.toString());
             throw new RuntimeException(e);
         }
     }
@@ -87,10 +85,6 @@ public class MapartImageConverter {
             double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
             MapartHelper.LOGGER.info("[{}] Conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
         }
-    }
-
-    public static void convertToBlocksPalette(BufferedImage image, boolean use3D) {
-        convertToBlocksPalette(image, use3D, false);
     }
 
     public static BufferedImage scaleToMapSize(BufferedImage image, int width, int height) {
@@ -170,9 +164,11 @@ public class MapartImageConverter {
 
     private static class ConvertImageFileRunnable implements Runnable {
         private final Path imagePath;
+        private final boolean logExecutionTime;
 
-        public ConvertImageFileRunnable(Path path) {
+        public ConvertImageFileRunnable(Path path, boolean logExecutionTime) {
             this.imagePath = path;
+            this.logExecutionTime = logExecutionTime;
         }
 
         @Override
@@ -188,7 +184,7 @@ public class MapartImageConverter {
                 bufferedImage = cropAndScale(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                convertToBlocksPalette(bufferedImage, MapartHelperClient.conversionConfig.use3D());
+                convertToBlocksPalette(bufferedImage, MapartHelperClient.conversionConfig.use3D(), logExecutionTime);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
@@ -197,9 +193,11 @@ public class MapartImageConverter {
                 MinecraftClient.getInstance().execute(() ->
                         NativeImageUtils.updateMapartImageTexture(image)
                 );
-                double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-                MapartHelper.LOGGER.info("Entire conversion took {} seconds", timeLeft);
 
+                if (logExecutionTime) {
+                    double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
+                    MapartHelper.LOGGER.info("Entire conversion took {} seconds", timeLeft);
+                }
 
             } catch (Exception e) {
                 MapartHelper.LOGGER.error("Error occurred while reading and converting an image:\n{}", e.toString());

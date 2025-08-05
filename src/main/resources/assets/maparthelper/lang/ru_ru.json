@@ -8,6 +8,7 @@
   "maparthelper.mapart_saved": "Мапарт успешно сохранён в папку saved_maps как \"%s\"",
   "maparthelper.selection_not_flat": "Выделение не является плоским. Выберите другую точку",
   "maparthelper.selection_has_no_maps": "Выделение не содержит ни одной рамки с непустой картой",
+  "maparthelper.open_folder": "[Нажмите, чтобы открыть папку]",
   "maparthelper.open_image_file": "[Нажмите, чтобы открыть изображение]",
   "maparthelper.selection_required": "Сначала выделите область с помощью /mart save selection",
   "maparthelper.selection_has_empty_places": "Некоторые рамки в выделении отсутствуют или без карты",

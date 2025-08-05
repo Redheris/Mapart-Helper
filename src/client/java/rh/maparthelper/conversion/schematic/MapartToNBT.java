@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
@@ -39,6 +40,7 @@ public class MapartToNBT {
                 if (player != null) {
                     Text file = Text.literal("schematics").styled(style -> style
                             .withClickEvent(new ClickEvent.OpenFile(SCHEMATICS))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.translatable("maparthelper.open_folder")))
                             .withUnderline(true)
                     );
                     player.sendMessage(
