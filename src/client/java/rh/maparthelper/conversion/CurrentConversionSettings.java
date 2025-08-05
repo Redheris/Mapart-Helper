@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public class CurrentConversionSettings {
     // GUI image
     public static Path imagePath;
-    public static NativeImageBackedTexture guiMapartImage = new NativeImageBackedTexture("mapart_gui_texture", 128, 128, true);
+    public static NativeImageBackedTexture guiMapartImage;
     public static Identifier guiMapartId = Identifier.of(MapartHelper.MOD_ID, "mapart_gui_texture");
 
     // Map settings
@@ -18,7 +18,7 @@ public class CurrentConversionSettings {
     public static int height = 1;
 
     // Cropping settings
-    public static int cropMode = -1;
+    public static int cropMode = MapartImageConverter.AUTO_CROP;
     public static int croppingFrameX = 0;
     public static int croppingFrameY = 0;
     public static int croppingFrameWidth = 0;
