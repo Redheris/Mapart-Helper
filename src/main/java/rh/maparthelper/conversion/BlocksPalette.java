@@ -14,7 +14,8 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.colors.ColorUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static java.util.Map.entry;
 
 public class BlocksPalette {
     // Lists of block classes for blocking/enabling by configs
@@ -115,14 +116,6 @@ public class BlocksPalette {
 
     public static MapColor[] getMapColors() {
         return palette.keySet().toArray(new MapColor[0]);
-    }
-
-    public static Map<MapColor, Block> getDefaultPalette() {
-        return palette.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().getFirst()
-                ));
     }
 
     private static MapColorEntry getClosestColor3D(int argb) {
@@ -231,6 +224,71 @@ public class BlocksPalette {
             if (clazz.isInstance(block)) return true;
         }
         return false;
+    }
+
+    public static Map<MapColor, Block> getDefaultPalette() {
+        return Map.<MapColor, Block>ofEntries(
+                entry(MapColor.PALE_GREEN, Blocks.GRASS_BLOCK),
+                entry(MapColor.PALE_YELLOW, Blocks.SANDSTONE),
+                entry(MapColor.WHITE_GRAY, Blocks.MUSHROOM_STEM),
+                entry(MapColor.BRIGHT_RED, Blocks.REDSTONE_BLOCK),
+                entry(MapColor.PALE_PURPLE, Blocks.PACKED_ICE),
+                entry(MapColor.IRON_GRAY, Blocks.PALE_OAK_LEAVES),
+                entry(MapColor.DARK_GREEN, Blocks.OAK_LEAVES),
+                entry(MapColor.WHITE, Blocks.WHITE_WOOL),
+                entry(MapColor.LIGHT_BLUE_GRAY, Blocks.CLAY),
+                entry(MapColor.DIRT_BROWN, Blocks.DIRT),
+                entry(MapColor.STONE_GRAY, Blocks.STONE),
+                entry(MapColor.OAK_TAN, Blocks.OAK_PLANKS),
+                entry(MapColor.OFF_WHITE, Blocks.DIORITE),
+                entry(MapColor.ORANGE, Blocks.TERRACOTTA),
+                entry(MapColor.MAGENTA, Blocks.MAGENTA_WOOL),
+                entry(MapColor.LIGHT_BLUE, Blocks.LIGHT_BLUE_WOOL),
+                entry(MapColor.YELLOW, Blocks.YELLOW_WOOL),
+                entry(MapColor.LIME, Blocks.LIME_WOOL),
+                entry(MapColor.PINK, Blocks.PINK_WOOL),
+                entry(MapColor.GRAY, Blocks.GRAY_WOOL),
+                entry(MapColor.LIGHT_GRAY, Blocks.PALE_MOSS_BLOCK),
+                entry(MapColor.CYAN, Blocks.CYAN_WOOL),
+                entry(MapColor.PURPLE, Blocks.PURPLE_WOOL),
+                entry(MapColor.BLUE, Blocks.BLUE_WOOL),
+                entry(MapColor.BROWN, Blocks.BROWN_WOOL),
+                entry(MapColor.GREEN, Blocks.MOSS_BLOCK),
+                entry(MapColor.RED, Blocks.NETHER_WART_BLOCK),
+                entry(MapColor.BLACK, Blocks.BLACK_WOOL),
+                entry(MapColor.GOLD, Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE),
+                entry(MapColor.DIAMOND_BLUE, Blocks.PRISMARINE_BRICKS),
+                entry(MapColor.LAPIS_BLUE, Blocks.LAPIS_BLOCK),
+                entry(MapColor.EMERALD_GREEN, Blocks.EMERALD_BLOCK),
+                entry(MapColor.SPRUCE_BROWN, Blocks.SPRUCE_PLANKS),
+                entry(MapColor.DARK_RED, Blocks.NETHERRACK),
+                entry(MapColor.TERRACOTTA_WHITE, Blocks.WHITE_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_ORANGE, Blocks.ORANGE_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_MAGENTA, Blocks.MAGENTA_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_LIGHT_BLUE, Blocks.LIGHT_BLUE_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_YELLOW, Blocks.YELLOW_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_LIME, Blocks.LIME_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_PINK, Blocks.PINK_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_GRAY, Blocks.GRAY_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_LIGHT_GRAY, Blocks.LIGHT_GRAY_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_CYAN, Blocks.CYAN_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_PURPLE, Blocks.PURPLE_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_BLUE, Blocks.BLUE_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_BROWN, Blocks.BROWN_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_GREEN, Blocks.GREEN_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_RED, Blocks.RED_TERRACOTTA),
+                entry(MapColor.TERRACOTTA_BLACK, Blocks.BLACK_TERRACOTTA),
+                entry(MapColor.DULL_RED, Blocks.CRIMSON_NYLIUM),
+                entry(MapColor.DULL_PINK, Blocks.CRIMSON_PLANKS),
+                entry(MapColor.DARK_CRIMSON, Blocks.CRIMSON_HYPHAE),
+                entry(MapColor.TEAL, Blocks.WARPED_NYLIUM),
+                entry(MapColor.DARK_AQUA, Blocks.WARPED_PLANKS),
+                entry(MapColor.DARK_DULL_PINK, Blocks.WARPED_HYPHAE),
+                entry(MapColor.BRIGHT_TEAL, Blocks.WARPED_WART_BLOCK),
+                entry(MapColor.DEEPSLATE_GRAY, Blocks.DEEPSLATE),
+                entry(MapColor.RAW_IRON_PINK, Blocks.RAW_IRON_BLOCK),
+                entry(MapColor.LICHEN_GREEN, Blocks.GLOW_LICHEN)
+        );
     }
 
     static {
