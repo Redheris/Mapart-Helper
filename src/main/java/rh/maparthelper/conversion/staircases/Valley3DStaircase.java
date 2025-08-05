@@ -27,13 +27,14 @@ public class Valley3DStaircase implements IMapartStaircase {
 
         for (int x = 0; x < width; x++) {
             for (int z = height - 2; z >= 0; z--) {
+                if (z > 1 && colors[z - 1][x] == 0) continue;
                 while (z > 0 && getBrightness(colors, x, z) != MapColor.Brightness.HIGH) {
                     staircase.get(z).set(x, staircase.get(z + 1).get(x) + getHeightShift(colors, x, z));
                     z--;
                 }
 
                 staircase.get(z).set(x, staircase.get(z + 1).get(x) + getHeightShift(colors, x, z));
-                if (z == 0) continue;
+                if (z == 0 || colors[z - 1][x] == 0) continue;
 
                 highBrightnessStairs.get(x).add(z - 1);
                 while (z > 0 && getBrightness(colors, x, z) == MapColor.Brightness.HIGH) {
@@ -49,6 +50,8 @@ public class Valley3DStaircase implements IMapartStaircase {
                 int z0 = col.get(i);
                 int z1 = col.get(i + 1);
                 int aboveHeight = z0 == 0 ? 1 : staircase.get(z0 - 1).get(x) + 1;
+                if (z0 > 1 && colors[z0 - 2][x] == 0)
+                    aboveHeight = 0;
                 for (int z = z0; z <= z1; z++) {
                     staircase.get(z).set(x, aboveHeight++);
                 }
@@ -57,7 +60,7 @@ public class Valley3DStaircase implements IMapartStaircase {
                 if (aboveHeight >= staircase.get(z1 + 1).get(x)) {
                     staircase.get(++z1).set(x, ++aboveHeight);
                 }
-                while (z1 < staircase.size() - 1 && getBrightness(colors, x, z1 + 1) == MapColor.Brightness.NORMAL) {
+                while (z1 < staircase.size() - 1 && colors[z1][x] != 0 && getBrightness(colors, x, z1 + 1) == MapColor.Brightness.NORMAL) {
                     staircase.get(++z1).set(x, aboveHeight);
                 }
             }

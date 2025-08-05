@@ -1,9 +1,6 @@
 package rh.maparthelper.conversion.schematic;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.block.MapColor;
+import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
@@ -123,7 +120,10 @@ public class NbtSchematicUtils {
                 for (int z = 1; z < height + 1; z++) {
                     for (int x = 0; x < width; x++) {
                         MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
-                        addColorToNbt(nbt, x, 0, z, color);
+                        if (color != MapColor.CLEAR)
+                            addColorToNbt(nbt, x, 0, z, color);
+                        else
+                            addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
                     }
                 }
                 addSizeToNbt(nbt, width, 1, height + 1);
@@ -143,7 +143,10 @@ public class NbtSchematicUtils {
                         maxHeight = Math.max(y, maxHeight);
 
                         MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
-                        addColorToNbt(nbt, x, y, z, color);
+                        if (color != MapColor.CLEAR)
+                            addColorToNbt(nbt, x, y, z, color);
+                        else
+                            addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
                     }
                 }
                 addSizeToNbt(nbt, width, maxHeight + 1, height + 1);

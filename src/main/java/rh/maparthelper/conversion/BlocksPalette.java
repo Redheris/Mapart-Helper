@@ -89,6 +89,7 @@ public class BlocksPalette {
     }
 
     public static MapColorEntry getMapColorEntryByARGB(int argb) {
+        if (argb == 0) return MapColorEntry.CLEAR;
         return argbMapColors.get(argb);
     }
 
@@ -161,6 +162,7 @@ public class BlocksPalette {
     }
 
     public static MapColorEntry getClosestColor(int argb, boolean use3D) {
+        if (argb == 0) return MapColorEntry.CLEAR;
         if (use3D)
             return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor3D);
         return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor2D);
@@ -378,5 +380,7 @@ public class BlocksPalette {
         };
     }
 
-    public record MapColorEntry(MapColor mapColor, MapColor.Brightness brightness) {}
+    public record MapColorEntry(MapColor mapColor, MapColor.Brightness brightness) {
+        public static final MapColorEntry CLEAR = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
+    }
 }

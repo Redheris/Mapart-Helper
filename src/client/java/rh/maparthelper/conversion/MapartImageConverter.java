@@ -2,6 +2,7 @@ package rh.maparthelper.conversion;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
@@ -72,9 +73,13 @@ public class MapartImageConverter {
                     return;
                 }
                 int argb = pixels[x + y * image.getWidth()];
+                if (argb == 0) continue;
                 int newArgb;
                 BlocksPalette.MapColorEntry color = BlocksPalette.getClosestColor(argb, use3D);
-                newArgb = color.mapColor().getRenderColor(color.brightness());
+                if (y > 0 && pixels[x + (y - 1) * image.getWidth()] == 0)
+                    newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
+                else
+                    newArgb = color.mapColor().getRenderColor(color.brightness());
                 pixels[x + y * image.getWidth()] = newArgb;
             }
         }
