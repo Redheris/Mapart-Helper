@@ -1,13 +1,14 @@
 package rh.maparthelper.conversion.schematic;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FallingBlock;
+import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.BlocksPalette;
@@ -86,11 +87,6 @@ public class NbtSchematicUtils {
         material_list.merge(blockId, 1, Integer::sum);
 
         nbt.put("blocks", blocks);
-    }
-
-    protected static void addBlockToNbt(NbtCompound nbt, int x, int y, int z, String blockId) {
-        Block block = Registries.BLOCK.get(Identifier.of(blockId));
-        addBlockToNbt(nbt, x, y, z, block);
     }
 
     protected static void addColorToNbt(NbtCompound nbt, int x, int y, int z, MapColor color) {

@@ -2,6 +2,8 @@ package rh.maparthelper.config;
 
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import rh.maparthelper.conversion.dithering.DitherAlgorithms;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
@@ -9,7 +11,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 public class ConversionConfiguration implements ConfigData {
     public StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
     public int useAuxBlocks = 0;
-    public String auxBlock = "minecraft:netherrack";
+    public Block auxBlock = Blocks.NETHERRACK;
     public DitherAlgorithms ditherAlgorithm = DitherAlgorithms.NONE;
 
     public boolean use3D() {
