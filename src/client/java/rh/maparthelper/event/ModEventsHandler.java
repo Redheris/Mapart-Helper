@@ -9,6 +9,7 @@ public class ModEventsHandler {
 
     public static void registerAll() {
         MapartSelectionHandler.init();
+        ClientTickHandler.init();
 
         clientStartedEvents();
     }
