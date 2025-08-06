@@ -22,17 +22,26 @@ public class MapartImageConverter {
     public static final int AUTO_CROP = 0;
     public static final int USER_CROP = 1;
 
+    public static BufferedImage lastImage;
+    public static Path lastImagePath;
+
     private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps").resolve("temp");
 
     private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Image-%d").build());
     private static Future<?> currentConvertingFuture;
 
     public static void readAndUpdateMapartImage(Path path) {
-        CurrentConversionSettings.imagePath = path;
-        FutureTask<Void> fut = new FutureTask<>(new ConvertImageFileRunnable(path, false), null);
+        FutureTask<Void> future;
+        if (path.equals(lastImagePath))
+            future = new FutureTask<>(new ConvertImageFileRunnable(null, false), null);
+        else {
+            lastImagePath = path;
+            future = new FutureTask<>(new ConvertImageFileRunnable(path, false), null);
+        }
+
         if (currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
-        currentConvertingFuture = convertingExecutor.submit(fut);
+        currentConvertingFuture = convertingExecutor.submit(future);
     }
 
     private static BufferedImage preprocessImage(BufferedImage image) {
@@ -88,7 +97,7 @@ public class MapartImageConverter {
 
         if (logExecutionTime) {
             double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-            MapartHelper.LOGGER.info("[{}] Conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
+            MapartHelper.LOGGER.info("[{}] Colors conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
         }
     }
 
@@ -180,13 +189,16 @@ public class MapartImageConverter {
         public void run() {
             try {
                 long startTime = System.currentTimeMillis();
-                BufferedImage bufferedImage = ImageIO.read(imagePath.toFile());
-                if (Thread.currentThread().isInterrupted()) return;
-
-                bufferedImage = preprocessImage(bufferedImage);
+                if (imagePath != null) {
+                    lastImage = ImageIO.read(imagePath.toFile());
+                }
+                BufferedImage bufferedImage = lastImage;
                 if (Thread.currentThread().isInterrupted()) return;
 
                 bufferedImage = cropAndScale(bufferedImage);
+                if (Thread.currentThread().isInterrupted()) return;
+
+                bufferedImage = preprocessImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 convertToBlocksPalette(bufferedImage, MapartHelperClient.conversionConfig.use3D(), logExecutionTime);
@@ -199,9 +211,9 @@ public class MapartImageConverter {
                         NativeImageUtils.updateMapartImageTexture(image)
                 );
 
-                if (logExecutionTime) {
+                if (!logExecutionTime) {
                     double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-                    MapartHelper.LOGGER.info("Entire conversion took {} seconds", timeLeft);
+                    MapartHelper.LOGGER.info("Image preprocessing and conversion took {} seconds", timeLeft);
                 }
 
             } catch (Exception e) {
