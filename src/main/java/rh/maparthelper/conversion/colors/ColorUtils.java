@@ -53,8 +53,6 @@ public class ColorUtils {
                 result.setRGB(x, y, newArgb);
             }
         }
-        if (!neutralSaturation)
-            result = applySaturation(result, saturationFactor);
         return neutralSaturation ? result : applySaturation(result, saturationFactor);
     }
 
