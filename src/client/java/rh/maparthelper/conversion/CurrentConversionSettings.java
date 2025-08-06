@@ -26,7 +26,7 @@ public class CurrentConversionSettings {
 
     // Preview settings
     public static boolean doShowGrid = false;
-    public static double previewScale = 0.5;
+    public static double previewScale = 1.0;
 
     // Image preprocessing
     public static float brightness = 1.0f;
