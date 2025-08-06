@@ -124,7 +124,6 @@ public class MapartImageConverter {
             g2d.dispose();
 
             return image;
-
         }
     }
 
@@ -211,7 +210,7 @@ public class MapartImageConverter {
                         NativeImageUtils.updateMapartImageTexture(image)
                 );
 
-                if (!logExecutionTime) {
+                if (logExecutionTime) {
                     double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
                     MapartHelper.LOGGER.info("Image preprocessing and conversion took {} seconds", timeLeft);
                 }

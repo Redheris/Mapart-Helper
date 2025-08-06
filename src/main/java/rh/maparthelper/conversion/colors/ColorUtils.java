@@ -24,45 +24,53 @@ public class ColorUtils {
     }
 
     public static BufferedImage preprocessImage(BufferedImage image, float brightnessFactor, float contrastLevel, float saturationFactor) {
+        float contrastFactor = (259 * (contrastLevel + 255)) / (255f * (259 - contrastLevel));
+        boolean neutralBrightness = Float.compare(brightnessFactor, 1.0f) == 0;
+        boolean neutralContrast = Float.compare(contrastFactor, 1.0f) == 0;
+        boolean neutralSaturation = Float.compare(saturationFactor, 1.0f) == 0;
+
+        if (neutralBrightness && neutralContrast)
+            return neutralSaturation ? image : applySaturation(image, saturationFactor);
+
         int width = image.getWidth();
         int height = image.getHeight();
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        float contrastFactor = (259 * (contrastLevel + 255)) / (255f * (259 - contrastLevel));
-
+        int argb, newArgb, alpha;
+        int[] rgb = new int[3];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getRGB(x, y);
-                int newArgb = getNewArgb(argb, brightnessFactor, contrastFactor);
+                argb = image.getRGB(x, y);
+                alpha = (argb >> 24) & 0xFF;
+                rgb[0] = (argb >> 16) & 0xFF;
+                rgb[1] = (argb >> 8) & 0xFF;
+                rgb[2] = argb & 0xFF;
+
+                if (!neutralBrightness) applyBrightness(rgb, brightnessFactor);
+                if (!neutralContrast) applyContrast(rgb, contrastFactor);
+
+                newArgb = (alpha << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
                 result.setRGB(x, y, newArgb);
             }
         }
-
-        if (Float.compare(saturationFactor, 1.0f) != 0) {
-            result = changeSaturation(result, saturationFactor);
-        }
-
-        return result;
+        if (!neutralSaturation)
+            result = applySaturation(result, saturationFactor);
+        return neutralSaturation ? result : applySaturation(result, saturationFactor);
     }
 
-    private static int getNewArgb(int argb, float brightnessFactor, float contrastFactor) {
-        int alpha = (argb >> 24) & 0xFF;
-        int red = (argb >> 16) & 0xFF;
-        int green = (argb >> 8) & 0xFF;
-        int blue = argb & 0xFF;
-
-        red = clamp((int) (red * brightnessFactor), 0, 255);
-        green = clamp((int) (green * brightnessFactor), 0, 255);
-        blue = clamp((int) (blue * brightnessFactor), 0, 255);
-
-        red = clamp((int) (contrastFactor * (red - 128) + 128), 0, 255);
-        green = clamp((int) (contrastFactor * (green - 128) + 128), 0, 255);
-        blue = clamp((int) (contrastFactor * (blue - 128) + 128), 0, 255);
-
-        return (alpha << 24) | (red << 16) | (green << 8) | blue;
+    private static void applyBrightness(int[] rgb, float brightnessFactor) {
+        rgb[0] = clamp((int) (rgb[0] * brightnessFactor), 0, 255);
+        rgb[1] = clamp((int) (rgb[1] * brightnessFactor), 0, 255);
+        rgb[2] = clamp((int) (rgb[2] * brightnessFactor), 0, 255);
     }
 
-    private static BufferedImage changeSaturation(BufferedImage image, float saturationFactor) {
+    private static void applyContrast(int[] rgb, float contrastFactor) {
+        rgb[0] = clamp((int) (contrastFactor * (rgb[0] - 128) + 128), 0, 255);
+        rgb[1] = clamp((int) (contrastFactor * (rgb[1] - 128) + 128), 0, 255);
+        rgb[2] = clamp((int) (contrastFactor * (rgb[2] - 128) + 128), 0, 255);
+    }
+
+    private static BufferedImage applySaturation(BufferedImage image, float saturationFactor) {
         int width = image.getWidth();
         int height = image.getHeight();
 
