@@ -29,11 +29,16 @@ public class PaletteConfigManager {
     public static void readPresetsFile() {
         if (!Files.exists(PRESETS_PATH)) {
             palettePresetsConfig = new PalettePresetsConfig();
+            savePresetsFile();
             return;
         }
         try (FileReader reader = new FileReader(PRESETS_PATH.toFile())) {
             palettePresetsConfig = gson.fromJson(reader, PalettePresetsConfig.class);
+            if (palettePresetsConfig == null) {
+                palettePresetsConfig = new PalettePresetsConfig();
+            }
             palettePresetsConfig.validateConfig();
+            savePresetsFile();
         } catch (Exception e) {
             MapartHelper.LOGGER.error(e.getMessage(), e);
         }
