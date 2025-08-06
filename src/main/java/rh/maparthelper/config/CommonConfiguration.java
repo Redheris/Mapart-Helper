@@ -9,7 +9,7 @@ import rh.maparthelper.MapartHelper;
 public class CommonConfiguration implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.ColorPicker
-    public int frameColor = 0x9900ff;
+    public int selectionColor = 0x9900ff;
 
     @ConfigEntry.Gui.Tooltip(count = 2)
     @ConfigEntry.Gui.CollapsibleObject

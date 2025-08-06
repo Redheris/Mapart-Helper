@@ -18,8 +18,10 @@
   "maparthelper.blocks_palette_generated": "",
   "maparthelper.nbt_saved": "",
 
-  "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor.@Tooltip": "",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.frameColor": "",
+  "key.maparthelper.openScreen": "",
+
+  "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor": "",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "",

@@ -7,14 +7,12 @@ import rh.maparthelper.conversion.CurrentConversionSettings;
 public class ModEventsHandler {
 
     public static void registerAll() {
-        AttackBlockHandler.init();
-        AttackEntityHandler.init();
-        ClientTickHandler.init();
+        MapartSelectionHandler.init();
 
-        registerOtherEvents();
+        clientStartedEvents();
     }
 
-    private static void registerOtherEvents() {
+    private static void clientStartedEvents() {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             TextureManager textureManager = client.getTextureManager();
             textureManager.registerTexture(CurrentConversionSettings.guiMapartId, CurrentConversionSettings.guiMapartImage);

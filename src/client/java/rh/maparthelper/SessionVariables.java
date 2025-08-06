@@ -11,6 +11,14 @@ public class SessionVariables {
     public static int selectionHeight;
     public static int selectionWidth;
 
+    public static Vec3d getSelectedPos() {
+        if (selectedPos1 != null)
+            return selectedPos1;
+        if (selectedPos2 != null)
+            return selectedPos2;
+        return null;
+    }
+
     public static int setSelectedPos1(Vec3d pos) {
         int flag = checkSize(pos, selectedPos2);
         if (flag >= 0)
