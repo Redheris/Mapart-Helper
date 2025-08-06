@@ -98,8 +98,8 @@ public class NbtSchematicUtils {
     protected static NbtCompound createMapartNbt() {
         material_list.clear();
         blocks_list.clear();
-        int mapWidth = CurrentConversionSettings.width;
-        int mapHeight = CurrentConversionSettings.height;
+        int mapWidth = CurrentConversionSettings.getWidth();
+        int mapHeight = CurrentConversionSettings.getHeight();
         NbtCompound nbt = createMapartBaseNbt();
 
         if (CurrentConversionSettings.guiMapartImage.getImage() != null) {

@@ -158,8 +158,8 @@ public class MapartImageConverter {
     }
 
     private static BufferedImage cropAndScale(BufferedImage image) {
-        int targetWidth = CurrentConversionSettings.width * 128;
-        int targetHeight = CurrentConversionSettings.height * 128;
+        int targetWidth = CurrentConversionSettings.getWidth() * 128;
+        int targetHeight = CurrentConversionSettings.getHeight() * 128;
 
         return switch (CurrentConversionSettings.cropMode) {
             case NO_CROP -> scaleToMapSize(image, targetWidth, targetHeight);

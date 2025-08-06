@@ -14,8 +14,8 @@ public class CurrentConversionSettings {
 
     // Map settings
     public static String mapartName = "New mapart";
-    public static int width = 1;
-    public static int height = 1;
+    private static int width = 1;
+    private static int height = 1;
 
     // Cropping settings
     public static int cropMode = MapartImageConverter.AUTO_CROP;
@@ -32,4 +32,28 @@ public class CurrentConversionSettings {
     public static float brightness = 1.0f;
     public static float contrast = 0.0f;
     public static float saturation = 1.0f;
+
+    public static void setSize(int width, int height) {
+        CurrentConversionSettings.width = width;
+        CurrentConversionSettings.height = height;
+        CurrentConversionSettings.guiMapartImage = null;
+    }
+
+    public static int getWidth() {
+        return width;
+    }
+
+    public static void setWidth(int width) {
+        CurrentConversionSettings.width = width;
+        CurrentConversionSettings.guiMapartImage = null;
+    }
+
+    public static int getHeight() {
+        return height;
+    }
+
+    public static void setHeight(int height) {
+        CurrentConversionSettings.height = height;
+        CurrentConversionSettings.guiMapartImage = null;
+    }
 }
