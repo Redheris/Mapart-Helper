@@ -34,9 +34,10 @@ public class CurrentConversionSettings {
     public static float saturation = 1.0f;
 
     public static void setSize(int width, int height) {
+        if (CurrentConversionSettings.width != width || CurrentConversionSettings.height != height)
+            CurrentConversionSettings.guiMapartImage = null;
         CurrentConversionSettings.width = width;
         CurrentConversionSettings.height = height;
-        CurrentConversionSettings.guiMapartImage = null;
     }
 
     public static int getWidth() {
@@ -44,8 +45,9 @@ public class CurrentConversionSettings {
     }
 
     public static void setWidth(int width) {
+        if (CurrentConversionSettings.width != width)
+            CurrentConversionSettings.guiMapartImage = null;
         CurrentConversionSettings.width = width;
-        CurrentConversionSettings.guiMapartImage = null;
     }
 
     public static int getHeight() {
@@ -53,7 +55,8 @@ public class CurrentConversionSettings {
     }
 
     public static void setHeight(int height) {
+        if (CurrentConversionSettings.height != height)
+            CurrentConversionSettings.guiMapartImage = null;
         CurrentConversionSettings.height = height;
-        CurrentConversionSettings.guiMapartImage = null;
     }
 }
