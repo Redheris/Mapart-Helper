@@ -1,12 +1,17 @@
 package rh.maparthelper.gui.widget;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import rh.maparthelper.conversion.CurrentConversionSettings;
+
+import java.util.List;
 
 public class MapartPreviewWidget extends ClickableWidget {
     private final int maxWidth;
@@ -22,6 +27,24 @@ public class MapartPreviewWidget extends ClickableWidget {
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
+
+        if (CurrentConversionSettings.guiMapartImage == null) {
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            Text dropFileText = Text.of("Перетащите файл изображения в окно редактора, чтобы создать мапарт");
+            int centerX = x + width / 2;
+
+            List<OrderedText> lines = textRenderer.wrapLines(dropFileText, width - 20);
+
+            for (int i = 0; i < lines.size(); i++) {
+                context.drawCenteredTextWithShadow(
+                        textRenderer,
+                        lines.get(i),
+                        centerX, y + 30 + i * 9,
+                        5636095
+                );
+            }
+        }
+
         int mapartWidth = CurrentConversionSettings.getWidth() * 128;
         int mapartHeight = CurrentConversionSettings.getHeight() * 128;
 

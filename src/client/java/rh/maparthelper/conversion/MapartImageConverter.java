@@ -44,6 +44,11 @@ public class MapartImageConverter {
         currentConvertingFuture = convertingExecutor.submit(future);
     }
 
+    public static void updateMapart() {
+        if (CurrentConversionSettings.imagePath != null)
+            readAndUpdateMapartImage(CurrentConversionSettings.imagePath);
+    }
+
     private static BufferedImage preprocessImage(BufferedImage image) {
         float brightness = CurrentConversionSettings.brightness;
         float contrast = CurrentConversionSettings.contrast;
