@@ -25,6 +25,8 @@ public class MapartToNBT {
     private static final ExecutorService nbtBuilderExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Schematic-%d").build());
 
     public static void saveNBT() {
+        if (CurrentConversionSettings.guiMapartImage == null)
+            return;
         nbtBuilderExecutor.execute(() -> {
             try {
                 NbtCompound mapartNbt = NbtSchematicUtils.createMapartNbt();
