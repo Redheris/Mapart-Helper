@@ -33,30 +33,45 @@ public class CurrentConversionSettings {
     public static float contrast = 0.0f;
     public static float saturation = 1.0f;
 
-    public static void setSize(int width, int height) {
-        if (CurrentConversionSettings.width != width || CurrentConversionSettings.height != height)
-            CurrentConversionSettings.guiMapartImage = null;
-        CurrentConversionSettings.width = width;
-        CurrentConversionSettings.height = height;
+    public static void resetMapart() {
+        imagePath = null;
+        guiMapartImage = null;
+        cropMode = MapartImageConverter.AUTO_CROP;
+        croppingFrameX = 0;
+        croppingFrameY = 0;
+        croppingFrameWidth = 0;
+        croppingFrameHeight = 0;
+        doShowGrid = false;
+        previewScale = 1.0;
+        brightness = 1.0f;
+        contrast = 0.0f;
+        saturation = 1.0f;
+    }
+
+    public static void setSize(int newWidth, int newHeight) {
+        if (width != newWidth || height != newHeight)
+            guiMapartImage = null;
+        width = newWidth;
+        height = newHeight;
     }
 
     public static int getWidth() {
         return width;
     }
 
-    public static void setWidth(int width) {
-        if (CurrentConversionSettings.width != width)
-            CurrentConversionSettings.guiMapartImage = null;
-        CurrentConversionSettings.width = width;
+    public static void setWidth(int newWidth) {
+        if (width != newWidth)
+            guiMapartImage = null;
+        width = newWidth;
     }
 
     public static int getHeight() {
         return height;
     }
 
-    public static void setHeight(int height) {
-        if (CurrentConversionSettings.height != height)
-            CurrentConversionSettings.guiMapartImage = null;
-        CurrentConversionSettings.height = height;
+    public static void setHeight(int newHeight) {
+        if (height != newHeight)
+            guiMapartImage = null;
+        height = newHeight;
     }
 }
