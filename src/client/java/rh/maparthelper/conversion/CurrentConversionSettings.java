@@ -21,8 +21,8 @@ public class CurrentConversionSettings {
     public static int cropMode = MapartImageConverter.AUTO_CROP;
     public static int croppingFrameX = 0;
     public static int croppingFrameY = 0;
-    public static int croppingFrameWidth = 0;
-    public static int croppingFrameHeight = 0;
+    public static int croppingFrameWidth = 1;
+    public static int croppingFrameHeight = 1;
 
     // Preview settings
     public static boolean doShowGrid = false;
@@ -36,23 +36,7 @@ public class CurrentConversionSettings {
     public static void resetMapart() {
         imagePath = null;
         guiMapartImage = null;
-        cropMode = MapartImageConverter.AUTO_CROP;
-        croppingFrameX = 0;
-        croppingFrameY = 0;
-        croppingFrameWidth = 0;
-        croppingFrameHeight = 0;
-        doShowGrid = false;
         previewScale = 1.0;
-        brightness = 1.0f;
-        contrast = 0.0f;
-        saturation = 1.0f;
-    }
-
-    public static void setSize(int newWidth, int newHeight) {
-        if (width != newWidth || height != newHeight)
-            guiMapartImage = null;
-        width = newWidth;
-        height = newHeight;
     }
 
     public static int getWidth() {
@@ -73,5 +57,29 @@ public class CurrentConversionSettings {
         if (height != newHeight)
             guiMapartImage = null;
         height = newHeight;
+    }
+
+    public static void centerCroppingSize(int imageWidth, int imageHeight) {
+        double mapartAspect = (double) width / height;
+        double imageAspect = (double) imageWidth / imageHeight;
+
+        int frameWidth, frameHeight;
+        int frameX, frameY;
+
+        if (imageAspect > mapartAspect) {
+            frameHeight = imageHeight;
+            frameY = 0;
+            frameWidth = (int) (frameHeight * mapartAspect);
+            frameX = (imageWidth - frameWidth) / 2;
+        } else {
+            frameWidth = imageWidth;
+            frameX = 0;
+            frameHeight = (int) (frameWidth / mapartAspect);
+            frameY = (imageHeight - frameHeight) / 2;
+        }
+        CurrentConversionSettings.croppingFrameX = frameX;
+        CurrentConversionSettings.croppingFrameY = frameY;
+        CurrentConversionSettings.croppingFrameWidth = frameWidth;
+        CurrentConversionSettings.croppingFrameHeight = frameHeight;
     }
 }

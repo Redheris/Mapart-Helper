@@ -141,23 +141,11 @@ public class MapartImageConverter {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        double mapartAspect = (double) targetWidth / targetHeight;
-        double imageAspect = (double) imageWidth / imageHeight;
-
-        int frameWidth, frameHeight;
-        int frameX, frameY;
-
-        if (imageAspect > mapartAspect) {
-            frameHeight = imageHeight;
-            frameY = 0;
-            frameWidth = (int) (frameHeight * mapartAspect);
-            frameX = (imageWidth - frameWidth) / 2;
-        } else {
-            frameWidth = imageWidth;
-            frameX = 0;
-            frameHeight = (int) (frameWidth / mapartAspect);
-            frameY = (imageHeight - frameHeight) / 2;
-        }
+        CurrentConversionSettings.centerCroppingSize(imageWidth, imageHeight);
+        int frameX = CurrentConversionSettings.croppingFrameX;
+        int frameY = CurrentConversionSettings.croppingFrameY;
+        int frameWidth = CurrentConversionSettings.croppingFrameWidth;
+        int frameHeight = CurrentConversionSettings.croppingFrameHeight;
 
         return cropAndScaleToMapSize(image, targetWidth, targetHeight, frameX, frameY, frameWidth, frameHeight);
     }
@@ -195,6 +183,7 @@ public class MapartImageConverter {
                 long startTime = System.currentTimeMillis();
                 if (imagePath != null) {
                     lastImage = ImageIO.read(imagePath.toFile());
+                    CurrentConversionSettings.centerCroppingSize(lastImage.getWidth(), lastImage.getHeight());
                 }
                 BufferedImage bufferedImage = lastImage;
                 if (Thread.currentThread().isInterrupted()) return;
