@@ -50,20 +50,20 @@ public class MapartToNBT {
                 mapartNbt = NbtSchematicUtils.createMapartNbt();
             else {
                 mapartNbt = NbtSchematicUtils.createMapartNbt(maps[i], 1, 1);
-                filename += "_" + (i % CurrentConversionSettings.getWidth()) + "_" + (i / CurrentConversionSettings.getWidth());
+                filename += " (" + (i % CurrentConversionSettings.getWidth()) + "_" + (i / CurrentConversionSettings.getWidth()) + ")";
             }
 
-            filename = makeUniqueFilename(filename, "nbt");
+            String writeFilename = makeUniqueFilename(filename, "nbt");
             try {
-                NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(filename));
+                NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(writeFilename));
                 if (zipOut != null) {
-                    try (FileInputStream fis = new FileInputStream(SCHEMATICS.resolve(filename).toFile())) {
+                    try (FileInputStream fis = new FileInputStream(SCHEMATICS.resolve(writeFilename).toFile())) {
                         ZipEntry zipEntry = new ZipEntry(filename);
                         zipOut.putNextEntry(zipEntry);
                         zipOut.write(fis.readAllBytes());
                     }
                     finally {
-                        Files.delete(SCHEMATICS.resolve(filename));
+                        Files.delete(SCHEMATICS.resolve(writeFilename));
                     }
                 }
             } catch (IOException e) {

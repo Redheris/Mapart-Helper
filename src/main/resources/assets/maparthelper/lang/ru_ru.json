@@ -18,8 +18,8 @@
   "maparthelper.saving_path_error": "Получен некорректный путь для сохранения файла. Убедитесь в корректности названия файла",
   "maparthelper.blocks_palette_generated": "Палитра блоков успешно сгенерирована",
   "maparthelper.nbt_file_saved": "NBT файл мапарта \"%s\" успешно сохранён в папку \"%s\"",
-  "maparthelper.nbt_files_saved": "%d NBT файла(-ов) мапарта \"%s\" успешно сохранены в папку \"%s\" в формате \"%2$s_x_y\"",
-  "maparthelper.nbt_zip_saved": "%d NBT файла(-ов) мапарта \"%s\" успешно сохранены в архив \"%s\" в формате \"%2$s_x_y\"",
+  "maparthelper.nbt_files_saved": "%d NBT файла(-ов) мапарта \"%s\" успешно сохранены в папку \"%s\" в формате \"%2$s (x_y)\"",
+  "maparthelper.nbt_zip_saved": "%d NBT файла(-ов) мапарта \"%s\" успешно сохранены в архив \"%s\" в формате \"%2$s (x_y)\"",
 
   "maparthelper.mapart_editor_screen": "Редактор мапартов",
 
