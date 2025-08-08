@@ -47,19 +47,14 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         int mapartWidth = CurrentConversionSettings.getWidth() * 128;
         int mapartHeight = CurrentConversionSettings.getHeight() * 128;
+        double scale = 2.0;
+        width = (int) (mapartWidth * scale);
+        height = (int) (mapartHeight * scale);
 
-        double previewScale = CurrentConversionSettings.previewScale;
-        width = (int) (mapartWidth * previewScale);
-        height = (int) (mapartHeight * previewScale);
-
-        double scaleX = maxWidth / (double) width;
-        double scaleY = maxHeight / (double) height;
-
-        double adapt = Math.min(scaleX, scaleY);
-        if (adapt < 1.0) {
-            previewScale *= adapt;
-            width = (int) (width * previewScale);
-            height = (int) (height * previewScale);
+        if (width > maxWidth || height > maxHeight) {
+            scale = Math.min(maxWidth / (double) mapartWidth, maxHeight / (double) mapartHeight);
+            width = (int) (mapartWidth * scale);
+            height = (int) (mapartHeight * scale);
         }
 
         if (CurrentConversionSettings.guiMapartImage != null) {
@@ -75,11 +70,11 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         if (CurrentConversionSettings.doShowGrid) {
             for (int mapX = 1; mapX < mapartWidth / 128; mapX++) {
-                int lineX = (int) (x + mapX * 128 * previewScale);
+                int lineX = (int) (x + mapX * 128 * scale);
                 context.fill(lineX, y, lineX + 1, y + height, Colors.CYAN);
             }
             for (int mapY = 1; mapY < mapartHeight / 128; mapY++) {
-                int lineY = (int) (y + mapY * 128 * previewScale);
+                int lineY = (int) (y + mapY * 128 * scale);
                 context.fill(x, lineY, x + width, lineY + 1, Colors.CYAN);
             }
         }
@@ -98,5 +93,4 @@ public class MapartPreviewWidget extends ClickableWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return false;
     }
-
 }
