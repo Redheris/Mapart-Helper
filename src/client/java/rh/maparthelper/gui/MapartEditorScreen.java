@@ -118,6 +118,12 @@ public class MapartEditorScreen extends Screen {
         ).size(150, 20).build();
         settings.add(saveSplitNBT, positioner.copy().alignHorizontalCenter());
 
+        ButtonWidget saveZipNBT = ButtonWidget.builder(
+                Text.of("Сохранить NBT в архиве"),
+                (btn) -> MapartToNBT.saveNBTAsZip()
+        ).size(150, 20).build();
+        settings.add(saveZipNBT, positioner.copy().alignHorizontalCenter());
+
         settings.refreshPositions();
         settings.forEachChild(this::addDrawableChild);
 

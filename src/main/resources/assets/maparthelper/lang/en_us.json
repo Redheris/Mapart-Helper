@@ -8,6 +8,7 @@
   "maparthelper.mapart_saved": "",
   "maparthelper.selection_not_flat": "",
   "maparthelper.selection_has_no_maps": "",
+  "maparthelper.open_file": "",
   "maparthelper.open_folder": "",
   "maparthelper.open_image_file": "",
   "maparthelper.selection_required": "",
@@ -18,6 +19,7 @@
   "maparthelper.blocks_palette_generated": "",
   "maparthelper.nbt_file_saved": "",
   "maparthelper.nbt_files_saved": "",
+  "maparthelper.nbt_zip_saved": "",
 
   "maparthelper.mapart_editor_screen": "",
 

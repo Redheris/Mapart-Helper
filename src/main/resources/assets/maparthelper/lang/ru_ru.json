@@ -8,6 +8,7 @@
   "maparthelper.mapart_saved": "Мапарт успешно сохранён в папку saved_maps как \"%s\"",
   "maparthelper.selection_not_flat": "Выделение не является плоским. Выберите другую точку",
   "maparthelper.selection_has_no_maps": "Выделение не содержит ни одной рамки с непустой картой",
+  "maparthelper.open_file": "[Нажмите, чтобы открыть файл]",
   "maparthelper.open_folder": "[Нажмите, чтобы открыть папку]",
   "maparthelper.open_image_file": "[Нажмите, чтобы открыть изображение]",
   "maparthelper.selection_required": "Сначала выделите область с помощью /mart save selection",
@@ -18,6 +19,7 @@
   "maparthelper.blocks_palette_generated": "Палитра блоков успешно сгенерирована",
   "maparthelper.nbt_file_saved": "NBT файл мапарта \"%s\" успешно сохранён в папку \"%s\"",
   "maparthelper.nbt_files_saved": "%d NBT файла(-ов) мапарта \"%s\" успешно сохранены в папку \"%s\" в формате \"%2$s_x_y\"",
+  "maparthelper.nbt_zip_saved": "%d NBT файла(-ов) мапарта \"%s\" успешно сохранены в архив \"%s\" в формате \"%2$s_x_y\"",
 
   "maparthelper.mapart_editor_screen": "Редактор мапартов",
 
