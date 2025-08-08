@@ -52,13 +52,22 @@ public class MapartEditorScreen extends Screen {
         GridWidget size = createSizeSettingsGrid();
         settings.add(size);
 
+        ButtonWidget croppingMode = ButtonWidget.builder(
+                Text.of("Кадрирование: " + getNameOfCroppingMode(CurrentConversionSettings.cropMode)),
+                btn -> {
+                    CurrentConversionSettings.previewScale = 1.0;
+                    CurrentConversionSettings.cropMode = (CurrentConversionSettings.cropMode + 2) % 3 - 1;
+                    btn.setMessage(Text.of("Кадрирование: " + getNameOfCroppingMode(CurrentConversionSettings.cropMode)));
+                    MapartImageConverter.updateMapart();
+                }
+        ).size(150, 20).build();
+        settings.add(croppingMode);
+
         ButtonWidget staircaseStyle = ButtonWidget.builder(
                 Text.of("Ступенчатость: " + MapartHelperClient.conversionConfig.staircaseStyle.name()),
                 btn -> {
                     ConversionConfiguration config = MapartHelperClient.conversionConfig;
-                    int nextStyle = config.staircaseStyle.ordinal() + 1;
-                    if (nextStyle >= StaircaseStyles.values().length - 1)
-                        nextStyle = 0;
+                    int nextStyle = (config.staircaseStyle.ordinal() + 1) % StaircaseStyles.values().length;
                     boolean was3D = config.use3D();
                     config.staircaseStyle = StaircaseStyles.values()[nextStyle];
                     if (was3D != config.use3D())
@@ -167,6 +176,15 @@ public class MapartEditorScreen extends Screen {
         CurrentConversionSettings.resetMapart();
         CurrentConversionSettings.imagePath = paths.getFirst();
         MapartImageConverter.readAndUpdateMapartImage(CurrentConversionSettings.imagePath);
+    }
+
+    private static String getNameOfCroppingMode(int mode) {
+        return switch (mode) {
+            case MapartImageConverter.NO_CROP -> "выкл";
+            case MapartImageConverter.AUTO_CROP -> "auto";
+            case MapartImageConverter.USER_CROP -> "manual";
+            default -> "?";
+        };
     }
 
 
