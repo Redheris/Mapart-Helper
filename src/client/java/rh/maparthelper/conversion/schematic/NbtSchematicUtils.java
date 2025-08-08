@@ -95,66 +95,71 @@ public class NbtSchematicUtils {
             addBlockToNbt(nbt, x, y - 1, z, MapartHelperClient.conversionConfig.auxBlock);
     }
 
-    protected static NbtCompound createMapartNbt() {
+    protected static NbtCompound createMapartNbt(int[] map, int mapsWidth, int mapsHeight) {
         material_list.clear();
         blocks_list.clear();
-        int mapWidth = CurrentConversionSettings.getWidth();
-        int mapHeight = CurrentConversionSettings.getHeight();
         NbtCompound nbt = createMapartBaseNbt();
 
-        if (CurrentConversionSettings.guiMapartImage.getImage() != null) {
-            int[] colorsRaw = CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb();
-            int width = mapWidth * 128;
-            int height = mapHeight * 128;
+        int width = mapsWidth * 128;
+        int height = mapsHeight * 128;
 
-            int[][] colors = new int[height][width];
-            for (int y = 0; y < height; y++) {
-                System.arraycopy(colorsRaw, y * width, colors[y], 0, width);
+        int[][] colors = new int[height][width];
+        for (int y = 0; y < height; y++) {
+            System.arraycopy(map, y * width, colors[y], 0, width);
+        }
+
+        StaircaseStyles staircase = MapartHelperClient.conversionConfig.staircaseStyle;
+        if (staircase == StaircaseStyles.FLAT_2D) {
+            for (int x = 0; x < width; x++) {
+                addBlockToNbt(nbt, x, 0, 0, MapartHelperClient.conversionConfig.auxBlock);
             }
-
-            StaircaseStyles staircase = MapartHelperClient.conversionConfig.staircaseStyle;
-            if (staircase == StaircaseStyles.FLAT_2D) {
+            for (int z = 1; z < height + 1; z++) {
                 for (int x = 0; x < width; x++) {
-                    addBlockToNbt(nbt, x, 0, 0, MapartHelperClient.conversionConfig.auxBlock);
+                    MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
+                    if (color != MapColor.CLEAR)
+                        addColorToNbt(nbt, x, 0, z, color);
+                    else
+                        addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
                 }
-                for (int z = 1; z < height + 1; z++) {
-                    for (int x = 0; x < width; x++) {
-                        MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
-                        if (color != MapColor.CLEAR)
-                            addColorToNbt(nbt, x, 0, z, color);
-                        else
-                            addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
-                    }
-                }
-                addSizeToNbt(nbt, width, 1, height + 1);
-            } else {
-                int maxHeight = 1;
-                List<List<Integer>> converted = staircase.getStaircase(colors);
+            }
+            addSizeToNbt(nbt, width, 1, height + 1);
+        } else {
+            int maxHeight = 1;
+            List<List<Integer>> converted = staircase.getStaircase(colors);
 
+            for (int x = 0; x < converted.getFirst().size(); x++) {
+                int y = converted.getFirst().get(x);
+                maxHeight = Math.max(y, maxHeight);
+
+                addBlockToNbt(nbt, x, y, 0, MapartHelperClient.conversionConfig.auxBlock);
+            }
+            for (int z = 1; z < converted.size(); z++) {
                 for (int x = 0; x < converted.getFirst().size(); x++) {
-                    int y = converted.getFirst().get(x);
+                    int y = converted.get(z).get(x);
                     maxHeight = Math.max(y, maxHeight);
 
-                    addBlockToNbt(nbt, x, y, 0, MapartHelperClient.conversionConfig.auxBlock);
+                    MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
+                    if (color != MapColor.CLEAR)
+                        addColorToNbt(nbt, x, y, z, color);
+                    else
+                        addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
                 }
-                for (int z = 1; z < converted.size(); z++) {
-                    for (int x = 0; x < converted.getFirst().size(); x++) {
-                        int y = converted.get(z).get(x);
-                        maxHeight = Math.max(y, maxHeight);
-
-                        MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
-                        if (color != MapColor.CLEAR)
-                            addColorToNbt(nbt, x, y, z, color);
-                        else
-                            addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
-                    }
-                }
-                addSizeToNbt(nbt, width, maxHeight + 1, height + 1);
             }
+            addSizeToNbt(nbt, width, maxHeight + 1, height + 1);
         }
+
 
         addPaletteToNbt(nbt);
 
         return nbt;
+    }
+
+    protected static NbtCompound createMapartNbt() {
+        int mapsWidth = CurrentConversionSettings.getWidth();
+        int mapsHeight = CurrentConversionSettings.getHeight();
+        if (CurrentConversionSettings.guiMapartImage.getImage() != null) {
+            return createMapartNbt(CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb(), mapsWidth, mapsHeight);
+        }
+        return createMapartBaseNbt();
     }
 }

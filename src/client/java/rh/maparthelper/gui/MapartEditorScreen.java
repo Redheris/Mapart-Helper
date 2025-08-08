@@ -108,9 +108,15 @@ public class MapartEditorScreen extends Screen {
 
         ButtonWidget saveNBT = ButtonWidget.builder(
                 Text.of("Сохранить NBT"),
-                (btn) -> MapartToNBT.saveNBT()
-        ).size(130, 20).build();
+                (btn) -> MapartToNBT.saveNBT(true)
+        ).size(150, 20).build();
         settings.add(saveNBT, positioner.copy().alignHorizontalCenter());
+
+        ButtonWidget saveSplitNBT = ButtonWidget.builder(
+                Text.of("Сохранить NBT каждой карты"),
+                (btn) -> MapartToNBT.saveNBT(false)
+        ).size(150, 20).build();
+        settings.add(saveSplitNBT, positioner.copy().alignHorizontalCenter());
 
         settings.refreshPositions();
         settings.forEachChild(this::addDrawableChild);
