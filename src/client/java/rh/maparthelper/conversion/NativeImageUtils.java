@@ -36,7 +36,7 @@ public class NativeImageUtils {
             for (int y = 0; y < height; y++) {
                 for (int i = 0; i < 128; i++) {
                     int rowStart = x * 128 + (y * 128 + i) * imageWidth;
-                    System.arraycopy(mapart, rowStart, maps[x + y * height], i * 128, 128);
+                    System.arraycopy(mapart, rowStart, maps[x + y * width], i * 128, 128);
                 }
             }
         }
