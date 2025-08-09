@@ -210,7 +210,11 @@ public class MapartImageConverter {
                 }
 
             } catch (Exception e) {
-                MapartHelper.LOGGER.error("Error occurred while reading and converting an image:\n{}", e.toString());
+                CurrentConversionSettings.guiMapartImage = null;
+                CurrentConversionSettings.imagePath = null;
+                lastImage = null;
+                lastImagePath = null;
+                MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
                 throw new RuntimeException(e);
             }
         }
