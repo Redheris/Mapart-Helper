@@ -10,6 +10,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import rh.maparthelper.conversion.CurrentConversionSettings;
+import rh.maparthelper.conversion.MapartImageConverter;
 
 import java.util.List;
 
@@ -86,11 +87,60 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public void mouseMoved(double mouseX, double mouseY) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (CurrentConversionSettings.cropMode == 1 && CurrentConversionSettings.guiMapartImage != null) {
+            int imageWidth = MapartImageConverter.lastImage.getWidth();
+            int imageHeight = MapartImageConverter.lastImage.getHeight();
+
+            double aspect = (double) CurrentConversionSettings.getWidth() / CurrentConversionSettings.getHeight();
+
+            int delta = (int) verticalAmount * 5;
+            int minSize = 64;
+            int cropWidth = CurrentConversionSettings.croppingFrameWidth;
+            int cropHeight = CurrentConversionSettings.croppingFrameHeight;
+            int centerX = CurrentConversionSettings.croppingFrameX + cropWidth / 2;
+            int centerY = CurrentConversionSettings.croppingFrameY + cropHeight / 2;
+
+            if (aspect < 1.0) {
+                cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
+                cropHeight = (int) (cropWidth / aspect);
+            } else {
+                cropHeight = Math.clamp(cropHeight - 2L * delta, minSize, imageHeight);
+                cropWidth = (int) (cropHeight * aspect);
+            }
+
+            int frameX = Math.clamp(centerX - cropWidth / 2, 0, imageWidth - cropWidth);
+            int frameY = Math.clamp(centerY - cropHeight / 2, 0, imageHeight - cropHeight);
+
+            CurrentConversionSettings.croppingFrameX = frameX;
+            CurrentConversionSettings.croppingFrameY = frameY;
+            CurrentConversionSettings.croppingFrameWidth = cropWidth;
+            CurrentConversionSettings.croppingFrameHeight = cropHeight;
+
+            MapartImageConverter.updateMapart();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (CurrentConversionSettings.cropMode != 1 || MapartImageConverter.lastImage == null || button != 0)
+            return false;
+
+        int diffX = (int) deltaX;
+        int diffY = (int) deltaY;
+        int imageWidth = MapartImageConverter.lastImage.getWidth();
+        int imageHeight = MapartImageConverter.lastImage.getHeight();
+
+        CurrentConversionSettings.croppingFrameX = Math.clamp(CurrentConversionSettings.croppingFrameX - diffX, 0, imageWidth - CurrentConversionSettings.croppingFrameWidth);
+        CurrentConversionSettings.croppingFrameY = Math.clamp(CurrentConversionSettings.croppingFrameY - diffY, 0, imageHeight - CurrentConversionSettings.croppingFrameHeight);
+        MapartImageConverter.updateMapart();
+
+        return true;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return false;
+        return true;
     }
 }

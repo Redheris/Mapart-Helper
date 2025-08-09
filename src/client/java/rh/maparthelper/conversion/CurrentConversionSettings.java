@@ -44,9 +44,13 @@ public class CurrentConversionSettings {
     }
 
     public static void setWidth(int newWidth) {
-        if (width != newWidth)
-            guiMapartImage = null;
+        if (width == newWidth) return;
+
         width = newWidth;
+        guiMapartImage = null;
+        if (MapartImageConverter.lastImage != null) {
+            centerCroppingSize(MapartImageConverter.lastImage.getWidth(), MapartImageConverter.lastImage.getHeight());
+        }
     }
 
     public static int getHeight() {
@@ -54,9 +58,13 @@ public class CurrentConversionSettings {
     }
 
     public static void setHeight(int newHeight) {
-        if (height != newHeight)
-            guiMapartImage = null;
+        if (height == newHeight) return;
+
         height = newHeight;
+        guiMapartImage = null;
+        if (MapartImageConverter.lastImage != null) {
+            centerCroppingSize(MapartImageConverter.lastImage.getWidth(), MapartImageConverter.lastImage.getHeight());
+        }
     }
 
     public static void centerCroppingSize(int imageWidth, int imageHeight) {

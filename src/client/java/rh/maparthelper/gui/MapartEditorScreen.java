@@ -27,6 +27,7 @@ import java.util.Optional;
 public class MapartEditorScreen extends Screen {
     DirectionalLayoutWidget settings;
     TextFieldWidget selectedTextWidget;
+    MapartPreviewWidget mapartPreview;
 
     public MapartEditorScreen() {
         super(Text.translatable("maparthelper.mapart_editor_screen"));
@@ -174,6 +175,13 @@ public class MapartEditorScreen extends Screen {
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        if (this.hoveredElement(mouseX, mouseY).orElse(null) == mapartPreview)
+            mapartPreview.mouseMoved(mouseX, mouseY);
+        super.mouseMoved(mouseX, mouseY);
     }
 
     @Override
