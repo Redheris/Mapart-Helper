@@ -36,6 +36,8 @@ public class CurrentConversionSettings {
     public static void resetMapart() {
         imagePath = null;
         guiMapartImage = null;
+        MapartImageConverter.lastImagePath = null;
+        MapartImageConverter.lastImage = null;
         previewScale = 1.0;
     }
 

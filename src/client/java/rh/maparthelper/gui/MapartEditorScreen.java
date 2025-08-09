@@ -143,7 +143,7 @@ public class MapartEditorScreen extends Screen {
         settings.forEachChild(this::addDrawableChild);
 
 
-        MapartPreviewWidget mapartPreview = new MapartPreviewWidget(220, 20, this.width - 230, this.height - 40);
+        mapartPreview = new MapartPreviewWidget(220, 20, this.width - 230, this.height - 40);
         this.addDrawableChild(mapartPreview);
     }
 

@@ -91,26 +91,27 @@ public class MapartPreviewWidget extends ClickableWidget {
         if (CurrentConversionSettings.cropMode == 1 && CurrentConversionSettings.guiMapartImage != null) {
             int imageWidth = MapartImageConverter.lastImage.getWidth();
             int imageHeight = MapartImageConverter.lastImage.getHeight();
-
-            double aspect = (double) CurrentConversionSettings.getWidth() / CurrentConversionSettings.getHeight();
+            double mapartAspect = (double) CurrentConversionSettings.getWidth() / CurrentConversionSettings.getHeight();
+            double imageAspect = (double) imageWidth / imageHeight;
 
             int delta = (int) verticalAmount * 5;
-            int minSize = 64;
+
+            int minSize = Math.min(imageWidth, Math.min(imageHeight, 64));
             int cropWidth = CurrentConversionSettings.croppingFrameWidth;
             int cropHeight = CurrentConversionSettings.croppingFrameHeight;
             int centerX = CurrentConversionSettings.croppingFrameX + cropWidth / 2;
             int centerY = CurrentConversionSettings.croppingFrameY + cropHeight / 2;
 
-            if (aspect < 1.0) {
+            if (imageAspect < mapartAspect) {
                 cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
-                cropHeight = (int) (cropWidth / aspect);
+                cropHeight = (int) (cropWidth / mapartAspect);
             } else {
                 cropHeight = Math.clamp(cropHeight - 2L * delta, minSize, imageHeight);
-                cropWidth = (int) (cropHeight * aspect);
+                cropWidth = (int) (cropHeight * mapartAspect);
             }
 
-            int frameX = Math.clamp(centerX - cropWidth / 2, 0, imageWidth - cropWidth);
-            int frameY = Math.clamp(centerY - cropHeight / 2, 0, imageHeight - cropHeight);
+            int frameX = Math.clamp(centerX - cropWidth / 2, 0, Math.max(imageWidth - cropWidth, 0));
+            int frameY = Math.clamp(centerY - cropHeight / 2, 0, Math.max(imageHeight - cropHeight, 0));
 
             CurrentConversionSettings.croppingFrameX = frameX;
             CurrentConversionSettings.croppingFrameY = frameY;
