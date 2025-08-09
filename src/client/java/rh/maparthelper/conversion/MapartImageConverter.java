@@ -106,7 +106,7 @@ public class MapartImageConverter {
         }
     }
 
-    public static BufferedImage scaleToMapSize(BufferedImage image, int width, int height) {
+    public static BufferedImage scaleImage(BufferedImage image, int width, int height) {
         boolean scaleUp = width > image.getWidth() || height > image.getHeight();
         if (scaleUp) {
             BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -132,12 +132,12 @@ public class MapartImageConverter {
         }
     }
 
-    public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int mapsX, int mapsY, int frameX, int frameY, int frameWidth, int frameHeight) {
+    public static BufferedImage cropAndScaleImage(BufferedImage image, int frameX, int frameY, int frameWidth, int frameHeight, int mapartWidth, int mapartHeight) {
         BufferedImage subimage = image.getSubimage(frameX, frameY, frameWidth, frameHeight);
-        return scaleToMapSize(subimage, mapsX, mapsY);
+        return scaleImage(subimage, mapartWidth, mapartHeight);
     }
 
-    public static BufferedImage cropAndScaleToMapSize(BufferedImage image, int targetWidth, int targetHeight) {
+    public static BufferedImage autoCropAndScale(BufferedImage image, int mapartWidth, int mapartHeight) {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
@@ -147,22 +147,22 @@ public class MapartImageConverter {
         int frameWidth = CurrentConversionSettings.croppingFrameWidth;
         int frameHeight = CurrentConversionSettings.croppingFrameHeight;
 
-        return cropAndScaleToMapSize(image, targetWidth, targetHeight, frameX, frameY, frameWidth, frameHeight);
+        return cropAndScaleImage(image, frameX, frameY, frameWidth, frameHeight, mapartWidth, mapartHeight);
     }
 
-    private static BufferedImage cropAndScale(BufferedImage image) {
-        int targetWidth = CurrentConversionSettings.getWidth() * 128;
-        int targetHeight = CurrentConversionSettings.getHeight() * 128;
+    private static BufferedImage cropAndScaleToMapSize(BufferedImage image) {
+        int mapartWidth = CurrentConversionSettings.getWidth() * 128;
+        int mapartHeight = CurrentConversionSettings.getHeight() * 128;
 
         return switch (CurrentConversionSettings.cropMode) {
-            case NO_CROP -> scaleToMapSize(image, targetWidth, targetHeight);
-            case AUTO_CROP -> cropAndScaleToMapSize(image, targetWidth, targetHeight);
+            case NO_CROP -> scaleImage(image, mapartWidth, mapartHeight);
+            case AUTO_CROP -> autoCropAndScale(image, mapartWidth, mapartHeight);
             case USER_CROP -> {
                 int frameX = CurrentConversionSettings.croppingFrameX;
                 int frameY = CurrentConversionSettings.croppingFrameY;
                 int frameWidth = CurrentConversionSettings.croppingFrameWidth;
                 int frameHeight = CurrentConversionSettings.croppingFrameHeight;
-                yield cropAndScaleToMapSize(image, targetWidth, targetHeight, frameX, frameY, frameWidth, frameHeight);
+                yield cropAndScaleImage(image, frameX, frameY, frameWidth, frameHeight, mapartWidth, mapartHeight);
             }
             default -> throw new IllegalArgumentException("Invalid cropping mode");
         };
@@ -188,7 +188,7 @@ public class MapartImageConverter {
                 BufferedImage bufferedImage = lastImage;
                 if (Thread.currentThread().isInterrupted()) return;
 
-                bufferedImage = cropAndScale(bufferedImage);
+                bufferedImage = cropAndScaleToMapSize(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 bufferedImage = preprocessImage(bufferedImage);
