@@ -40,11 +40,16 @@ public class MapartEditorScreen extends Screen {
 
         TextFieldWidget mapartName = createTextInputFieldWidget(150, CurrentConversionSettings.mapartName, -1);
         mapartName.setChangedListener(value -> {
+            mapartName.setEditableColor(Colors.WHITE);
             if (value.isEmpty()) {
                 mapartName.setSuggestion("Название мапарта");
                 return;
             }
             mapartName.setSuggestion(null);
+            if (value.matches(".*[<>:\"/|?*\\\\].*")) {
+                mapartName.setEditableColor(Colors.LIGHT_RED);
+                return;
+            }
             CurrentConversionSettings.mapartName = value;
         });
         settings.add(mapartName);
