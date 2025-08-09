@@ -121,7 +121,7 @@ public class BlocksPalette {
 
     private static MapColorEntry getClosestColor3D(int argb) {
         MapColorEntry closest = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
-        double minDist = Integer.MAX_VALUE;
+        double minDist = ColorUtils.colorDistance(argb, 0);
 
         for (MapColor color : palette.keySet()) {
             for (int brightId = 0; brightId < 3; brightId++) {
@@ -146,7 +146,7 @@ public class BlocksPalette {
 
     private static MapColorEntry getClosestColor2D(int argb) {
         MapColor closest = MapColor.CLEAR;
-        double minDist = Integer.MAX_VALUE;
+        double minDist = ColorUtils.colorDistance(argb, 0);
 
         for (MapColor color : palette.keySet()) {
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);

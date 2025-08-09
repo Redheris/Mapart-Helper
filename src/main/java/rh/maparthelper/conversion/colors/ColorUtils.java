@@ -8,19 +8,26 @@ import static java.lang.Math.clamp;
 public class ColorUtils {
 
     public static double colorDistance(int argb1, int argb2) {
+        int a1 = (argb1 >> 24) & 0xFF;
         int r1 = (argb1 >> 16) & 0xFF;
         int g1 = (argb1 >> 8) & 0xFF;
         int b1 = argb1 & 0xFF;
 
+        int a2 = (argb2 >> 24) & 0xFF;
         int r2 = (argb2 >> 16) & 0xFF;
         int g2 = (argb2 >> 8) & 0xFF;
         int b2 = argb2 & 0xFF;
 
+        double alphaFactor = (a1 / 255.0) * (a2 / 255.0);
+
         int dr = r1 - r2;
         int dg = g1 - g2;
         int db = b1 - b2;
+        int da = a1 - a2;
 
-        return Math.sqrt(dr * dr + dg * dg + db * db);
+        double colorDist = Math.sqrt(dr * dr + dg * dg + db * db) * alphaFactor;
+
+        return colorDist + Math.abs(da) * 2;
     }
 
     public static BufferedImage preprocessImage(BufferedImage image, float brightnessFactor, float contrastLevel, float saturationFactor) {
