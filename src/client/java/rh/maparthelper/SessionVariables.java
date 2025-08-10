@@ -11,6 +11,8 @@ public class SessionVariables {
     public static int selectionHeight;
     public static int selectionWidth;
 
+    public static boolean showMapartStartPos = false;
+
     public static Vec3d getSelectedPos() {
         if (selectedPos1 != null)
             return selectedPos1;

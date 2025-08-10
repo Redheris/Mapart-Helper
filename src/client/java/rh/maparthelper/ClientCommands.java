@@ -41,6 +41,12 @@ public class ClientCommands {
                             )
                     )
                 )
+                .then(literal("beams")
+                        .executes(ctx -> {
+                            SessionVariables.showMapartStartPos = !SessionVariables.showMapartStartPos;
+                            return 1;
+                        })
+                )
                 .then(literal("palette")
                         .then(literal("regenerate")
                             .executes(ctx -> {
