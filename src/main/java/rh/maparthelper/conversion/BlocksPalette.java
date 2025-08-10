@@ -121,7 +121,7 @@ public class BlocksPalette {
 
     private static MapColorEntry getClosestColor3D(int argb) {
         MapColorEntry closest = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
-        double minDist = ColorUtils.colorDistance(argb, 0);
+        double minDist = Integer.MAX_VALUE;
 
         for (MapColor color : palette.keySet()) {
             for (int brightId = 0; brightId < 3; brightId++) {
@@ -131,7 +131,7 @@ public class BlocksPalette {
 
                 if (current == argb) return new MapColorEntry(color, brightness);
 
-                double dist = ColorUtils.colorDistance(argb, current);
+                double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);
                 if (dist < minDist) {
                     minDist = dist;
                     closest = new MapColorEntry(color, brightness);
@@ -146,12 +146,12 @@ public class BlocksPalette {
 
     private static MapColorEntry getClosestColor2D(int argb) {
         MapColor closest = MapColor.CLEAR;
-        double minDist = ColorUtils.colorDistance(argb, 0);
+        double minDist = Integer.MAX_VALUE;
 
         for (MapColor color : palette.keySet()) {
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);
             if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL);
-            double dist = ColorUtils.colorDistance(argb, current);
+            double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);
             if (dist < minDist) {
                 minDist = dist;
                 closest = color;
@@ -162,7 +162,7 @@ public class BlocksPalette {
     }
 
     public static MapColorEntry getClosestColor(int argb, boolean use3D) {
-        if (argb == 0) return MapColorEntry.CLEAR;
+        if (((argb >> 24) & 0xFF) < 80) return MapColorEntry.CLEAR;
         if (use3D)
             return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor3D);
         return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor2D);
@@ -170,6 +170,7 @@ public class BlocksPalette {
 
     public static void clearColorCache(){
         cachedClosestColors.clear();
+        ColorUtils.clearRgb2LabCache();
     }
 
     public static void placeBlocksFromPalette(World world, int playerX, int y, int playerZ) {

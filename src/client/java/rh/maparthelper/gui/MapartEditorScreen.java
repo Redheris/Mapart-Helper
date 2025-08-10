@@ -6,9 +6,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
@@ -53,7 +55,8 @@ public class MapartEditorScreen extends Screen {
             }
             CurrentConversionSettings.mapartName = value;
         });
-        settings.add(mapartName);
+        settings.add(new TextWidget(Text.literal("Название мапарта"), textRenderer));
+        settings.add(mapartName, positioner.copy().marginTop(0));
 
         GridWidget size = createSizeSettingsGrid();
         settings.add(size);
@@ -93,6 +96,18 @@ public class MapartEditorScreen extends Screen {
                 }
         ).size(80, 20).build();
         settings.add(showGridButton, positioner.copy());
+
+        ButtonWidget useLAB = ButtonWidget.builder(
+                MapartHelper.config.conversionSettings.useLAB ? Text.of("LAB: вкл") : Text.of("LAB: выкл"),
+                (btn) -> {
+                    MapartHelper.config.conversionSettings.useLAB = !MapartHelper.config.conversionSettings.useLAB;
+                    btn.setMessage(MapartHelper.config.conversionSettings.useLAB ? Text.of("LAB: вкл") :
+                            Text.of("LAB: выкл"));
+                    AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
+                    MapartImageConverter.updateMapart();
+                }
+        ).size(80, 20).tooltip(Tooltip.of(Text.of("Повышает точность подбора цветов. Может увеличить время обработки"))).build();
+        settings.add(useLAB, positioner.copy());
 
         ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();
         ImageAdjustmentSliderWidget sliderContrast = createContrastSlider();

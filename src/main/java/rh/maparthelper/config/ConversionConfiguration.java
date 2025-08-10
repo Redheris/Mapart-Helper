@@ -13,6 +13,7 @@ public class ConversionConfiguration implements ConfigData {
     public int useAuxBlocks = 0;
     public Block auxBlock = Blocks.NETHERRACK;
     public DitherAlgorithms ditherAlgorithm = DitherAlgorithms.NONE;
+    public boolean useLAB = false;
 
     public boolean use3D() {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
