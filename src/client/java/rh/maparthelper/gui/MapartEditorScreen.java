@@ -61,7 +61,6 @@ public class MapartEditorScreen extends Screen {
         ButtonWidget croppingMode = ButtonWidget.builder(
                 Text.of("Кадрирование: " + getNameOfCroppingMode(CurrentConversionSettings.cropMode)),
                 btn -> {
-                    CurrentConversionSettings.previewScale = 1.0;
                     CurrentConversionSettings.cropMode = (CurrentConversionSettings.cropMode + 2) % 3 - 1;
                     btn.setMessage(Text.of("Кадрирование: " + getNameOfCroppingMode(CurrentConversionSettings.cropMode)));
                     MapartImageConverter.updateMapart();
@@ -175,6 +174,13 @@ public class MapartEditorScreen extends Screen {
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (this.hoveredElement(mouseX, mouseY).orElse(null) != mapartPreview)
+            mapartPreview.scaleImageCrop(mouseX, mouseY, verticalAmount, false);
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override

@@ -88,6 +88,10 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        return scaleImageCrop(mouseX, mouseY, verticalAmount, true);
+    }
+
+    public boolean scaleImageCrop(double mouseX, double mouseY, double verticalAmount, boolean mouseCenter) {
         if (CurrentConversionSettings.cropMode == 1 && CurrentConversionSettings.guiMapartImage != null) {
             int imageWidth = MapartImageConverter.lastImage.getWidth();
             int imageHeight = MapartImageConverter.lastImage.getHeight();
@@ -95,12 +99,18 @@ public class MapartPreviewWidget extends ClickableWidget {
             double imageAspect = (double) imageWidth / imageHeight;
 
             int delta = (int) verticalAmount * 5;
+            double scaleX = 0.5;
+            double scaleY = 0.5;
+            if (mouseCenter) {
+                scaleX = (mouseX - getX()) / width;
+                scaleY = (mouseY - getY()) / height;
+            }
 
             int minSize = Math.min(imageWidth, Math.min(imageHeight, 64));
             int cropWidth = CurrentConversionSettings.croppingFrameWidth;
             int cropHeight = CurrentConversionSettings.croppingFrameHeight;
-            int centerX = CurrentConversionSettings.croppingFrameX + cropWidth / 2;
-            int centerY = CurrentConversionSettings.croppingFrameY + cropHeight / 2;
+            int centerX = (int) (CurrentConversionSettings.croppingFrameX + cropWidth * scaleX);
+            int centerY = (int) (CurrentConversionSettings.croppingFrameY + cropHeight * scaleY);
 
             if (imageAspect < mapartAspect) {
                 cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
@@ -110,8 +120,8 @@ public class MapartPreviewWidget extends ClickableWidget {
                 cropWidth = (int) (cropHeight * mapartAspect);
             }
 
-            int frameX = Math.clamp(centerX - cropWidth / 2, 0, Math.max(imageWidth - cropWidth, 0));
-            int frameY = Math.clamp(centerY - cropHeight / 2, 0, Math.max(imageHeight - cropHeight, 0));
+            int frameX = Math.clamp(centerX - (int) (cropWidth * scaleX), 0, Math.max(imageWidth - cropWidth, 0));
+            int frameY = Math.clamp(centerY - (int) (cropHeight * scaleY), 0, Math.max(imageHeight - cropHeight, 0));
 
             CurrentConversionSettings.croppingFrameX = frameX;
             CurrentConversionSettings.croppingFrameY = frameY;
