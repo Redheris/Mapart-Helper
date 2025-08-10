@@ -29,6 +29,12 @@ public class ClientTickHandler {
             while (openScreen.wasPressed()) {
                 client.setScreen(new MapartEditorScreen());
             }
+            if (client.world != null && !SessionVariables.fakeItemFrames.isEmpty()) {
+                long liveTime = client.world.getTime() - SessionVariables.fakeFramesBornTime;
+                if (liveTime >= MapartHelper.config.commonConfiguration.fakeItemFramesLiveTime) {
+                    SessionVariables.removeFakeItemFrames(client.world);
+                }
+            }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {

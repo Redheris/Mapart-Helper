@@ -26,6 +26,7 @@
   "key.maparthelper.openScreen": "Открыть редактор мапартов",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "Для /mart save selection",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor": "Цвет при выделении мапарта",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Длительность показа фейковых рамок (в тиках)",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "на основании которой можно будет удобнее настроить пользовательскую палитру,",

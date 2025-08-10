@@ -11,6 +11,8 @@ public class CommonConfiguration implements ConfigData {
     @ConfigEntry.ColorPicker
     public int selectionColor = 0x9900ff;
 
+    public int fakeItemFramesLiveTime = 100;
+
     @ConfigEntry.Gui.Tooltip(count = 2)
     @ConfigEntry.Gui.CollapsibleObject
     public UseInBlockPalette useInPalette = new UseInBlockPalette();
