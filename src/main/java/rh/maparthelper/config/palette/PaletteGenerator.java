@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.palette;
+package rh.maparthelper.config.palette;
 
 import net.minecraft.block.*;
 import net.minecraft.item.ItemStack;
@@ -6,6 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.conversion.colors.MapColorEntry;
 
 import java.util.*;
 
@@ -20,11 +21,9 @@ public class PaletteGenerator {
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
-
     public static void initColors(Map<Integer, List<Block>> palette) {
         palette.clear();
-        argbMapColors.clear();
+        PaletteColors.argbMapColors.clear();
 
         for (Block block : Registries.BLOCK) {
             BlockState state = block.getDefaultState();
@@ -62,7 +61,7 @@ public class PaletteGenerator {
 
     private static void addARGBMapColorEntries(MapColor mapColor) {
         if (mapColor == MapColor.WATER_BLUE) {
-            argbMapColors.put(
+            PaletteColors.argbMapColors.put(
                     mapColor.getRenderColor(MapColor.Brightness.NORMAL),
                     new MapColorEntry(mapColor, MapColor.Brightness.NORMAL)
             );
@@ -75,7 +74,7 @@ public class PaletteGenerator {
             for (MapColor.Brightness brightness : brightnesses) {
                 int argb = mapColor.getRenderColor(brightness);
                 MapColorEntry entry = new MapColorEntry(mapColor, brightness);
-                argbMapColors.put(argb, entry);
+                PaletteColors.argbMapColors.put(argb, entry);
             }
         }
     }

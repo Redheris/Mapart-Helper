@@ -12,7 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import rh.maparthelper.conversion.palette.config.PaletteConfigManager;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -60,12 +60,6 @@ public class ClientCommands {
                                 );
                                 return 1;
                             }))
-                        .then(literal("test")
-                            .executes(ctx -> {
-                                // Just a temporary testing code :)
-                                return 1;
-                            })
-                        )
                 )
             ));
     }

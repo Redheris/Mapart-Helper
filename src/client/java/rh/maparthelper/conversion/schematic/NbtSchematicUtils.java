@@ -9,9 +9,9 @@ import net.minecraft.nbt.NbtList;
 import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.CurrentConversionSettings;
-import rh.maparthelper.conversion.palette.PaletteColors;
-import rh.maparthelper.conversion.palette.PaletteGenerator;
-import rh.maparthelper.conversion.palette.config.PaletteConfigManager;
+import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.config.palette.PaletteGenerator;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
 import java.util.*;

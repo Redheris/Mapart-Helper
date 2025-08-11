@@ -12,8 +12,8 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import rh.maparthelper.conversion.palette.MapColorEntry;
-import rh.maparthelper.conversion.palette.PaletteColors;
+import rh.maparthelper.conversion.colors.MapColorEntry;
+import rh.maparthelper.config.palette.PaletteColors;
 
 import java.util.ArrayList;
 import java.util.List;

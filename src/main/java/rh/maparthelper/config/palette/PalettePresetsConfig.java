@@ -1,8 +1,7 @@
-package rh.maparthelper.conversion.palette.config;
+package rh.maparthelper.config.palette;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import rh.maparthelper.conversion.palette.PaletteGenerator;
 
 import java.util.*;
 
@@ -78,7 +77,7 @@ public class PalettePresetsConfig {
     }
 
     public static class PalettePreset {
-        private final Map<MapColor, Block> colors = new TreeMap<>(Comparator.comparingInt(o -> o.id));
+        public final Map<MapColor, Block> colors = new TreeMap<>(Comparator.comparingInt(o -> o.id));
 
         private PalettePreset(Map<MapColor, Block> colors) {
             this.colors.putAll(colors);
@@ -88,16 +87,12 @@ public class PalettePresetsConfig {
             this.colors.putAll(origin.colors);
         }
 
-        public List<Block> getBlocks() {
+        List<Block> getBlocks() {
             return new ArrayList<>(colors.values().stream().toList());
         }
 
-        public Block getBlockOfMapColor(MapColor color) {
+        Block getBlockOfMapColor(MapColor color) {
             return colors.get(color);
-        }
-
-        public void changeEntry(MapColor color, Block block) {
-            colors.put(color, block);
         }
     }
 }

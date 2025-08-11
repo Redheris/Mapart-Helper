@@ -3,7 +3,7 @@ package rh.maparthelper.event;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.texture.TextureManager;
 import rh.maparthelper.conversion.CurrentConversionSettings;
-import rh.maparthelper.conversion.palette.config.PaletteConfigManager;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 
 public class ModEventsHandler {
 

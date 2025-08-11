@@ -9,8 +9,8 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.ColorUtils;
-import rh.maparthelper.conversion.palette.MapColorEntry;
-import rh.maparthelper.conversion.palette.PaletteColors;
+import rh.maparthelper.conversion.colors.MapColorEntry;
+import rh.maparthelper.config.palette.PaletteColors;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

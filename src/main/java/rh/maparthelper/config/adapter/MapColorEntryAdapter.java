@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.palette.config;
+package rh.maparthelper.config.adapter;
 
 import com.google.gson.*;
 import net.minecraft.block.Block;

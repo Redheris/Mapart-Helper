@@ -1,16 +1,15 @@
-package rh.maparthelper.conversion.palette;
+package rh.maparthelper.config.palette;
 
 import net.minecraft.block.MapColor;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.colors.ColorUtils;
-import rh.maparthelper.conversion.palette.config.PaletteConfigManager;
+import rh.maparthelper.conversion.colors.MapColorEntry;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static rh.maparthelper.conversion.palette.PaletteGenerator.argbMapColors;
-
 public class PaletteColors {
+    static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
     static final Map<Integer, MapColorEntry> cachedClosestColors = new HashMap<>();
 
     public static MapColorEntry getMapColorEntryByARGB(int argb) {

@@ -9,7 +9,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rh.maparthelper.config.BlockTypeAdapter;
+import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.MapartHelperConfig;
 
 public class MapartHelper implements ModInitializer {
