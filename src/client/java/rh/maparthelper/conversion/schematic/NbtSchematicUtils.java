@@ -10,7 +10,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.BlocksPalette;
 import rh.maparthelper.conversion.CurrentConversionSettings;
-import rh.maparthelper.conversion.pallete.PaletteConfigManager;
+import rh.maparthelper.conversion.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
 import java.util.*;

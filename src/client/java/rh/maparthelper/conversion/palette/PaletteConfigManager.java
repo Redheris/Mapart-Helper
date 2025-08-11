@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.pallete;
+package rh.maparthelper.conversion.palette;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.conversion.pallete.gson.MapColorEntryAdapter;
+import rh.maparthelper.conversion.palette.gson.MapColorEntryAdapter;
 
 import java.io.FileReader;
 import java.io.FileWriter;

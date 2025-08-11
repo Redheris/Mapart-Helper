@@ -2,7 +2,7 @@ package rh.maparthelper;
 
 import net.fabricmc.api.ClientModInitializer;
 import rh.maparthelper.config.ConversionConfiguration;
-import rh.maparthelper.conversion.pallete.PaletteConfigManager;
+import rh.maparthelper.conversion.palette.PaletteConfigManager;
 import rh.maparthelper.event.ModEventsHandler;
 
 public class MapartHelperClient implements ClientModInitializer {
