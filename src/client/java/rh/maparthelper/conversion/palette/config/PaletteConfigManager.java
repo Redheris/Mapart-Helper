@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.config.BlockTypeAdapter;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,12 +20,46 @@ public class PaletteConfigManager {
     private static final Path PRESETS_PATH = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("palette_presets.json");
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
+            .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
             .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorEntryAdapter())
             .create();
 
     public static PalettePresetsConfig palettePresetsConfig;
+    public static CompletePalette completePalette;
 
-    // Reading JSON file containing all user presets
+    public static void regenerateCompletePalette() {
+        completePalette = new CompletePalette();
+        saveCompletePalette();
+    }
+
+    // JSON file containing complete palette for setting presets in GUI
+    public static void readCompletePalette() {
+        Path completePaletepath = PRESETS_PATH.resolveSibling("complete_palette.json");
+        if (!Files.exists(completePaletepath)) {
+            completePalette = new CompletePalette();
+            saveCompletePalette();
+            return;
+        }
+        try (FileReader reader = new FileReader(completePaletepath.toFile())) {
+            completePalette = gson.fromJson(reader, CompletePalette.class);
+            if (completePalette == null) {
+                completePalette = new CompletePalette();
+            }
+            saveCompletePalette();
+        } catch (Exception e) {
+            MapartHelper.LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    public static void saveCompletePalette() {
+        try (FileWriter writer = new FileWriter(PRESETS_PATH.resolveSibling("complete_palette.json").toFile())) {
+            gson.toJson(completePalette, writer);
+        } catch (IOException e) {
+            MapartHelper.LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    // JSON file containing all user presets
     public static void readPresetsFile() {
         if (!Files.exists(PRESETS_PATH)) {
             palettePresetsConfig = new PalettePresetsConfig();
@@ -43,7 +78,6 @@ public class PaletteConfigManager {
         }
     }
 
-    // Updating JSON file containing all user presets
     public static void savePresetsFile() {
         try (FileWriter writer = new FileWriter(PRESETS_PATH.toFile())) {
             gson.toJson(palettePresetsConfig, writer);

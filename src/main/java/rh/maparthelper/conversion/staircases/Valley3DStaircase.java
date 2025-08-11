@@ -1,7 +1,6 @@
 package rh.maparthelper.conversion.staircases;
 
 import net.minecraft.block.MapColor;
-import rh.maparthelper.conversion.BlocksPalette;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +74,9 @@ public class Valley3DStaircase implements IMapartStaircase {
     }
 
     private static MapColor.Brightness getBrightness(int[][] colors, int x, int z) {
-        return BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).brightness();
+        // TODO: dummy cal
+//        return BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).brightness();
+        return null;
     }
 
     private static int getHeightShift(int[][] colors, int x, int z) {

@@ -8,8 +8,9 @@ import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
-import rh.maparthelper.conversion.BlocksPalette;
 import rh.maparthelper.conversion.CurrentConversionSettings;
+import rh.maparthelper.conversion.palette.PaletteColors;
+import rh.maparthelper.conversion.palette.PaletteGenerator;
 import rh.maparthelper.conversion.palette.config.PaletteConfigManager;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
@@ -60,7 +61,7 @@ public class NbtSchematicUtils {
         NbtList palette = new NbtList();
 
         for (Block block : blocks_list) {
-            BlockState blockState = BlocksPalette.getDefaultPaletteState(block);
+            BlockState blockState = PaletteGenerator.getDefaultPaletteState(block);
             NbtCompound blockEntry = NbtHelper.fromBlockState(blockState);
             palette.add(blockEntry);
         }
@@ -115,7 +116,7 @@ public class NbtSchematicUtils {
             }
             for (int z = 1; z < height + 1; z++) {
                 for (int x = 0; x < width; x++) {
-                    MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
+                    MapColor color = PaletteColors.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
                     if (color != MapColor.CLEAR)
                         addColorToNbt(nbt, x, 0, z, color);
                     else
@@ -138,7 +139,7 @@ public class NbtSchematicUtils {
                     int y = converted.get(z).get(x);
                     maxHeight = Math.max(y, maxHeight);
 
-                    MapColor color = BlocksPalette.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
+                    MapColor color = PaletteColors.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
                     if (color != MapColor.CLEAR)
                         addColorToNbt(nbt, x, y, z, color);
                     else

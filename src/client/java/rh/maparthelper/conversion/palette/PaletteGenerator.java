@@ -1,23 +1,17 @@
-package rh.maparthelper.conversion;
+package rh.maparthelper.conversion.palette;
 
 import net.minecraft.block.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
-import org.joml.Vector2i;
-import rh.maparthelper.MapUtils;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.conversion.colors.ColorUtils;
 
 import java.util.*;
 
 import static java.util.Map.entry;
 
-public class BlocksPalette {
+public class PaletteGenerator {
     // Lists of block classes for blocking/enabling by configs
     private static final Class<?>[] NEED_WATER_BLOCKS;
     private static final Class<?>[] MEANINGLESS_BLOCKS;
@@ -26,11 +20,9 @@ public class BlocksPalette {
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
 
-    private static final Map<MapColor, ArrayList<Block>> palette = new TreeMap<>(Comparator.comparingInt(o -> o.id));
-    private static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
-    private static final Map<Integer, MapColorEntry> cachedClosestColors = new HashMap<>();
+    static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
 
-    public static void initColors() {
+    public static void initColors(Map<Integer, List<Block>> palette) {
         palette.clear();
         argbMapColors.clear();
 
@@ -40,17 +32,17 @@ public class BlocksPalette {
             if (color == MapColor.CLEAR)
                 continue;
             if (color != null) {
-                if (!palette.containsKey(color))
-                    palette.put(color, new ArrayList<>());
+                if (!palette.containsKey(color.id))
+                    palette.put(color.id, new ArrayList<>());
                 boolean useCreativeBlocks = MapartHelper.config.commonConfiguration.useInPalette.creativeBlocks;
                 if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE))
-                    palette.get(color).add(block);
+                    palette.get(color.id).add(block);
             }
         }
 
-        for (MapColor color : palette.keySet()) {
-            if (!palette.get(color).isEmpty())
-                addARGBMapColorEntries(color);
+        for (int colorId : palette.keySet()) {
+            if (!palette.get(colorId).isEmpty())
+                addARGBMapColorEntries(MapColor.get(colorId));
         }
 
         ItemStack[] toolItems = {
@@ -61,8 +53,8 @@ public class BlocksPalette {
                 new ItemStack(Items.NETHERITE_HOE),
                 new ItemStack(Items.SHEARS)
         };
-        for (MapColor key : palette.keySet()) {
-            palette.get(key).sort((b1, b2) ->
+        for (int colorId : palette.keySet()) {
+            palette.get(colorId).sort((b1, b2) ->
                     Float.compare(getRoughMinBreakingSpeed(b1, toolItems), getRoughMinBreakingSpeed(b2, toolItems))
             );
         }
@@ -88,11 +80,6 @@ public class BlocksPalette {
         }
     }
 
-    public static MapColorEntry getMapColorEntryByARGB(int argb) {
-        if (argb == 0) return MapColorEntry.CLEAR;
-        return argbMapColors.get(argb);
-    }
-
     private static boolean useBlockInPalette(Block block) {
         var useInPalette = MapartHelper.config.commonConfiguration.useInPalette;
 
@@ -108,98 +95,6 @@ public class BlocksPalette {
         if (!useInPalette.needWaterBlocks && matchesAny(block, NEED_WATER_BLOCKS)) return false;
         if (!useInPalette.growableBlocks && matchesAny(block, GROWABLE_BLOCKS)) return false;
         return useInPalette.grassLikeBlocks || !matchesAny(block, GRASS_LIKE_BLOCKS);
-    }
-
-
-    public static ArrayList<Block> getBlocksOfColor(MapColor color) {
-        return palette.get(color);
-    }
-
-    public static MapColor[] getMapColors() {
-        return palette.keySet().toArray(new MapColor[0]);
-    }
-
-    private static MapColorEntry getClosestColor3D(int argb) {
-        MapColorEntry closest = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
-        double minDist = Integer.MAX_VALUE;
-
-        for (MapColor color : palette.keySet()) {
-            for (int brightId = 0; brightId < 3; brightId++) {
-                MapColor.Brightness brightness;
-                brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.NORMAL : MapColor.Brightness.validateAndGet(brightId);
-                int current = color.getRenderColor(brightness);
-
-                if (current == argb) return new MapColorEntry(color, brightness);
-
-                double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closest = new MapColorEntry(color, brightness);
-                }
-
-                if (color == MapColor.WATER_BLUE) break;
-            }
-        }
-
-        return closest;
-    }
-
-    private static MapColorEntry getClosestColor2D(int argb) {
-        MapColor closest = MapColor.CLEAR;
-        double minDist = Integer.MAX_VALUE;
-
-        for (MapColor color : palette.keySet()) {
-            int current = color.getRenderColor(MapColor.Brightness.NORMAL);
-            if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL);
-            double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);
-            if (dist < minDist) {
-                minDist = dist;
-                closest = color;
-            }
-        }
-
-        return new MapColorEntry(closest, MapColor.Brightness.NORMAL);
-    }
-
-    public static MapColorEntry getClosestColor(int argb, boolean use3D) {
-        if (((argb >> 24) & 0xFF) < 80) return MapColorEntry.CLEAR;
-        if (use3D)
-            return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor3D);
-        return cachedClosestColors.computeIfAbsent(argb, BlocksPalette::getClosestColor2D);
-    }
-
-    public static void clearColorCache(){
-        cachedClosestColors.clear();
-        ColorUtils.clearRgb2LabCache();
-    }
-
-    public static void placeBlocksFromPalette(World world, int playerX, int y, int playerZ) {
-        Vector2i startPos = MapUtils.getMapAreaStartPos(playerX, playerZ);
-        int startX = startPos.x;
-        int startZ = startPos.y;
-
-        int maxLen = palette.values().stream().mapToInt(ArrayList::size).max().orElse(0);
-
-        BlockPos.Mutable pos = new BlockPos.Mutable(startX, y, startZ);
-        for (int x = 0; x < maxLen; x++) {
-            for (int z = -1; z < palette.size(); z++) {
-                world.setBlockState(pos.add(x, 0, z), Blocks.GRASS_BLOCK.getDefaultState());
-            }
-        }
-
-        pos.set(startX, y, startZ);
-        for (MapColor color : palette.keySet()) {
-            for (Block block : palette.get(color)) {
-                world.setBlockState(pos, getDefaultPaletteState(block), 18);
-                pos = pos.move(Direction.EAST);
-                if (pos.getX() == startX + 128) {
-                    pos = pos.move(Direction.WEST, 128);
-                    pos = pos.move(Direction.SOUTH);
-                }
-            }
-            pos = pos.move(Direction.WEST, pos.getX() - startX);
-            pos = pos.move(Direction.SOUTH);
-        }
     }
 
     public static BlockState getDefaultPaletteState(Block block) {
@@ -229,7 +124,7 @@ public class BlocksPalette {
         return false;
     }
 
-    public static Map<MapColor, Block> getDefaultPalette() {
+    public static Map<MapColor, Block> getDefaultPreset() {
         return Map.<MapColor, Block>ofEntries(
                 entry(MapColor.PALE_GREEN, Blocks.GRASS_BLOCK),
                 entry(MapColor.PALE_YELLOW, Blocks.SANDSTONE),
@@ -244,7 +139,7 @@ public class BlocksPalette {
                 entry(MapColor.STONE_GRAY, Blocks.STONE),
                 entry(MapColor.OAK_TAN, Blocks.OAK_PLANKS),
                 entry(MapColor.OFF_WHITE, Blocks.DIORITE),
-                entry(MapColor.ORANGE, Blocks.TERRACOTTA),
+                entry(MapColor.ORANGE, Blocks.ORANGE_WOOL),
                 entry(MapColor.MAGENTA, Blocks.MAGENTA_WOOL),
                 entry(MapColor.LIGHT_BLUE, Blocks.LIGHT_BLUE_WOOL),
                 entry(MapColor.YELLOW, Blocks.YELLOW_WOOL),
@@ -379,9 +274,5 @@ public class BlocksPalette {
                 LightningRodBlock.class,
                 CarvedPumpkinBlock.class
         };
-    }
-
-    public record MapColorEntry(MapColor mapColor, MapColor.Brightness brightness) {
-        public static final MapColorEntry CLEAR = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
     }
 }

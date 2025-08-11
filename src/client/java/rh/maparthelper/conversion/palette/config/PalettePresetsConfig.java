@@ -2,7 +2,7 @@ package rh.maparthelper.conversion.palette.config;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import rh.maparthelper.conversion.BlocksPalette;
+import rh.maparthelper.conversion.palette.PaletteGenerator;
 
 import java.util.*;
 
@@ -17,6 +17,10 @@ public class PalettePresetsConfig {
     // Returns String array of palettes names for using as lists in game
     public String[] getPaletteNames() {
         return presets.keySet().toArray(String[]::new);
+    }
+
+    public Set<MapColor> getCurrentPresetColors() {
+        return presets.get(currentPreset).colors.keySet();
     }
 
     public List<Block> getPresetBlocks(String presetName) {
@@ -51,8 +55,7 @@ public class PalettePresetsConfig {
         if (presets == null)
             presets = new HashMap<>();
         String presetName = "New Preset";
-        Map<MapColor, Block> defaultPalette = BlocksPalette.getDefaultPalette();
-        PalettePreset preset = new PalettePreset(defaultPalette);
+        PalettePreset preset = new PalettePreset(PaletteGenerator.getDefaultPreset());
         presets.put(presetName, preset);
         currentPreset = presetName;
     }
@@ -75,14 +78,14 @@ public class PalettePresetsConfig {
     }
 
     public static class PalettePreset {
-        private final Map<MapColor, Block> colors;
+        private final Map<MapColor, Block> colors = new TreeMap<>(Comparator.comparingInt(o -> o.id));
 
         private PalettePreset(Map<MapColor, Block> colors) {
-            this.colors = colors;
+            this.colors.putAll(colors);
         }
 
         public PalettePreset(PalettePreset origin) {
-            this.colors = new HashMap<>(origin.colors);
+            this.colors.putAll(origin.colors);
         }
 
         public List<Block> getBlocks() {

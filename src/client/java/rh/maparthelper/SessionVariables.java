@@ -12,7 +12,8 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import rh.maparthelper.conversion.BlocksPalette;
+import rh.maparthelper.conversion.palette.MapColorEntry;
+import rh.maparthelper.conversion.palette.PaletteColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +103,7 @@ public class SessionVariables {
         MapState mapState = MapState.of((byte) 1, false, null);
         mapState.colors = new byte[map.length];
         for (int i = 0; i < map.length; i++) {
-            BlocksPalette.MapColorEntry color = BlocksPalette.getClosestColor(map[i], MapartHelperClient.conversionConfig.use3D());
+            MapColorEntry color = PaletteColors.getClosestColor(map[i], MapartHelperClient.conversionConfig.use3D());
             mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());
         }
 

@@ -2,6 +2,8 @@ package rh.maparthelper;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -10,12 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import rh.maparthelper.conversion.BlocksPalette;
+import rh.maparthelper.conversion.palette.config.PaletteConfigManager;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-
+@Environment(EnvType.CLIENT)
 public class ClientCommands {
 
     public static void registerCommands() {

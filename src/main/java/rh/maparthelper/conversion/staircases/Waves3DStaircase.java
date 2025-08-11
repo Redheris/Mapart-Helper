@@ -1,7 +1,6 @@
 package rh.maparthelper.conversion.staircases;
 
 import net.minecraft.block.MapColor;
-import rh.maparthelper.conversion.BlocksPalette;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +46,9 @@ public class Waves3DStaircase implements IMapartStaircase {
 
     private static int getHeightAlt(int[][] colors, int x, int z) {
         if (z == colors.length) return 0;
-        MapColor.Brightness brightness = BlocksPalette.getMapColorEntryByARGB(colors[z][x]).brightness();
+        // TODO: dummy call
+//        MapColor.Brightness brightness = BlocksPalette.getMapColorEntryByARGB(colors[z][x]).brightness();
+        MapColor.Brightness brightness = null;
         if (brightness == MapColor.Brightness.LOW) return 1;
         if (brightness == MapColor.Brightness.HIGH) return -1;
         return 0;

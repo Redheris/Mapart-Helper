@@ -9,13 +9,18 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.ColorUtils;
+import rh.maparthelper.conversion.palette.MapColorEntry;
+import rh.maparthelper.conversion.palette.PaletteColors;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.file.Path;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 public class MapartImageConverter {
     public static final int NO_CROP = -1;
@@ -83,13 +88,13 @@ public class MapartImageConverter {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 if (Thread.currentThread().isInterrupted()) {
-                    BlocksPalette.clearColorCache();
+                    PaletteColors.clearColorCache();
                     return;
                 }
                 int argb = pixels[x + y * image.getWidth()];
                 if (argb == 0) continue;
                 int newArgb;
-                BlocksPalette.MapColorEntry color = BlocksPalette.getClosestColor(argb, use3D);
+                MapColorEntry color = PaletteColors.getClosestColor(argb, use3D);
                 if (y > 0 && pixels[x + (y - 1) * image.getWidth()] == 0)
                     newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
                 else
@@ -98,7 +103,7 @@ public class MapartImageConverter {
             }
         }
 
-        BlocksPalette.clearColorCache();
+        PaletteColors.clearColorCache();
 
         if (logExecutionTime) {
             double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
