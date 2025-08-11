@@ -53,7 +53,7 @@ public class ClientCommands {
                         .then(literal("regenerate")
                             .executes(ctx -> {
                                 // Regenerates blocks palette to correspond to the configs and game's blocks list
-                                BlocksPalette.initColors();
+                                PaletteConfigManager.regenerateCompletePalette();
                                 ctx.getSource().getPlayer().sendMessage(Text.translatable(
                                         "maparthelper.blocks_palette_generated").formatted(Formatting.GREEN),
                                         true
