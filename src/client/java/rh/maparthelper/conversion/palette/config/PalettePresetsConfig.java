@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.palette;
+package rh.maparthelper.conversion.palette.config;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
