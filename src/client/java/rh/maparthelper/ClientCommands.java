@@ -13,6 +13,8 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.conversion.CurrentConversionSettings;
+import rh.maparthelper.conversion.NativeImageUtils;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -46,6 +48,16 @@ public class ClientCommands {
                 .then(literal("beams")
                         .executes(ctx -> {
                             SessionVariables.showMapartStartPos = !SessionVariables.showMapartStartPos;
+                            Text status;
+                            if (SessionVariables.showMapartStartPos)
+                                status = Text.translatable("maparthelper.beams_on").formatted(Formatting.GREEN);
+                            else
+                                status = Text.translatable("maparthelper.beams_off").formatted(Formatting.RED);
+                            ctx.getSource().getPlayer().sendMessage(
+                                    Text.translatable("maparthelper.beams_change_status", status)
+                                            .formatted(Formatting.DARK_AQUA),
+                                    true
+                            );
                             return 1;
                         })
                 )
@@ -63,6 +75,10 @@ public class ClientCommands {
                         .then(literal("update")
                             .executes(ctx -> {
                                 PaletteConfigManager.readPresetsConfigFile();
+                                ctx.getSource().getPlayer().sendMessage(Text.translatable(
+                                                "maparthelper.presets_config_updated").formatted(Formatting.GREEN),
+                                        true
+                                );
                                 return 1;
                             })
                         )

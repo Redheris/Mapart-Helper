@@ -13,7 +13,7 @@ public class CommonConfiguration implements ConfigData {
 
     public int fakeItemFramesLiveTime = 100;
 
-    @ConfigEntry.Gui.Tooltip(count = 2)
+    @ConfigEntry.Gui.Tooltip(count = 3)
     @ConfigEntry.Gui.CollapsibleObject
     public UseInBlockPalette useInPalette = new UseInBlockPalette();
 
