@@ -88,7 +88,7 @@ public class NbtSchematicUtils {
     }
 
     protected static void addColorToNbt(NbtCompound nbt, int x, int y, int z, MapColor color) {
-        Block block = PaletteConfigManager.palettePresetsConfig.getBlockOfMapColor(color);
+        Block block = PaletteConfigManager.presetsConfig.getBlockOfMapColor(color);
         addBlockToNbt(nbt, x, y, z, block);
         if (y == 0) return;
         int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;

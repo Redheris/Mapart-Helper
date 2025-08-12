@@ -6,84 +6,90 @@ import net.minecraft.block.MapColor;
 import java.util.*;
 
 public class PalettePresetsConfig {
-    private String currentPreset;
-    private Map<String, PalettePreset> presets;
+    String currentPresetFile;
+    public Map<String, String> presetFiles = new HashMap<>();
+    transient Map<String, PalettePreset> presets = new HashMap<>();
 
-    PalettePresetsConfig() {
-        createNewPreset();
+    static PalettePresetsConfig createDefaultConfig() {
+        PalettePresetsConfig config = new PalettePresetsConfig();
+        config.createNewPreset();
+        return config;
     }
 
-    // Returns String array of palettes names for using as lists in game
-    public String[] getPaletteNames() {
-        return presets.keySet().toArray(String[]::new);
+    public Set<String> getPresetKeys() {
+        return presetFiles.keySet();
+    }
+
+    public Set<MapColor> getPresetColors(String filename) {
+        return presets.get(filename).colors.keySet();
     }
 
     public Set<MapColor> getCurrentPresetColors() {
-        return presets.get(currentPreset).colors.keySet();
+        return getPresetColors(currentPresetFile);
     }
 
-    public List<Block> getPresetBlocks(String presetName) {
-        return presets.get(presetName).getBlocks();
+    public List<Block> getPresetBlocks(String preset) {
+        return presets.get(preset).getBlocks();
     }
+
     public List<Block> getCurrentPresetBlocks() {
-        return getPresetBlocks(currentPreset);
+        return getPresetBlocks(currentPresetFile);
     }
 
-    public Block getPresetBlockOfMapColor(String presetName, MapColor color) {
-        return presets.get(presetName).getBlockOfMapColor(color);
+    public Block getPresetBlockOfMapColor(String preset, MapColor color) {
+        return presets.get(preset).getBlockOfMapColor(color);
     }
+
     public Block getBlockOfMapColor(MapColor color) {
-        return getPresetBlockOfMapColor(currentPreset, color);
+        return getPresetBlockOfMapColor(currentPresetFile, color);
     }
 
     // Returns a clone of the preset for editing
-    public PalettePreset copyPreset(String name) {
-        return new PalettePreset(presets.get(name));
+    public PalettePreset copyPreset(String key) {
+        return new PalettePreset(presets.get(key));
     }
 
     // Updates preset after in-game editing
-    public void updatePreset(String name, PalettePreset preset) {
-        presets.replace(name, preset);
+    public void updatePreset(String key, PalettePreset preset) {
+        presets.replace(key, preset);
     }
 
-    void changeCurrentPreset(String name) {
-        currentPreset = name;
+    void changeCurrentPreset(String key) {
+        currentPresetFile = key;
     }
 
     void createNewPreset() {
-        if (presets == null)
-            presets = new HashMap<>();
-        String presetName = "New Preset";
-        PalettePreset preset = new PalettePreset(PaletteGenerator.getDefaultPreset());
+        String presetName = "new_preset.json";
+        PalettePreset preset = PaletteGenerator.getDefaultPreset();
+        presetFiles.put(presetName, "New Preset");
         presets.put(presetName, preset);
-        currentPreset = presetName;
+        currentPresetFile = presetName;
     }
 
-    void duplicatePreset(String name) {
-        presets.put(name + " (Copy)", new PalettePreset(presets.get(name)));
+    void duplicatePreset(String filename) {
+        PalettePreset preset = new PalettePreset(presets.get(filename));
+        presets.put(filename + " (Copy).json", preset);
+        presetFiles.put(filename + " (Copy).json", presetFiles.get(filename) + " (Copy)");
     }
 
-    void validateConfig() {
-        if (presets.isEmpty()) {
-            createNewPreset();
-        } else if (!presets.containsKey(currentPreset)) {
-            currentPreset = presets.keySet().iterator().next();
-        }
-    }
-
-    void renamePreset(String oldName, String newName) {
-        presets.put(newName, presets.get(oldName));
-        presets.remove(oldName);
+    void renamePreset(String filename, String newName) {
+        presetFiles.replace(filename, newName);
     }
 
     public static class PalettePreset {
-        public final Map<MapColor, Block> colors = new TreeMap<>(Comparator.comparingInt(o -> o.id));
+        public final Map<MapColor, Block> colors;
 
-        private PalettePreset(Map<MapColor, Block> colors) {
+        PalettePreset() {
+            this.colors = new TreeMap<>(Comparator.comparingInt(o -> o.id));
+        }
+
+        PalettePreset(Map<MapColor, Block> colors) {
+            this();
             this.colors.putAll(colors);
         }
 
-        public PalettePreset(PalettePreset origin) {
+        PalettePreset(PalettePreset origin) {
+            this();
             this.colors.putAll(origin.colors);
         }
 

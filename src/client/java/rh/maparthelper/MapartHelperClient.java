@@ -12,7 +12,7 @@ public class MapartHelperClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         MapartToFile.initializeSavesDir();
-        PaletteConfigManager.readPresetsFile();
+        PaletteConfigManager.readPresetsConfigFile();
 
         ClientCommands.registerCommands();
         ModEventsHandler.registerAll();

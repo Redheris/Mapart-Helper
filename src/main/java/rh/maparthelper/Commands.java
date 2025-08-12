@@ -63,7 +63,7 @@ public class Commands {
                                     }
                                 }
 
-                                Set<MapColor> paletteColors = PaletteConfigManager.palettePresetsConfig.getCurrentPresetColors();
+                                Set<MapColor> paletteColors = PaletteConfigManager.presetsConfig.getCurrentPresetColors();
                                 var it = paletteColors.iterator();
                                 for (int x = 0; x < paletteColors.size(); x++) {
                                     MapColor color = it.next();

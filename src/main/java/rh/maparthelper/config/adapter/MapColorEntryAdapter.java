@@ -7,8 +7,9 @@ import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class MapColorEntryAdapter implements JsonSerializer<Map<MapColor, Block>>, JsonDeserializer<Map<MapColor, Block>> {
     @Override
@@ -23,7 +24,7 @@ public class MapColorEntryAdapter implements JsonSerializer<Map<MapColor, Block>
 
     @Override
     public Map<MapColor, Block> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        Map<MapColor, Block> map = new HashMap<>();
+        Map<MapColor, Block> map = new TreeMap<>(Comparator.comparingInt(o -> o.id));
         JsonObject obj = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
             MapColor color = MapColors.valueOf(entry.getKey()).color;

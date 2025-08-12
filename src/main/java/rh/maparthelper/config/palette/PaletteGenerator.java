@@ -123,8 +123,8 @@ public class PaletteGenerator {
         return false;
     }
 
-    public static Map<MapColor, Block> getDefaultPreset() {
-        return Map.<MapColor, Block>ofEntries(
+    public static PalettePresetsConfig.PalettePreset getDefaultPreset() {
+        Map<MapColor, Block> colors = Map.<MapColor, Block>ofEntries(
                 entry(MapColor.PALE_GREEN, Blocks.GRASS_BLOCK),
                 entry(MapColor.PALE_YELLOW, Blocks.SANDSTONE),
                 entry(MapColor.WHITE_GRAY, Blocks.MUSHROOM_STEM),
@@ -186,6 +186,7 @@ public class PaletteGenerator {
                 entry(MapColor.RAW_IRON_PINK, Blocks.RAW_IRON_BLOCK),
                 entry(MapColor.LICHEN_GREEN, Blocks.GLOW_LICHEN)
         );
+        return new PalettePresetsConfig.PalettePreset(colors);
     }
 
     static {

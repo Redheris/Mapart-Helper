@@ -21,7 +21,7 @@ public class PaletteColors {
         MapColorEntry closest = new MapColorEntry(MapColor.CLEAR, MapColor.Brightness.NORMAL);
         double minDist = Integer.MAX_VALUE;
 
-        for (MapColor color : PaletteConfigManager.palettePresetsConfig.getCurrentPresetColors()) {
+        for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             for (int brightId = 0; brightId < 3; brightId++) {
                 MapColor.Brightness brightness;
                 brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.NORMAL : MapColor.Brightness.validateAndGet(brightId);
@@ -46,7 +46,7 @@ public class PaletteColors {
         MapColor closest = MapColor.CLEAR;
         double minDist = Integer.MAX_VALUE;
 
-        for (MapColor color : PaletteConfigManager.palettePresetsConfig.getCurrentPresetColors()) {
+        for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);
             if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL);
             double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);

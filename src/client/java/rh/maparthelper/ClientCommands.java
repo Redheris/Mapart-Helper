@@ -60,6 +60,12 @@ public class ClientCommands {
                                 );
                                 return 1;
                             }))
+                        .then(literal("update")
+                            .executes(ctx -> {
+                                PaletteConfigManager.readPresetsConfigFile();
+                                return 1;
+                            })
+                        )
                 )
             ));
     }
