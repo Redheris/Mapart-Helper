@@ -55,17 +55,12 @@ public class ColorUtils {
 
 
     public static double colorDistanceARGB(int argb1, int argb2) {
-        int r1 = (argb1 >> 16) & 0xFF;
-        int g1 = (argb1 >> 8) & 0xFF;
-        int b1 = argb1 & 0xFF;
+        int[] rgb1 = getRGB(argb1);
+        int[] rgb2 = getRGB(argb2);
 
-        int r2 = (argb2 >> 16) & 0xFF;
-        int g2 = (argb2 >> 8) & 0xFF;
-        int b2 = argb2 & 0xFF;
-
-        int dr = r1 - r2;
-        int dg = g1 - g2;
-        int db = b1 - b2;
+        int dr = rgb2[0] - rgb1[0];
+        int dg = rgb2[1] - rgb1[1];
+        int db = rgb2[2] - rgb1[2];
 
         return Math.sqrt(dr * dr + dg * dg + db * db);
     }
@@ -108,36 +103,29 @@ public class ColorUtils {
         int height = image.getHeight();
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 
-        int argb, newArgb, alpha;
-        int[] rgb = new int[3];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                argb = image.getRGB(x, y);
-                alpha = (argb >> 24) & 0xFF;
-                rgb[0] = (argb >> 16) & 0xFF;
-                rgb[1] = (argb >> 8) & 0xFF;
-                rgb[2] = argb & 0xFF;
+                int[] argb = getARGB(image.getRGB(x, y));
 
-                if (!neutralBrightness) applyBrightness(rgb, brightnessFactor);
-                if (!neutralContrast) applyContrast(rgb, contrastFactor);
+                if (!neutralBrightness) applyBrightness(argb, brightnessFactor);
+                if (!neutralContrast) applyContrast(argb, contrastFactor);
 
-                newArgb = (alpha << 24) | (rgb[0] << 16) | (rgb[1] << 8) | rgb[2];
-                result.setRGB(x, y, newArgb);
+                result.setRGB(x, y, getARGB(argb));
             }
         }
         return neutralSaturation ? result : applySaturation(result, saturationFactor);
     }
 
-    private static void applyBrightness(int[] rgb, float brightnessFactor) {
-        rgb[0] = clamp((int) (rgb[0] * brightnessFactor), 0, 255);
-        rgb[1] = clamp((int) (rgb[1] * brightnessFactor), 0, 255);
-        rgb[2] = clamp((int) (rgb[2] * brightnessFactor), 0, 255);
+    private static void applyBrightness(int[] argb, float brightnessFactor) {
+        argb[1] = clamp((int) (argb[1] * brightnessFactor), 0, 255);
+        argb[2] = clamp((int) (argb[2] * brightnessFactor), 0, 255);
+        argb[3] = clamp((int) (argb[3] * brightnessFactor), 0, 255);
     }
 
-    private static void applyContrast(int[] rgb, float contrastFactor) {
-        rgb[0] = clamp((int) (contrastFactor * (rgb[0] - 128) + 128), 0, 255);
-        rgb[1] = clamp((int) (contrastFactor * (rgb[1] - 128) + 128), 0, 255);
-        rgb[2] = clamp((int) (contrastFactor * (rgb[2] - 128) + 128), 0, 255);
+    private static void applyContrast(int[] argb, float contrastFactor) {
+        argb[1] = clamp((int) (contrastFactor * (argb[1] - 128) + 128), 0, 255);
+        argb[2] = clamp((int) (contrastFactor * (argb[2] - 128) + 128), 0, 255);
+        argb[3] = clamp((int) (contrastFactor * (argb[3] - 128) + 128), 0, 255);
     }
 
     private static BufferedImage applySaturation(BufferedImage image, float saturationFactor) {
@@ -148,14 +136,8 @@ public class ColorUtils {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getRGB(x, y);
-
-                int alpha = (argb >> 24) & 0xFF;
-                int red = (argb >> 16) & 0xFF;
-                int green = (argb >> 8) & 0xFF;
-                int blue = argb & 0xFF;
-
-                float[] hsb = Color.RGBtoHSB(red, green, blue, null);
+                int[] argb = getARGB(image.getRGB(x, y));
+                float[] hsb = Color.RGBtoHSB(argb[1], argb[2], argb[3], null);
                 float hue = hsb[0];
                 float saturation = hsb[1];
                 float brightness = hsb[2];
@@ -163,11 +145,29 @@ public class ColorUtils {
                 saturation = Math.max(0f, Math.min(1f, saturation * saturationFactor));
 
                 int rgb = Color.HSBtoRGB(hue, saturation, brightness);
-                int newArgb = (alpha << 24) | (rgb & 0x00FFFFFF);
-                result.setRGB(x, y, newArgb);
+                result.setRGB(x, y, argb[0] << 24 | rgb);
             }
         }
 
         return result;
+    }
+
+    private static int[] getRGB(int argb) {
+        int r = (argb >> 16) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int b = argb & 0xFF;
+        return new int[]{r, g, b};
+    }
+
+    private static int[] getARGB(int argb) {
+        int a = (argb >> 24) & 0xFF;
+        int r = (argb >> 16) & 0xFF;
+        int g = (argb >> 8) & 0xFF;
+        int b = argb & 0xFF;
+        return new int[]{a, r, g, b};
+    }
+
+    private static int getARGB(int[] argb) {
+        return (argb[0] << 24) | (argb[1] << 16) | (argb[2] << 8) | argb[3];
     }
 }

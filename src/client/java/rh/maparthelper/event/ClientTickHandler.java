@@ -46,8 +46,8 @@ public class ClientTickHandler {
                 return;
 
             Vec3d pos = context.camera().getPos();
-            for (int x = 0; x < 2; x++) {
-                for (int y = 0; y < 2; y++) {
+            for (int x = -1; x < 2; x++) {
+                for (int y = -1; y < 2; y++) {
                     Vector2i mapPos = MapUtils.getMapAreaStartPos((int)pos.x + x * 128, (int)pos.z + y * 128);
                     if (x == 0 && y == 0 && Math.abs(pos.x - mapPos.x - 0.5) <= 0.4 && Math.abs(pos.z - mapPos.y - 0.5) <= 0.4) continue;
 
