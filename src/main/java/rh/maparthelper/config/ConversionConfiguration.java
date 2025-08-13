@@ -18,4 +18,7 @@ public class ConversionConfiguration implements ConfigData {
     public boolean use3D() {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
     }
+    public boolean useDithering() {
+        return this.ditheringAlgorithm != DitheringAlgorithms.NONE;
+    }
 }

@@ -11,12 +11,14 @@ import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.ColorUtils;
 import rh.maparthelper.conversion.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -83,23 +85,45 @@ public class MapartImageConverter {
     public static void convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
         long startTime = System.currentTimeMillis();
 
+        int width = image.getWidth();
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
+        int[] errorsArray = new int[0];
+        DitheringAlgorithms ditherAlg = MapartHelper.config.conversionSettings.ditheringAlgorithm;
+        if (ditherAlg != DitheringAlgorithms.NONE)
+            errorsArray = new int[ditherAlg.rowsNumber * width * 3];
+
         for (int y = 0; y < image.getHeight(); y++) {
-            for (int x = 0; x < image.getWidth(); x++) {
+            for (int x = 0; x < width; x++) {
                 if (Thread.currentThread().isInterrupted()) {
                     PaletteColors.clearColorCache();
                     return;
                 }
-                int argb = pixels[x + y * image.getWidth()];
+                int argb = pixels[x + y * width];
                 if (argb == 0) continue;
+                if (ditherAlg != DitheringAlgorithms.NONE) {
+                    int ind = x * 3;
+                    int[] argb0 = ColorUtils.getARGB(argb);
+                    argb0[1] = Math.clamp(argb0[1] + errorsArray[ind], 0, 255);
+                    argb0[2] = Math.clamp(argb0[2] + errorsArray[ind + 1], 0, 255);
+                    argb0[3] = Math.clamp(argb0[3] + errorsArray[ind + 2], 0, 255);
+                    argb = ColorUtils.getARGB(argb0);
+                }
                 int newArgb;
                 MapColorEntry color = PaletteColors.getClosestColor(argb, use3D);
-                if (y > 0 && pixels[x + (y - 1) * image.getWidth()] == 0)
+                if (ditherAlg != DitheringAlgorithms.NONE)
+                    ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
+                if (y > 0 && pixels[x + (y - 1) * width] == 0)
                     newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
                 else
                     newArgb = color.mapColor().getRenderColor(color.brightness());
-                pixels[x + y * image.getWidth()] = newArgb;
+                pixels[x + y * width] = newArgb;
+            }
+            if (ditherAlg != DitheringAlgorithms.NONE) {
+                for (int row = 1; row < ditherAlg.rowsNumber; row++) {
+                    System.arraycopy(errorsArray, row * width * 3, errorsArray, (row - 1) * width * 3, width * 3);
+                }
+                Arrays.fill(errorsArray, (ditherAlg.rowsNumber - 1) * width * 3, ditherAlg.rowsNumber * width * 3, 0);
             }
         }
 

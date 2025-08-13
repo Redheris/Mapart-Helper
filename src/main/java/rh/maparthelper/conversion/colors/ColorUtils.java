@@ -152,14 +152,14 @@ public class ColorUtils {
         return result;
     }
 
-    private static int[] getRGB(int argb) {
+    public static int[] getRGB(int argb) {
         int r = (argb >> 16) & 0xFF;
         int g = (argb >> 8) & 0xFF;
         int b = argb & 0xFF;
         return new int[]{r, g, b};
     }
 
-    private static int[] getARGB(int argb) {
+    public static int[] getARGB(int argb) {
         int a = (argb >> 24) & 0xFF;
         int r = (argb >> 16) & 0xFF;
         int g = (argb >> 8) & 0xFF;
@@ -167,7 +167,7 @@ public class ColorUtils {
         return new int[]{a, r, g, b};
     }
 
-    private static int getARGB(int[] argb) {
+    public static int getARGB(int[] argb) {
         return (argb[0] << 24) | (argb[1] << 16) | (argb[2] << 8) | argb[3];
     }
 }

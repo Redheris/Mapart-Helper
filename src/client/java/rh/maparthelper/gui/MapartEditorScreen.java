@@ -16,6 +16,7 @@ import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
@@ -85,6 +86,19 @@ public class MapartEditorScreen extends Screen {
                 }
         ).size(150, 20).build();
         settings.add(staircaseStyle);
+
+        ButtonWidget ditheringAlg = ButtonWidget.builder(
+                Text.of("Дизеринг: " + MapartHelperClient.conversionConfig.ditheringAlgorithm.name()),
+                btn -> {
+                    ConversionConfiguration config = MapartHelperClient.conversionConfig;
+                    int nextAlg = (config.ditheringAlgorithm.ordinal() + 1) % DitheringAlgorithms.values().length;
+                    config.ditheringAlgorithm = DitheringAlgorithms.values()[nextAlg];
+                    MapartImageConverter.updateMapart();
+                    btn.setMessage(Text.of("Дизеринг: " + config.ditheringAlgorithm.name()));
+                    AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
+                }
+        ).size(150, 20).build();
+        settings.add(ditheringAlg);
 
 
         ButtonWidget showGridButton = ButtonWidget.builder(
