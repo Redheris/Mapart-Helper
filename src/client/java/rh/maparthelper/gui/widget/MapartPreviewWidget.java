@@ -9,6 +9,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 
@@ -92,7 +93,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     public boolean scaleImageCrop(double mouseX, double mouseY, double verticalAmount, boolean mouseCenter) {
-        if (CurrentConversionSettings.cropMode == 1 && CurrentConversionSettings.guiMapartImage != null) {
+        if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP && CurrentConversionSettings.guiMapartImage != null) {
             int imageWidth = MapartImageConverter.lastImage.getWidth();
             int imageHeight = MapartImageConverter.lastImage.getHeight();
             double mapartAspect = (double) CurrentConversionSettings.getWidth() / CurrentConversionSettings.getHeight();
@@ -135,7 +136,7 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (CurrentConversionSettings.cropMode != 1 || MapartImageConverter.lastImage == null || button != 0)
+        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || MapartImageConverter.lastImage == null || button != 0)
             return false;
 
         int diffX = (int) deltaX;

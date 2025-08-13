@@ -18,7 +18,7 @@ public class CurrentConversionSettings {
     private static int height = 1;
 
     // Cropping settings
-    public static int cropMode = MapartImageConverter.AUTO_CROP;
+    public static CroppingMode cropMode = CroppingMode.AUTO_CROP;
     public static int croppingFrameX = 0;
     public static int croppingFrameY = 0;
     public static int croppingFrameWidth = 1;

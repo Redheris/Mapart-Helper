@@ -25,9 +25,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 public class MapartImageConverter {
-    public static final int NO_CROP = -1;
-    public static final int AUTO_CROP = 0;
-    public static final int USER_CROP = 1;
 
     public static BufferedImage lastImage;
     public static Path lastImagePath;
@@ -194,7 +191,6 @@ public class MapartImageConverter {
                 int frameHeight = CurrentConversionSettings.croppingFrameHeight;
                 yield cropAndScaleImage(image, frameX, frameY, frameWidth, frameHeight, mapartWidth, mapartHeight);
             }
-            default -> throw new IllegalArgumentException("Invalid cropping mode");
         };
     }
 

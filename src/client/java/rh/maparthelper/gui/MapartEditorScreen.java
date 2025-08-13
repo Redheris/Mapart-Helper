@@ -14,6 +14,7 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
+import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
@@ -63,10 +64,11 @@ public class MapartEditorScreen extends Screen {
         settings.add(size);
 
         ButtonWidget croppingMode = ButtonWidget.builder(
-                Text.of("Кадрирование: " + getNameOfCroppingMode(CurrentConversionSettings.cropMode)),
+                Text.of("Кадрирование: " + CurrentConversionSettings.cropMode.name()),
                 btn -> {
-                    CurrentConversionSettings.cropMode = (CurrentConversionSettings.cropMode + 2) % 3 - 1;
-                    btn.setMessage(Text.of("Кадрирование: " + getNameOfCroppingMode(CurrentConversionSettings.cropMode)));
+                    int nextMode = (CurrentConversionSettings.cropMode.ordinal() + 1) % CroppingMode.values().length;
+                    CurrentConversionSettings.cropMode = CroppingMode.values()[nextMode];
+                    btn.setMessage(Text.of("Кадрирование: " + CurrentConversionSettings.cropMode.name()));
                     MapartImageConverter.updateMapart();
                 }
         ).size(150, 20).build();
@@ -117,10 +119,9 @@ public class MapartEditorScreen extends Screen {
                     MapartHelper.config.conversionSettings.useLAB = !MapartHelper.config.conversionSettings.useLAB;
                     btn.setMessage(MapartHelper.config.conversionSettings.useLAB ? Text.of("LAB: вкл") :
                             Text.of("LAB: выкл"));
-                    AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                     MapartImageConverter.updateMapart();
                 }
-        ).size(80, 20).tooltip(Tooltip.of(Text.of("Повышает точность подбора цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
+        ).size(80, 20).tooltip(Tooltip.of(Text.of("Улучшает подбор цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
         settings.add(useLAB, positioner.copy());
 
         ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();
@@ -224,15 +225,6 @@ public class MapartEditorScreen extends Screen {
         CurrentConversionSettings.resetMapart();
         CurrentConversionSettings.imagePath = paths.getFirst();
         MapartImageConverter.readAndUpdateMapartImage(CurrentConversionSettings.imagePath);
-    }
-
-    private static String getNameOfCroppingMode(int mode) {
-        return switch (mode) {
-            case MapartImageConverter.NO_CROP -> "выкл";
-            case MapartImageConverter.AUTO_CROP -> "auto";
-            case MapartImageConverter.USER_CROP -> "manual";
-            default -> "?";
-        };
     }
 
 
