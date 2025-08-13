@@ -3,14 +3,14 @@ package rh.maparthelper.conversion.dithering;
 import java.util.Arrays;
 
 public enum DitheringAlgorithms {
-    NONE(new float[0], new int[0], new int[0]),
+    NONE(new int[0], new int[0], new int[0]),
     FLOYD_STEINBERG(
-            new float[]{7F/16, 3F/16, 5F/16, 1F/16},
+            new int[]{7, 3, 5, 1},
             new int[]{1, -1, 0, 1},
             new int[]{0, 1, 1, 1}
     ),
     ATKINSON(
-            new float[]{1F/8, 1F/8, 1F/8, 1F/8, 1F/8, 1F/8},
+            new int[]{1, 1, 1, 1, 1, 1},
             new int[]{1, 2, -1, 0, 1, 0},
             new int[]{0, 0, 1, 1, 1, 2}
     );
@@ -27,13 +27,17 @@ public enum DitheringAlgorithms {
      * (1/16)<br>
      * --X 7<br>
      * 3 5 1<br>
-     * Then kernel will be {7F/16, 3F/16, 5F/16, 1F/16} and two other arrays will be coordinate offsets with X at (0,0)
-     * @param kernel Array of algorithm's coefficients for diffusion error propagation
+     * Then weights will be {7, 3F, 5, 1} (/16 will apply as sum of the weights) and two other arrays will be coordinate offsets with X at (0,0)
+     * @param weights Array of algorithm's weights for diffusion error propagation
      * @param offsetX Array of horizontal (x) coordinate offsets
      * @param offsetY Array of vertical (y) coordinate offsets
      */
-    DitheringAlgorithms(float[] kernel, int[] offsetX, int[] offsetY) {
-        this.kernel = kernel;
+    DitheringAlgorithms(int[] weights, int[] offsetX, int[] offsetY) {
+        int sum = Arrays.stream(weights).sum();
+        this.kernel = new float[weights.length];
+        for (int i = 0; i < weights.length; i++) {
+            this.kernel[i] = (float) weights[i] / sum;
+        }
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.rowsNumber = Arrays.stream(offsetY).max().orElse(0) + 1;
