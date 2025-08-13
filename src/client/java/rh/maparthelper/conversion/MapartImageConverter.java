@@ -42,7 +42,6 @@ public class MapartImageConverter {
         if (path.equals(lastImagePath))
             future = new FutureTask<>(new ConvertImageFileRunnable(null, false), null);
         else {
-            lastImagePath = path;
             future = new FutureTask<>(new ConvertImageFileRunnable(path, false), null);
         }
 
@@ -70,7 +69,7 @@ public class MapartImageConverter {
             if (mapartTexture != null && mapartTexture.getImage() != null)
                 mapartTexture.getImage().writeTo(imagePath);
         } catch (Exception e) {
-            MapartHelper.LOGGER.error("Error occurred while saving an image: {}", e.toString());
+            MapartHelper.LOGGER.error("Error occurred while saving the image to \"{}\"", imagePath, e);
             throw new RuntimeException(e);
         }
     }
@@ -84,13 +83,15 @@ public class MapartImageConverter {
      **/
     public static void convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
         long startTime = System.currentTimeMillis();
+        PaletteColors.clearColorCache();
 
         int width = image.getWidth();
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
         int[] errorsArray = new int[0];
         DitheringAlgorithms ditherAlg = MapartHelper.config.conversionSettings.ditheringAlgorithm;
-        if (ditherAlg != DitheringAlgorithms.NONE)
+        boolean useDithering = ditherAlg != DitheringAlgorithms.NONE;
+        if (useDithering)
             errorsArray = new int[ditherAlg.rowsNumber * width * 3];
 
         for (int y = 0; y < image.getHeight(); y++) {
@@ -101,7 +102,7 @@ public class MapartImageConverter {
                 }
                 int argb = pixels[x + y * width];
                 if (argb == 0) continue;
-                if (ditherAlg != DitheringAlgorithms.NONE) {
+                if (useDithering) {
                     int ind = x * 3;
                     int[] argb0 = ColorUtils.getARGB(argb);
                     argb0[1] = Math.clamp(argb0[1] + errorsArray[ind], 0, 255);
@@ -110,8 +111,8 @@ public class MapartImageConverter {
                     argb = ColorUtils.getARGB(argb0);
                 }
                 int newArgb;
-                MapColorEntry color = PaletteColors.getClosestColor(argb, use3D);
-                if (ditherAlg != DitheringAlgorithms.NONE)
+                MapColorEntry color = PaletteColors.getClosestColor(argb, use3D, useDithering);
+                if (useDithering)
                     ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
                 if (y > 0 && pixels[x + (y - 1) * width] == 0)
                     newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
@@ -119,7 +120,7 @@ public class MapartImageConverter {
                     newArgb = color.mapColor().getRenderColor(color.brightness());
                 pixels[x + y * width] = newArgb;
             }
-            if (ditherAlg != DitheringAlgorithms.NONE) {
+            if (useDithering) {
                 for (int row = 1; row < ditherAlg.rowsNumber; row++) {
                     System.arraycopy(errorsArray, row * width * 3, errorsArray, (row - 1) * width * 3, width * 3);
                 }
@@ -127,12 +128,12 @@ public class MapartImageConverter {
             }
         }
 
-        PaletteColors.clearColorCache();
-
         if (logExecutionTime) {
             double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
             MapartHelper.LOGGER.info("[{}] Colors conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
         }
+
+        PaletteColors.clearColorCache();
     }
 
     public static BufferedImage scaleImage(BufferedImage image, int width, int height) {
@@ -211,8 +212,11 @@ public class MapartImageConverter {
             try {
                 long startTime = System.currentTimeMillis();
                 if (imagePath != null) {
-                    lastImage = ImageIO.read(imagePath.toFile());
-                    CurrentConversionSettings.centerCroppingSize(lastImage.getWidth(), lastImage.getHeight());
+                    lastImagePath = null;
+                    BufferedImage readImage = ImageIO.read(imagePath.toFile());
+                    CurrentConversionSettings.centerCroppingSize(readImage.getWidth(), readImage.getHeight());
+                    lastImage = readImage;
+                    lastImagePath = imagePath;
                 }
                 BufferedImage bufferedImage = lastImage;
                 if (Thread.currentThread().isInterrupted()) return;
@@ -239,10 +243,7 @@ public class MapartImageConverter {
                 }
 
             } catch (Exception e) {
-                CurrentConversionSettings.guiMapartImage = null;
                 CurrentConversionSettings.imagePath = null;
-                lastImage = null;
-                lastImagePath = null;
                 MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
                 throw new RuntimeException(e);
             }

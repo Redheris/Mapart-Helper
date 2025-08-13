@@ -102,8 +102,10 @@ public class SessionVariables {
     public static void addFakeItemFrame(int[] map, ClientPlayerEntity player) {
         MapState mapState = MapState.of((byte) 1, false, null);
         mapState.colors = new byte[map.length];
+        boolean use3D = MapartHelperClient.conversionConfig.use3D();
+        boolean useDithering = MapartHelperClient.conversionConfig.useDithering();
         for (int i = 0; i < map.length; i++) {
-            MapColorEntry color = PaletteColors.getClosestColor(map[i], MapartHelperClient.conversionConfig.use3D());
+            MapColorEntry color = PaletteColors.getClosestColor(map[i], use3D, useDithering);
             mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());
         }
 
