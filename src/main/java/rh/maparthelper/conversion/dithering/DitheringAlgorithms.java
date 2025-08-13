@@ -1,5 +1,5 @@
 package rh.maparthelper.conversion.dithering;
 
-public enum DitherAlgorithms {
+public enum DitheringAlgorithms {
     NONE
 }
