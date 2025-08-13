@@ -120,7 +120,7 @@ public class MapartEditorScreen extends Screen {
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                     MapartImageConverter.updateMapart();
                 }
-        ).size(80, 20).tooltip(Tooltip.of(Text.of("Повышает точность подбора цветов. Может увеличить время обработки"))).build();
+        ).size(80, 20).tooltip(Tooltip.of(Text.of("Повышает точность подбора цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
         settings.add(useLAB, positioner.copy());
 
         ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();

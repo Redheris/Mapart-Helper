@@ -54,7 +54,7 @@ public class ColorUtils {
     }
 
 
-    public static double colorDistanceARGB(int argb1, int argb2) {
+    public static double colorDistanceARGB_noSqrt(int argb1, int argb2) {
         int[] rgb1 = getRGB(argb1);
         int[] rgb2 = getRGB(argb2);
 
@@ -62,10 +62,10 @@ public class ColorUtils {
         int dg = rgb2[1] - rgb1[1];
         int db = rgb2[2] - rgb1[2];
 
-        return Math.sqrt(dr * dr + dg * dg + db * db);
+        return dr * dr + dg * dg + db * db;
     }
 
-    public static double colorDistanceLAB(int[] lab1, int[] lab2) {
+    public static double colorDistanceLAB_noSqrt(int[] lab1, int[] lab2) {
         int L1 = lab1[0];
         int a1 = lab1[1];
         int b1 = lab1[2];
@@ -78,16 +78,16 @@ public class ColorUtils {
         int da = a2 - a1;
         int db = b2 - b1;
 
-        return Math.sqrt(dL * dL + da * da + db * db);
+        return dL * dL + da * da + db * db;
     }
 
     public static double colorDistance(int argb1, int argb2, boolean useLAB) {
         if (useLAB) {
             int[] lab1 = rgb2LabCache.computeIfAbsent(argb1, ColorUtils::rgb2lab);
             int[] lab2 = rgb2LabCache.computeIfAbsent(argb2, ColorUtils::rgb2lab);
-            return colorDistanceLAB(lab1, lab2);
+            return colorDistanceLAB_noSqrt(lab1, lab2);
         }
-        return colorDistanceARGB(argb1, argb2);
+        return colorDistanceARGB_noSqrt(argb1, argb2);
     }
 
     public static BufferedImage preprocessImage(BufferedImage image, float brightnessFactor, float contrastLevel, float saturationFactor) {
