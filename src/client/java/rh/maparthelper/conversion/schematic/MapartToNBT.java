@@ -126,7 +126,7 @@ public class MapartToNBT {
     private static String makeUniqueFilename(String filename, String ext) {
         if (Files.exists(SCHEMATICS.resolve(filename + "." + ext))) {
             int suffix = 1;
-            while (Files.exists(SCHEMATICS.resolve(filename + " (" + suffix + ").nbt")))
+            while (Files.exists(SCHEMATICS.resolve(filename + " (" + suffix + ")." + ext)))
                 suffix++;
             return filename + " (" + suffix + ")" + "." + ext;
         }
