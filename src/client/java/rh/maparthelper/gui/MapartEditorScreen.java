@@ -4,7 +4,9 @@ import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
@@ -20,17 +22,22 @@ import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
+import rh.maparthelper.gui.widget.DropdownMenuWidget;
 import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends Screen {
+    private final List<Drawable> drawables = new ArrayList<>();
+
     DirectionalLayoutWidget settings;
     TextFieldWidget selectedTextWidget;
+    DropdownMenuWidget selectedDropdownMenu;
     MapartPreviewWidget mapartPreview;
 
     public MapartEditorScreen() {
@@ -124,25 +131,9 @@ public class MapartEditorScreen extends Screen {
         ).size(80, 20).tooltip(Tooltip.of(Text.of("Улучшает подбор цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
         settings.add(useLAB, positioner.copy());
 
-        ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();
-        ImageAdjustmentSliderWidget sliderContrast = createContrastSlider();
-        ImageAdjustmentSliderWidget sliderSaturation = createSaturationSlider();
-
-        ButtonWidget reset = ButtonWidget.builder(
-                Text.of("Сброс"),
-                (btn) -> {
-                    CurrentConversionSettings.brightness = 1.0f;
-                    CurrentConversionSettings.contrast = 0.0f;
-                    CurrentConversionSettings.saturation = 1.0f;
-                    sliderBrightness.setValue(0.5f);
-                    sliderContrast.setValue(0.5f);
-                    sliderSaturation.setValue(0.5f);
-                }
-        ).size(80, 20).build();
-        settings.add(reset);
-        settings.add(sliderBrightness);
-        settings.add(sliderContrast);
-        settings.add(sliderSaturation);
+        DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
+        imagePreprocessing.addSelectableEntries(this::addSelectableChild);
+        settings.add(imagePreprocessing);
 
         ButtonWidget submit = ButtonWidget.builder(
                 Text.of("Применить изменения"),
@@ -150,26 +141,14 @@ public class MapartEditorScreen extends Screen {
         ).size(130, 20).build();
         settings.add(submit, positioner.copy().alignHorizontalCenter());
 
-        ButtonWidget saveNBT = ButtonWidget.builder(
-                Text.of("Сохранить NBT"),
-                (btn) -> MapartToNBT.saveNBT(true)
-        ).size(150, 20).build();
-        settings.add(saveNBT, positioner.copy().alignHorizontalCenter());
-
-        ButtonWidget saveSplitNBT = ButtonWidget.builder(
-                Text.of("Сохранить NBT каждой карты"),
-                (btn) -> MapartToNBT.saveNBT(false)
-        ).size(150, 20).build();
-        settings.add(saveSplitNBT, positioner.copy().alignHorizontalCenter());
-
-        ButtonWidget saveZipNBT = ButtonWidget.builder(
-                Text.of("Сохранить NBT в архиве"),
-                (btn) -> MapartToNBT.saveNBTAsZip()
-        ).size(150, 20).build();
-        settings.add(saveZipNBT, positioner.copy().alignHorizontalCenter());
+        DropdownMenuWidget saveMapart = createSaveMapartDropdown();
+        saveMapart.addSelectableEntries(this::addSelectableChild);
+        settings.add(saveMapart);
 
         settings.refreshPositions();
         settings.forEachChild(this::addDrawableChild);
+        imagePreprocessing.refreshPositions();
+        saveMapart.refreshPositions();
 
 
         mapartPreview = new MapartPreviewWidget(220, 20, this.width - 230, this.height - 40);
@@ -177,8 +156,30 @@ public class MapartEditorScreen extends Screen {
     }
 
     @Override
+    protected <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement) {
+        this.drawables.add(drawableElement);
+        return super.addDrawableChild(drawableElement);
+    }
+
+    @Override
+    protected void clearChildren() {
+        super.clearChildren();
+        this.drawables.clear();
+    }
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+        this.renderBackground(context, mouseX, mouseY, delta);
+
+        for (Drawable drawable : this.drawables) {
+            if (selectedDropdownMenu != null && selectedDropdownMenu.isExpanded && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
+                if (drawable == selectedDropdownMenu)
+                    drawable.render(context, mouseX, mouseY, delta);
+                else
+                    drawable.render(context, 0, 0, delta);
+            } else
+                drawable.render(context, mouseX, mouseY, delta);
+        }
     }
 
     @Override
@@ -191,19 +192,52 @@ public class MapartEditorScreen extends Screen {
         Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
         if (optional.isEmpty()) {
             this.setFocused(null);
+            if (selectedDropdownMenu != null && !selectedDropdownMenu.isMouseOver(mouseX, mouseY)) {
+                collapseDropdown();
+            }
             return false;
         }
         Element element = optional.get();
+
+        if (element instanceof DropdownMenuWidget dropMenu) {
+            if (element != selectedDropdownMenu) {
+                if (selectedDropdownMenu == null || !selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
+                    collapseDropdown();
+                    selectedDropdownMenu = dropMenu;
+                } else if (selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY))
+                    return false;
+            }
+            return dropMenu.mouseClicked(mouseX, mouseY, button);
+        }
+        if (selectedDropdownMenu != null) {
+            if (selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
+                if (selectedDropdownMenu.isChild((ClickableWidget) element)) {
+                    this.setFocused(element);
+                    this.setDragging(true);
+                    return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
+                } else
+                    return false;
+            } else {
+                collapseDropdown();
+            }
+        }
+
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
             selectedTextWidget = textField;
             textField.setSelectionStart(0);
             textField.setSelectionEnd(textField.getText().length());
             this.setFocused(textField);
             return true;
-
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void collapseDropdown() {
+        if (this.selectedDropdownMenu != null) {
+            this.selectedDropdownMenu.switchExpanded(false);
+            this.selectedDropdownMenu = null;
+        }
     }
 
     @Override
@@ -319,5 +353,61 @@ public class MapartEditorScreen extends Screen {
                 },
                 value -> String.format("Насыщенность: %.2f", value)
         );
+    }
+
+    private DropdownMenuWidget createImagePreprocessingDropdown() {
+        ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();
+        ImageAdjustmentSliderWidget sliderContrast = createContrastSlider();
+        ImageAdjustmentSliderWidget sliderSaturation = createSaturationSlider();
+
+        ButtonWidget reset = ButtonWidget.builder(
+                Text.of("Сброс"),
+                (btn) -> {
+                    CurrentConversionSettings.brightness = 1.0f;
+                    CurrentConversionSettings.contrast = 0.0f;
+                    CurrentConversionSettings.saturation = 1.0f;
+                    sliderBrightness.setValue(0.5f);
+                    sliderContrast.setValue(0.5f);
+                    sliderSaturation.setValue(0.5f);
+                }
+        ).size(80, 20).build();
+
+        DropdownMenuWidget imagePreprocessing = new DropdownMenuWidget(this, 0, 0, 100, 20, 154, Text.of("Предобработка"));
+        imagePreprocessing.addEntry(reset);
+        imagePreprocessing.addEntry(sliderBrightness);
+        imagePreprocessing.addEntry(sliderContrast);
+        imagePreprocessing.addEntry(sliderSaturation);
+
+        return imagePreprocessing;
+    }
+
+    private DropdownMenuWidget createSaveMapartDropdown() {
+        ButtonWidget saveImage = ButtonWidget.builder(
+                Text.of("Сохранить PNG"),
+                (btn) -> MapartImageConverter.saveMapartImage(CurrentConversionSettings.mapartName)
+        ).size(150, 20).build();
+
+        ButtonWidget saveNBT = ButtonWidget.builder(
+                Text.of("Сохранить NBT"),
+                (btn) -> MapartToNBT.saveNBT(true)
+        ).size(150, 20).build();
+
+        ButtonWidget saveSplitNBT = ButtonWidget.builder(
+                Text.of("Сохранить NBT каждой карты"),
+                (btn) -> MapartToNBT.saveNBT(false)
+        ).size(150, 20).build();
+
+        ButtonWidget saveZipNBT = ButtonWidget.builder(
+                Text.of("Сохранить NBT в архиве"),
+                (btn) -> MapartToNBT.saveNBTAsZip()
+        ).size(150, 20).build();
+
+        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 100, 20, 154, Text.of("Сохранить"));
+        saveMapart.addEntry(saveImage);
+        saveMapart.addEntry(saveNBT);
+        saveMapart.addEntry(saveSplitNBT);
+        saveMapart.addEntry(saveZipNBT);
+
+        return saveMapart;
     }
 }
