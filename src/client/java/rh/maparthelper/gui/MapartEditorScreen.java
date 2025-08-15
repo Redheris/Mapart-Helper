@@ -13,7 +13,6 @@ import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.conversion.CroppingMode;
@@ -23,6 +22,7 @@ import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
+import rh.maparthelper.gui.widget.EnumDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
 
@@ -70,43 +70,51 @@ public class MapartEditorScreen extends Screen {
         GridWidget size = createSizeSettingsGrid();
         settings.add(size);
 
-        ButtonWidget croppingMode = ButtonWidget.builder(
-                Text.of("Кадрирование: " + CurrentConversionSettings.cropMode.name()),
-                btn -> {
-                    int nextMode = (CurrentConversionSettings.cropMode.ordinal() + 1) % CroppingMode.values().length;
-                    CurrentConversionSettings.cropMode = CroppingMode.values()[nextMode];
-                    btn.setMessage(Text.of("Кадрирование: " + CurrentConversionSettings.cropMode.name()));
+        EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
+                this, 0, 0, 150, 20, 150,
+                Text.of("Кадрирование: "), Text.translatable("maparthelper.option." + CurrentConversionSettings.cropMode.name())
+        );
+        croppingMode.addEntries(
+                e -> {
+                    CurrentConversionSettings.cropMode = (CroppingMode) e;
                     MapartImageConverter.updateMapart();
-                }
-        ).size(150, 20).build();
+                },
+                CroppingMode.values()
+        );
+        croppingMode.addSelectableEntries(this::addSelectableChild);
         settings.add(croppingMode);
 
-        ButtonWidget staircaseStyle = ButtonWidget.builder(
-                Text.of("Ступенчатость: " + MapartHelperClient.conversionConfig.staircaseStyle.name()),
-                btn -> {
-                    ConversionConfiguration config = MapartHelperClient.conversionConfig;
-                    int nextStyle = (config.staircaseStyle.ordinal() + 1) % StaircaseStyles.values().length;
+        EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
+                this, 0, 0, 150, 20, 150,
+                Text.of("Ступенчатость: "), Text.translatable("maparthelper.option." + MapartHelper.config.conversionSettings.staircaseStyle.name())
+        );
+        staircaseStyle.addEntries(
+                e -> {
+                    ConversionConfiguration config = MapartHelper.config.conversionSettings;
                     boolean was3D = config.use3D();
-                    config.staircaseStyle = StaircaseStyles.values()[nextStyle];
-                    if (was3D != config.use3D())
+                    config.staircaseStyle = (StaircaseStyles) e;
+                    if (config.use3D() != was3D)
                         MapartImageConverter.updateMapart();
-                    btn.setMessage(Text.of("Ступенчатость: " + config.staircaseStyle.name()));
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
-                }
-        ).size(150, 20).build();
+                },
+                StaircaseStyles.values()
+        );
+        staircaseStyle.addSelectableEntries(this::addSelectableChild);
         settings.add(staircaseStyle);
 
-        ButtonWidget ditheringAlg = ButtonWidget.builder(
-                Text.of("Дизеринг: " + MapartHelperClient.conversionConfig.ditheringAlgorithm.name()),
-                btn -> {
-                    ConversionConfiguration config = MapartHelperClient.conversionConfig;
-                    int nextAlg = (config.ditheringAlgorithm.ordinal() + 1) % DitheringAlgorithms.values().length;
-                    config.ditheringAlgorithm = DitheringAlgorithms.values()[nextAlg];
+        EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
+                this, 0, 0, 150, 20, 150,
+                Text.of("Дизеринг: "), Text.translatable("maparthelper.option." + MapartHelper.config.conversionSettings.ditheringAlgorithm.name())
+        );
+        ditheringAlg.addEntries(
+                e -> {
+                    MapartHelper.config.conversionSettings.ditheringAlgorithm = (DitheringAlgorithms) e;
                     MapartImageConverter.updateMapart();
-                    btn.setMessage(Text.of("Дизеринг: " + config.ditheringAlgorithm.name()));
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
-                }
-        ).size(150, 20).build();
+                },
+                DitheringAlgorithms.values()
+        );
+        ditheringAlg.addSelectableEntries(this::addSelectableChild);
         settings.add(ditheringAlg);
 
 
@@ -135,18 +143,21 @@ public class MapartEditorScreen extends Screen {
         imagePreprocessing.addSelectableEntries(this::addSelectableChild);
         settings.add(imagePreprocessing);
 
+        DropdownMenuWidget saveMapart = createSaveMapartDropdown();
+        saveMapart.addSelectableEntries(this::addSelectableChild);
+        settings.add(saveMapart);
+
         ButtonWidget submit = ButtonWidget.builder(
                 Text.of("Применить изменения"),
                 (btn) -> MapartImageConverter.updateMapart()
         ).size(130, 20).build();
         settings.add(submit, positioner.copy().alignHorizontalCenter());
 
-        DropdownMenuWidget saveMapart = createSaveMapartDropdown();
-        saveMapart.addSelectableEntries(this::addSelectableChild);
-        settings.add(saveMapart);
-
         settings.refreshPositions();
         settings.forEachChild(this::addDrawableChild);
+        croppingMode.refreshPositions();
+        staircaseStyle.refreshPositions();
+        ditheringAlg.refreshPositions();
         imagePreprocessing.refreshPositions();
         saveMapart.refreshPositions();
 

@@ -17,7 +17,7 @@ public class DropdownMenuWidget extends ButtonWidget {
     private final Screen parent;
     private final List<ClickableWidget> elements = new ArrayList<>();
     private int menuHeight = 2;
-    private final int menuWidth;
+    protected final int menuWidth;
     private boolean expandUpwards = false;
     private int topYExpanded;
     private int bottomYExpanded;
@@ -36,7 +36,7 @@ public class DropdownMenuWidget extends ButtonWidget {
         expandedOne = null;
     }
 
-    public void addEntry(ClickableWidget widget) {
+    public final void addEntry(ClickableWidget widget) {
         widget.visible = false;
         elements.add(widget);
         menuHeight += widget.getHeight() + 2;
