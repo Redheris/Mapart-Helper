@@ -15,10 +15,7 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
@@ -55,16 +52,14 @@ public class MapartToNBT {
 
             String writeFilename = makeUniqueFilename(filename, "nbt");
             try {
-                NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(writeFilename));
-                if (zipOut != null) {
-                    try (FileInputStream fis = new FileInputStream(SCHEMATICS.resolve(writeFilename).toFile())) {
-                        ZipEntry zipEntry = new ZipEntry(filename);
-                        zipOut.putNextEntry(zipEntry);
-                        zipOut.write(fis.readAllBytes());
-                    }
-                    finally {
-                        Files.delete(SCHEMATICS.resolve(writeFilename));
-                    }
+                if (zipOut == null) {
+                    NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(writeFilename));
+                } else {
+                    ZipEntry zipEntry = new ZipEntry(filename + ".nbt");
+                    zipOut.putNextEntry(zipEntry);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    NbtIo.writeCompressed(mapartNbt, out);
+                    out.writeTo(zipOut);
                 }
             } catch (IOException e) {
                 MapartHelper.LOGGER.error("An error occurred during saving NBT file", e);
