@@ -27,17 +27,11 @@ import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class MapartEditorScreen extends Screen {
-    private final List<Drawable> drawables = new ArrayList<>();
-
+public class MapartEditorScreen extends ScreenAdapted {
     DirectionalLayoutWidget settings;
-    TextFieldWidget selectedTextWidget;
-    DropdownMenuWidget selectedDropdownMenu;
     MapartPreviewWidget mapartPreview;
 
     public MapartEditorScreen() {
@@ -164,91 +158,6 @@ public class MapartEditorScreen extends Screen {
 
         mapartPreview = new MapartPreviewWidget(220, 20, this.width - 230, this.height - 40);
         this.addDrawableChild(mapartPreview);
-    }
-
-    @Override
-    protected <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement) {
-        this.drawables.add(drawableElement);
-        return super.addDrawableChild(drawableElement);
-    }
-
-    @Override
-    protected void clearChildren() {
-        super.clearChildren();
-        this.drawables.clear();
-    }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
-
-        for (Drawable drawable : this.drawables) {
-            if (selectedDropdownMenu != null && selectedDropdownMenu.isExpanded && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                if (drawable == selectedDropdownMenu)
-                    drawable.render(context, mouseX, mouseY, delta);
-                else
-                    drawable.render(context, 0, 0, delta);
-            } else
-                drawable.render(context, mouseX, mouseY, delta);
-        }
-    }
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (selectedTextWidget != null) {
-            selectedTextWidget.setSelectionStart(0);
-            selectedTextWidget.setSelectionEnd(0);
-            selectedTextWidget = null;
-        }
-        Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
-        if (optional.isEmpty()) {
-            this.setFocused(null);
-            if (selectedDropdownMenu != null && !selectedDropdownMenu.isMouseOver(mouseX, mouseY)) {
-                collapseDropdown();
-            }
-            return false;
-        }
-        Element element = optional.get();
-
-        if (element instanceof DropdownMenuWidget dropMenu) {
-            if (element != selectedDropdownMenu) {
-                if (selectedDropdownMenu == null || !selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                    collapseDropdown();
-                    selectedDropdownMenu = dropMenu;
-                } else if (selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY))
-                    return false;
-            }
-            return dropMenu.mouseClicked(mouseX, mouseY, button);
-        }
-        if (selectedDropdownMenu != null) {
-            if (selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                if (selectedDropdownMenu.isChild((ClickableWidget) element)) {
-                    this.setFocused(element);
-                    this.setDragging(true);
-                    return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
-                } else
-                    return false;
-            } else {
-                collapseDropdown();
-            }
-        }
-
-        if (!element.isFocused() && element instanceof TextFieldWidget textField) {
-            selectedTextWidget = textField;
-            textField.setSelectionStart(0);
-            textField.setSelectionEnd(textField.getText().length());
-            this.setFocused(textField);
-            return true;
-        }
-
-        return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    private void collapseDropdown() {
-        if (this.selectedDropdownMenu != null) {
-            this.selectedDropdownMenu.switchExpanded(false);
-            this.selectedDropdownMenu = null;
-        }
     }
 
     @Override
