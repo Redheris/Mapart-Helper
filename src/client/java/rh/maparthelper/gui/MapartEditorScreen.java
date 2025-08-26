@@ -3,11 +3,7 @@ package rh.maparthelper.gui;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
@@ -15,16 +11,14 @@ import net.minecraft.util.Colors;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
-import rh.maparthelper.gui.widget.DropdownMenuWidget;
-import rh.maparthelper.gui.widget.EnumDropdownMenuWidget;
-import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
-import rh.maparthelper.gui.widget.MapartPreviewWidget;
+import rh.maparthelper.gui.widget.*;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -147,6 +141,25 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(130, 20).build();
         settings.add(submit, positioner.copy().alignHorizontalCenter());
 
+        TextWidget presetLabel = new TextWidget(Text.of("Текущий пресет:"), textRenderer);
+        settings.add(presetLabel);
+
+        PresetsDropdownMenuWidget list = new PresetsDropdownMenuWidget(
+                this, 0, 0, 150, 20,130,
+                Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
+        );
+        list.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.getPresetKeys());
+        list.addSelectableEntries(this::addSelectableChild);
+        settings.add(list, positioner.copy().marginTop(0));
+
+        ButtonWidget presets = ButtonWidget.builder(
+                Text.of("Редактор пресетов"),
+                (btn) -> MinecraftClient.getInstance().setScreen(
+                        new PresetsEditorScreen(this, Text.translatable("maparthelper.presets_editor_screen"), 60, 30, 60, 30)
+                )
+        ).size(130, 20).build();
+        settings.add(presets);
+
         settings.refreshPositions();
         settings.forEachChild(this::addDrawableChild);
         croppingMode.refreshPositions();
@@ -154,6 +167,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ditheringAlg.refreshPositions();
         imagePreprocessing.refreshPositions();
         saveMapart.refreshPositions();
+        list.refreshPositions();
 
 
         mapartPreview = new MapartPreviewWidget(220, 20, this.width - 230, this.height - 40);

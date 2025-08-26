@@ -98,7 +98,7 @@ public class DropdownMenuWidget extends ButtonWidget {
         context.enableScissor(getX(), topYExpanded, getX() + menuWidth, bottomYExpanded);
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
-        matrixStack.translate(0, 0, 50);
+        matrixStack.translate(0, 0, 300);
          if (expandUpwards)
             context.fill(getX(), getY() - menuHeight, getX() + menuWidth, getY(), 0x99FFFFFF);
          else

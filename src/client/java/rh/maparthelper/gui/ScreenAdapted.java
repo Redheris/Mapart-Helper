@@ -33,6 +33,12 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
+    protected <T extends Drawable> T addDrawable(T drawable) {
+        this.drawables.add(drawable);
+        return super.addDrawable(drawable);
+    }
+
+    @Override
     protected void clearChildren() {
         super.clearChildren();
         this.drawables.clear();

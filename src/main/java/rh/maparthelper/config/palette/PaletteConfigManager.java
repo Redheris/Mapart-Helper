@@ -177,6 +177,12 @@ public class PaletteConfigManager {
         savePresetsConfigFile();
     }
 
+    public static void updatePreset(String key, PalettePresetsConfig.PalettePreset preset) {
+        presetsConfig.updatePreset(key, preset);
+        // TODO: replace by saving a single preset instead of every one
+        savePresetFiles();
+    }
+
     public static void createNewPreset() {
         presetsConfig.createNewPreset();
         savePresetsConfigFile();

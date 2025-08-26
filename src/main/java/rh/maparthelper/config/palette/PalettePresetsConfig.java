@@ -16,6 +16,14 @@ public class PalettePresetsConfig {
         return config;
     }
 
+    public String getCurrentPresetFilename() {
+        return currentPresetFile;
+    }
+
+    public String getCurrentPresetName() {
+        return presetFiles.get(currentPresetFile);
+    }
+
     public Set<String> getPresetKeys() {
         return presetFiles.keySet();
     }
@@ -50,7 +58,7 @@ public class PalettePresetsConfig {
     }
 
     // Updates preset after in-game editing
-    public void updatePreset(String key, PalettePreset preset) {
+    void updatePreset(String key, PalettePreset preset) {
         presets.replace(key, preset);
     }
 
