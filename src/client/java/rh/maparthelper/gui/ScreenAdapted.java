@@ -54,7 +54,7 @@ public abstract class ScreenAdapted extends Screen {
         Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
         if (optional.isEmpty()) {
             this.setFocused(null);
-            if (selectedDropdownMenu != null && !selectedDropdownMenu.isMouseOver(mouseX, mouseY)) {
+            if (selectedDropdownMenu != null && !selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
                 collapseDropdown();
             }
             return false;
