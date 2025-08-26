@@ -1,6 +1,7 @@
 package rh.maparthelper.gui;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
@@ -108,8 +109,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
             );
             GridWidget.Adder adder = blocksList.grid.createAdder(1);
 
-            // TODO: add an option of not using the color
             List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
+            MapColorBlockWidget noneBlock = new MapColorBlockWidget(
+                    0, 0, squareSize, squareSize,
+                    b -> presetEdit.colors.remove(mapColor),
+                    mapColor, Blocks.BARRIER
+            );
+            adder.add(noneBlock, blocksList.grid.copyPositioner().alignHorizontalCenter());
             for (Block block : blocks) {
                 MapColorBlockWidget blockWidget = new MapColorBlockWidget(
                         0, 0, squareSize, squareSize,
@@ -247,11 +253,15 @@ public class PresetsEditorScreen extends ScreenAdapted {
                     && mouseY >= y
                     && mouseY < y + height;
             if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
-                List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem);
-                PresetsEditorScreen.this.setTooltip(tooltip.stream().map(Text::asOrderedText).toList());
+                if (block != Blocks.BARRIER) {
+                    List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem);
+                    PresetsEditorScreen.this.setTooltip(tooltip.stream().map(Text::asOrderedText).toList());
+                } else {
+                    PresetsEditorScreen.this.setTooltip(Text.of("Не использовать цвет"));
+                }
             }
 
-            if (presetEdit.colors.get(mapColor) == block) {
+            if (presetEdit.colors.get(mapColor) == block || block == Blocks.BARRIER && !presetEdit.colors.containsKey(mapColor)) {
                 matrixStack.push();
                 matrixStack.translate(0, 0, 200);
                 context.drawBorder(x, y, width, height, Colors.CYAN);
