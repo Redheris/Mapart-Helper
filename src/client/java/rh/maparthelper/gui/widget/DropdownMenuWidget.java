@@ -55,7 +55,7 @@ public class DropdownMenuWidget extends ButtonWidget {
         bottomYExpanded = expandUpwards ? getY() : getBottom() + menuHeight;
     }
 
-    public void addSelectableEntries(Consumer<ClickableWidget> consumer) {
+    public void forEachEntry(Consumer<ClickableWidget> consumer) {
         elements.forEach(consumer);
     }
 

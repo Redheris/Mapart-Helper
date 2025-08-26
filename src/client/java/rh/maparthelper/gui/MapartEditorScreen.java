@@ -21,6 +21,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -69,7 +70,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 CroppingMode.values()
         );
-        croppingMode.addSelectableEntries(this::addSelectableChild);
+        croppingMode.forEachEntry(this::addSelectableChild);
         settings.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
@@ -87,7 +88,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 StaircaseStyles.values()
         );
-        staircaseStyle.addSelectableEntries(this::addSelectableChild);
+        staircaseStyle.forEachEntry(this::addSelectableChild);
         settings.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
@@ -102,7 +103,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 DitheringAlgorithms.values()
         );
-        ditheringAlg.addSelectableEntries(this::addSelectableChild);
+        ditheringAlg.forEachEntry(this::addSelectableChild);
         settings.add(ditheringAlg);
 
 
@@ -125,21 +126,23 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartImageConverter.updateMapart();
                 }
         ).size(80, 20).tooltip(Tooltip.of(Text.of("Улучшает подбор цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
+        useLAB.setTooltipDelay(Duration.ofMillis(500));
         settings.add(useLAB, positioner.copy());
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
-        imagePreprocessing.addSelectableEntries(this::addSelectableChild);
+        imagePreprocessing.forEachEntry(this::addSelectableChild);
         settings.add(imagePreprocessing);
 
         DropdownMenuWidget saveMapart = createSaveMapartDropdown();
-        saveMapart.addSelectableEntries(this::addSelectableChild);
+        saveMapart.forEachEntry(this::addSelectableChild);
         settings.add(saveMapart);
 
-        ButtonWidget submit = ButtonWidget.builder(
-                Text.of("Применить изменения"),
-                (btn) -> MapartImageConverter.updateMapart()
-        ).size(130, 20).build();
-        settings.add(submit, positioner.copy().alignHorizontalCenter());
+//        Useless when updates automatically
+//        ButtonWidget submit = ButtonWidget.builder(
+//                Text.of("Применить изменения"),
+//                (btn) -> MapartImageConverter.updateMapart()
+//        ).size(130, 20).build();
+//        settings.add(submit, positioner.copy().alignHorizontalCenter());
 
         TextWidget presetLabel = new TextWidget(Text.of("Текущий пресет:"), textRenderer);
         settings.add(presetLabel);
@@ -149,7 +152,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
         );
         list.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.getPresetKeys());
-        list.addSelectableEntries(this::addSelectableChild);
+        list.forEachEntry(this::addSelectableChild);
         settings.add(list, positioner.copy().marginTop(0));
 
         ButtonWidget presets = ButtonWidget.builder(
