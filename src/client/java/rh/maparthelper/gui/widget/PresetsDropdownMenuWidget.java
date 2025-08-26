@@ -5,6 +5,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -39,5 +40,13 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
         for (String value : values) {
             addEntry(action, value);
         }
+    }
+
+    public void updateNames(Set<String> values) {
+        Iterator<String> it = values.iterator();
+        this.forEachEntry(w -> {
+            Text valueText = Text.of("\"" + PaletteConfigManager.presetsConfig.presetFiles.get(it.next()) + "\"");
+            w.setMessage(valueText);
+        });
     }
 }

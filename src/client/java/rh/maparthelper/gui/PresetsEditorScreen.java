@@ -34,6 +34,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private String presetName = presetsConfig.presetFiles.get(editingPreset);
     private PalettePresetsConfig.PalettePreset presetEdit = presetsConfig.copyPreset(editingPreset);
 
+    private PresetsDropdownMenuWidget presetsListDropdown;
+
     protected PresetsEditorScreen(MapartEditorScreen parent, Text title, int x, int y, int marginRight, int marginBottom) {
         super(title);
         this.parent = parent;
@@ -53,12 +55,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.boxWidth = parent.width - x - marginRight;
         this.boxHeight = parent.height - y - marginBottom;
 
-        DirectionalLayoutWidget presetBar = DirectionalLayoutWidget.horizontal();
-        presetBar.setPosition(x + 5, y + 5);
-        Positioner presetBarPositioner = presetBar.getMainPositioner();
+        DirectionalLayoutWidget presetBarLeft = DirectionalLayoutWidget.horizontal();
+        presetBarLeft.setPosition(x + 5, y + 5);
+        Positioner presetBarLeftPositioner = presetBarLeft.getMainPositioner().alignVerticalCenter();
 
         TextWidget presetNameLabel = new TextWidget(Text.of("Пресет:"), textRenderer);
-        presetBar.add(presetNameLabel, presetBarPositioner.copy().alignVerticalCenter().marginRight(10));
+        presetBarLeft.add(presetNameLabel, presetBarLeftPositioner.copy().marginRight(5));
 
         TextFieldWidget presetName = new TextFieldWidget(
                 textRenderer, (int)(boxWidth * 0.4), 20, Text.empty()
@@ -72,18 +74,36 @@ public class PresetsEditorScreen extends ScreenAdapted {
             presetName.setSuggestion(null);
             this.presetName = value;
         });
-        presetBar.add(presetName);
+        presetBarLeft.add(presetName);
 
-        PresetsDropdownMenuWidget presetsListDropdown = new PresetsDropdownMenuWidget(
+        presetsListDropdown = new PresetsDropdownMenuWidget(
                 this, 0, 0, 20, 20, presetName.getWidth() + 20, Text.of("...")
         );
         presetsListDropdown.addEntries(name -> changeEditingPreset(presetName, name), presetsConfig.getPresetKeys());
-        presetsListDropdown.addSelectableEntries(this::addSelectableChild);
-        presetBar.add(presetsListDropdown);
+        presetsListDropdown.forEachEntry(this::addSelectableChild);
+        presetBarLeft.add(presetsListDropdown);
 
-        presetBar.refreshPositions();
-        presetBar.forEachChild(this::addDrawableChild);
+        presetBarLeft.refreshPositions();
+        presetBarLeft.forEachChild(this::addDrawableChild);
         presetsListDropdown.refreshPositions();
+
+        DirectionalLayoutWidget presetBarRight = DirectionalLayoutWidget.horizontal();
+        presetBarRight.setPosition(0, y + 5);
+        presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(2);
+
+        ButtonWidget save = ButtonWidget.builder(Text.of("Сохранить"),b -> saveChanges())
+                .size(60, 20)
+                .build();
+        presetBarRight.add(save);
+
+        ButtonWidget close = ButtonWidget.builder(Text.of("❌"), b -> this.close())
+                .size(20, 20)
+                .build();
+        presetBarRight.add(close);
+
+        presetBarRight.refreshPositions();
+        presetBarRight.setX(x + boxWidth - presetBarRight.getWidth());
+        presetBarRight.forEachChild(this::addDrawableChild);
 
         // =========== Colors editing area ===========
 
@@ -144,6 +164,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetNameField.setText(presetsConfig.presetFiles.get(preset));
         this.editingPreset = preset;
         this.presetEdit = presetsConfig.copyPreset(editingPreset);
+    }
+
+    private void saveChanges() {
+        PaletteConfigManager.updatePreset(editingPreset, presetEdit);
+        PaletteConfigManager.renamePreset(editingPreset, this.presetName);
+        this.presetsConfig = PaletteConfigManager.presetsConfig;
+        presetsListDropdown.updateNames(presetsConfig.getPresetKeys());
     }
 
     @Override
