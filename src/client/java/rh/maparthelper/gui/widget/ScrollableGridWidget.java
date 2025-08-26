@@ -51,7 +51,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     protected double getDeltaYPerScroll() {
-        return (double) getContentsHeightWithPadding() / height * 4.0;
+        return 15;
     }
 
     @Override
