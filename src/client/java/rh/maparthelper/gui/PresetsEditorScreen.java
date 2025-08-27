@@ -38,6 +38,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private final Set<String> deletedPresets = new HashSet<>();
     private final Set<String> updatedPresets = new HashSet<>();
 
+    private PresetsDropdownMenuWidget presetsListDropdown;
     private TextFieldWidget presetNameField;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, Text title, int x, int y, int marginRight, int marginBottom) {
@@ -72,7 +73,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetNameField.setText(presetsConfig.presetFiles.get(editingPreset));
         presetBarLeft.add(presetNameField);
 
-        PresetsDropdownMenuWidget presetsListDropdown = new PresetsDropdownMenuWidget(
+        presetsListDropdown = new PresetsDropdownMenuWidget(
                 this, 0, 0, 20, 20, presetNameField.getWidth() + 20,
                 Text.of("☰")
         );
@@ -88,7 +89,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
             }
             presetNameField.setSuggestion(null);
             presetsConfig.presetFiles.put(editingPreset, value);
-            presetsListDropdown.updateNames(presetsConfig.presetFiles.values());
+            if (presetsListDropdown != null)
+                presetsListDropdown.updateNames(presetsConfig.presetFiles.values());
         });
 
 
@@ -221,6 +223,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private void duplicatePreset() {
         String newPreset = presetsConfig.duplicatePreset(editingPreset);
         updatedPresets.add(newPreset);
+        presetsListDropdown = null;
         changeEditingPreset(newPreset);
         clearAndInit();
     }
@@ -231,6 +234,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         if (PaletteConfigManager.presetsConfig.presetFiles.containsKey(editingPreset)) {
             deletedPresets.add(editingPreset);
         }
+        presetsListDropdown = null;
         changeEditingPreset(presetsConfig.getCurrentPresetFilename());
         clearAndInit();
     }
@@ -238,6 +242,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private void createNewPreset() {
         String newPreset = presetsConfig.createNewPreset();
         updatedPresets.add(newPreset);
+        presetsListDropdown = null;
         changeEditingPreset(newPreset);
         clearAndInit();
     }
