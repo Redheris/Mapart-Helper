@@ -172,6 +172,25 @@ public class PaletteConfigManager {
         }
     }
 
+    private static void savePresetFile(String filename) {
+        Path presetsPath = CONFIG_PATH.resolve("presets");
+        try (FileWriter writer = new FileWriter(presetsPath.resolve(filename).toFile())) {
+            PalettePresetsConfig.PalettePreset preset = presetsConfig.presets.get(filename);
+            gson.toJson(preset, writer);
+        } catch (IOException e) {
+            MapartHelper.LOGGER.error("Failed to save preset \"{}\"", filename, e);
+        }
+    }
+
+    private static void deletePresetFile(String filename) {
+        try {
+            Path presetsPath = CONFIG_PATH.resolve("presets");
+            Files.delete(presetsPath.resolve(filename));
+        } catch (IOException e) {
+            MapartHelper.LOGGER.error("Failed to delete preset \"{}\"", filename, e);
+        }
+    }
+
     public static void changeCurrentPreset(String name) {
         presetsConfig.changeCurrentPreset(name);
         savePresetsConfigFile();
@@ -179,8 +198,7 @@ public class PaletteConfigManager {
 
     public static void updatePreset(String key, PalettePresetsConfig.PalettePreset preset) {
         presetsConfig.updatePreset(key, preset);
-        // TODO: replace by saving a single preset instead of every one
-        savePresetFiles();
+        savePresetFile(key);
     }
 
     public static void createNewPreset() {
@@ -188,13 +206,24 @@ public class PaletteConfigManager {
         savePresetsConfigFile();
     }
 
-    public static void renamePreset(String oldName, String newName) {
-        presetsConfig.renamePreset(oldName, newName);
+    public static void deletePreset(String filename) {
+        if (presetsConfig.presetFiles.size() == 1) {
+            presetsConfig = PalettePresetsConfig.createDefaultConfig();
+        } else {
+            presetsConfig.deletePreset(filename);
+        }
+        deletePresetFile(filename);
         savePresetsConfigFile();
     }
 
-    public static void duplicatePreset(String name) {
-        presetsConfig.duplicatePreset(name);
+    public static void renamePreset(String filename, String newName) {
+        presetsConfig.renamePreset(filename, newName);
         savePresetsConfigFile();
+    }
+
+    public static void duplicatePreset(String filename) {
+        String newFilename = presetsConfig.duplicatePreset(filename);
+        savePresetsConfigFile();
+        savePresetFile(newFilename);
     }
 }

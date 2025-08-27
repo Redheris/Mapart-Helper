@@ -7,6 +7,7 @@ import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -35,6 +36,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private PalettePresetsConfig.PalettePreset presetEdit = presetsConfig.copyPreset(editingPreset);
 
     private PresetsDropdownMenuWidget presetsListDropdown;
+    private TextFieldWidget presetNameField;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, Text title, int x, int y, int marginRight, int marginBottom) {
         super(title);
@@ -62,30 +64,51 @@ public class PresetsEditorScreen extends ScreenAdapted {
         TextWidget presetNameLabel = new TextWidget(Text.of("Пресет:"), textRenderer);
         presetBarLeft.add(presetNameLabel, presetBarLeftPositioner.copy().marginRight(5));
 
-        TextFieldWidget presetName = new TextFieldWidget(
-                textRenderer, (int)(boxWidth * 0.4), 20, Text.empty()
+        presetNameField = new TextFieldWidget(
+                textRenderer, (int)(boxWidth * 0.35), 20, Text.empty()
         );
-        presetName.setText(this.presetName);
-        presetName.setChangedListener(value -> {
+        presetNameField.setText(this.presetName);
+        presetNameField.setChangedListener(value -> {
             if (value.isBlank()) {
-                presetName.setSuggestion("Название пресета");
+                presetNameField.setSuggestion("Название пресета");
                 return;
             }
-            presetName.setSuggestion(null);
+            presetNameField.setSuggestion(null);
             this.presetName = value;
         });
-        presetBarLeft.add(presetName);
+        presetBarLeft.add(presetNameField);
 
         presetsListDropdown = new PresetsDropdownMenuWidget(
-                this, 0, 0, 20, 20, presetName.getWidth() + 20, Text.of("...")
+                this, 0, 0, 20, 20, presetNameField.getWidth() + 20, Text.of("☰")
         );
-        presetsListDropdown.addEntries(name -> changeEditingPreset(presetName, name), presetsConfig.getPresetKeys());
+        presetsListDropdown.setTooltip(Tooltip.of(Text.of("Выбрать пресет")));
+        presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.getPresetKeys());
         presetsListDropdown.forEachEntry(this::addSelectableChild);
         presetBarLeft.add(presetsListDropdown);
+
+
+        ButtonWidget createNewPreset = ButtonWidget.builder(Text.of("➕"), b -> this.createNewPreset())
+                .size(20, 20)
+                .build();
+        createNewPreset.setTooltip(Tooltip.of(Text.of("Создать новый пресет")));
+        presetBarLeft.add(createNewPreset);
+
+        ButtonWidget duplicatePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD0"), b -> this.duplicatePreset())
+                .size(20, 20)
+                .build();
+        duplicatePreset.setTooltip(Tooltip.of(Text.of("Дублировать выбранный пресет")));
+        presetBarLeft.add(duplicatePreset);
+
+        ButtonWidget deletePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD1"), b -> this.deletePreset())
+                .size(20, 20)
+                .build();
+        deletePreset.setTooltip(Tooltip.of(Text.of("Удалить выбранный пресет")));
+        presetBarLeft.add(deletePreset);
 
         presetBarLeft.refreshPositions();
         presetBarLeft.forEachChild(this::addDrawableChild);
         presetsListDropdown.refreshPositions();
+
 
         DirectionalLayoutWidget presetBarRight = DirectionalLayoutWidget.horizontal();
         presetBarRight.setPosition(0, y + 5);
@@ -160,9 +183,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.addDrawableChild(colorsEditor);
     }
 
-    private void changeEditingPreset(TextFieldWidget presetNameField, String preset) {
-        presetNameField.setText(presetsConfig.presetFiles.get(preset));
-        this.editingPreset = preset;
+    private void changeEditingPreset(String presetFile) {
+        this.presetName = presetsConfig.presetFiles.get(presetFile);
+        this.presetNameField.setText(presetName);
+        this.editingPreset = presetFile;
         this.presetEdit = presetsConfig.copyPreset(editingPreset);
     }
 
@@ -171,6 +195,27 @@ public class PresetsEditorScreen extends ScreenAdapted {
         PaletteConfigManager.renamePreset(editingPreset, this.presetName);
         this.presetsConfig = PaletteConfigManager.presetsConfig;
         presetsListDropdown.updateNames(presetsConfig.getPresetKeys());
+    }
+
+    private void duplicatePreset() {
+        PaletteConfigManager.duplicatePreset(editingPreset);
+        this.presetsConfig = PaletteConfigManager.presetsConfig;
+        changeEditingPreset(presetsConfig.getCurrentPresetFilename());
+        clearAndInit();
+    }
+
+    private void deletePreset() {
+        PaletteConfigManager.deletePreset(editingPreset);
+        this.presetsConfig = PaletteConfigManager.presetsConfig;
+        changeEditingPreset(presetsConfig.getCurrentPresetFilename());
+        clearAndInit();
+    }
+
+    private void createNewPreset() {
+        PaletteConfigManager.createNewPreset();
+        this.presetsConfig = PaletteConfigManager.presetsConfig;
+        changeEditingPreset(presetsConfig.getCurrentPresetFilename());
+        clearAndInit();
     }
 
     @Override

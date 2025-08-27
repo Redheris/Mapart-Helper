@@ -74,10 +74,19 @@ public class PalettePresetsConfig {
         currentPresetFile = presetName;
     }
 
-    void duplicatePreset(String filename) {
+    void deletePreset(String filename) {
+        presetFiles.remove(filename);
+        presets.remove(filename);
+        currentPresetFile = presetFiles.keySet().iterator().next();
+    }
+
+    String duplicatePreset(String filename) {
         PalettePreset preset = new PalettePreset(presets.get(filename));
-        presets.put(filename + " (Copy).json", preset);
-        presetFiles.put(filename + " (Copy).json", presetFiles.get(filename) + " (Copy)");
+        String newFilename = presetFiles.get(filename) + " (Copy).json";
+        presets.put(newFilename, preset);
+        presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
+        currentPresetFile = newFilename;
+        return newFilename;
     }
 
     void renamePreset(String filename, String newName) {
