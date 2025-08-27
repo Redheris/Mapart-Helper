@@ -2,6 +2,7 @@ package rh.maparthelper.config.palette;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
+import org.apache.commons.io.FilenameUtils;
 import rh.maparthelper.util.Utils;
 
 import java.util.*;
@@ -93,13 +94,14 @@ public class PalettePresetsConfig {
             PalettePresetsConfig newConfig = this.copyConfig();
             newConfig.presetFiles.remove(filename);
             newConfig.presets.remove(filename);
-            newConfig.currentPresetFile = presetFiles.keySet().iterator().next();
+            newConfig.currentPresetFile = newConfig.presetFiles.keySet().iterator().next();
             return new Editable(newConfig);
         }
 
         public String duplicatePreset(String filename) {
             PalettePreset preset = new PalettePreset(presets.get(filename));
-            String newFilename = filename + " (Copy).json";
+            String newFilename = FilenameUtils.getBaseName(filename) + " (Copy)";
+            newFilename = Utils.makeUniqueFilename(presetFiles::containsKey, newFilename, "json", "%s_%d");
             presets.put(newFilename, preset);
             presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
             return newFilename;
