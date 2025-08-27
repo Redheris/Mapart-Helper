@@ -3,6 +3,7 @@ package rh.maparthelper.config.palette;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
@@ -103,7 +104,7 @@ public class PaletteConfigManager {
     private static boolean validatePresetsConfig() {
         boolean hasChanges = false;
         if (presetsConfig.presetFiles.isEmpty()) {
-            presetsConfig.createNewPreset();
+            presetsConfig.currentPresetFile = presetsConfig.createNewPreset();
             savePresetFiles();
             hasChanges = true;
         } else if (!presetsConfig.presetFiles.containsKey(presetsConfig.currentPresetFile)) {
@@ -143,8 +144,12 @@ public class PaletteConfigManager {
                         hasChanges = true;
                     }
                     MapartHelper.LOGGER.info("Preset file \"{}\" successfully read", path);
+                } catch (JsonSyntaxException e) {
+                    MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", path, e.getMessage());
+                    presetsConfig.presetFiles.remove(path.getFileName().toString());
                 } catch (IOException e) {
                     MapartHelper.LOGGER.error("Failed to read preset \"{}\"", path, e);
+                    presetsConfig.presetFiles.remove(path.getFileName().toString());
                 }
             }
         } catch (IOException e) {
@@ -172,7 +177,7 @@ public class PaletteConfigManager {
         }
     }
 
-    private static void savePresetFile(String filename) {
+    public static void savePresetFile(String filename) {
         Path presetsPath = CONFIG_PATH.resolve("presets");
         try (FileWriter writer = new FileWriter(presetsPath.resolve(filename).toFile())) {
             PalettePresetsConfig.PalettePreset preset = presetsConfig.presets.get(filename);
@@ -182,7 +187,7 @@ public class PaletteConfigManager {
         }
     }
 
-    private static void deletePresetFile(String filename) {
+    public static void deletePresetFile(String filename) {
         try {
             Path presetsPath = CONFIG_PATH.resolve("presets");
             Files.delete(presetsPath.resolve(filename));
@@ -192,38 +197,7 @@ public class PaletteConfigManager {
     }
 
     public static void changeCurrentPreset(String name) {
-        presetsConfig.changeCurrentPreset(name);
+        presetsConfig.setCurrentPreset(name);
         savePresetsConfigFile();
-    }
-
-    public static void updatePreset(String key, PalettePresetsConfig.PalettePreset preset) {
-        presetsConfig.updatePreset(key, preset);
-        savePresetFile(key);
-    }
-
-    public static void createNewPreset() {
-        presetsConfig.createNewPreset();
-        savePresetsConfigFile();
-    }
-
-    public static void deletePreset(String filename) {
-        if (presetsConfig.presetFiles.size() == 1) {
-            presetsConfig = PalettePresetsConfig.createDefaultConfig();
-        } else {
-            presetsConfig.deletePreset(filename);
-        }
-        deletePresetFile(filename);
-        savePresetsConfigFile();
-    }
-
-    public static void renamePreset(String filename, String newName) {
-        presetsConfig.renamePreset(filename, newName);
-        savePresetsConfigFile();
-    }
-
-    public static void duplicatePreset(String filename) {
-        String newFilename = presetsConfig.duplicatePreset(filename);
-        savePresetsConfigFile();
-        savePresetFile(newFilename);
     }
 }

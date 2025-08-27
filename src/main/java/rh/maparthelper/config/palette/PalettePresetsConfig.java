@@ -12,8 +12,20 @@ public class PalettePresetsConfig {
 
     static PalettePresetsConfig createDefaultConfig() {
         PalettePresetsConfig config = new PalettePresetsConfig();
-        config.createNewPreset();
+        config.currentPresetFile = config.createNewPreset();
         return config;
+    }
+
+    public PalettePresetsConfig copyConfig() {
+        PalettePresetsConfig clone = new PalettePresetsConfig();
+        clone.currentPresetFile = this.currentPresetFile;
+        clone.presetFiles = new HashMap<>(this.presetFiles);
+        clone.presets = new HashMap<>(this.presets);
+        return clone;
+    }
+
+    public Editable getEditable() {
+        return new Editable(this);
     }
 
     public String getCurrentPresetFilename() {
@@ -24,24 +36,12 @@ public class PalettePresetsConfig {
         return presetFiles.get(currentPresetFile);
     }
 
-    public Set<String> getPresetKeys() {
-        return presetFiles.keySet();
-    }
-
     public Set<MapColor> getPresetColors(String filename) {
         return presets.get(filename).colors.keySet();
     }
 
     public Set<MapColor> getCurrentPresetColors() {
         return getPresetColors(currentPresetFile);
-    }
-
-    public List<Block> getPresetBlocks(String preset) {
-        return presets.get(preset).getBlocks();
-    }
-
-    public List<Block> getCurrentPresetBlocks() {
-        return getPresetBlocks(currentPresetFile);
     }
 
     public Block getPresetBlockOfMapColor(String preset, MapColor color) {
@@ -52,45 +52,57 @@ public class PalettePresetsConfig {
         return getPresetBlockOfMapColor(currentPresetFile, color);
     }
 
-    // Returns a clone of the preset for editing
-    public PalettePreset copyPreset(String key) {
-        return new PalettePreset(presets.get(key));
+    void setCurrentPreset(String presetFilename) {
+        if (presetFiles.containsKey(presetFilename))
+            this.currentPresetFile = presetFilename;
     }
 
-    // Updates preset after in-game editing
-    void updatePreset(String key, PalettePreset preset) {
-        presets.replace(key, preset);
-    }
-
-    void changeCurrentPreset(String key) {
-        currentPresetFile = key;
-    }
-
-    void createNewPreset() {
+    String createNewPreset() {
         String presetName = "new_preset.json";
         PalettePreset preset = PaletteGenerator.getDefaultPreset();
         presetFiles.put(presetName, "New Preset");
         presets.put(presetName, preset);
-        currentPresetFile = presetName;
+        return presetName;
     }
 
-    void deletePreset(String filename) {
-        presetFiles.remove(filename);
-        presets.remove(filename);
-        currentPresetFile = presetFiles.keySet().iterator().next();
-    }
+    public static class Editable extends PalettePresetsConfig {
+        public Editable(PalettePresetsConfig config) {
+            this.currentPresetFile = config.currentPresetFile;
+            this.presetFiles = new HashMap<>(config.presetFiles);
+            this.presets = new HashMap<>(config.presets);
+        }
 
-    String duplicatePreset(String filename) {
-        PalettePreset preset = new PalettePreset(presets.get(filename));
-        String newFilename = presetFiles.get(filename) + " (Copy).json";
-        presets.put(newFilename, preset);
-        presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
-        currentPresetFile = newFilename;
-        return newFilename;
-    }
+        public void setCurrentPreset(String presetFilename) {
+            if (presetFiles.containsKey(presetFilename))
+                this.currentPresetFile = presetFilename;
+        }
 
-    void renamePreset(String filename, String newName) {
-        presetFiles.replace(filename, newName);
+        public PalettePreset getPreset(String presetFilename) {
+            return this.presets.get(presetFilename);
+        }
+
+        public String createNewPreset() {
+            return super.createNewPreset();
+        }
+
+        public Editable deletePreset(String filename) {
+            if (presetFiles.size() == 1) {
+                return new Editable(createDefaultConfig());
+            }
+            PalettePresetsConfig newConfig = this.copyConfig();
+            newConfig.presetFiles.remove(filename);
+            newConfig.presets.remove(filename);
+            newConfig.currentPresetFile = presetFiles.keySet().iterator().next();
+            return new Editable(newConfig);
+        }
+
+        public String duplicatePreset(String filename) {
+            PalettePreset preset = new PalettePreset(presets.get(filename));
+            String newFilename = filename + " (Copy).json";
+            presets.put(newFilename, preset);
+            presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
+            return newFilename;
+        }
     }
 
     public static class PalettePreset {
@@ -110,12 +122,16 @@ public class PalettePresetsConfig {
             this.colors.putAll(origin.colors);
         }
 
-        List<Block> getBlocks() {
-            return new ArrayList<>(colors.values().stream().toList());
-        }
-
         Block getBlockOfMapColor(MapColor color) {
             return colors.get(color);
+        }
+
+        public void updateColor(MapColor mapColor, Block block) {
+            this.colors.put(mapColor, block);
+        }
+
+        public void removeColor(MapColor mapColor) {
+            this.colors.remove(mapColor);
         }
     }
 }

@@ -5,8 +5,9 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
@@ -21,14 +22,14 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
         super(parent, x, y, width, height, menuWidth, fieldName);
     }
 
-    public void addEntry(Consumer<String> action, String value) {
-        Text valueText = Text.of("\"" + PaletteConfigManager.presetsConfig.presetFiles.get(value) + "\"");
+    public void addEntry(Consumer<String> action, String presetFile, String presetName) {
+        Text valueText = Text.of("\"" + presetName + "\"");
         ButtonWidget widget = ButtonWidget.builder(
                         valueText,
                         btn -> {
                             if (dynamicText)
                                 this.setMessage(valueText);
-                            action.accept(value);
+                            action.accept(presetFile);
                         }
                 )
                 .size(menuWidth - 4, 15)
@@ -36,17 +37,9 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
         super.addEntry(widget);
     }
 
-    public void addEntries(Consumer<String> action, Set<String> values) {
-        for (String value : values) {
-            addEntry(action, value);
+    public void addEntries(Consumer<String> action, Map<String, String> presetFiles) {
+        for (Map.Entry<String, String> entry : presetFiles.entrySet()) {
+            addEntry(action, entry.getKey(), entry.getValue());
         }
-    }
-
-    public void updateNames(Set<String> values) {
-        Iterator<String> it = values.iterator();
-        this.forEachEntry(w -> {
-            Text valueText = Text.of("\"" + PaletteConfigManager.presetsConfig.presetFiles.get(it.next()) + "\"");
-            w.setMessage(valueText);
-        });
     }
 }

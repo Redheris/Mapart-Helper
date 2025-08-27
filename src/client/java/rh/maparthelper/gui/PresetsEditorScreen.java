@@ -19,7 +19,9 @@ import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class PresetsEditorScreen extends ScreenAdapted {
     private final MapartEditorScreen parent;
@@ -30,12 +32,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private int boxWidth;
     private int boxHeight;
 
-    private PalettePresetsConfig presetsConfig = PaletteConfigManager.presetsConfig;
+    private PalettePresetsConfig.Editable presetsConfig = PaletteConfigManager.presetsConfig.getEditable();
     private String editingPreset = presetsConfig.getCurrentPresetFilename();
-    private String presetName = presetsConfig.presetFiles.get(editingPreset);
-    private PalettePresetsConfig.PalettePreset presetEdit = presetsConfig.copyPreset(editingPreset);
 
-    private PresetsDropdownMenuWidget presetsListDropdown;
+    private final Set<String> deletedPresets = new HashSet<>();
+    private final Set<String> updatedPresets = new HashSet<>();
+
     private TextFieldWidget presetNameField;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, Text title, int x, int y, int marginRight, int marginBottom) {
@@ -67,40 +69,47 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetNameField = new TextFieldWidget(
                 textRenderer, (int)(boxWidth * 0.35), 20, Text.empty()
         );
-        presetNameField.setText(this.presetName);
+        presetNameField.setText(presetsConfig.presetFiles.get(editingPreset));
         presetNameField.setChangedListener(value -> {
             if (value.isBlank()) {
                 presetNameField.setSuggestion("Название пресета");
                 return;
             }
             presetNameField.setSuggestion(null);
-            this.presetName = value;
+            presetsConfig.presetFiles.put(editingPreset, value);
         });
         presetBarLeft.add(presetNameField);
 
-        presetsListDropdown = new PresetsDropdownMenuWidget(
-                this, 0, 0, 20, 20, presetNameField.getWidth() + 20, Text.of("☰")
+        PresetsDropdownMenuWidget presetsListDropdown = new PresetsDropdownMenuWidget(
+                this, 0, 0, 20, 20, presetNameField.getWidth() + 20,
+                Text.of("☰")
         );
         presetsListDropdown.setTooltip(Tooltip.of(Text.of("Выбрать пресет")));
-        presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.getPresetKeys());
+        presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.presetFiles);
         presetsListDropdown.forEachEntry(this::addSelectableChild);
         presetBarLeft.add(presetsListDropdown);
 
 
+        ButtonWidget refreshFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.refreshFiles())
+                .size(17, 20)
+                .build();
+        refreshFiles.setTooltip(Tooltip.of(Text.of("Обновить список и пресеты из файлов")));
+        presetBarLeft.add(refreshFiles);
+
         ButtonWidget createNewPreset = ButtonWidget.builder(Text.of("➕"), b -> this.createNewPreset())
-                .size(20, 20)
+                .size(17, 20)
                 .build();
         createNewPreset.setTooltip(Tooltip.of(Text.of("Создать новый пресет")));
         presetBarLeft.add(createNewPreset);
 
         ButtonWidget duplicatePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD0"), b -> this.duplicatePreset())
-                .size(20, 20)
+                .size(17, 20)
                 .build();
         duplicatePreset.setTooltip(Tooltip.of(Text.of("Дублировать выбранный пресет")));
         presetBarLeft.add(duplicatePreset);
 
         ButtonWidget deletePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD1"), b -> this.deletePreset())
-                .size(20, 20)
+                .size(17, 20)
                 .build();
         deletePreset.setTooltip(Tooltip.of(Text.of("Удалить выбранный пресет")));
         presetBarLeft.add(deletePreset);
@@ -112,7 +121,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         DirectionalLayoutWidget presetBarRight = DirectionalLayoutWidget.horizontal();
         presetBarRight.setPosition(0, y + 5);
-        presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(2);
+        presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(1);
 
         ButtonWidget save = ButtonWidget.builder(Text.of("Сохранить"),b -> saveChanges())
                 .size(60, 20)
@@ -134,7 +143,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int columns = (boxWidth - 5) / (squareSize + 5);
         ScrollableGridWidget colorsEditor = new ScrollableGridWidget(x, y + 31, boxWidth, boxHeight - 31, y, y + boxHeight, 6);
         GridWidget colorsGrid = colorsEditor.grid;
-        colorsGrid.getMainPositioner().alignHorizontalCenter().margin(5, 4, 0, 0);
+        colorsGrid.add(EmptyWidget.ofWidth(boxWidth - 11), 0, 0, 1, columns);
+        colorsGrid.getMainPositioner().alignHorizontalCenter().margin(0, 4, 0, 0);
 
         for (int i = 0; i < 63; i++) {
             MapColor mapColor = MapColor.get(i + 1);
@@ -155,14 +165,20 @@ public class PresetsEditorScreen extends ScreenAdapted {
             List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
                     0, 0, squareSize, squareSize,
-                    b -> presetEdit.colors.remove(mapColor),
+                    b -> {
+                        presetsConfig.getPreset(editingPreset).removeColor(mapColor);
+                        updatedPresets.add(editingPreset);
+                    },
                     mapColor, Blocks.BARRIER
             );
             adder.add(noneBlock, blocksList.grid.copyPositioner().alignHorizontalCenter());
             for (Block block : blocks) {
                 MapColorBlockWidget blockWidget = new MapColorBlockWidget(
                         0, 0, squareSize, squareSize,
-                        b -> presetEdit.colors.put(mapColor, block),
+                        b -> {
+                            presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
+                            updatedPresets.add(editingPreset);
+                        },
                         mapColor, block
                 );
                 adder.add(blockWidget, blocksList.grid.copyPositioner().alignHorizontalCenter());
@@ -184,38 +200,62 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void changeEditingPreset(String presetFile) {
-        this.presetName = presetsConfig.presetFiles.get(presetFile);
-        this.presetNameField.setText(presetName);
         this.editingPreset = presetFile;
-        this.presetEdit = presetsConfig.copyPreset(editingPreset);
+        this.presetNameField.setText(presetsConfig.presetFiles.get(presetFile));
     }
 
-    private void saveChanges() {
-        PaletteConfigManager.updatePreset(editingPreset, presetEdit);
-        PaletteConfigManager.renamePreset(editingPreset, this.presetName);
-        this.presetsConfig = PaletteConfigManager.presetsConfig;
-        presetsListDropdown.updateNames(presetsConfig.getPresetKeys());
+    private void refreshFiles() {
+        PaletteConfigManager.readCompletePalette();
+        PaletteConfigManager.readPresetsConfigFile();
+
+        this.presetsConfig = PaletteConfigManager.presetsConfig.getEditable();
+        this.editingPreset = presetsConfig.getCurrentPresetFilename();
+
+        this.deletedPresets.clear();
+        this.updatedPresets.clear();
+        clearAndInit();
     }
 
     private void duplicatePreset() {
-        PaletteConfigManager.duplicatePreset(editingPreset);
-        this.presetsConfig = PaletteConfigManager.presetsConfig;
-        changeEditingPreset(presetsConfig.getCurrentPresetFilename());
+        String newPreset = presetsConfig.duplicatePreset(editingPreset);
+        updatedPresets.add(newPreset);
+        changeEditingPreset(newPreset);
         clearAndInit();
     }
 
     private void deletePreset() {
-        PaletteConfigManager.deletePreset(editingPreset);
-        this.presetsConfig = PaletteConfigManager.presetsConfig;
+        presetsConfig = presetsConfig.deletePreset(editingPreset);
+        updatedPresets.remove(editingPreset);
+        if (PaletteConfigManager.presetsConfig.presetFiles.containsKey(editingPreset)) {
+            deletedPresets.add(editingPreset);
+        }
         changeEditingPreset(presetsConfig.getCurrentPresetFilename());
         clearAndInit();
     }
 
     private void createNewPreset() {
-        PaletteConfigManager.createNewPreset();
-        this.presetsConfig = PaletteConfigManager.presetsConfig;
+        presetsConfig.createNewPreset();
         changeEditingPreset(presetsConfig.getCurrentPresetFilename());
         clearAndInit();
+    }
+
+    private void saveChanges() {
+        presetsConfig.setCurrentPreset(editingPreset);
+        PaletteConfigManager.presetsConfig = presetsConfig;
+        if (!updatedPresets.isEmpty()) {
+            for (String filename : updatedPresets) {
+                PaletteConfigManager.savePresetFile(filename);
+            }
+            updatedPresets.clear();
+        }
+        if (!deletedPresets.isEmpty()) {
+            for (String filename : deletedPresets) {
+                PaletteConfigManager.deletePresetFile(filename);
+            }
+            deletedPresets.clear();
+        }
+
+        PaletteConfigManager.savePresetsConfigFile();
     }
 
     @Override
@@ -333,7 +373,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 }
             }
 
-            if (presetEdit.colors.get(mapColor) == block || block == Blocks.BARRIER && !presetEdit.colors.containsKey(mapColor)) {
+            PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
+            if (preset.colors.get(mapColor) == block || block == Blocks.BARRIER && !preset.colors.containsKey(mapColor)) {
                 matrixStack.push();
                 matrixStack.translate(0, 0, 200);
                 context.drawBorder(x, y, width, height, Colors.CYAN);
