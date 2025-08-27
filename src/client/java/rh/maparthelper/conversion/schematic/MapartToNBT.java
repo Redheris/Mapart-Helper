@@ -14,9 +14,9 @@ import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
+import rh.maparthelper.util.Utils;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,7 +50,7 @@ public class MapartToNBT {
                 filename += " (" + (i % CurrentConversionSettings.getWidth()) + "_" + (i / CurrentConversionSettings.getWidth()) + ")";
             }
 
-            String writeFilename = makeUniqueFilename(filename, "nbt");
+            String writeFilename = Utils.makeUniqueFilename(SCHEMATICS, filename, "nbt");
             try {
                 if (zipOut == null) {
                     NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(writeFilename));
@@ -104,7 +104,7 @@ public class MapartToNBT {
     public static void saveNBTAsZip() {
         if (CurrentConversionSettings.guiMapartImage == null)
             return;
-        String filename = makeUniqueFilename(CurrentConversionSettings.mapartName, "zip");
+        String filename = Utils.makeUniqueFilename(SCHEMATICS, CurrentConversionSettings.mapartName, "zip");
         File fileToZip = SCHEMATICS.resolve(filename).toFile();
 
         nbtBuilderExecutor.execute(() -> {
@@ -116,16 +116,6 @@ public class MapartToNBT {
                 MapartHelper.LOGGER.error("An error occurred during saving zip", e);
             }
         });
-    }
-
-    private static String makeUniqueFilename(String filename, String ext) {
-        if (Files.exists(SCHEMATICS.resolve(filename + "." + ext))) {
-            int suffix = 1;
-            while (Files.exists(SCHEMATICS.resolve(filename + " (" + suffix + ")." + ext)))
-                suffix++;
-            return filename + " (" + suffix + ")" + "." + ext;
-        }
-        return filename + "." + ext;
     }
 
 }

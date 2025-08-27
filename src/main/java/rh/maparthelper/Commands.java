@@ -11,6 +11,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.util.MapUtils;
 
 import java.util.Set;
 

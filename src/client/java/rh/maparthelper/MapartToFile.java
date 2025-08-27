@@ -20,6 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import rh.maparthelper.util.Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -143,17 +144,12 @@ public class MapartToFile {
     }
 
     private static void saveMapartFile(PlayerEntity player, String filename, NativeImage image) throws IOException {
-        if (Files.exists(SAVE_MAPS_DIR.resolve(filename + ".png"))) {
-            int suffix = 1;
-            while (Files.exists(SAVE_MAPS_DIR.resolve(filename + " (" + suffix + ").png")))
-                suffix++;
-            filename = filename + " (" + suffix + ")";
-        }
+        filename = Utils.makeUniqueFilename(SAVE_MAPS_DIR, filename, "png");
 
-        Path filePath = SAVE_MAPS_DIR.resolve(filename + ".png");
+        Path filePath = SAVE_MAPS_DIR.resolve(filename);
         image.writeTo(filePath);
 
-        Text mapartFile = Text.literal(filename + ".png")
+        Text mapartFile = Text.literal(filename)
                 .styled(style -> style
                         .withColor(Formatting.GREEN)
                         .withClickEvent(new ClickEvent.OpenFile(filePath.toAbsolutePath().toString()))

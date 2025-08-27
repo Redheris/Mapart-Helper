@@ -11,7 +11,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
-import rh.maparthelper.MapUtils;
+import rh.maparthelper.util.MapUtils;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.SessionVariables;
 import rh.maparthelper.gui.MapartEditorScreen;

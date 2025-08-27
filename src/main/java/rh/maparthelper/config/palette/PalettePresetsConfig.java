@@ -2,6 +2,7 @@ package rh.maparthelper.config.palette;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
+import rh.maparthelper.util.Utils;
 
 import java.util.*;
 
@@ -58,7 +59,7 @@ public class PalettePresetsConfig {
     }
 
     String createNewPreset() {
-        String presetName = "new_preset.json";
+        String presetName = Utils.makeUniqueFilename(presetFiles::containsKey, "new_preset", "json", "%s_%d");
         PalettePreset preset = PaletteGenerator.getDefaultPreset();
         presetFiles.put(presetName, "New Preset");
         presets.put(presetName, preset);

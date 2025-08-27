@@ -12,6 +12,7 @@ import rh.maparthelper.conversion.colors.ColorUtils;
 import rh.maparthelper.conversion.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.util.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -29,7 +30,7 @@ public class MapartImageConverter {
     public static BufferedImage lastImage;
     public static Path lastImagePath;
 
-    private final static Path TEMP_ARTS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps").resolve("temp");
+    private final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
     private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Image-%d").build());
     private static Future<?> currentConvertingFuture;
@@ -72,7 +73,8 @@ public class MapartImageConverter {
     }
 
     public static void saveMapartImage(String filename) {
-        saveMapartImage(TEMP_ARTS_DIR.getParent().resolve(filename + ".png"));
+        filename = Utils.makeUniqueFilename(SAVED_MAPS_DIR, filename, "png");
+        saveMapartImage(SAVED_MAPS_DIR.resolve(filename));
     }
 
     /**
