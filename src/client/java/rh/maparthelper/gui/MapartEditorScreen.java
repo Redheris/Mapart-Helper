@@ -148,18 +148,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         settings.add(presetLabel);
 
         PresetsDropdownMenuWidget list = new PresetsDropdownMenuWidget(
-                this, 0, 0, 150, 20,130,
+                this, 0, 0, 150, 20, 150,
                 Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
         );
-        list.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.getPresetKeys());
+        list.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.presetFiles);
         list.forEachEntry(this::addSelectableChild);
         settings.add(list, positioner.copy().marginTop(0));
 
         ButtonWidget presets = ButtonWidget.builder(
                 Text.of("Редактор пресетов"),
                 (btn) -> MinecraftClient.getInstance().setScreen(
-                        new PresetsEditorScreen(this, Text.translatable("maparthelper.presets_editor_screen"), 60, 30, 60, 30)
-                )
+                        new PresetsEditorScreen(this, Text.translatable("maparthelper.presets_editor_screen"),
+                                45, 30, 45, 30
+                        ))
         ).size(130, 20).build();
         settings.add(presets);
 
