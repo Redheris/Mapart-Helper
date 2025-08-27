@@ -28,7 +28,7 @@
   "maparthelper.mapart_editor_screen": "Редактор мапартов",
   "maparthelper.presets_editor_screen": "Редактор пресетов палитры",
 
-  "maparthelper.option.FLAT_2D": "Плоский (2D)",
+  "maparthelper.option.FLAT_2D": "Выкл. (2D)",
   "maparthelper.option.VALLEY_3D":"Впадина (3D)",
   "maparthelper.option.WAVES_3D": "Волны (3D)",
   "maparthelper.option.NONE": "Нет",

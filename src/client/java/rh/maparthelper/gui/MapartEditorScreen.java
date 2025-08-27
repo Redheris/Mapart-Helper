@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
@@ -26,7 +27,8 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
-    DirectionalLayoutWidget settings;
+    DirectionalLayoutWidget settingsLeft;
+    DirectionalLayoutWidget settingsRight;
     MapartPreviewWidget mapartPreview;
 
     public MapartEditorScreen() {
@@ -35,11 +37,12 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     @Override
     protected void init() {
-        settings = DirectionalLayoutWidget.vertical();
-        settings.setPosition(15, 25);
-        Positioner positioner = settings.getMainPositioner().margin(0, 5, 0, 0);
+        settingsLeft = DirectionalLayoutWidget.vertical();
+        settingsLeft.setPosition(5, 20);
+        Positioner settingLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
+        int baseWidth = 150;
 
-        TextFieldWidget mapartName = createTextInputFieldWidget(150, CurrentConversionSettings.mapartName, -1);
+        TextFieldWidget mapartName = createTextInputFieldWidget(baseWidth, CurrentConversionSettings.mapartName, -1);
         mapartName.setChangedListener(value -> {
             mapartName.setEditableColor(Colors.WHITE);
             if (value.isEmpty()) {
@@ -53,14 +56,14 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             CurrentConversionSettings.mapartName = value;
         });
-        settings.add(new TextWidget(Text.literal("Название мапарта"), textRenderer));
-        settings.add(mapartName, positioner.copy().marginTop(0));
+        settingsLeft.add(new TextWidget(Text.literal("Название мапарта"), textRenderer));
+        settingsLeft.add(mapartName, settingLeftPositioner.copy().marginTop(0));
 
         GridWidget size = createSizeSettingsGrid();
-        settings.add(size);
+        settingsLeft.add(size);
 
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
-                this, 0, 0, 150, 20, 150,
+                this, 0, 0, baseWidth, 20, baseWidth,
                 Text.of("Кадрирование: "), Text.translatable("maparthelper.option." + CurrentConversionSettings.cropMode.name())
         );
         croppingMode.addEntries(
@@ -71,10 +74,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CroppingMode.values()
         );
         croppingMode.forEachEntry(this::addSelectableChild);
-        settings.add(croppingMode);
+        settingsLeft.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
-                this, 0, 0, 150, 20, 150,
+                this, 0, 0, baseWidth, 20, baseWidth,
                 Text.of("Ступенчатость: "), Text.translatable("maparthelper.option." + MapartHelper.config.conversionSettings.staircaseStyle.name())
         );
         staircaseStyle.addEntries(
@@ -89,10 +92,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 StaircaseStyles.values()
         );
         staircaseStyle.forEachEntry(this::addSelectableChild);
-        settings.add(staircaseStyle);
+        settingsLeft.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
-                this, 0, 0, 150, 20, 150,
+                this, 0, 0, baseWidth, 20, baseWidth,
                 Text.of("Дизеринг: "), Text.translatable("maparthelper.option." + MapartHelper.config.conversionSettings.ditheringAlgorithm.name())
         );
         ditheringAlg.addEntries(
@@ -104,7 +107,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 DitheringAlgorithms.values()
         );
         ditheringAlg.forEachEntry(this::addSelectableChild);
-        settings.add(ditheringAlg);
+        settingsLeft.add(ditheringAlg);
 
 
         ButtonWidget showGridButton = ButtonWidget.builder(
@@ -115,7 +118,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                             Text.of("Сетка: выкл"));
                 }
         ).size(80, 20).build();
-        settings.add(showGridButton, positioner.copy());
+        settingsLeft.add(showGridButton);
 
         ButtonWidget useLAB = ButtonWidget.builder(
                 MapartHelper.config.conversionSettings.useLAB ? Text.of("LAB: вкл") : Text.of("LAB: выкл"),
@@ -127,15 +130,11 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
         ).size(80, 20).tooltip(Tooltip.of(Text.of("Улучшает подбор цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
         useLAB.setTooltipDelay(Duration.ofMillis(500));
-        settings.add(useLAB, positioner.copy());
+        settingsLeft.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
         imagePreprocessing.forEachEntry(this::addSelectableChild);
-        settings.add(imagePreprocessing);
-
-        DropdownMenuWidget saveMapart = createSaveMapartDropdown();
-        saveMapart.forEachEntry(this::addSelectableChild);
-        settings.add(saveMapart);
+        settingsLeft.add(imagePreprocessing);
 
 //        Useless when updates automatically
 //        ButtonWidget submit = ButtonWidget.builder(
@@ -144,16 +143,26 @@ public class MapartEditorScreen extends ScreenAdapted {
 //        ).size(130, 20).build();
 //        settings.add(submit, positioner.copy().alignHorizontalCenter());
 
-        TextWidget presetLabel = new TextWidget(Text.of("Текущий пресет:"), textRenderer);
-        settings.add(presetLabel);
+        settingsLeft.refreshPositions();
+        settingsLeft.forEachChild(this::addDrawableChild);
+        croppingMode.refreshPositions();
+        staircaseStyle.refreshPositions();
+        ditheringAlg.refreshPositions();
+        imagePreprocessing.refreshPositions();
+
+        // =========== Presets and Material list area ===========
+
+        settingsRight = DirectionalLayoutWidget.vertical();
+        Positioner settingsRightPositioner = settingsRight.getMainPositioner().marginTop(5);
 
         PresetsDropdownMenuWidget list = new PresetsDropdownMenuWidget(
-                this, 0, 0, 150, 20, 150,
+                this, 0, 0, baseWidth, 20, baseWidth,
                 Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
         );
         list.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.presetFiles);
         list.forEachEntry(this::addSelectableChild);
-        settings.add(list, positioner.copy().marginTop(0));
+        settingsRight.add(new TextWidget(Text.of("Текущий пресет:"), textRenderer));
+        settingsRight.add(list, settingsRightPositioner.copy().marginTop(0));
 
         ButtonWidget presets = ButtonWidget.builder(
                 Text.of("Редактор пресетов"),
@@ -161,21 +170,34 @@ public class MapartEditorScreen extends ScreenAdapted {
                         new PresetsEditorScreen(this, Text.translatable("maparthelper.presets_editor_screen"),
                                 45, 30, 45, 30
                         ))
-        ).size(130, 20).build();
-        settings.add(presets);
+        ).size(baseWidth, 20).build();
+        settingsRight.add(presets);
 
-        settings.refreshPositions();
-        settings.forEachChild(this::addDrawableChild);
-        croppingMode.refreshPositions();
-        staircaseStyle.refreshPositions();
-        ditheringAlg.refreshPositions();
-        imagePreprocessing.refreshPositions();
-        saveMapart.refreshPositions();
+        settingsRight.refreshPositions();
+        settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);
+        settingsRight.forEachChild(this::addDrawableChild);
         list.refreshPositions();
 
-
-        mapartPreview = new MapartPreviewWidget(220, 20, this.width - 230, this.height - 40);
+        int maxX = settingsRight.getX() - 15;
+//        maxX = width - 15;
+        mapartPreview = new MapartPreviewWidget(
+                settingsLeft.getX() + settingsLeft.getWidth() + 15, 33,
+                maxX, this.height - 20
+        );
         this.addDrawableChild(mapartPreview);
+
+        DropdownMenuWidget saveMapart = createSaveMapartDropdown();
+        saveMapart.setPosition(mapartPreview.getX(), 10);
+        saveMapart.forEachEntry(this::addSelectableChild);
+        this.addDrawableChild(saveMapart);
+        saveMapart.refreshPositions();
+    }
+
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
+        context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
@@ -213,7 +235,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     private GridWidget createSizeSettingsGrid() {
         GridWidget size = new GridWidget().setSpacing(10).setRowSpacing(1);
-        GridWidget.Adder adder = size.createAdder(3);
+        GridWidget.Adder adder = size.createAdder(2);
 
         TextFieldWidget widthInput = createTextInputFieldWidget(
                 30, "" + CurrentConversionSettings.getWidth(), 3
@@ -250,7 +272,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 heightInput.setEditableColor(Colors.LIGHT_RED);
             }
         });
-        adder.add(new TextWidget(Text.literal("Размеры мапарта"), textRenderer), 3);
+        adder.add(new TextWidget(Text.literal("Размеры мапарта"), textRenderer), 2);
         adder.add(widthInput);
         adder.add(heightInput);
 
@@ -323,24 +345,25 @@ public class MapartEditorScreen extends ScreenAdapted {
         ButtonWidget saveImage = ButtonWidget.builder(
                 Text.of("Сохранить PNG"),
                 (btn) -> MapartImageConverter.saveMapartImage(CurrentConversionSettings.mapartName)
-        ).size(150, 20).build();
+        ).size(156, 20).build();
 
         ButtonWidget saveNBT = ButtonWidget.builder(
                 Text.of("Сохранить NBT"),
                 (btn) -> MapartToNBT.saveNBT(true)
-        ).size(150, 20).build();
+        ).size(156, 20).build();
 
         ButtonWidget saveSplitNBT = ButtonWidget.builder(
                 Text.of("Сохранить NBT каждой карты"),
                 (btn) -> MapartToNBT.saveNBT(false)
-        ).size(150, 20).build();
+        ).size(156, 20).build();
 
         ButtonWidget saveZipNBT = ButtonWidget.builder(
                 Text.of("Сохранить NBT в архиве"),
                 (btn) -> MapartToNBT.saveNBTAsZip()
-        ).size(150, 20).build();
+        ).size(156, 20).build();
 
-        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 100, 20, 154, Text.of("Сохранить"));
+        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, Text.of("\uD83D\uDDAB"));
+        saveMapart.setTooltip(Tooltip.of(Text.of("Сохранить мапарт как...")));
         saveMapart.addEntry(saveImage);
         saveMapart.addEntry(saveNBT);
         saveMapart.addEntry(saveSplitNBT);

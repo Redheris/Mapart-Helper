@@ -20,10 +20,10 @@ public class MapartPreviewWidget extends ClickableWidget {
     private final int maxWidth;
     private final int maxHeight;
 
-    public MapartPreviewWidget(int x, int y, int maxWidth, int maxHeight) {
+    public MapartPreviewWidget(int x, int y, int maxX, int maxY) {
         super(x, y, CurrentConversionSettings.getWidth() * 128, CurrentConversionSettings.getHeight() * 128, Text.empty());
-        this.maxWidth = maxWidth;
-        this.maxHeight = maxHeight;
+        this.maxWidth = maxX - x;
+        this.maxHeight = maxY - y;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class MapartPreviewWidget extends ClickableWidget {
                 context.drawCenteredTextWithShadow(
                         textRenderer,
                         lines.get(i),
-                        centerX, y + 30 + i * 9,
+                        centerX, y + 15 + i * 9,
                         5636095
                 );
             }
