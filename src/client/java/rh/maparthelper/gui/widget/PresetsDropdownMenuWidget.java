@@ -4,6 +4,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -38,5 +40,10 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
         for (Map.Entry<String, String> entry : presetFiles.entrySet()) {
             addEntry(action, entry.getKey(), entry.getValue());
         }
+    }
+
+    public void updateNames(Collection<String> names) {
+        Iterator<String> it = names.iterator();
+        this.forEachEntry(btn -> btn.setMessage(Text.of("\"" + it.next() + "\"")));
     }
 }

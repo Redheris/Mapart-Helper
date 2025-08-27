@@ -70,14 +70,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 textRenderer, (int)(boxWidth * 0.35), 20, Text.empty()
         );
         presetNameField.setText(presetsConfig.presetFiles.get(editingPreset));
-        presetNameField.setChangedListener(value -> {
-            if (value.isBlank()) {
-                presetNameField.setSuggestion("Название пресета");
-                return;
-            }
-            presetNameField.setSuggestion(null);
-            presetsConfig.presetFiles.put(editingPreset, value);
-        });
         presetBarLeft.add(presetNameField);
 
         PresetsDropdownMenuWidget presetsListDropdown = new PresetsDropdownMenuWidget(
@@ -88,6 +80,16 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.presetFiles);
         presetsListDropdown.forEachEntry(this::addSelectableChild);
         presetBarLeft.add(presetsListDropdown);
+
+        presetNameField.setChangedListener(value -> {
+            if (value.isBlank()) {
+                presetNameField.setSuggestion("Название пресета");
+                return;
+            }
+            presetNameField.setSuggestion(null);
+            presetsConfig.presetFiles.put(editingPreset, value);
+            presetsListDropdown.updateNames(presetsConfig.presetFiles.values());
+        });
 
 
         ButtonWidget refreshFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.refreshFiles())
