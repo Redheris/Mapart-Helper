@@ -19,6 +19,8 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     private final List<ClickableWidget> elements = new ArrayList<>();
     private int menuHeight = 2;
     protected final int menuWidth;
+    private int menuXOffset = 0;
+
     private boolean expandUpwards = false;
     private int topYExpanded;
     private int bottomYExpanded;
@@ -36,6 +38,14 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         this.bottomYExpanded = y + height;
         this.menuWidth = menuWidth;
         expandedOne = null;
+    }
+
+    public void setMenuXOffset(int menuXOffset) {
+        this.menuXOffset = menuXOffset;
+    }
+
+    public int getMenuX() {
+        return this.getX() + this.menuXOffset;
     }
 
     public final void addEntry(ClickableWidget widget) {
@@ -98,7 +108,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     public boolean isMouseOverMenu(double mouseX, double mouseY) {
-        return isExpanded && mouseX >= getX() && mouseX < getX() + menuWidth && mouseY >= topYExpanded && mouseY < bottomYExpanded;
+        return isExpanded && mouseX >= getMenuX() && mouseX < getMenuX() + menuWidth && mouseY >= topYExpanded && mouseY < bottomYExpanded;
     }
 
     @Override
@@ -106,7 +116,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         if (needRelayout) {
             if (getBottom() + menuHeight > parent.height)
                 expandUpwards = true;
-            int x = getX() + 2;
+            int x = getMenuX() + 2;
             int y = (expandUpwards ? getY() - menuHeight : getBottom()) + 2;
             for (ClickableWidget element : elements) {
                 element.setPosition(x, y);
@@ -118,18 +128,16 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         }
 
         if (isExpanded) {
-            context.enableScissor(getX(), topYExpanded, getX() + menuWidth, bottomYExpanded);
             MatrixStack matrixStack = context.getMatrices();
             matrixStack.push();
             matrixStack.translate(0, 0, 300);
             if (expandUpwards)
-                context.fill(getX(), getY() - menuHeight, getX() + menuWidth, getY(), 0x99FFFFFF);
+                context.fill(getMenuX(), getY() - menuHeight, getMenuX() + menuWidth, getY(), 0x99FFFFFF);
             else
-                context.fill(getX(), getY() + height, getX() + menuWidth, getY() + height + menuHeight, 0x99FFFFFF);
+                context.fill(getMenuX(), getY() + height, getMenuX() + menuWidth, getY() + height + menuHeight, 0x99FFFFFF);
             elements.forEach(
                     e -> e.render(context, mouseX, mouseY, deltaTicks));
             matrixStack.pop();
-            context.disableScissor();
         }
 
         super.renderWidget(context, mouseX, mouseY, deltaTicks);

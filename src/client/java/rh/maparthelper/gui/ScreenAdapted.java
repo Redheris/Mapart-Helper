@@ -80,6 +80,7 @@ public abstract class ScreenAdapted extends Screen {
             }
             return dropMenu.mouseClicked(mouseX, mouseY, button);
         }
+        collapseDropdown();
 
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
             selectedTextWidget = textField;

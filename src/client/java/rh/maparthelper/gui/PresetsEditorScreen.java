@@ -65,7 +65,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarLeft.add(presetNameLabel, presetBarLeftPositioner.copy().marginRight(5));
 
         presetNameField = new TextFieldWidget(
-                textRenderer, (int)(boxWidth * 0.35), 20, Text.empty()
+                textRenderer, (int) (boxWidth * 0.35), 20, Text.empty()
         );
         presetNameField.setText(presetsConfig.presetFiles.get(editingPreset));
         presetBarLeft.add(presetNameField);
@@ -74,6 +74,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 this, 0, 0, 20, 20, presetNameField.getWidth() + 20,
                 Text.of("☰")
         );
+        presetsListDropdown.setMenuXOffset(-presetNameField.getWidth());
         presetsListDropdown.setTooltip(Tooltip.of(Text.of("Выбрать пресет")));
         presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.presetFiles);
         presetsListDropdown.forEachEntry(this::addSelectableChild);
@@ -123,7 +124,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarRight.setPosition(0, y + 5);
         presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(1);
 
-        ButtonWidget save = ButtonWidget.builder(Text.of("Сохранить"),b -> saveChanges())
+        ButtonWidget save = ButtonWidget.builder(Text.of("Сохранить"), b -> saveChanges())
                 .size(60, 20)
                 .build();
         presetBarRight.add(save);
@@ -281,8 +282,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int h = boxHeight;
         context.fill(x, y, x + w, y + h, 0x77000000);
         context.fill(x, y, x + w, y + 30, 0x44000000);
-        context.drawBorder(x - 1, y - 1, w + 2, h + 2,0x44FFFFFF);
-        context.drawHorizontalLine(x, x + w, y + 30,0x77FFFFFF);
+        context.drawBorder(x - 1, y - 1, w + 2, h + 2, 0x44FFFFFF);
+        context.drawHorizontalLine(x, x + w, y + 30, 0x77FFFFFF);
 
         super.render(context, mouseX, mouseY, deltaTicks);
     }
