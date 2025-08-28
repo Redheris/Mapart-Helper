@@ -120,7 +120,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         presetBarLeft.refreshPositions();
         presetBarLeft.forEachChild(this::addDrawableChild);
-        presetsListDropdown.refreshPositions();
 
 
         DirectionalLayoutWidget presetBarRight = DirectionalLayoutWidget.horizontal();
@@ -145,7 +144,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         int squareSize = 24;
         int columns = (boxWidth - 5) / (squareSize + 5);
-        ScrollableGridWidget colorsEditor = new ScrollableGridWidget(x, y + 31, boxWidth, boxHeight - 31, y, y + boxHeight, 6);
+        ScrollableGridWidget colorsEditor = new ScrollableGridWidget(
+                null,
+                x, y + 31, boxWidth, boxHeight - 31,
+                y, y + boxHeight, 6
+        );
         GridWidget colorsGrid = colorsEditor.grid;
         colorsGrid.add(EmptyWidget.ofWidth(boxWidth - 11), 0, 0, 1, columns);
         colorsGrid.getMainPositioner().alignHorizontalCenter().margin(0, 4, 0, 0);
@@ -162,9 +165,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 colorsGrid.add(color, row, i % columns, colorsGrid.copyPositioner().marginTop(10));
 
             ScrollableGridWidget blocksList = new ScrollableGridWidget(
-                    0, 0, squareSize, 150, colorsEditor.getY(), y + boxHeight, 3
+                    colorsEditor,
+                    0, 0, squareSize + 5, 150,
+                    colorsEditor.getY(), y + boxHeight, 3
             );
             GridWidget.Adder adder = blocksList.grid.createAdder(1);
+            adder.add(EmptyWidget.ofWidth(blocksList.getWidth()));
 
             List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
@@ -194,8 +200,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
                     i % columns,
                     colorsGrid.copyPositioner().alignHorizontalCenter()
             );
-
-            colorsEditor.refreshPositions();
             this.addDrawableChild(blocksList);
         }
 
@@ -270,7 +274,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         MatrixStack matrixStack = context.getMatrices();
         matrixStack.push();
-        matrixStack.translate(0, 0, -50);
+        matrixStack.translate(0, 0, -250);
         parent.render(context, 0, 0, deltaTicks);
         matrixStack.pop();
 

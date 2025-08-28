@@ -5,7 +5,6 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
@@ -24,6 +23,11 @@ public abstract class ScreenAdapted extends Screen {
 
     protected ScreenAdapted(Text title) {
         super(title);
+    }
+
+    @Override
+    protected void init() {
+        collapseDropdown();
     }
 
     @Override
@@ -59,9 +63,14 @@ public abstract class ScreenAdapted extends Screen {
             }
             return false;
         }
-        Element element = optional.get();
 
+        if (selectedDropdownMenu != null && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
+            return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
+        }
+
+        Element element = optional.get();
         if (element instanceof DropdownMenuWidget dropMenu) {
+            this.setFocused(element);
             if (element != selectedDropdownMenu) {
                 if (selectedDropdownMenu == null || !selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
                     collapseDropdown();
@@ -70,18 +79,6 @@ public abstract class ScreenAdapted extends Screen {
                     return false;
             }
             return dropMenu.mouseClicked(mouseX, mouseY, button);
-        }
-        if (selectedDropdownMenu != null) {
-            if (selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                if (selectedDropdownMenu.isChild((ClickableWidget) element)) {
-                    this.setFocused(element);
-                    this.setDragging(true);
-                    return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
-                } else
-                    return false;
-            } else {
-                collapseDropdown();
-            }
         }
 
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
@@ -112,6 +109,7 @@ public abstract class ScreenAdapted extends Screen {
 
     private void collapseDropdown() {
         if (this.selectedDropdownMenu != null) {
+            this.setFocused(null);
             this.selectedDropdownMenu.switchExpanded(false);
             this.selectedDropdownMenu = null;
         }

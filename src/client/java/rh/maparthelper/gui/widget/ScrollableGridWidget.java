@@ -1,23 +1,29 @@
 package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidget {
+    @Nullable
+    private final Element parentWidget;
     public final GridWidget grid;
     private final int scrollWidth;
     private final int minY;
     private final int maxY;
+    private boolean needRelayout = false;
 
-    public ScrollableGridWidget(int x, int y, int width, int height, int minY, int maxY, int scrollWidth) {
+    public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int minY, int maxY, int scrollWidth) {
         super(x, y, width, height, Text.empty());
+        this.parentWidget = parentWidget;
         this.grid = new GridWidget(x, y);
         this.minY = minY;
         this.maxY = maxY;
@@ -39,9 +45,20 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     public void refreshPositions() {
-        grid.setX(this.getX());
-        grid.setY((int) (this.getY() - this.getScrollY()));
         grid.refreshPositions();
+        LayoutWidget.super.refreshPositions();
+    }
+
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+        this.needRelayout = true;
+    }
+
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+        this.needRelayout = true;
     }
 
     @Override
@@ -68,11 +85,20 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        if (overflows()) {
+            return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        }
+        return parentWidget != null && parentWidget.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        if (needRelayout) {
+            grid.setX(this.getX());
+            grid.setY((int) (this.getY() - this.getScrollY()));
+            grid.refreshPositions();
+            this.needRelayout = false;
+        }
         context.enableScissor(getX(), Math.max(getY(), minY), getRight(), Math.min(getBottom(), maxY));
         grid.forEachChild(w -> w.render(context, mouseX, mouseY, deltaTicks));
         drawScrollbar(context);

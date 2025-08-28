@@ -37,10 +37,11 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     @Override
     protected void init() {
+        super.init();
         settingsLeft = DirectionalLayoutWidget.vertical();
         settingsLeft.setPosition(5, 20);
         Positioner settingLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
-        int baseWidth = 150;
+        int baseWidth = 155;
 
         TextFieldWidget mapartName = createTextInputFieldWidget(baseWidth, CurrentConversionSettings.mapartName, -1);
         mapartName.setChangedListener(value -> {
@@ -73,7 +74,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 CroppingMode.values()
         );
-        croppingMode.forEachEntry(this::addSelectableChild);
         settingsLeft.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
@@ -91,7 +91,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 StaircaseStyles.values()
         );
-        staircaseStyle.forEachEntry(this::addSelectableChild);
         settingsLeft.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
@@ -106,7 +105,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 DitheringAlgorithms.values()
         );
-        ditheringAlg.forEachEntry(this::addSelectableChild);
         settingsLeft.add(ditheringAlg);
 
 
@@ -133,7 +131,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
-        imagePreprocessing.forEachEntry(this::addSelectableChild);
         settingsLeft.add(imagePreprocessing);
 
 //        Useless when updates automatically
@@ -145,24 +142,20 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         settingsLeft.refreshPositions();
         settingsLeft.forEachChild(this::addDrawableChild);
-        croppingMode.refreshPositions();
-        staircaseStyle.refreshPositions();
-        ditheringAlg.refreshPositions();
-        imagePreprocessing.refreshPositions();
 
-        // =========== Presets and Material list area ===========
+        // =========== Presets and Material presetsList area ===========
 
         settingsRight = DirectionalLayoutWidget.vertical();
         Positioner settingsRightPositioner = settingsRight.getMainPositioner().marginTop(5);
 
-        PresetsDropdownMenuWidget list = new PresetsDropdownMenuWidget(
+        PresetsDropdownMenuWidget presetsList = new PresetsDropdownMenuWidget(
                 this, 0, 0, baseWidth, 20, baseWidth,
                 Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
         );
-        list.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.presetFiles);
-        list.forEachEntry(this::addSelectableChild);
+        presetsList.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.presetFiles);
+        presetsList.forEachEntry(this::addSelectableChild);
         settingsRight.add(new TextWidget(Text.of("Текущий пресет:"), textRenderer));
-        settingsRight.add(list, settingsRightPositioner.copy().marginTop(0));
+        settingsRight.add(presetsList, settingsRightPositioner.copy().marginTop(0));
 
         ButtonWidget presets = ButtonWidget.builder(
                 Text.of("Редактор пресетов"),
@@ -176,13 +169,12 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsRight.refreshPositions();
         settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);
         settingsRight.forEachChild(this::addDrawableChild);
-        list.refreshPositions();
 
-        int maxX = settingsRight.getX() - 15;
-//        maxX = width - 15;
+        // =========== Mapart preview area ===========
+
         mapartPreview = new MapartPreviewWidget(
                 settingsLeft.getX() + settingsLeft.getWidth() + 15, 33,
-                maxX, this.height - 20
+                settingsRight.getX() - 15, this.height - 20
         );
         this.addDrawableChild(mapartPreview);
 

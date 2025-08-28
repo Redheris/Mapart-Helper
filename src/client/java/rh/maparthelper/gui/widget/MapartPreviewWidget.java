@@ -31,23 +31,6 @@ public class MapartPreviewWidget extends ClickableWidget {
         int x = getX();
         int y = getY();
 
-        if (CurrentConversionSettings.guiMapartImage == null) {
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            Text dropFileText = Text.of("Перетащите файл изображения в окно редактора, чтобы создать мапарт");
-            int centerX = x + width / 2;
-
-            List<OrderedText> lines = textRenderer.wrapLines(dropFileText, width - 20);
-
-            for (int i = 0; i < lines.size(); i++) {
-                context.drawCenteredTextWithShadow(
-                        textRenderer,
-                        lines.get(i),
-                        centerX, y + 15 + i * 9,
-                        5636095
-                );
-            }
-        }
-
         int mapartWidth = CurrentConversionSettings.getWidth() * 128;
         int mapartHeight = CurrentConversionSettings.getHeight() * 128;
         double scale = 2.0;
@@ -69,6 +52,19 @@ public class MapartPreviewWidget extends ClickableWidget {
                     width, height,
                     width, height
             );
+        } else {
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            Text dropFileText = Text.of("Перетащите файл изображения в окно редактора, чтобы создать мапарт");
+            int centerX = x + width / 2;
+            List<OrderedText> lines = textRenderer.wrapLines(dropFileText, width - 5);
+            for (int i = 0; i < lines.size(); i++) {
+                context.drawCenteredTextWithShadow(
+                        textRenderer,
+                        lines.get(i),
+                        centerX, y + 5 + i * 9,
+                        5636095
+                );
+            }
         }
 
         if (!(MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen))
