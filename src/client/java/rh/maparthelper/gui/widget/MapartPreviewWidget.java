@@ -12,7 +12,6 @@ import net.minecraft.util.Colors;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
-import rh.maparthelper.gui.MapartEditorScreen;
 
 import java.util.List;
 
@@ -66,9 +65,6 @@ public class MapartPreviewWidget extends ClickableWidget {
                 );
             }
         }
-
-        if (!(MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen))
-            return;
 
         if (CurrentConversionSettings.doShowGrid) {
             for (int mapX = 1; mapX < mapartWidth / 128; mapX++) {
