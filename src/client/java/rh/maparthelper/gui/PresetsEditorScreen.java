@@ -2,20 +2,17 @@ package rh.maparthelper.gui;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
 import net.minecraft.block.MapColor;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
+import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
 
@@ -175,21 +172,23 @@ public class PresetsEditorScreen extends ScreenAdapted {
             List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
                     0, 0, squareSize, squareSize,
-                    b -> {
+                    Blocks.BARRIER, mapColor,
+                    (mx, my) -> {
                         presetsConfig.getPreset(editingPreset).removeColor(mapColor);
                         updatedPresets.add(editingPreset);
-                    },
-                    mapColor, Blocks.BARRIER
+                    }
             );
+            noneBlock.setTooltip(Text.of("Не использовать цвет"));
+
             adder.add(noneBlock, blocksList.grid.copyPositioner().alignHorizontalCenter());
             for (Block block : blocks) {
                 MapColorBlockWidget blockWidget = new MapColorBlockWidget(
                         0, 0, squareSize, squareSize,
-                        b -> {
+                        block, mapColor,
+                        (mx, my) -> {
                             presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
                             updatedPresets.add(editingPreset);
-                        },
-                        mapColor, block
+                        }
                 );
                 adder.add(blockWidget, blocksList.grid.copyPositioner().alignHorizontalCenter());
             }
@@ -306,7 +305,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         public final MapColor color;
 
-        public MapColorWidget(int x, int y, int squareSize, MapColor color) {
+        private MapColorWidget(int x, int y, int squareSize, MapColor color) {
             super(x, y, squareSize, squareSize, Text.empty());
             this.x = x;
             this.y = y;
@@ -342,56 +341,45 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
     }
 
-    private class MapColorBlockWidget extends ButtonWidget {
+    private class MapColorBlockWidget extends BlockItemWidget {
         private final MapColor mapColor;
-        private final Block block;
+        private final ClickAction clickAction;
 
-        protected MapColorBlockWidget(int x, int y, int width, int height, PressAction onPress, MapColor mapColor, Block block) {
-            super(x, y, width, height, Text.empty(), onPress, DEFAULT_NARRATION_SUPPLIER);
+        private MapColorBlockWidget(int x, int y, int width, int height, Block block, MapColor mapColor, ClickAction clickAction) {
+            super(PresetsEditorScreen.this, x, y, width, height, block, true);
             this.mapColor = mapColor;
-            this.block = block;
+            this.clickAction = clickAction;
+        }
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            this.clickAction.click(mouseX, mouseY);
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-            MatrixStack matrixStack = context.getMatrices();
-            matrixStack.push();
-            ItemStack blockItem;
-            if (block instanceof FluidBlock) {
-                blockItem = Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem().getDefaultStack();
-            } else {
-                blockItem = block.asItem().getDefaultStack();
-            }
-
-            int x = getX();
-            int y = getY();
-
-            matrixStack.translate(x, y, 0);
-            matrixStack.scale(width / 16f, height / 16f, 1);
-            matrixStack.translate(-x, -y, 0);
-            context.drawItem(blockItem, x, y);
-            matrixStack.pop();
-
-            boolean isMouseOverBlock = mouseX >= x
-                    && mouseX < x + width
-                    && mouseY >= y
-                    && mouseY < y + height;
-            if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
-                if (block != Blocks.BARRIER) {
-                    List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem);
-                    PresetsEditorScreen.this.setTooltip(tooltip.stream().map(Text::asOrderedText).toList());
-                } else {
-                    PresetsEditorScreen.this.setTooltip(Text.of("Не использовать цвет"));
-                }
-            }
+            super.renderWidget(context, mouseX, mouseY, deltaTicks);
 
             PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
-            if (preset.colors.get(mapColor) == block || block == Blocks.BARRIER && !preset.colors.containsKey(mapColor)) {
+            Block presetBlock = preset.colors.get(mapColor);
+            boolean flag = presetBlock == null && blockItem == Blocks.BARRIER.asItem();
+            flag = flag || (presetBlock != null && presetBlock.asItem() == blockItem);
+            if (flag) {
+                MatrixStack matrixStack = context.getMatrices();
                 matrixStack.push();
                 matrixStack.translate(0, 0, 200);
-                context.drawBorder(x, y, width, height, Colors.CYAN);
+                context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
                 matrixStack.pop();
             }
+        }
+
+        interface ClickAction {
+            void click(double mouseX, double mouseY);
         }
     }
 }
