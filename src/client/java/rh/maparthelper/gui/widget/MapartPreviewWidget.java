@@ -44,14 +44,14 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         if (CurrentConversionSettings.guiMapartImage != null) {
             context.drawTexture(
-                    RenderLayer::getGuiTexturedOverlay,
+                    RenderLayer::getGuiTextured,
                     CurrentConversionSettings.guiMapartId,
                     x, y,
                     0.0F, 0.0F,
                     width, height,
                     width, height
             );
-        } else {
+        } else if (!MapartImageConverter.isConverting()){
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
             Text dropFileText = Text.of("Перетащите файл изображения в окно редактора, чтобы создать мапарт");
             int centerX = x + width / 2;
@@ -76,6 +76,19 @@ public class MapartPreviewWidget extends ClickableWidget {
                 context.fill(x, lineY, x + width, lineY + 1, Colors.CYAN);
             }
         }
+
+        if (MapartImageConverter.isConverting()) {
+            double conversionProgress = MapartImageConverter.getConversionProgress();
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            context.fill(x, y, (int) (x + width * conversionProgress), getBottom(), 0x3000FF00);
+            context.drawCenteredTextWithShadow(
+                    textRenderer,
+                    (int) (conversionProgress * 100) + "%",
+                    x + width / 2, y,
+                    0xFF00FF00
+            );
+        }
+
         context.drawBorder(x - 1, y - 1, width + 2, height + 2, Colors.CYAN);
     }
 

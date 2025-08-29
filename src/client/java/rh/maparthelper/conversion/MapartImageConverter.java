@@ -1,5 +1,6 @@
 package rh.maparthelper.conversion;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
@@ -31,6 +32,7 @@ public class MapartImageConverter {
     public static BufferedImage lastImage;
     public static Path lastImagePath;
     private static final ColorsCounter colorsCounter = new ColorsCounter();
+    private static volatile AtomicDouble conversionProgress = new AtomicDouble(0.0);
 
     private final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
@@ -62,6 +64,15 @@ public class MapartImageConverter {
         }
         Arrays.sort(countsSorted, Comparator.comparingInt(MapColorCount::amount).reversed());
         return countsSorted;
+    }
+
+    public static boolean isConverting() {
+        double d = conversionProgress.get();
+        return d > 0.0 && d < 1.0;
+    }
+
+    public static double getConversionProgress() {
+        return conversionProgress.get();
     }
 
     private static BufferedImage preprocessImage(BufferedImage image) {
@@ -98,6 +109,7 @@ public class MapartImageConverter {
 
         int width = image.getWidth();
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        double progressStep = 1.0 / pixels.length;
 
         int[] errorsArray = new int[0];
         DitheringAlgorithms ditherAlg = MapartHelper.config.conversionSettings.ditheringAlgorithm;
@@ -134,6 +146,7 @@ public class MapartImageConverter {
                 if (color != MapColorEntry.CLEAR) {
                     colorsCounter.increment(color.mapColor().id);
                 }
+                conversionProgress.addAndGet(progressStep);
             }
             if (useDithering) {
                 for (int row = 1; row < ditherAlg.rowsNumber; row++) {
@@ -148,6 +161,7 @@ public class MapartImageConverter {
             MapartHelper.LOGGER.info("[{}] Colors conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
         }
 
+        conversionProgress.set(1.0);
         PaletteColors.clearColorCache();
     }
 
@@ -225,6 +239,7 @@ public class MapartImageConverter {
         public void run() {
             try {
                 long startTime = System.currentTimeMillis();
+                conversionProgress = new AtomicDouble(0.0);
                 if (imagePath != null) {
                     lastImagePath = null;
                     BufferedImage readImage = ImageIO.read(imagePath.toFile());
