@@ -368,8 +368,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
             PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
             Block presetBlock = preset.colors.get(mapColor);
-            boolean flag = presetBlock == null && blockItem == Blocks.BARRIER.asItem();
-            flag = flag || (presetBlock != null && presetBlock.asItem() == blockItem);
+            boolean flag = presetBlock == null && block == Blocks.BARRIER;
+            flag = flag || (presetBlock != null && presetBlock == block);
             if (flag) {
                 MatrixStack matrixStack = context.getMatrices();
                 matrixStack.push();

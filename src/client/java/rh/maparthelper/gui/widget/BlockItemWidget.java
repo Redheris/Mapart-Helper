@@ -25,6 +25,7 @@ public class BlockItemWidget extends ClickableWidget {
     private final int height;
     private final boolean hasClickAction;
 
+    protected final Block block;
     protected final Item blockItem;
     private List<OrderedText> tooltip;
 
@@ -35,6 +36,7 @@ public class BlockItemWidget extends ClickableWidget {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.block = block;
         if (block instanceof FluidBlock) {
             this.blockItem = Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem();
         } else {
