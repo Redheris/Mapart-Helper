@@ -55,7 +55,7 @@ public class MapartPreviewWidget extends ClickableWidget {
             );
         } else if (!MapartImageConverter.isConverting()){
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            Text dropFileText = Text.of("Перетащите файл изображения в окно редактора, чтобы создать мапарт");
+            Text dropFileText = Text.translatable("maparthelper.gui.drop_here_mapart");
             int centerX = x + width / 2;
             List<OrderedText> lines = textRenderer.wrapLines(dropFileText, width - 5);
             for (int i = 0; i < lines.size(); i++) {

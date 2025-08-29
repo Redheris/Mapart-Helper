@@ -15,6 +15,9 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import rh.maparthelper.gui.PresetsEditorScreen;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class BlockItemWidget extends ClickableWidget {
@@ -43,7 +46,7 @@ public class BlockItemWidget extends ClickableWidget {
             this.blockItem = block.asItem();
         }
         List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
-        this.tooltip = tooltip.stream().map(Text::asOrderedText).toList();
+        this.tooltip = new ArrayList<>(tooltip.stream().map(Text::asOrderedText).toList());
         this.hasClickAction = hasClickAction;
     }
 
@@ -52,7 +55,11 @@ public class BlockItemWidget extends ClickableWidget {
     }
 
     public void setTooltip(Text tooltip) {
-        this.tooltip = List.of(tooltip.asOrderedText());
+        this.tooltip = new ArrayList<>(List.of(tooltip.asOrderedText()));
+    }
+
+    public void insertToTooltip(int i, Text tooltip) {
+        this.tooltip.add(i, tooltip.asOrderedText());
     }
 
     @Override

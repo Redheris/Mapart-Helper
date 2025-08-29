@@ -39,8 +39,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private PresetsDropdownMenuWidget presetsListDropdown;
     private TextFieldWidget presetNameField;
 
-    protected PresetsEditorScreen(MapartEditorScreen parent, Text title, int x, int y, int marginRight, int marginBottom) {
-        super(title);
+    protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
+        super(Text.translatable("maparthelper.gui.presets_editor_screen"));
         this.parent = parent;
         this.x = x;
         this.y = y;
@@ -62,7 +62,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarLeft.setPosition(x + 5, y + 5);
         Positioner presetBarLeftPositioner = presetBarLeft.getMainPositioner().alignVerticalCenter();
 
-        TextWidget presetNameLabel = new TextWidget(Text.of("Пресет:"), textRenderer);
+        TextWidget presetNameLabel = new TextWidget(Text.translatable("maparthelper.gui.preset"), textRenderer);
         presetBarLeft.add(presetNameLabel, presetBarLeftPositioner.copy().marginRight(5));
 
         presetNameField = new TextFieldWidget(
@@ -76,14 +76,14 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 Text.of("☰")
         );
         presetsListDropdown.setMenuXOffset(-presetNameField.getWidth());
-        presetsListDropdown.setTooltip(Tooltip.of(Text.of("Выбрать пресет")));
+        presetsListDropdown.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.choose_preset")));
         presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.presetFiles);
         presetsListDropdown.forEachEntry(this::addSelectableChild);
         presetBarLeft.add(presetsListDropdown);
 
         presetNameField.setChangedListener(value -> {
             if (value.isBlank()) {
-                presetNameField.setSuggestion("Название пресета");
+                presetNameField.setSuggestion(Text.translatable("maparthelper.gui.presets.preset_name").getString());
                 return;
             }
             presetNameField.setSuggestion(null);
@@ -93,28 +93,28 @@ public class PresetsEditorScreen extends ScreenAdapted {
         });
 
 
-        ButtonWidget refreshFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.refreshFiles())
+        ButtonWidget updateFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.updateFiles())
                 .size(17, 20)
                 .build();
-        refreshFiles.setTooltip(Tooltip.of(Text.of("Обновить список и пресеты из файлов")));
-        presetBarLeft.add(refreshFiles);
+        updateFiles.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
+        presetBarLeft.add(updateFiles);
 
         ButtonWidget createNewPreset = ButtonWidget.builder(Text.of("➕"), b -> this.createNewPreset())
                 .size(17, 20)
                 .build();
-        createNewPreset.setTooltip(Tooltip.of(Text.of("Создать новый пресет")));
+        createNewPreset.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.createNewPreset_tooltip")));
         presetBarLeft.add(createNewPreset);
 
         ButtonWidget duplicatePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD0"), b -> this.duplicatePreset())
                 .size(17, 20)
                 .build();
-        duplicatePreset.setTooltip(Tooltip.of(Text.of("Дублировать выбранный пресет")));
+        duplicatePreset.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.duplicatePreset_tooltip")));
         presetBarLeft.add(duplicatePreset);
 
         ButtonWidget deletePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD1"), b -> this.deletePreset())
                 .size(17, 20)
                 .build();
-        deletePreset.setTooltip(Tooltip.of(Text.of("Удалить выбранный пресет")));
+        deletePreset.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.deletePreset_tooltip")));
         presetBarLeft.add(deletePreset);
 
         presetBarLeft.refreshPositions();
@@ -125,7 +125,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarRight.setPosition(0, y + 5);
         presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(1);
 
-        ButtonWidget save = ButtonWidget.builder(Text.of("Сохранить"), b -> saveChanges())
+        ButtonWidget save = ButtonWidget.builder(Text.translatable("maparthelper.gui.save"), b -> saveChanges())
                 .size(60, 20)
                 .build();
         presetBarRight.add(save);
@@ -180,7 +180,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                         updatedPresets.add(editingPreset);
                     }
             );
-            noneBlock.setTooltip(Text.of("Не использовать цвет"));
+            noneBlock.setTooltip(Text.translatable("maparthelper.gui.presets.remove_color"));
 
             adder.add(noneBlock, blocksList.grid.copyPositioner().alignHorizontalCenter());
             for (Block block : blocks) {
@@ -213,7 +213,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.presetNameField.setText(presetsConfig.presetFiles.get(presetFile));
     }
 
-    private void refreshFiles() {
+    private void updateFiles() {
         PaletteConfigManager.readCompletePalette();
         PaletteConfigManager.readPresetsConfigFile();
 
