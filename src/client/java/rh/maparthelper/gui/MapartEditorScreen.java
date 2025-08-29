@@ -337,8 +337,9 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             widthInput.setSuggestion(null);
             try {
-                CurrentConversionSettings.setWidth(Integer.parseInt(value));
-                MapartImageConverter.updateMapart();
+                if (CurrentConversionSettings.setWidth(Integer.parseInt(value))) {
+                    MapartImageConverter.updateMapart();
+                }
             } catch (NumberFormatException e) {
                 widthInput.setEditableColor(Colors.LIGHT_RED);
             }
@@ -355,8 +356,9 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             heightInput.setSuggestion(null);
             try {
-                CurrentConversionSettings.setHeight(Integer.parseInt(value));
-                MapartImageConverter.updateMapart();
+                if (CurrentConversionSettings.setHeight(Integer.parseInt(value))) {
+                    MapartImageConverter.updateMapart();
+                }
             } catch (NumberFormatException e) {
                 heightInput.setEditableColor(Colors.LIGHT_RED);
             }

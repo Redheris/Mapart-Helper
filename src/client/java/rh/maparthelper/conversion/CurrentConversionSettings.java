@@ -45,28 +45,30 @@ public class CurrentConversionSettings {
         return width;
     }
 
-    public static void setWidth(int newWidth) {
-        if (width == newWidth) return;
+    public static boolean setWidth(int newWidth) {
+        if (width == newWidth) return false;
 
         width = newWidth;
         guiMapartImage = null;
         if (MapartImageConverter.lastImage != null) {
             centerCroppingSize(MapartImageConverter.lastImage.getWidth(), MapartImageConverter.lastImage.getHeight());
         }
+        return true;
     }
 
     public static int getHeight() {
         return height;
     }
 
-    public static void setHeight(int newHeight) {
-        if (height == newHeight) return;
+    public static boolean setHeight(int newHeight) {
+        if (height == newHeight) return false;
 
         height = newHeight;
         guiMapartImage = null;
         if (MapartImageConverter.lastImage != null) {
             centerCroppingSize(MapartImageConverter.lastImage.getWidth(), MapartImageConverter.lastImage.getHeight());
         }
+        return true;
     }
 
     public static void centerCroppingSize(int imageWidth, int imageHeight) {
