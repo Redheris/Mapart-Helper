@@ -3,6 +3,8 @@ package rh.maparthelper.gui;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.block.Block;
+import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
@@ -13,11 +15,13 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
+import rh.maparthelper.conversion.schematic.NbtSchematicUtils;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
 
@@ -29,10 +33,87 @@ import java.util.List;
 public class MapartEditorScreen extends ScreenAdapted {
     DirectionalLayoutWidget settingsLeft;
     DirectionalLayoutWidget settingsRight;
+    ScrollableGridWidget materialList;
     MapartPreviewWidget mapartPreview;
+
+    private int auxBlockCount = 0;
 
     public MapartEditorScreen() {
         super(Text.translatable("maparthelper.mapart_editor_screen"));
+    }
+
+    public void updateMaterialList() {
+        this.remove(materialList);
+        int listTop = settingsRight.getY() + settingsRight.getHeight();
+
+        materialList = new ScrollableGridWidget(
+                null,
+                settingsRight.getX() - 6, listTop,
+                width - settingsRight.getX() - 1, height - listTop,
+                listTop, height, 6
+        );
+        materialList.setLeftScroll(true);
+        materialList.grid.setColumnSpacing(0);
+        materialList.grid.getMainPositioner().alignVerticalCenter();
+        GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
+
+        PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
+        MapartImageConverter.MapColorCount[] colorsCounter = MapartImageConverter.getColorsCounter();
+
+
+        this.auxBlockCount = CurrentConversionSettings.getWidth() * 128;
+        TextWidget auxAmount = addBlockToMaterialList(
+                materialListAdder, palette, new MapartImageConverter.MapColorCount(0, auxBlockCount)
+        );
+        for (MapartImageConverter.MapColorCount colorCount : colorsCounter) {
+            addBlockToMaterialList(materialListAdder, palette, colorCount);
+        }
+        if (auxAmount != null) {
+            Block auxBlock = MapartHelper.config.conversionSettings.auxBlock;
+            Text amountText = Text.of(getCountString(auxBlockCount, auxBlock.asItem().getMaxCount()));
+            auxAmount.setWidth(textRenderer.getWidth(amountText));
+            auxAmount.setMessage(amountText);
+        }
+
+        materialList.refreshPositions();
+        this.addDrawableChild(materialList);
+    }
+
+    private TextWidget addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, MapartImageConverter.MapColorCount color) {
+        if (color.amount() == 0) return null;
+        Block block = color.id() == 0 ? MapartHelper.config.conversionSettings.auxBlock : palette.getBlockOfMapColor(MapColor.get(color.id()));
+
+        adder.add(
+                new BlockItemWidget(this, 0, 0, 24, 24, block),
+                materialList.grid.copyPositioner().marginLeft(6)
+        );
+        TextWidget amountText = new TextWidget(Text.of(getCountString(color.amount(), block.asItem().getMaxCount())), textRenderer);
+        adder.add(amountText);
+        amountText.setTooltip(Tooltip.of(amountText.getMessage()));
+        amountText.setTooltipDelay(Duration.ofMillis(100));
+
+        if (color.id() > 0 && NbtSchematicUtils.needsAuxBlock(block)) {
+            auxBlockCount += color.amount();
+        }
+        return amountText;
+    }
+
+    private String getCountString(int amount, int stackSize) {
+        StringBuilder text = new StringBuilder();
+        int shBoxSize = 27 * stackSize;
+        int shBoxes = amount / shBoxSize;
+        int stacks = amount % shBoxSize / stackSize;
+        int items = amount % shBoxSize % stackSize;
+        boolean counted = shBoxes > 0 || stacks > 0;
+
+        if (shBoxes > 0) text.append(shBoxes).append("§3SB§r");
+        if (stacks > 0) text.append(shBoxes > 0 ? " + " : "").append(stacks).append("§3x64§r");
+        if (counted) {
+            text.insert(0, " = ");
+            if (items > 0) text.append(" + ").append(items);
+        }
+
+        return text.insert(0, "" + amount).toString();
     }
 
     @Override
@@ -41,9 +122,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft = DirectionalLayoutWidget.vertical();
         settingsLeft.setPosition(5, 20);
         Positioner settingLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
-        int baseWidth = 155;
 
-        TextFieldWidget mapartName = createTextInputFieldWidget(baseWidth, CurrentConversionSettings.mapartName, -1);
+        int baseElementWidth = 165;
+        TextFieldWidget mapartName = createTextInputFieldWidget(baseElementWidth, CurrentConversionSettings.mapartName, -1);
         mapartName.setChangedListener(value -> {
             mapartName.setEditableColor(Colors.WHITE);
             if (value.isEmpty()) {
@@ -64,7 +145,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.add(size);
 
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
-                this, 0, 0, baseWidth, 20, baseWidth,
+                this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.of("Кадрирование: "), Text.translatable("maparthelper.option." + CurrentConversionSettings.cropMode.name())
         );
         croppingMode.addEntries(
@@ -77,7 +158,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
-                this, 0, 0, baseWidth, 20, baseWidth,
+                this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.of("Ступенчатость: "), Text.translatable("maparthelper.option." + MapartHelper.config.conversionSettings.staircaseStyle.name())
         );
         staircaseStyle.addEntries(
@@ -94,7 +175,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
-                this, 0, 0, baseWidth, 20, baseWidth,
+                this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.of("Дизеринг: "), Text.translatable("maparthelper.option." + MapartHelper.config.conversionSettings.ditheringAlgorithm.name())
         );
         ditheringAlg.addEntries(
@@ -107,17 +188,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         settingsLeft.add(ditheringAlg);
 
-
-        ButtonWidget showGridButton = ButtonWidget.builder(
-                CurrentConversionSettings.doShowGrid ? Text.of("Сетка: вкл") : Text.of("Сетка: выкл"),
-                (btn) -> {
-                    CurrentConversionSettings.doShowGrid = !CurrentConversionSettings.doShowGrid;
-                    btn.setMessage(CurrentConversionSettings.doShowGrid ? Text.of("Сетка: вкл") :
-                            Text.of("Сетка: выкл"));
-                }
-        ).size(80, 20).build();
-        settingsLeft.add(showGridButton);
-
         ButtonWidget useLAB = ButtonWidget.builder(
                 MapartHelper.config.conversionSettings.useLAB ? Text.of("LAB: вкл") : Text.of("LAB: выкл"),
                 (btn) -> {
@@ -126,8 +196,9 @@ public class MapartEditorScreen extends ScreenAdapted {
                             Text.of("LAB: выкл"));
                     MapartImageConverter.updateMapart();
                 }
-        ).size(80, 20).tooltip(Tooltip.of(Text.of("Улучшает подбор цветов. Заметно влияет на скорость обработки, поэтому рекомендуется применять §cпосле настройки остальных параметров"))).build();
-        useLAB.setTooltipDelay(Duration.ofMillis(500));
+        ).size(80, 20).build();
+        useLAB.setTooltip(Tooltip.of(Text.of("Улучшает подбор цветов. Заметно влияет на скорость обработки, поэтому для средних и больших артов рекомендуется применять §cпосле настройки остальных параметров")));
+        useLAB.setTooltipDelay(Duration.ofSeconds(1));
         settingsLeft.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
@@ -143,17 +214,22 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.refreshPositions();
         settingsLeft.forEachChild(this::addDrawableChild);
 
-        // =========== Presets and Material presetsList area ===========
+        // =========== Presets and Material List area ===========
 
         settingsRight = DirectionalLayoutWidget.vertical();
         Positioner settingsRightPositioner = settingsRight.getMainPositioner().marginTop(5);
 
         PresetsDropdownMenuWidget presetsList = new PresetsDropdownMenuWidget(
-                this, 0, 0, baseWidth, 20, baseWidth,
+                this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
         );
-        presetsList.addEntries(PaletteConfigManager::changeCurrentPreset, PaletteConfigManager.presetsConfig.presetFiles);
-        presetsList.forEachEntry(this::addSelectableChild);
+        presetsList.addEntries(
+                s -> {
+                    PaletteConfigManager.changeCurrentPreset(s);
+                    MapartImageConverter.updateMapart();
+                },
+                PaletteConfigManager.presetsConfig.presetFiles
+        );
         settingsRight.add(new TextWidget(Text.of("Текущий пресет:"), textRenderer));
         settingsRight.add(presetsList, settingsRightPositioner.copy().marginTop(0));
 
@@ -163,12 +239,19 @@ public class MapartEditorScreen extends ScreenAdapted {
                         new PresetsEditorScreen(this, Text.translatable("maparthelper.presets_editor_screen"),
                                 45, 30, 45, 30
                         ))
-        ).size(baseWidth, 20).build();
+        ).size(baseElementWidth, 20).build();
         settingsRight.add(presets);
+
+        settingsRight.add(
+                new TextWidget(Text.of("Список материалов"), textRenderer),
+                settingsRightPositioner.copy().marginTop(15)
+        );
 
         settingsRight.refreshPositions();
         settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);
         settingsRight.forEachChild(this::addDrawableChild);
+
+        updateMaterialList();
 
         // =========== Mapart preview area ===========
 
@@ -178,11 +261,20 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         this.addDrawableChild(mapartPreview);
 
-        DropdownMenuWidget saveMapart = createSaveMapartDropdown();
-        saveMapart.setPosition(mapartPreview.getX(), 10);
-        saveMapart.forEachEntry(this::addSelectableChild);
-        this.addDrawableChild(saveMapart);
-        saveMapart.refreshPositions();
+        DirectionalLayoutWidget mapartOptions = DirectionalLayoutWidget.horizontal().spacing(2);
+        mapartOptions.setPosition(mapartPreview.getX(), 10);
+
+        mapartOptions.add(createSaveMapartDropdown());
+
+        ButtonWidget showGridButton = ButtonWidget.builder(
+                Text.of("#"),
+                (btn) -> CurrentConversionSettings.doShowGrid = !CurrentConversionSettings.doShowGrid
+        ).size(20, 20).build();
+        showGridButton.setTooltip(Tooltip.of(Text.of("Переключить отображение сетки")));
+        mapartOptions.add(showGridButton);
+
+        mapartOptions.refreshPositions();
+        mapartOptions.forEachChild(this::addDrawableChild);
     }
 
     @Override

@@ -8,10 +8,11 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.MapartHelperClient;
+import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.colors.ColorUtils;
 import rh.maparthelper.conversion.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.gui.MapartEditorScreen;
 import rh.maparthelper.util.Utils;
 
 import javax.imageio.ImageIO;
@@ -20,15 +21,16 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 public class MapartImageConverter {
-
     public static BufferedImage lastImage;
     public static Path lastImagePath;
+    private static final ColorsCounter colorsCounter = new ColorsCounter();
 
     private final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
@@ -51,6 +53,15 @@ public class MapartImageConverter {
     public static void updateMapart() {
         if (CurrentConversionSettings.imagePath != null)
             readAndUpdateMapartImage(CurrentConversionSettings.imagePath);
+    }
+
+    public static MapColorCount[] getColorsCounter() {
+        MapColorCount[] countsSorted = new MapColorCount[63];
+        for (int id = 1; id < 64; id++) {
+            countsSorted[id - 1] = new MapColorCount(id, colorsCounter.get(id));
+        }
+        Arrays.sort(countsSorted, Comparator.comparingInt(MapColorCount::amount).reversed());
+        return countsSorted;
     }
 
     private static BufferedImage preprocessImage(BufferedImage image) {
@@ -83,6 +94,7 @@ public class MapartImageConverter {
     public static void convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
         long startTime = System.currentTimeMillis();
         PaletteColors.clearColorCache();
+        colorsCounter.clear();
 
         int width = image.getWidth();
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
@@ -97,6 +109,7 @@ public class MapartImageConverter {
             for (int x = 0; x < width; x++) {
                 if (Thread.currentThread().isInterrupted()) {
                     PaletteColors.clearColorCache();
+                    colorsCounter.clear();
                     return;
                 }
                 int argb = pixels[x + y * width];
@@ -118,6 +131,9 @@ public class MapartImageConverter {
                 else
                     newArgb = color.mapColor().getRenderColor(color.brightness());
                 pixels[x + y * width] = newArgb;
+                if (color != MapColorEntry.CLEAR) {
+                    colorsCounter.increment(color.mapColor().id);
+                }
             }
             if (useDithering) {
                 for (int row = 1; row < ditherAlg.rowsNumber; row++) {
@@ -141,7 +157,7 @@ public class MapartImageConverter {
             BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = resized.createGraphics();
 
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR); // или BICUBIC
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -231,9 +247,11 @@ public class MapartImageConverter {
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                MinecraftClient.getInstance().execute(() ->
-                        NativeImageUtils.updateMapartImageTexture(image)
-                );
+                MinecraftClient.getInstance().execute(() -> {
+                    if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen)
+                        editorScreen.updateMaterialList();
+                    NativeImageUtils.updateMapartImageTexture(image);
+                });
 
                 if (logExecutionTime) {
                     double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
@@ -245,6 +263,25 @@ public class MapartImageConverter {
                 MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public record MapColorCount(int id, int amount) {
+    }
+
+    private static class ColorsCounter {
+        private int[] counter = new int[63];
+
+        void increment(int colorId) {
+            this.counter[colorId - 1]++;
+        }
+
+        int get(int colorId) {
+            return this.counter[colorId - 1];
+        }
+
+        void clear() {
+            this.counter = new int[63];
         }
     }
 }

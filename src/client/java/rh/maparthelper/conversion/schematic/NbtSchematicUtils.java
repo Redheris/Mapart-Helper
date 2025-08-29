@@ -17,17 +17,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import java.util.*;
 
 public class NbtSchematicUtils {
-    private static final Map<Integer, Integer> material_list = new HashMap<>();
     private static final List<Block> blocks_list = new ArrayList<>();
-
-    public static List<Map.Entry<Block, Integer>> getMaterialList(boolean fromMostFreq) {
-        Map<Block, Integer> blocksCount = new HashMap<>();
-        material_list.forEach((k, v) -> blocksCount.put(blocks_list.get(k), v));
-        List<Map.Entry<Block, Integer>> list = blocksCount.entrySet().stream()
-                .sorted(Comparator.comparingInt(Map.Entry::getValue))
-                .toList();
-        return fromMostFreq ? list.reversed() : list;
-    }
 
     private static int getBlockMaterialId(Block block) {
         int ind = blocks_list.indexOf(block);
@@ -82,8 +72,6 @@ public class NbtSchematicUtils {
         entry.put("state", NbtInt.of(blockId));
         blocks.add(entry);
 
-        material_list.merge(blockId, 1, Integer::sum);
-
         nbt.put("blocks", blocks);
     }
 
@@ -91,13 +79,12 @@ public class NbtSchematicUtils {
         Block block = PaletteConfigManager.presetsConfig.getBlockOfMapColor(color);
         addBlockToNbt(nbt, x, y, z, block);
         if (y == 0) return;
-        int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;
-        if (usingAuxMode == 0 && (block instanceof FallingBlock || block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty()))
+
+        if (needsAuxBlock(block))
             addBlockToNbt(nbt, x, y - 1, z, MapartHelperClient.conversionConfig.auxBlock);
     }
 
     protected static NbtCompound createMapartNbt(int[] map, int mapsWidth, int mapsHeight) {
-        material_list.clear();
         blocks_list.clear();
         NbtCompound nbt = createMapartBaseNbt();
 
@@ -162,5 +149,10 @@ public class NbtSchematicUtils {
             return createMapartNbt(CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb(), mapsWidth, mapsHeight);
         }
         return createMapartBaseNbt();
+    }
+
+    public static boolean needsAuxBlock(Block block) {
+        int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;
+        return usingAuxMode == 0 && (block instanceof FallingBlock || block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty());
     }
 }

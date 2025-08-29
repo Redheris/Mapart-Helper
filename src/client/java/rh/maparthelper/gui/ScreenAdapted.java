@@ -43,6 +43,13 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
+    protected void remove(Element child) {
+        if (child instanceof Drawable)
+            this.drawables.remove((Drawable) child);
+        super.remove(child);
+    }
+
+    @Override
     protected void clearChildren() {
         super.clearChildren();
         this.drawables.clear();

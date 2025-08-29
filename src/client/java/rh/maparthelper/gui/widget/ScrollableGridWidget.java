@@ -20,6 +20,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     private final int minY;
     private final int maxY;
     private boolean needRelayout = false;
+    private boolean leftScroll = false;
 
     public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int minY, int maxY, int scrollWidth) {
         super(x, y, width, height, Text.empty());
@@ -28,6 +29,10 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         this.minY = minY;
         this.maxY = maxY;
         this.scrollWidth = scrollWidth;
+    }
+
+    public void setLeftScroll(boolean leftScroll) {
+        this.leftScroll = leftScroll;
     }
 
     @Override
@@ -80,7 +85,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     protected int getScrollbarX() {
-        return this.getRight() - scrollWidth;
+        return this.leftScroll ? this.getX() : this.getRight() - scrollWidth;
     }
 
     @Override
