@@ -290,10 +290,19 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        if (this.hoveredElement(mouseX, mouseY).orElse(null) != mapartPreview)
-            mapartPreview.scaleImageCrop(mouseX, mouseY, verticalAmount, false);
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
+            return mapartPreview.keyPressed(keyCode, scanCode, modifiers);
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
+            return mapartPreview.keyReleased(keyCode, scanCode, modifiers);
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
     }
 
     @Override

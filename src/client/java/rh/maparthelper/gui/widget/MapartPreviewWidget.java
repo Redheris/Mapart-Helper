@@ -9,6 +9,7 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
@@ -18,6 +19,7 @@ import java.util.List;
 public class MapartPreviewWidget extends ClickableWidget {
     private final int maxWidth;
     private final int maxHeight;
+    private boolean scaleToCursor = true;
 
     public MapartPreviewWidget(int x, int y, int maxX, int maxY) {
         super(x, y, CurrentConversionSettings.getWidth() * 128, CurrentConversionSettings.getHeight() * 128, Text.empty());
@@ -98,10 +100,10 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        return scaleImageCrop(mouseX, mouseY, verticalAmount, true);
+        return scaleImageCrop(mouseX, mouseY, verticalAmount);
     }
 
-    public boolean scaleImageCrop(double mouseX, double mouseY, double verticalAmount, boolean mouseCenter) {
+    private boolean scaleImageCrop(double mouseX, double mouseY, double verticalAmount) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP && CurrentConversionSettings.guiMapartImage != null) {
             int imageWidth = MapartImageConverter.lastImage.getWidth();
             int imageHeight = MapartImageConverter.lastImage.getHeight();
@@ -111,7 +113,7 @@ public class MapartPreviewWidget extends ClickableWidget {
             int delta = (int) verticalAmount * 5;
             double scaleX = 0.5;
             double scaleY = 0.5;
-            if (mouseCenter) {
+            if (this.scaleToCursor) {
                 scaleX = (mouseX - getX()) / width;
                 scaleY = (mouseY - getY()) / height;
             }
@@ -141,6 +143,24 @@ public class MapartPreviewWidget extends ClickableWidget {
             MapartImageConverter.updateMapart();
         }
         return true;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+            this.scaleToCursor = false;
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+            this.scaleToCursor = true;
+            return true;
+        }
+        return false;
     }
 
     @Override
