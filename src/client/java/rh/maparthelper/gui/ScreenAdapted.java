@@ -62,32 +62,26 @@ public abstract class ScreenAdapted extends Screen {
             selectedTextWidget.setSelectionEnd(0);
             selectedTextWidget = null;
         }
+        if (selectedDropdownMenu != null && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
+            return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
+        }
+
         Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
         if (optional.isEmpty()) {
             this.setFocused(null);
-            if (selectedDropdownMenu != null && !selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                collapseDropdown();
-            }
+            collapseDropdown();
             return false;
-        }
-
-        if (selectedDropdownMenu != null && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-            return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
         }
 
         Element element = optional.get();
         if (element instanceof DropdownMenuWidget dropMenu) {
             this.setFocused(element);
             if (element != selectedDropdownMenu) {
-                if (selectedDropdownMenu == null || !selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                    collapseDropdown();
-                    selectedDropdownMenu = dropMenu;
-                } else if (selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY))
-                    return false;
+                collapseDropdown();
+                selectedDropdownMenu = dropMenu;
             }
             return dropMenu.mouseClicked(mouseX, mouseY, button);
         }
-        collapseDropdown();
 
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
             selectedTextWidget = textField;

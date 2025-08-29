@@ -68,13 +68,11 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
 
     @Override
     public void forEachElement(Consumer<Widget> consumer) {
-        elements.forEach(consumer);
     }
 
     @Override
     public void forEachChild(Consumer<ClickableWidget> consumer) {
         super.forEachChild(consumer);
-        LayoutWidget.super.forEachChild(consumer);
     }
 
     public void forEachEntry(Consumer<ClickableWidget> consumer) {
@@ -103,8 +101,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
                 }
             }
         }
-        boolean head = expandUpwards ? mouseY >= getY() : mouseY < getBottom();
-        return head && super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     public boolean isMouseOverMenu(double mouseX, double mouseY) {
@@ -128,6 +125,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         }
 
         if (isExpanded) {
+            context.enableScissor(getMenuX(), topYExpanded, getMenuX() + menuWidth, bottomYExpanded);
             MatrixStack matrixStack = context.getMatrices();
             matrixStack.push();
             matrixStack.translate(0, 0, 300);
@@ -138,6 +136,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
             elements.forEach(
                     e -> e.render(context, mouseX, mouseY, deltaTicks));
             matrixStack.pop();
+            context.disableScissor();
         }
 
         super.renderWidget(context, mouseX, mouseY, deltaTicks);

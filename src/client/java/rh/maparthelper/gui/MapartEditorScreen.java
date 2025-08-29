@@ -60,7 +60,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
         MapartImageConverter.MapColorCount[] colorsCounter = MapartImageConverter.getColorsCounter();
 
-
         this.auxBlockCount = CurrentConversionSettings.getWidth() * 128;
         TextWidget auxAmount = addBlockToMaterialList(
                 materialListAdder, palette, new MapartImageConverter.MapColorCount(0, auxBlockCount)
@@ -82,6 +81,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private TextWidget addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, MapartImageConverter.MapColorCount color) {
         if (color.amount() == 0) return null;
         Block block = color.id() == 0 ? MapartHelper.config.conversionSettings.auxBlock : palette.getBlockOfMapColor(MapColor.get(color.id()));
+        if (block == null) return null;
 
         adder.add(
                 new BlockItemWidget(this, 0, 0, 24, 24, block),
@@ -155,6 +155,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 CroppingMode.values()
         );
+        croppingMode.forEachEntry(this::addSelectableChild);
         settingsLeft.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
@@ -172,6 +173,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 StaircaseStyles.values()
         );
+        staircaseStyle.forEachEntry(this::addSelectableChild);
         settingsLeft.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
@@ -186,6 +188,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 DitheringAlgorithms.values()
         );
+        ditheringAlg.forEachEntry(this::addSelectableChild);
         settingsLeft.add(ditheringAlg);
 
         ButtonWidget useLAB = ButtonWidget.builder(
@@ -202,6 +205,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
+        imagePreprocessing.forEachEntry(this::addSelectableChild);
         settingsLeft.add(imagePreprocessing);
 
 //        Useless when updates automatically
@@ -231,16 +235,17 @@ public class MapartEditorScreen extends ScreenAdapted {
                 PaletteConfigManager.presetsConfig.presetFiles
         );
         settingsRight.add(new TextWidget(Text.of("Текущий пресет:"), textRenderer));
+        presetsList.forEachEntry(this::addSelectableChild);
         settingsRight.add(presetsList, settingsRightPositioner.copy().marginTop(0));
 
-        ButtonWidget presets = ButtonWidget.builder(
+        ButtonWidget presetsEditor = ButtonWidget.builder(
                 Text.of("Редактор пресетов"),
                 (btn) -> MinecraftClient.getInstance().setScreen(
                         new PresetsEditorScreen(this, Text.translatable("maparthelper.presets_editor_screen"),
                                 45, 30, 45, 30
                         ))
         ).size(baseElementWidth, 20).build();
-        settingsRight.add(presets);
+        settingsRight.add(presetsEditor);
 
         settingsRight.add(
                 new TextWidget(Text.of("Список материалов"), textRenderer),

@@ -252,11 +252,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void saveChanges() {
-        presetsConfig.setCurrentPreset(editingPreset);
         PaletteConfigManager.presetsConfig = presetsConfig;
         if (!updatedPresets.isEmpty()) {
             for (String filename : updatedPresets) {
                 PaletteConfigManager.savePresetFile(filename);
+                if (filename.equals(PaletteConfigManager.presetsConfig.getCurrentPresetFilename())) {
+                    MapartImageConverter.updateMapart();
+                }
             }
             updatedPresets.clear();
         }
