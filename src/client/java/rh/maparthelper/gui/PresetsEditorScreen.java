@@ -12,6 +12,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
+import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
