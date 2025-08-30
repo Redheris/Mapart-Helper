@@ -22,7 +22,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class ServerCommands {
     public static void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-            dispatcher.register(literal("mart-server")
+            dispatcher.register(literal("mart-creative")
                 .executes(ctx -> {
                     // Commands list
                     return 1;
