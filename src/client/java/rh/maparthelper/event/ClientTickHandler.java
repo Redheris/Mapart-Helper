@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.command.ClientCommandsContext;
+import rh.maparthelper.command.FakeMapsPreview;
 import rh.maparthelper.util.MapUtils;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.MapartEditorScreen;
@@ -29,16 +30,16 @@ public class ClientTickHandler {
             while (openScreen.wasPressed()) {
                 client.setScreen(new MapartEditorScreen());
             }
-            if (client.world != null && !ClientCommandsContext.fakeItemFrames.isEmpty()) {
-                long liveTime = client.world.getTime() - ClientCommandsContext.fakeFramesBornTime;
+            if (client.world != null && ClientCommandsContext.showFakeItemFrames()) {
+                long liveTime = client.world.getTime() - ClientCommandsContext.getFakeFramesBornTime();
                 if (liveTime >= MapartHelper.config.commonConfiguration.fakeItemFramesLiveTime) {
-                    ClientCommandsContext.removeFakeItemFrames(client.world);
+                    FakeMapsPreview.removeFakeItemFrames(client.world);
                 }
             }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (!ClientCommandsContext.showMapartStartPos) return;
+            if (!ClientCommandsContext.showMapartStartPos()) return;
             MatrixStack matrices = context.matrixStack();
             VertexConsumerProvider vertexConsumers = context.consumers();
 

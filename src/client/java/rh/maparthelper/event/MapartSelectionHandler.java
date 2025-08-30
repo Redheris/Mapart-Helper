@@ -27,9 +27,9 @@ public class MapartSelectionHandler {
             Vec3d selectedPos = ClientCommandsContext.getSelectedPos();
             if (selectedPos == null) return;
 
-            Direction direction = ClientCommandsContext.selectedDirection;
-            Vec3d pos1 = ClientCommandsContext.selectedPos1;
-            Vec3d pos2 = ClientCommandsContext.selectedPos2;
+            Direction direction = ClientCommandsContext.getSelectedDirection();
+            Vec3d pos1 = ClientCommandsContext.getSelectedPos1();
+            Vec3d pos2 = ClientCommandsContext.getSelectedPos2();
 
             int selectionColor = MapartHelper.config.commonConfiguration.selectionColor;
 
@@ -48,7 +48,7 @@ public class MapartSelectionHandler {
 
 
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
-            if (!ClientCommandsContext.isSelectingFramesArea || !player.getWorld().isClient())
+            if (ClientCommandsContext.isNotSelectingFramesArea() || !player.getWorld().isClient())
                 return ActionResult.PASS;
 
             // Offset from center to the item frame's box
@@ -57,7 +57,7 @@ public class MapartSelectionHandler {
             return ActionResult.FAIL;
         });
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (!ClientCommandsContext.isSelectingFramesArea)
+            if (ClientCommandsContext.isNotSelectingFramesArea())
                 return ActionResult.PASS;
 
             if (entity instanceof ItemFrameEntity mapFrame) {
@@ -71,7 +71,7 @@ public class MapartSelectionHandler {
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (!ClientCommandsContext.isSelectingFramesArea || !player.getWorld().isClient())
+            if (ClientCommandsContext.isNotSelectingFramesArea() || !player.getWorld().isClient())
                 return ActionResult.PASS;
 
             Vec3d currentPos = hitResult.getBlockPos().toCenterPos().offset(hitResult.getSide(), 0.53);
@@ -80,7 +80,7 @@ public class MapartSelectionHandler {
             return ActionResult.FAIL;
         });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (!ClientCommandsContext.isSelectingFramesArea)
+            if (ClientCommandsContext.isNotSelectingFramesArea())
                 return ActionResult.PASS;
 
             if (entity instanceof ItemFrameEntity mapFrame) {
@@ -95,8 +95,8 @@ public class MapartSelectionHandler {
     }
 
     private static void selectPosition(PlayerEntity player, Vec3d pos, Direction direction, boolean secondPos) {
-        if ((secondPos || ClientCommandsContext.selectedPos2 == null) && (!secondPos || ClientCommandsContext.selectedPos1 == null)) {
-            ClientCommandsContext.selectedDirection = direction;
+        if ((secondPos || ClientCommandsContext.getSelectedPos2() == null) && (!secondPos || ClientCommandsContext.getSelectedPos1() == null)) {
+            ClientCommandsContext.setSelectedDirection(direction);
             if (secondPos)
                 ClientCommandsContext.setSelectedPos2(pos);
             else
@@ -104,14 +104,14 @@ public class MapartSelectionHandler {
             return;
         }
 
-        if (!direction.equals(ClientCommandsContext.selectedDirection)) {
+        if (!direction.equals(ClientCommandsContext.getSelectedDirection())) {
             player.sendMessage(Text.translatable("maparthelper.selection_not_flat").withColor(Colors.LIGHT_RED), true);
             return;
         }
 
-        Vec3d selectedPos = secondPos ? ClientCommandsContext.selectedPos1 : ClientCommandsContext.selectedPos2;
+        Vec3d selectedPos = secondPos ? ClientCommandsContext.getSelectedPos1() : ClientCommandsContext.getSelectedPos2();
 
-        boolean isFlat = switch (ClientCommandsContext.selectedDirection.getAxis()) {
+        boolean isFlat = switch (ClientCommandsContext.getSelectedDirection().getAxis()) {
             case Direction.Axis.X -> pos.x == selectedPos.x;
             case Direction.Axis.Y -> pos.y == selectedPos.y;
             case Direction.Axis.Z -> pos.z == selectedPos.z;

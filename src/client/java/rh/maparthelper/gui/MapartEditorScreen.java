@@ -16,6 +16,7 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.command.FakeMapsPreview;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.UseAuxBlocks;
@@ -340,6 +341,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(20, 20).build();
         showGridButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showGrid_tooltip")));
         mapartOptions.add(showGridButton);
+
+        ButtonWidget showInWorldButton = ButtonWidget.builder(
+                Text.of("\uD83C\uDF0D"),
+                (btn) -> {
+                    if (client == null || client.player == null) return;
+                    if (FakeMapsPreview.createFakeFramesFromMapart(client.player)) {
+                        FakeMapsPreview.showFakeFrames(client.player, CurrentConversionSettings.getWidth(), CurrentConversionSettings.getHeight());
+                        this.close();
+                    }
+                }
+        ).size(20, 20).build();
+        showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
+        mapartOptions.add(showInWorldButton);
 
         mapartOptions.refreshPositions();
         mapartOptions.forEachChild(this::addDrawableChild);

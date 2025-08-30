@@ -1,4 +1,4 @@
-package rh.maparthelper;
+package rh.maparthelper.command;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.MapColor;
@@ -20,7 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import rh.maparthelper.command.ClientCommandsContext;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.util.Utils;
 
 import java.io.IOException;

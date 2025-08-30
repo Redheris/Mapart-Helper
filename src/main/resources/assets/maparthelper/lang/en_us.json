@@ -60,6 +60,7 @@
   "maparthelper.aux_block": "Auxiliary block",
   "maparthelper.gui.use_aux": "Include: ",
   "maparthelper.gui.showGrid_tooltip": "Toggle grid display",
+  "maparthelper.gui.showInWorld_tooltip": "Temporarily preview fake maps in the world",
   "maparthelper.gui.mapart_size_label": "Mapart size",
   "maparthelper.gui.brightness":  "Brightness",
   "maparthelper.gui.contrast": "Contrast",
