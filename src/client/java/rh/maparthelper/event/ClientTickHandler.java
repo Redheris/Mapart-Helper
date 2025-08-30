@@ -11,9 +11,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
+import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.util.MapUtils;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.SessionVariables;
 import rh.maparthelper.gui.MapartEditorScreen;
 
 public class ClientTickHandler {
@@ -29,16 +29,16 @@ public class ClientTickHandler {
             while (openScreen.wasPressed()) {
                 client.setScreen(new MapartEditorScreen());
             }
-            if (client.world != null && !SessionVariables.fakeItemFrames.isEmpty()) {
-                long liveTime = client.world.getTime() - SessionVariables.fakeFramesBornTime;
+            if (client.world != null && !ClientCommandsContext.fakeItemFrames.isEmpty()) {
+                long liveTime = client.world.getTime() - ClientCommandsContext.fakeFramesBornTime;
                 if (liveTime >= MapartHelper.config.commonConfiguration.fakeItemFramesLiveTime) {
-                    SessionVariables.removeFakeItemFrames(client.world);
+                    ClientCommandsContext.removeFakeItemFrames(client.world);
                 }
             }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            if (!SessionVariables.showMapartStartPos) return;
+            if (!ClientCommandsContext.showMapartStartPos) return;
             MatrixStack matrices = context.matrixStack();
             VertexConsumerProvider vertexConsumers = context.consumers();
 

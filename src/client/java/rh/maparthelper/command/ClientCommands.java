@@ -1,4 +1,4 @@
-package rh.maparthelper;
+package rh.maparthelper.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import rh.maparthelper.MapartToFile;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -45,9 +46,9 @@ public class ClientCommands {
                 )
                 .then(literal("beams")
                         .executes(ctx -> {
-                            SessionVariables.showMapartStartPos = !SessionVariables.showMapartStartPos;
+                            ClientCommandsContext.showMapartStartPos = !ClientCommandsContext.showMapartStartPos;
                             Text status;
-                            if (SessionVariables.showMapartStartPos)
+                            if (ClientCommandsContext.showMapartStartPos)
                                 status = Text.translatable("maparthelper.beams_on").formatted(Formatting.GREEN);
                             else
                                 status = Text.translatable("maparthelper.beams_off").formatted(Formatting.RED);
@@ -139,7 +140,7 @@ public class ClientCommands {
     }
 
     private static int saveMapFromFramesArea(CommandContext<FabricClientCommandSource> ctx) {
-        if (SessionVariables.selectedPos2 == null || SessionVariables.selectedPos1 == null) {
+        if (ClientCommandsContext.selectedPos2 == null || ClientCommandsContext.selectedPos1 == null) {
             ctx.getSource().sendFeedback(Text.translatable("maparthelper.selection_required").formatted(Formatting.RED));
             return 0;
         }
@@ -157,12 +158,12 @@ public class ClientCommands {
         assert ctx.getSource().getEntity() instanceof ClientPlayerEntity;
         ClientPlayerEntity player = (ClientPlayerEntity) ctx.getSource().getEntity();
 
-        if (SessionVariables.selectedPos1 != null || SessionVariables.isSelectingFramesArea) {
-            SessionVariables.resetSelection();
+        if (ClientCommandsContext.selectedPos1 != null || ClientCommandsContext.isSelectingFramesArea) {
+            ClientCommandsContext.resetSelection();
             player.sendMessage(Text.translatable("maparthelper.selecting_stopped").formatted(Formatting.DARK_AQUA), true);
             return 0;
         }
-        SessionVariables.isSelectingFramesArea = true;
+        ClientCommandsContext.isSelectingFramesArea = true;
 
         player.sendMessage(Text.translatable("maparthelper.pos_selecting").formatted(Formatting.DARK_AQUA), false);
         player.sendMessage(Text.translatable("maparthelper.stop_selecting").formatted(Formatting.GRAY, Formatting.ITALIC), false);

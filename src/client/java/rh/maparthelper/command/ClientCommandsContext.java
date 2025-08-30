@@ -1,4 +1,4 @@
-package rh.maparthelper;
+package rh.maparthelper.command;
 
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -12,13 +12,14 @@ import net.minecraft.item.map.MapState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.conversion.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SessionVariables {
+public class ClientCommandsContext {
     public static boolean isSelectingFramesArea = false;
     public static Direction selectedDirection;
     public static Vec3d selectedPos1;
@@ -57,7 +58,7 @@ public class SessionVariables {
     private static int checkSize(Vec3d pos1, Vec3d pos2) {
         if (pos1 == null || pos2 == null)
             return 0;
-        switch (SessionVariables.selectedDirection.getAxis()) {
+        switch (ClientCommandsContext.selectedDirection.getAxis()) {
             case X -> {
                 selectionWidth = (int) Math.abs(pos1.getZ() - pos2.getZ()) + 1;
                 selectionHeight = (int) Math.abs(pos1.getY() - pos2.getY()) + 1;
@@ -93,7 +94,7 @@ public class SessionVariables {
     }
 
     public static void removeFakeItemFrames(ClientWorld world) {
-        for (ItemFrameEntity itemFrame : SessionVariables.fakeItemFrames)
+        for (ItemFrameEntity itemFrame : ClientCommandsContext.fakeItemFrames)
             world.removeEntity(itemFrame.getId(), Entity.RemovalReason.DISCARDED);
         fakeItemFrames.clear();
         fakeFramesBornTime = 0;

@@ -20,6 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.util.Utils;
 
 import java.io.IOException;
@@ -44,11 +45,11 @@ public class MapartToFile {
     }
 
     public static void saveImageFromItemFramesArea(PlayerEntity player, World world, String filename) {
-        Vec3d pos1 = SessionVariables.selectedPos1;
-        Vec3d pos2 = SessionVariables.selectedPos2;
+        Vec3d pos1 = ClientCommandsContext.selectedPos1;
+        Vec3d pos2 = ClientCommandsContext.selectedPos2;
 
-        int width = SessionVariables.selectionWidth;
-        int height = SessionVariables.selectionHeight;
+        int width = ClientCommandsContext.selectionWidth;
+        int height = ClientCommandsContext.selectionHeight;
         int size = width * height;
 
         Box area = new Box(pos1, pos2);
@@ -69,19 +70,19 @@ public class MapartToFile {
             BlockPos p1 = if1.getBlockPos();
             BlockPos p2 = if2.getBlockPos();
 
-            if (SessionVariables.selectedDirection.getAxis() != Direction.Axis.Y) {
+            if (ClientCommandsContext.selectedDirection.getAxis() != Direction.Axis.Y) {
                 int heightCompare = Integer.compare(p2.getY(), p1.getY());
                 if (heightCompare != 0) return heightCompare;
             }
 
-            return switch (SessionVariables.selectedDirection) {
+            return switch (ClientCommandsContext.selectedDirection) {
                 case EAST -> Integer.compare(p2.getZ(), p1.getZ());
                 case WEST -> Integer.compare(p1.getZ(), p2.getZ());
                 case NORTH -> Integer.compare(p2.getX(), p1.getX());
                 case SOUTH -> Integer.compare(p1.getX(), p2.getX());
                 case UP, DOWN -> {
                     int zCompare;
-                    if (SessionVariables.selectedDirection == Direction.DOWN)
+                    if (ClientCommandsContext.selectedDirection == Direction.DOWN)
                         zCompare = Integer.compare(p2.getZ(), p1.getZ());
                     else
                         zCompare = Integer.compare(p1.getZ(), p2.getZ());
@@ -115,7 +116,7 @@ public class MapartToFile {
                 }
             }
 
-            SessionVariables.resetSelection();
+            ClientCommandsContext.resetSelection();
             saveMapartFile(player, filename, mapart);
 
         } catch (InvalidPathException e) {

@@ -17,19 +17,19 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.SessionVariables;
+import rh.maparthelper.command.ClientCommandsContext;
 
 public class MapartSelectionHandler {
 
     public static void init() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             assert client.world != null;
-            Vec3d selectedPos = SessionVariables.getSelectedPos();
+            Vec3d selectedPos = ClientCommandsContext.getSelectedPos();
             if (selectedPos == null) return;
 
-            Direction direction = SessionVariables.selectedDirection;
-            Vec3d pos1 = SessionVariables.selectedPos1;
-            Vec3d pos2 = SessionVariables.selectedPos2;
+            Direction direction = ClientCommandsContext.selectedDirection;
+            Vec3d pos1 = ClientCommandsContext.selectedPos1;
+            Vec3d pos2 = ClientCommandsContext.selectedPos2;
 
             int selectionColor = MapartHelper.config.commonConfiguration.selectionColor;
 
@@ -48,7 +48,7 @@ public class MapartSelectionHandler {
 
 
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
-            if (!SessionVariables.isSelectingFramesArea || !player.getWorld().isClient())
+            if (!ClientCommandsContext.isSelectingFramesArea || !player.getWorld().isClient())
                 return ActionResult.PASS;
 
             // Offset from center to the item frame's box
@@ -57,7 +57,7 @@ public class MapartSelectionHandler {
             return ActionResult.FAIL;
         });
         AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (!SessionVariables.isSelectingFramesArea)
+            if (!ClientCommandsContext.isSelectingFramesArea)
                 return ActionResult.PASS;
 
             if (entity instanceof ItemFrameEntity mapFrame) {
@@ -71,7 +71,7 @@ public class MapartSelectionHandler {
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (!SessionVariables.isSelectingFramesArea || !player.getWorld().isClient())
+            if (!ClientCommandsContext.isSelectingFramesArea || !player.getWorld().isClient())
                 return ActionResult.PASS;
 
             Vec3d currentPos = hitResult.getBlockPos().toCenterPos().offset(hitResult.getSide(), 0.53);
@@ -80,7 +80,7 @@ public class MapartSelectionHandler {
             return ActionResult.FAIL;
         });
         UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-            if (!SessionVariables.isSelectingFramesArea)
+            if (!ClientCommandsContext.isSelectingFramesArea)
                 return ActionResult.PASS;
 
             if (entity instanceof ItemFrameEntity mapFrame) {
@@ -95,23 +95,23 @@ public class MapartSelectionHandler {
     }
 
     private static void selectPosition(PlayerEntity player, Vec3d pos, Direction direction, boolean secondPos) {
-        if ((secondPos || SessionVariables.selectedPos2 == null) && (!secondPos || SessionVariables.selectedPos1 == null)) {
-            SessionVariables.selectedDirection = direction;
+        if ((secondPos || ClientCommandsContext.selectedPos2 == null) && (!secondPos || ClientCommandsContext.selectedPos1 == null)) {
+            ClientCommandsContext.selectedDirection = direction;
             if (secondPos)
-                SessionVariables.setSelectedPos2(pos);
+                ClientCommandsContext.setSelectedPos2(pos);
             else
-                SessionVariables.setSelectedPos1(pos);
+                ClientCommandsContext.setSelectedPos1(pos);
             return;
         }
 
-        if (!direction.equals(SessionVariables.selectedDirection)) {
+        if (!direction.equals(ClientCommandsContext.selectedDirection)) {
             player.sendMessage(Text.translatable("maparthelper.selection_not_flat").withColor(Colors.LIGHT_RED), true);
             return;
         }
 
-        Vec3d selectedPos = secondPos ? SessionVariables.selectedPos1 : SessionVariables.selectedPos2;
+        Vec3d selectedPos = secondPos ? ClientCommandsContext.selectedPos1 : ClientCommandsContext.selectedPos2;
 
-        boolean isFlat = switch (SessionVariables.selectedDirection.getAxis()) {
+        boolean isFlat = switch (ClientCommandsContext.selectedDirection.getAxis()) {
             case Direction.Axis.X -> pos.x == selectedPos.x;
             case Direction.Axis.Y -> pos.y == selectedPos.y;
             case Direction.Axis.Z -> pos.z == selectedPos.z;
@@ -122,7 +122,7 @@ public class MapartSelectionHandler {
             return;
         }
 
-        int flag = secondPos ? SessionVariables.setSelectedPos2(pos) : SessionVariables.setSelectedPos1(pos);
+        int flag = secondPos ? ClientCommandsContext.setSelectedPos2(pos) : ClientCommandsContext.setSelectedPos1(pos);
 
         if (flag == -1)
             player.sendMessage(Text.translatable("maparthelper.too_many_maps").formatted(Formatting.RED), true);
