@@ -84,9 +84,12 @@
 
   "key.maparthelper.openScreen": "Open mapart editor",
   "text.autoconfig.mapart-helper.title": "Mapart Helper",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "Used for /mart save selection",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "Used for /mart save selection and /mart beams",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor": "Selection color",
   "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Fake item frames display duration (in ticks)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.showUseLABTooltip": "Show tooltip for LAB toggle",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.logConversionTime": "Log art conversion duration",
+
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Include in palette:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Which blocks will be used when generating the global palette",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[1]": "on the basis of which you can more easily adjust a custom palette,",

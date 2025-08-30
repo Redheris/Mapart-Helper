@@ -213,8 +213,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
         ).size(80, 20).build();
 
-        useLAB.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.useLAB_tooltip")));
-        useLAB.setTooltipDelay(Duration.ofSeconds(1));
+        if (MapartHelper.config.commonConfiguration.showUseLABTooltip) {
+            useLAB.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.useLAB_tooltip")));
+            useLAB.setTooltipDelay(Duration.ofMillis(500));
+        }
         settingsLeft.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
@@ -269,13 +271,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         useAuxBlocks.forEachEntry(this::addSelectableChild);
         settingsLeft.add(useAuxBlocks);
-
-//        Useless when updates automatically
-//        ButtonWidget submit = ButtonWidget.builder(
-//                Text.translatable("maparthelper.gui.submit_changes"),
-//                (btn) -> MapartImageConverter.updateMapart()
-//        ).size(130, 20).build();
-//        settings.add(submit, positioner.copy().alignHorizontalCenter());
 
         settingsLeft.refreshPositions();
         settingsLeft.forEachChild(this::addDrawableChild);

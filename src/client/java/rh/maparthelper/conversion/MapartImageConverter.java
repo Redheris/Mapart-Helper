@@ -36,15 +36,16 @@ public class MapartImageConverter {
 
     private final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
-    private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Image-%d").build());
+    private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Image").build());
     private static Future<?> currentConvertingFuture;
 
     public static void readAndUpdateMapartImage(Path path) {
         FutureTask<Void> future;
+        boolean logExecutionTime = MapartHelper.config.commonConfiguration.logConversionTime;
         if (path.equals(lastImagePath))
-            future = new FutureTask<>(new ConvertImageFileRunnable(null, false), null);
+            future = new FutureTask<>(new ConvertImageFileRunnable(null, logExecutionTime), null);
         else {
-            future = new FutureTask<>(new ConvertImageFileRunnable(path, false), null);
+            future = new FutureTask<>(new ConvertImageFileRunnable(path, logExecutionTime), null);
         }
 
         if (currentConvertingFuture != null)
