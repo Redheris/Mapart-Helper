@@ -76,7 +76,7 @@
   "maparthelper.gui.presets.choose_preset": "Choose preset",
   "maparthelper.gui.presets.preset_name": "Preset name",
   "maparthelper.gui.presets.updateFiles_tooltip": "Update the list and presets from files",
-  "maparthelper.gui.presets.createNewPreset_tooltip": "Create new preset",
+  "maparthelper.gui.presets.createNewPreset_tooltip": "Create a new preset",
   "maparthelper.gui.presets.duplicatePreset_tooltip": "Duplicate current preset",
   "maparthelper.gui.presets.deletePreset_tooltip": "Delete current preset",
   "maparthelper.gui.save": "Save",

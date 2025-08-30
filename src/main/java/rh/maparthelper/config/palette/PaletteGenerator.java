@@ -4,6 +4,7 @@ import net.minecraft.block.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.property.Properties;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.colors.MapColorEntry;
@@ -20,6 +21,7 @@ public class PaletteGenerator {
     private static final Class<?>[] GROWABLE_BLOCKS;
     private static final Class<?>[] GRASS_LIKE_BLOCKS;
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
+    private static final List<Block> FUNCTIONAL_BLOCKS;
 
     public static void initColors(Map<Integer, List<Block>> palette) {
         palette.clear();
@@ -34,7 +36,7 @@ public class PaletteGenerator {
                 if (!palette.containsKey(color.id))
                     palette.put(color.id, new ArrayList<>());
                 boolean useCreativeBlocks = MapartHelper.config.commonConfiguration.useInPalette.creativeBlocks;
-                if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE))
+                if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE && block != Blocks.PETRIFIED_OAK_SLAB))
                     palette.get(color.id).add(block);
             }
         }
@@ -53,9 +55,7 @@ public class PaletteGenerator {
                 new ItemStack(Items.SHEARS)
         };
         for (int colorId : palette.keySet()) {
-            palette.get(colorId).sort((b1, b2) ->
-                    Float.compare(getRoughMinBreakingSpeed(b1, toolItems), getRoughMinBreakingSpeed(b2, toolItems))
-            );
+            palette.get(colorId).sort(Comparator.comparingDouble(b -> getBlockScore(b, toolItems)));
         }
     }
 
@@ -102,6 +102,33 @@ public class PaletteGenerator {
         state = state.withIfExists(Properties.DOWN, true);
         state = state.withIfExists(Properties.PERSISTENT, true);
         return state;
+    }
+
+    private static float getBlockScore(Block block, ItemStack[] tools) {
+        float breakTime = getRoughMinBreakingSpeed(block, tools);
+        float typePenalty = 0f;
+        BlockState blockState = block.getDefaultState();
+
+        if (block == Blocks.PACKED_ICE) typePenalty -= 3.0f;
+        if (block == Blocks.DIORITE) typePenalty -= 3.0f;
+        else if (isWool(blockState)) typePenalty -= 5.0f;
+        else if (blockState.isIn(BlockTags.TERRACOTTA)) typePenalty -= 4.5f;
+        else if (blockState.isIn(BlockTags.LEAVES)) typePenalty -= 3.0f;
+
+        if (blockState.isIn(BlockTags.PLANKS) || blockState.isIn(BlockTags.WOODEN_SLABS)) typePenalty -= 0.1f;
+        else if (block == Blocks.BROWN_MUSHROOM_BLOCK) typePenalty += 0.5f;
+        else if (block instanceof ScaffoldingBlock) typePenalty += 2.0f;
+        else if (block instanceof CarpetBlock) typePenalty += 1.0f;
+        else if (block instanceof FallingBlock) typePenalty += 1.5f;
+        else if (blockState.isIn(BlockTags.PRESSURE_PLATES)) typePenalty += 0.3f;
+        else if (blockState.isIn(BlockTags.SLABS)) typePenalty += 2.0f;
+        else if (FUNCTIONAL_BLOCKS.contains(block) || block instanceof BlockWithEntity) typePenalty += 4.0f;
+
+        return breakTime + typePenalty;
+    }
+
+    private static boolean isWool(BlockState blockState) {
+        return blockState.isIn(BlockTags.WOOL) || blockState.isIn(BlockTags.WOOL_CARPETS);
     }
 
     private static float getRoughMinBreakingSpeed(Block block, ItemStack[] tools) {
@@ -251,8 +278,8 @@ public class PaletteGenerator {
                 VineBlock.class
         };
         GRASS_LIKE_BLOCKS = new Class[]{
-                GrassBlock.class,
                 PlantBlock.class,
+                TallPlantBlock.class,
                 CoralBlock.class,
                 CoralFanBlock.class,
                 CoralWallFanBlock.class,
@@ -274,5 +301,19 @@ public class PaletteGenerator {
                 LightningRodBlock.class,
                 CarvedPumpkinBlock.class
         };
+        FUNCTIONAL_BLOCKS = List.of(
+                Blocks.CRAFTING_TABLE,
+                Blocks.ANVIL,
+                Blocks.CHIPPED_ANVIL,
+                Blocks.DAMAGED_ANVIL,
+                Blocks.GRINDSTONE,
+                Blocks.STONECUTTER,
+                Blocks.NOTE_BLOCK,
+                Blocks.LOOM,
+                Blocks.CARTOGRAPHY_TABLE,
+                Blocks.FLETCHING_TABLE,
+                Blocks.SMITHING_TABLE,
+                Blocks.FURNACE
+        );
     }
 }
