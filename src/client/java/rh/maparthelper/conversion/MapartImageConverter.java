@@ -263,11 +263,7 @@ public class MapartImageConverter {
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                MinecraftClient.getInstance().execute(() -> {
-                    if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen)
-                        editorScreen.updateMaterialList();
-                    NativeImageUtils.updateMapartImageTexture(image);
-                });
+                MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(image));
 
                 if (logExecutionTime) {
                     double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
@@ -278,6 +274,12 @@ public class MapartImageConverter {
                 CurrentConversionSettings.imagePath = null;
                 MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
                 throw new RuntimeException(e);
+            } finally {
+                MinecraftClient.getInstance().execute(() -> {
+                    if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen) {
+                        editorScreen.updateMaterialList();
+                    }
+                });
             }
         }
     }

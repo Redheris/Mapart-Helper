@@ -40,6 +40,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     DirectionalLayoutWidget settingsRight;
     ScrollableGridWidget materialList;
     MapartPreviewWidget mapartPreview;
+    private final int baseElementWidth = 165;
 
     private int auxBlockCount = 0;
 
@@ -49,6 +50,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public void updateMaterialList() {
         this.remove(materialList);
+        if (CurrentConversionSettings.imagePath == null) return;
         int listTop = settingsRight.getY() + settingsRight.getHeight();
 
         materialList = new ScrollableGridWidget(
@@ -131,7 +133,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.setPosition(5, 20);
         Positioner settingLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
 
-        int baseElementWidth = 165;
         TextFieldWidget mapartName = createTextInputFieldWidget(baseElementWidth, CurrentConversionSettings.mapartName, -1);
         mapartName.setChangedListener(value -> {
             mapartName.setEditableColor(Colors.WHITE);
@@ -227,13 +228,19 @@ public class MapartEditorScreen extends ScreenAdapted {
                 new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),
                 settingLeftPositioner.copy().marginTop(15)
         );
+        String currentAuxBlock = Registries.BLOCK.getId(MapartHelper.config.conversionSettings.auxBlock).toString();
+        currentAuxBlock = currentAuxBlock.substring(currentAuxBlock.indexOf("minecraft:") + 10);
         TextFieldWidget auxBlockId = createTextInputFieldWidget(
                 baseElementWidth,
-                Registries.BLOCK.getId(MapartHelper.config.conversionSettings.auxBlock).toString(),
+                currentAuxBlock,
                 -1
         );
         auxBlockId.setChangedListener(s -> {
-            if (!Identifier.isPathValid(s)) {
+            auxBlockId.setEditableColor(Colors.WHITE);
+            int delimiterInd = s.indexOf(':');
+            if (delimiterInd != -1 && !Identifier.isNamespaceValid(s.substring(0, delimiterInd))
+                    || !Identifier.isPathValid(s.substring(delimiterInd + 1))
+            ) {
                 auxBlockId.setEditableColor(Colors.LIGHT_RED);
                 return;
             }
@@ -242,7 +249,6 @@ public class MapartEditorScreen extends ScreenAdapted {
             Identifier id = Identifier.of(s);
             Block newBlock = Registries.BLOCK.get(id);
             if (newBlock != Blocks.AIR && !NbtSchematicUtils.needsAuxBlock(newBlock)) {
-                auxBlockId.setEditableColor(Colors.WHITE);
                 MapartHelper.config.conversionSettings.auxBlock = newBlock;
                 updateMaterialList();
                 AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
@@ -439,7 +445,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ImageAdjustmentSliderWidget createBrightnessSlider() {
         Text brightness = Text.translatable("maparthelper.gui.brightness");
         return new ImageAdjustmentSliderWidget(
-                150, 15, 0.f, 2.f, true,
+                baseElementWidth, 15, 0.f, 2.f, true,
                 CurrentConversionSettings.brightness,
                 value -> {
                     CurrentConversionSettings.brightness = value.floatValue();
@@ -452,7 +458,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ImageAdjustmentSliderWidget createContrastSlider() {
         Text contrast = Text.translatable("maparthelper.gui.contrast");
         return new ImageAdjustmentSliderWidget(
-                150, 15, -255, 255, false,
+                baseElementWidth, 15, -255, 255, false,
                 CurrentConversionSettings.contrast,
                 value -> {
                     CurrentConversionSettings.contrast = value.floatValue();
@@ -465,7 +471,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ImageAdjustmentSliderWidget createSaturationSlider() {
         Text saturation = Text.translatable("maparthelper.gui.saturation");
         return new ImageAdjustmentSliderWidget(
-                150, 15, 0.f, 2.f, true,
+                baseElementWidth, 15, 0.f, 2.f, true,
                 CurrentConversionSettings.saturation,
                 value -> {
                     CurrentConversionSettings.saturation = value.floatValue();
@@ -493,7 +499,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(80, 20).build();
 
         DropdownMenuWidget imagePreprocessing = new DropdownMenuWidget(
-                this, 0, 0, 100, 20, 154,
+                this, 0, 0, 100, 20, baseElementWidth + 4,
                 Text.translatable("maparthelper.gui.image_preprocessing")
         );
         imagePreprocessing.addEntry(reset);

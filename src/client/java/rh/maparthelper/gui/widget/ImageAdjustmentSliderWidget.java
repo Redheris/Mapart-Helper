@@ -61,7 +61,7 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
         double value = min + (max - min) * this.value;
         if (!isDecimalValue)
             return Math.floor(value);
-        return Math.floor(value * 100) / 100;
+        return (this.value < 0.5 ? Math.floor(value * 100) : Math.ceil(value * 100)) / 100;
     }
 
     @Override
