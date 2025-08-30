@@ -6,8 +6,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
 import rh.maparthelper.MapartHelperClient;
+import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteGenerator;
@@ -152,7 +154,9 @@ public class NbtSchematicUtils {
     }
 
     public static boolean needsAuxBlock(Block block) {
-        int usingAuxMode = MapartHelperClient.conversionConfig.useAuxBlocks;
-        return usingAuxMode == 0 && (block instanceof FallingBlock || block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty());
+        if (MapartHelperClient.conversionConfig.useAuxBlocks == UseAuxBlocks.NO_AUX) return false;
+        boolean canPlaceAtAir = block.getDefaultState().canPlaceAt(DummyWorldView.getInstance(), BlockPos.ORIGIN);
+        boolean hasNoCollision = block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty();
+        return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
     }
 }

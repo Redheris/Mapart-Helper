@@ -1,7 +1,7 @@
 package rh.maparthelper.config;
 
 public enum UseAuxBlocks {
-    TOP_ROW,
+    NO_AUX,
     NEEDED,
 //    ALL
 }
