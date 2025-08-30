@@ -14,7 +14,7 @@ public class PalettePresetsConfig {
 
     static PalettePresetsConfig createDefaultConfig() {
         PalettePresetsConfig config = new PalettePresetsConfig();
-        config.currentPresetFile = config.createNewPreset();
+        config.currentPresetFile = config.createNewPreset(true);
         return config;
     }
 
@@ -59,9 +59,13 @@ public class PalettePresetsConfig {
             this.currentPresetFile = presetFilename;
     }
 
-    String createNewPreset() {
+    String createNewPreset(boolean createDefault) {
         String presetName = Utils.makeUniqueFilename(presetFiles::containsKey, "new_preset", "json", "%s_%d");
-        PalettePreset preset = PaletteGenerator.getDefaultPreset();
+        PalettePreset preset;
+        if (createDefault)
+            preset = new PalettePreset(PaletteGenerator.getDefaultPreset());
+        else
+            preset = new PalettePreset();
         presetFiles.put(presetName, "New Preset");
         presets.put(presetName, preset);
         return presetName;
@@ -84,7 +88,7 @@ public class PalettePresetsConfig {
         }
 
         public String createNewPreset() {
-            return super.createNewPreset();
+            return super.createNewPreset(false);
         }
 
         public Editable deletePreset(String filename) {
@@ -111,17 +115,18 @@ public class PalettePresetsConfig {
     public static class PalettePreset {
         public final Map<MapColor, Block> colors;
 
-        PalettePreset() {
+        {
             this.colors = new TreeMap<>(Comparator.comparingInt(o -> o.id));
         }
 
+        PalettePreset() {
+        }
+
         PalettePreset(Map<MapColor, Block> colors) {
-            this();
             this.colors.putAll(colors);
         }
 
         PalettePreset(PalettePreset origin) {
-            this();
             this.colors.putAll(origin.colors);
         }
 

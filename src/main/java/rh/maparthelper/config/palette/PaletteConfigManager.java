@@ -104,7 +104,7 @@ public class PaletteConfigManager {
     private static boolean validatePresetsConfig() {
         boolean hasChanges = false;
         if (presetsConfig.presetFiles.isEmpty()) {
-            presetsConfig.currentPresetFile = presetsConfig.createNewPreset();
+            presetsConfig.currentPresetFile = presetsConfig.createNewPreset(true);
             savePresetFiles();
             hasChanges = true;
         } else if (!presetsConfig.presetFiles.containsKey(presetsConfig.currentPresetFile)) {
