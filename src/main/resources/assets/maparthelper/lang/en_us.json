@@ -43,6 +43,8 @@
   "maparthelper.gui.option.SIERRA": "Sierra",
   "maparthelper.gui.option.SIERRA_LITE": "Sierra Lite",
   "maparthelper.gui.option.SIERRA_2ROW": "Sierra Two-row",
+  "maparthelper.gui.option.TOP_ROW": "Only top row",
+  "maparthelper.gui.option.NEEDED": "Needed",
 
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
   "maparthelper.gui.shulker_box_abbr": "SB",
@@ -56,6 +58,7 @@
   "maparthelper.gui.current_preset_label": "Current preset:",
   "maparthelper.gui.material_list_label": "Material list",
   "maparthelper.aux_block": "Auxiliary block",
+  "maparthelper.gui.use_aux": "Include: ",
   "maparthelper.gui.showGrid_tooltip": "Toggle grid display",
   "maparthelper.gui.mapart_size_label": "Mapart size",
   "maparthelper.gui.brightness":  "Brightness",

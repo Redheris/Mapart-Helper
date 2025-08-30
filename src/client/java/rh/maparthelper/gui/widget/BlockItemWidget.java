@@ -16,8 +16,6 @@ import net.minecraft.text.Text;
 import rh.maparthelper.gui.PresetsEditorScreen;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class BlockItemWidget extends ClickableWidget {
@@ -60,6 +58,10 @@ public class BlockItemWidget extends ClickableWidget {
 
     public void insertToTooltip(int i, Text tooltip) {
         this.tooltip.add(i, tooltip.asOrderedText());
+    }
+
+    public int getStackSize() {
+        return this.blockItem.getMaxCount();
     }
 
     @Override

@@ -43,6 +43,8 @@
   "maparthelper.gui.option.SIERRA": "Sierra",
   "maparthelper.gui.option.SIERRA_LITE": "Sierra Lite",
   "maparthelper.gui.option.SIERRA_2ROW": "Sierra Two-row",
+  "maparthelper.gui.option.TOP_ROW": "Нет",
+  "maparthelper.gui.option.NEEDED": "Только нужные",
 
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
   "maparthelper.gui.shulker_box_abbr": "Ш",
@@ -56,6 +58,7 @@
   "maparthelper.gui.current_preset_label": "Текущий пресет:",
   "maparthelper.gui.material_list_label": "Список материалов",
   "maparthelper.aux_block": "Вспомогательный блок",
+  "maparthelper.gui.use_aux": "Добавлять: ",
   "maparthelper.gui.showGrid_tooltip": "Переключить отображение сетки",
   "maparthelper.gui.mapart_size_label": "Размеры мапарта",
   "maparthelper.gui.brightness":  "Яркость",

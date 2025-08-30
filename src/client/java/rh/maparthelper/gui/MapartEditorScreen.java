@@ -4,17 +4,21 @@ import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
+import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CroppingMode;
@@ -62,46 +66,43 @@ public class MapartEditorScreen extends ScreenAdapted {
         MapartImageConverter.MapColorCount[] colorsCounter = MapartImageConverter.getColorsCounter();
 
         this.auxBlockCount = CurrentConversionSettings.getWidth() * 128;
-        TextWidget auxAmount = addBlockToMaterialList(
-                materialListAdder, palette, new MapartImageConverter.MapColorCount(0, auxBlockCount)
-        );
+        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(this, 0, 0, 24, 24, MapartHelper.config.conversionSettings.auxBlock);
+        auxBlockItemWidget.insertToTooltip(1, Text.translatable("maparthelper.aux_block").formatted(Formatting.GRAY));
+        TextWidget auxAmountText = new TextWidget(Text.empty(), textRenderer);
+        materialListAdder.add(auxBlockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
+        materialListAdder.add(auxAmountText);
+
         for (MapartImageConverter.MapColorCount colorCount : colorsCounter) {
             addBlockToMaterialList(materialListAdder, palette, colorCount);
         }
-        if (auxAmount != null) {
-            Block auxBlock = MapartHelper.config.conversionSettings.auxBlock;
-            Text amountText = Text.of(getCountString(auxBlockCount, auxBlock.asItem().getMaxCount()));
-            auxAmount.setWidth(textRenderer.getWidth(amountText));
-            auxAmount.setMessage(amountText);
-            auxAmount.setTooltip(Tooltip.of(amountText));
-        }
+
+        Text amountText = Text.of(getAmountString(auxBlockCount, auxBlockItemWidget.getStackSize()));
+        auxAmountText.setWidth(textRenderer.getWidth(amountText));
+        auxAmountText.setMessage(amountText);
+        auxAmountText.setTooltip(Tooltip.of(amountText));
 
         materialList.refreshPositions();
         this.addDrawableChild(materialList);
     }
 
-    private TextWidget addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, MapartImageConverter.MapColorCount color) {
-        if (color.amount() == 0) return null;
-        Block block = color.id() == 0 ? MapartHelper.config.conversionSettings.auxBlock : palette.getBlockOfMapColor(MapColor.get(color.id()));
-        if (block == null) return null;
+    private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, MapartImageConverter.MapColorCount color) {
+        if (color.amount() == 0) return;
+        Block block = palette.getBlockOfMapColor(MapColor.get(color.id()));
+        if (block == null) return;
 
         BlockItemWidget blockItemWidget = new BlockItemWidget(this, 0, 0, 24, 24, block);
-        if (color.id() == 0) {
-            blockItemWidget.insertToTooltip(1, Text.translatable("maparthelper.aux_block").formatted(Formatting.GRAY));
-        }
         adder.add(blockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
-        TextWidget amountText = new TextWidget(Text.of(getCountString(color.amount(), block.asItem().getMaxCount())), textRenderer);
+        TextWidget amountText = new TextWidget(Text.of(getAmountString(color.amount(), block.asItem().getMaxCount())), textRenderer);
         adder.add(amountText);
         amountText.setTooltip(Tooltip.of(amountText.getMessage()));
         amountText.setTooltipDelay(Duration.ofMillis(100));
 
-        if (color.id() > 0 && NbtSchematicUtils.needsAuxBlock(block)) {
+        if (NbtSchematicUtils.needsAuxBlock(block)) {
             auxBlockCount += color.amount();
         }
-        return amountText;
     }
 
-    private String getCountString(int amount, int stackSize) {
+    private String getAmountString(int amount, int stackSize) {
         StringBuilder text = new StringBuilder();
         int shBoxSize = 27 * stackSize;
         int shBoxes = amount / shBoxSize;
@@ -111,7 +112,10 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         if (shBoxes > 0)
             text.append(shBoxes).append("§3").append(Text.translatable("maparthelper.gui.shulker_box_abbr").getString()).append("§r");
-        if (stacks > 0) text.append(shBoxes > 0 ? " + " : "").append(stacks).append("§3x64§r");
+        if (stacks > 0) {
+            text.append(shBoxes > 0 ? " + " : "").append(stacks);
+            if (stackSize > 1) text.append("§3x").append(stackSize).append("§r");
+        }
         if (counted) {
             text.insert(0, " = ");
             if (items > 0) text.append(" + ").append(items);
@@ -216,6 +220,55 @@ public class MapartEditorScreen extends ScreenAdapted {
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
         imagePreprocessing.forEachEntry(this::addSelectableChild);
         settingsLeft.add(imagePreprocessing);
+
+        settingsLeft.add(
+                new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),
+                settingLeftPositioner.copy().marginTop(15)
+        );
+        TextFieldWidget auxBlockId = createTextInputFieldWidget(
+                baseElementWidth,
+                Registries.BLOCK.getId(MapartHelper.config.conversionSettings.auxBlock).toString(),
+                -1
+        );
+        auxBlockId.setChangedListener(s -> {
+            if (!Identifier.isPathValid(s)) {
+                auxBlockId.setEditableColor(Colors.LIGHT_RED);
+                return;
+            }
+            if (s.equals(Registries.BLOCK.getId(MapartHelper.config.conversionSettings.auxBlock).toString()))
+                return;
+            Identifier id = Identifier.of(s);
+            Block newBlock = Registries.BLOCK.get(id);
+            if (newBlock != Blocks.AIR && !NbtSchematicUtils.needsAuxBlock(newBlock)) {
+                auxBlockId.setEditableColor(Colors.WHITE);
+                MapartHelper.config.conversionSettings.auxBlock = newBlock;
+                updateMaterialList();
+                AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
+            } else {
+                auxBlockId.setEditableColor(Colors.LIGHT_RED);
+            }
+        });
+        settingsLeft.add(auxBlockId);
+
+        EnumDropdownMenuWidget useAuxBlocks = new EnumDropdownMenuWidget(
+                this, 0, 0,
+                baseElementWidth, 20, baseElementWidth,
+                Text.translatable("maparthelper.gui.use_aux"),
+                Text.translatable("maparthelper.gui.option." + MapartHelper.config.conversionSettings.useAuxBlocks)
+        );
+        useAuxBlocks.addEntries(
+                e -> {
+                    UseAuxBlocks was = MapartHelper.config.conversionSettings.useAuxBlocks;
+                    MapartHelper.config.conversionSettings.useAuxBlocks = (UseAuxBlocks) e;
+                    if (was != MapartHelper.config.conversionSettings.useAuxBlocks) {
+                        updateMaterialList();
+                        AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
+                    }
+                },
+                UseAuxBlocks.values()
+        );
+        useAuxBlocks.forEachEntry(this::addSelectableChild);
+        settingsLeft.add(useAuxBlocks);
 
 //        Useless when updates automatically
 //        ButtonWidget submit = ButtonWidget.builder(

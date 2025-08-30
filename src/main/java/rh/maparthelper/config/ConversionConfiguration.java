@@ -10,7 +10,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 @Config(name = "conversion-settings")
 public class ConversionConfiguration implements ConfigData {
     public StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
-    public int useAuxBlocks = 0;
+    public UseAuxBlocks useAuxBlocks = UseAuxBlocks.NEEDED;
     public Block auxBlock = Blocks.NETHERRACK;
     public DitheringAlgorithms ditheringAlgorithm = DitheringAlgorithms.NONE;
     public transient boolean useLAB = false;
