@@ -7,6 +7,11 @@ import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.colors.ColorUtils;
@@ -19,6 +24,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -83,20 +89,43 @@ public class MapartImageConverter {
         return ColorUtils.preprocessImage(image, brightness, contrast, saturation);
     }
 
-    private static void saveMapartImage(Path imagePath) {
+    private static boolean saveMapartImage(Path imagePath) {
         try {
             NativeImageBackedTexture mapartTexture = CurrentConversionSettings.guiMapartImage;
-            if (mapartTexture != null && mapartTexture.getImage() != null)
-                mapartTexture.getImage().writeTo(imagePath);
+            if (mapartTexture == null || mapartTexture.getImage() == null)
+                return false;
+            mapartTexture.getImage().writeTo(imagePath);
+        } catch (InvalidPathException e) {
+            MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
+            throw new RuntimeException(e);
         } catch (Exception e) {
             MapartHelper.LOGGER.error("Error occurred while saving the image to \"{}\"", imagePath, e);
             throw new RuntimeException(e);
         }
+        return true;
     }
 
-    public static void saveMapartImage(String filename) {
-        filename = Utils.makeUniqueFilename(SAVED_MAPS_DIR, filename, "png");
-        saveMapartImage(SAVED_MAPS_DIR.resolve(filename));
+    public static void saveMapartImage(String filename, PlayerEntity player) {
+        try {
+            filename = Utils.makeUniqueFilename(SAVED_MAPS_DIR, filename, "png");
+            Path filepath = SAVED_MAPS_DIR.resolve(filename);
+            if (saveMapartImage(filepath) && player != null) {
+                Text mapartFile = Text.literal(filename)
+                        .styled(style -> style
+                                .withColor(Formatting.GREEN)
+                                .withClickEvent(new ClickEvent.OpenFile(filepath.toFile()))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.translatable("maparthelper.open_image_file")))
+                                .withUnderline(true)
+                        );
+
+                player.sendMessage(Text.translatable("maparthelper.mapart_saved", mapartFile).formatted(Formatting.GREEN), false);
+            }
+        } catch (InvalidPathException e) {
+            player.sendMessage(Text.translatable("maparthelper.saving_path_error").formatted(Formatting.RED), false);
+            MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
+        } catch (Exception e) {
+            player.sendMessage(Text.translatable("maparthelper.saving_error").formatted(Formatting.RED), false);
+        }
     }
 
     /**

@@ -14,7 +14,7 @@
   "maparthelper.selection_required": "Сначала выделите область с помощью /mart save selection",
   "maparthelper.selection_has_empty_places": "Некоторые рамки в выделении отсутствуют или без карты",
   "maparthelper.too_many_maps": "Слишком большая область. Максимальный размер - 300 блоков",
-  "maparthelper.saving_error": "Произошла неизвестная ошибка при сохранении мапарта. Для подробностей обратитесь к логам",
+  "maparthelper.saving_error": "Произошла ошибка при сохранении мапарта. Для подробностей обратитесь к логам",
   "maparthelper.saving_path_error": "Получен некорректный путь для сохранения файла. Убедитесь в корректности названия файла",
   "maparthelper.blocks_palette_generated": "Палитра блоков успешно сгенерирована",
   "maparthelper.nbt_file_saved": "NBT файл мапарта \"%s\" успешно сохранён в папку \"%s\"",

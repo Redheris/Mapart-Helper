@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -527,7 +528,10 @@ public class MapartEditorScreen extends ScreenAdapted {
     private DropdownMenuWidget createSaveMapartDropdown() {
         ButtonWidget saveImage = ButtonWidget.builder(
                 Text.translatable("maparthelper.gui.savePNG"),
-                (btn) -> MapartImageConverter.saveMapartImage(CurrentConversionSettings.mapartName)
+                (btn) -> {
+                    PlayerEntity player = client != null ? client.player : null;
+                    MapartImageConverter.saveMapartImage(CurrentConversionSettings.mapartName, player);
+                }
         ).size(156, 20).build();
 
         ButtonWidget saveNBT = ButtonWidget.builder(

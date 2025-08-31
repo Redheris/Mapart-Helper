@@ -14,7 +14,7 @@
   "maparthelper.selection_required": "First, select an area using /mart save selection",
   "maparthelper.selection_has_empty_places": "Some item frames in the selection are absent or without a filled map",
   "maparthelper.too_many_maps": "The area is too large. Maximum size is 300 blocks",
-  "maparthelper.saving_error": "Unexpected error occurred during saving the mapart. Check logs for details",
+  "maparthelper.saving_error": "An error occurred during saving the mapart. Check logs for details",
   "maparthelper.saving_path_error": "Provided file saving path is invalid. Make sure the filename is valid",
   "maparthelper.blocks_palette_generated": "Block palette successfully generated",
   "maparthelper.nbt_file_saved": "NBT file of the mapart \"%s\" successfully saved into the folder \"%s\"",
