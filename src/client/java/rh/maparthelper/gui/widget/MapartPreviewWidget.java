@@ -53,7 +53,7 @@ public class MapartPreviewWidget extends ClickableWidget {
                     width, height,
                     width, height
             );
-        } else if (!MapartImageConverter.isConverting()){
+        } else if (!MapartImageConverter.isConverting()) {
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
             Text dropFileText = Text.translatable("maparthelper.gui.drop_here_mapart");
             int centerX = x + width / 2;
@@ -63,7 +63,7 @@ public class MapartPreviewWidget extends ClickableWidget {
                         textRenderer,
                         lines.get(i),
                         centerX, y + 5 + i * 9,
-                        5636095
+                        0xff55ffff
                 );
             }
         }
