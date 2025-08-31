@@ -9,7 +9,9 @@ import java.util.TreeMap;
 public class CompletePalette {
     public final Map<Integer, List<Block>> palette = new TreeMap<>();
 
-    CompletePalette() {
-        PaletteGenerator.initColors(palette);
+    static CompletePalette generate() {
+        CompletePalette generated = new CompletePalette();
+        PaletteGenerator.initColors(generated.palette);
+        return generated;
     }
 }

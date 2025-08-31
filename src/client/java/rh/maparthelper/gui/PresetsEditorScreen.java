@@ -214,7 +214,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void updateFiles() {
-        PaletteConfigManager.readCompletePalette();
+        PaletteConfigManager.updateCompletePalette();
         PaletteConfigManager.readPresetsConfigFile();
 
         this.presetsConfig = PaletteConfigManager.presetsConfig.getEditable();

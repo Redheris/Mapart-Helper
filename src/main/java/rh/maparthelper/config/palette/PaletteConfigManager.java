@@ -32,26 +32,31 @@ public class PaletteConfigManager {
     public static CompletePalette completePalette;
 
     public static void regenerateCompletePalette() {
-        completePalette = new CompletePalette();
+        completePalette = CompletePalette.generate();
         saveCompletePalette();
     }
 
     // JSON file containing complete palette for setting presets in GUI
-    public static void readCompletePalette() {
+    public static boolean readCompletePalette() {
         Path completePaletepath = CONFIG_PATH.resolve("complete_palette.json");
         if (!Files.exists(completePaletepath)) {
-            completePalette = new CompletePalette();
-            saveCompletePalette();
-            return;
+            return false;
         }
         try (FileReader reader = new FileReader(completePaletepath.toFile())) {
             completePalette = gson.fromJson(reader, CompletePalette.class);
-            if (completePalette == null) {
-                completePalette = new CompletePalette();
+            if (completePalette != null) {
+                return true;
             }
-            saveCompletePalette();
         } catch (Exception e) {
-            MapartHelper.LOGGER.error(e.getMessage(), e);
+            MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", completePaletepath, e.getMessage(), e);
+        }
+        return false;
+    }
+
+    public static void updateCompletePalette() {
+        boolean validPaletteFile = readCompletePalette();
+        if (!validPaletteFile) {
+            regenerateCompletePalette();
         }
     }
 

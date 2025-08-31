@@ -6,9 +6,9 @@ import net.minecraft.client.texture.TextureManager;
 import rh.maparthelper.command.ClientCommands;
 import rh.maparthelper.command.MapartToFile;
 import rh.maparthelper.config.ConversionConfiguration;
-import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.event.ModEventsHandler;
+import rh.maparthelper.event.PaletteLoader;
 
 public class MapartHelperClient implements ClientModInitializer {
 
@@ -21,17 +21,16 @@ public class MapartHelperClient implements ClientModInitializer {
         ClientCommands.registerCommands();
         ModEventsHandler.registerAll();
 
-        conversionConfig = MapartHelper.config.conversionSettings;
-
+        PaletteLoader.init();
         registerClientStartedEvents();
+
+        conversionConfig = MapartHelper.config.conversionSettings;
     }
 
     private static void registerClientStartedEvents() {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             TextureManager textureManager = client.getTextureManager();
             textureManager.registerTexture(CurrentConversionSettings.guiMapartId, CurrentConversionSettings.guiMapartImage);
-            PaletteConfigManager.readCompletePalette();
-            PaletteConfigManager.readPresetsConfigFile();
         });
     }
 }
