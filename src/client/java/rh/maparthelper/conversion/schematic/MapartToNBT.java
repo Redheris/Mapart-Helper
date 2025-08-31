@@ -17,6 +17,7 @@ import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.util.Utils;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -30,6 +31,14 @@ public class MapartToNBT {
 
     private static void saveNBT(boolean asSingleFile, ZipOutputStream zipOut, File zipFile) {
         assert CurrentConversionSettings.guiMapartImage.getImage() != null;
+
+        try {
+            if (!Files.exists(SCHEMATICS)) {
+                Files.createDirectory(SCHEMATICS);
+            }
+        } catch (IOException e) {
+            MapartHelper.LOGGER.error("Failed to write schematics directory", e);
+        }
 
         int[][] maps;
         if (asSingleFile) {
