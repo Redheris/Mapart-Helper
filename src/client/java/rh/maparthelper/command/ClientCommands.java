@@ -72,6 +72,7 @@ public class ClientCommands {
                             }))
                         .then(literal("update")
                             .executes(ctx -> {
+                                PaletteConfigManager.updateCompletePalette();
                                 PaletteConfigManager.readPresetsConfigFile();
                                 ctx.getSource().getPlayer().sendMessage(Text.translatable(
                                                 "maparthelper.presets_config_updated").formatted(Formatting.GREEN),

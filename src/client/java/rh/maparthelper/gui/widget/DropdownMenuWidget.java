@@ -6,8 +6,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.LayoutWidget;
 import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,16 +126,16 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
 
         if (isExpanded) {
             context.enableScissor(getMenuX(), topYExpanded, getMenuX() + menuWidth, bottomYExpanded);
-            MatrixStack matrixStack = context.getMatrices();
-            matrixStack.push();
-            matrixStack.translate(0, 0, 300);
+            Matrix3x2fStack matrixStack = context.getMatrices();
+            matrixStack.pushMatrix();
+            matrixStack.translate(0, 0);
             if (expandUpwards)
                 context.fill(getMenuX(), getY() - menuHeight, getMenuX() + menuWidth, getY(), 0x99FFFFFF);
             else
                 context.fill(getMenuX(), getY() + height, getMenuX() + menuWidth, getY() + height + menuHeight, 0x99FFFFFF);
             elements.forEach(
                     e -> e.render(context, mouseX, mouseY, deltaTicks));
-            matrixStack.pop();
+            matrixStack.popMatrix();
             context.disableScissor();
         }
 

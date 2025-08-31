@@ -7,9 +7,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import org.joml.Matrix3x2fStack;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageConverter;
@@ -168,6 +168,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                     0, 0, squareSize + 5, 150,
                     colorsEditor.getY(), y + boxHeight, 3
             );
+            blocksList.grid.getMainPositioner().alignHorizontalCenter().alignVerticalCenter();
             GridWidget.Adder adder = blocksList.grid.createAdder(1);
             adder.add(EmptyWidget.ofWidth(blocksList.getWidth()));
 
@@ -275,11 +276,15 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        MatrixStack matrixStack = context.getMatrices();
-        matrixStack.push();
-        matrixStack.translate(0, 0, -250);
+        Matrix3x2fStack matrixStack = context.getMatrices();
+
+        matrixStack.pushMatrix();
         parent.render(context, 0, 0, deltaTicks);
-        matrixStack.pop();
+        matrixStack.popMatrix();
+
+        context.state.createNewRootLayer();
+        this.applyBlur(context);
+        this.renderDarkening(context);
 
         int w = boxWidth;
         int h = boxHeight;
@@ -293,7 +298,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        this.applyBlur();
+//        context.applyBlur();
     }
 
     @Override
@@ -350,7 +355,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         private final ClickAction clickAction;
 
         private MapColorBlockWidget(int x, int y, int width, int height, Block block, MapColor mapColor, ClickAction clickAction) {
-            super(PresetsEditorScreen.this, x, y, width, height, block, true);
+            super(x, y, width, height, block, true);
             this.mapColor = mapColor;
             this.clickAction = clickAction;
         }
@@ -374,11 +379,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
             boolean flag = presetBlock == null && block == Blocks.BARRIER;
             flag = flag || (presetBlock != null && presetBlock == block);
             if (flag) {
-                MatrixStack matrixStack = context.getMatrices();
-                matrixStack.push();
-                matrixStack.translate(0, 0, 200);
+                Matrix3x2fStack matrixStack = context.getMatrices();
+                context.state.goUpLayer();
+                matrixStack.pushMatrix();
+                matrixStack.translate(0, 0);
                 context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
-                matrixStack.pop();
+                matrixStack.popMatrix();
+                context.state.goDownLayer();
             }
         }
 

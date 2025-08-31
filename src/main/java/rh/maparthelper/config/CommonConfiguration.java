@@ -14,6 +14,8 @@ public class CommonConfiguration implements ConfigData {
     public int fakeItemFramesLiveTime = 100;
     public boolean showUseLABTooltip = true;
     public boolean logConversionTime = false;
+    @ConfigEntry.Gui.Tooltip
+    public boolean scaleBlockWidgets = false;
 
     @ConfigEntry.Gui.Tooltip(count = 3)
     @ConfigEntry.Gui.CollapsibleObject

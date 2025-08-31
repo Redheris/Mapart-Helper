@@ -11,11 +11,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.command.FakeMapsPreview;
-import rh.maparthelper.util.MapUtils;
-import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.MapartEditorScreen;
+import rh.maparthelper.util.MapUtils;
 
 public class ClientTickHandler {
     public static void init() {
@@ -32,7 +32,7 @@ public class ClientTickHandler {
             }
             if (client.world != null && ClientCommandsContext.showFakeItemFrames()) {
                 long liveTime = client.world.getTime() - ClientCommandsContext.getFakeFramesBornTime();
-                if (liveTime >= MapartHelper.config.commonConfiguration.fakeItemFramesLiveTime) {
+                if (liveTime >= MapartHelper.commonConfig.fakeItemFramesLiveTime) {
                     FakeMapsPreview.removeFakeItemFrames(client.world);
                 }
             }
@@ -58,7 +58,7 @@ public class ClientTickHandler {
                             matrices, vertexConsumers,
                             BeaconBlockEntityRenderer.BEAM_TEXTURE,
                             0, 1, 0, 0, context.world().getHeight(),
-                            MapartHelper.config.commonConfiguration.selectionColor,
+                            MapartHelper.commonConfig.selectionColor,
                             0.2F, 0.0F
                     );
                     matrices.pop();

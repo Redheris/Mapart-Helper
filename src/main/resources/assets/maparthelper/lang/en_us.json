@@ -90,6 +90,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Fake item frames display duration (in ticks)",
   "text.autoconfig.mapart-helper.option.commonConfiguration.showUseLABTooltip": "Show tooltip for LAB toggle",
   "text.autoconfig.mapart-helper.option.commonConfiguration.logConversionTime": "Log art conversion duration",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets": "Scale blocks in GUI",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets.@Tooltip": "Temporarily setting until block scaling is fixed",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Include in palette:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Which blocks will be used when generating the global palette",

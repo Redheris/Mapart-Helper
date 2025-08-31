@@ -4,22 +4,21 @@ import net.minecraft.block.Block;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
+import org.joml.Matrix3x2fStack;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.PresetsEditorScreen;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlockItemWidget extends ClickableWidget {
-    private final Screen parent;
     private int x;
     private int y;
     private final int width;
@@ -30,9 +29,8 @@ public class BlockItemWidget extends ClickableWidget {
     protected final Item blockItem;
     private List<OrderedText> tooltip;
 
-    public BlockItemWidget(Screen parent, int x, int y, int width, int height, Block block, boolean hasClickAction) {
+    public BlockItemWidget(int x, int y, int width, int height, Block block, boolean hasClickAction) {
         super(x, y, width, height, Text.of(block.getName()));
-        this.parent = parent;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -48,8 +46,8 @@ public class BlockItemWidget extends ClickableWidget {
         this.hasClickAction = hasClickAction;
     }
 
-    public BlockItemWidget(Screen parent, int x, int y, int width, int height, Block block) {
-        this(parent, x, y, width, height, block, false);
+    public BlockItemWidget(int x, int y, int width, int height, Block block) {
+        this(x, y, width, height, block, false);
     }
 
     public void setTooltip(Text tooltip) {
@@ -66,24 +64,41 @@ public class BlockItemWidget extends ClickableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        MatrixStack matrixStack = context.getMatrices();
-        matrixStack.push();
-
         ItemStack blockItem = this.blockItem.getDefaultStack();
 
-        matrixStack.translate(x, y, 0);
-        matrixStack.scale(width / 16f, height / 16f, 1);
-        matrixStack.translate(-x, -y, 0);
+        Matrix3x2fStack matrixStack = context.getMatrices();
+        matrixStack.pushMatrix();
+
+        if (MapartHelper.commonConfig.scaleBlockWidgets) {
+            matrixStack.translate(x, y);
+            matrixStack.scale(width / 16f, height / 16f);
+            matrixStack.translate(-x, -y);
+        } else {
+            matrixStack.translate(4, 4);
+        }
         context.drawItem(blockItem, x, y);
 
-        matrixStack.pop();
+        matrixStack.popMatrix();
+
+//        mc.getItemModelManager().clearAndUpdate(keyedItemRenderState, blockItem, ItemDisplayContext.GUI, mc.world, mc.player, 0);
+//        VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+//        renderer.renderItem(
+//                blockItem,
+//                ItemDisplayContext.GUI,
+//                0xF000F0,
+//                OverlayTexture.DEFAULT_UV,
+//                itemMatrices,
+//                vertexConsumers,
+//                mc.world,
+//                0
+//        );
 
         boolean isMouseOverBlock = mouseX >= x
                 && mouseX < x + width
                 && mouseY >= y
                 && mouseY < y + height;
         if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
-            parent.setTooltip(this.tooltip);
+            context.drawTooltip(this.tooltip, mouseX, mouseY);
         }
     }
 

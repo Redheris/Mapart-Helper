@@ -89,6 +89,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Длительность показа фейковых рамок (в тиках)",
   "text.autoconfig.mapart-helper.option.commonConfiguration.showUseLABTooltip": "Отображать подсказку для переключения LAB",
   "text.autoconfig.mapart-helper.option.commonConfiguration.logConversionTime": "Выводить длительность обработки арта в логи",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets": "Масштабировать блоки в GUI",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets.@Tooltip": "Временная настройка, пока масштабирование блоков не будет исправлено",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",

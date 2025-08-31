@@ -10,13 +10,16 @@ import net.minecraft.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rh.maparthelper.command.ServerCommands;
+import rh.maparthelper.config.CommonConfiguration;
+import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.MapartHelperConfig;
 
 public class MapartHelper implements ModInitializer {
     public static final String MOD_ID = "mapart-helper";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static MapartHelperConfig config;
+    public static CommonConfiguration commonConfig;
+    public static ConversionConfiguration conversionSettings;
 
     @Override
     public void onInitialize() {
@@ -30,7 +33,9 @@ public class MapartHelper implements ModInitializer {
                         new GsonConfigSerializer<>(c, clazz, gson)
                 )
         );
-        config = AutoConfig.getConfigHolder(MapartHelperConfig.class).getConfig();
+        MapartHelperConfig config = AutoConfig.getConfigHolder(MapartHelperConfig.class).getConfig();
+        commonConfig = config.commonConfiguration;
+        conversionSettings = config.conversionSettings;
 
         ServerCommands.registerCommands();
     }

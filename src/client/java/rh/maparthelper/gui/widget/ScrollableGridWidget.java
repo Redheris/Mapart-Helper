@@ -4,7 +4,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,9 +111,6 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     protected void drawScrollbar(DrawContext context) {
-        MatrixStack matrixStack = context.getMatrices();
-        matrixStack.push();
-        matrixStack.translate(0, 0, 200);
         if (this.overflows()) {
             int i = this.getScrollbarX();
             int j = this.getScrollbarThumbHeight();
@@ -122,7 +118,6 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
             context.fill(i, this.getY(), i + scrollWidth, getY() + this.getHeight(), 0xFF555555);
             context.fill(i, k, i + scrollWidth, k + j, 0xFFA8A8A8);
         }
-        matrixStack.pop();
     }
 
     @Override

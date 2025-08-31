@@ -13,7 +13,7 @@ import net.minecraft.item.Items;
 import net.minecraft.item.map.MapState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import rh.maparthelper.MapartHelperClient;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
@@ -44,8 +44,8 @@ public class FakeMapsPreview {
     public static void addFakeItemFrame(int[] map, ClientPlayerEntity player) {
         MapState mapState = MapState.of((byte) 1, false, null);
         mapState.colors = new byte[map.length];
-        boolean use3D = MapartHelperClient.conversionConfig.use3D();
-        boolean useDithering = MapartHelperClient.conversionConfig.useDithering();
+        boolean use3D = MapartHelper.conversionSettings.use3D();
+        boolean useDithering = MapartHelper.conversionSettings.useDithering();
         for (int i = 0; i < map.length; i++) {
             MapColorEntry color = PaletteColors.getClosestColor(map[i], use3D, useDithering);
             mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());

@@ -34,7 +34,7 @@ public class PaletteGenerator {
             if (color != null) {
                 if (!palette.containsKey(color.id))
                     palette.put(color.id, new ArrayList<>());
-                boolean useCreativeBlocks = MapartHelper.config.commonConfiguration.useInPalette.creativeBlocks;
+                boolean useCreativeBlocks = MapartHelper.commonConfig.useInPalette.creativeBlocks;
                 if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE && block != Blocks.PETRIFIED_OAK_SLAB))
                     palette.get(color.id).add(block);
             }
@@ -79,7 +79,7 @@ public class PaletteGenerator {
     }
 
     private static boolean useBlockInPalette(Block block) {
-        var useInPalette = MapartHelper.config.commonConfiguration.useInPalette;
+        var useInPalette = MapartHelper.commonConfig.useInPalette;
 
         if (useInPalette.anyBlocks) return true;
         if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;

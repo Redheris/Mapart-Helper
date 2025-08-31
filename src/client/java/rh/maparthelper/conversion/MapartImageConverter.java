@@ -8,7 +8,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.MapartHelperClient;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.colors.ColorUtils;
 import rh.maparthelper.conversion.colors.MapColorEntry;
@@ -41,7 +40,7 @@ public class MapartImageConverter {
 
     public static void readAndUpdateMapartImage(Path path) {
         FutureTask<Void> future;
-        boolean logExecutionTime = MapartHelper.config.commonConfiguration.logConversionTime;
+        boolean logExecutionTime = MapartHelper.commonConfig.logConversionTime;
         if (path.equals(lastImagePath))
             future = new FutureTask<>(new ConvertImageFileRunnable(null, logExecutionTime), null);
         else {
@@ -113,7 +112,7 @@ public class MapartImageConverter {
         double progressStep = 1.0 / pixels.length;
 
         int[] errorsArray = new int[0];
-        DitheringAlgorithms ditherAlg = MapartHelper.config.conversionSettings.ditheringAlgorithm;
+        DitheringAlgorithms ditherAlg = MapartHelper.conversionSettings.ditheringAlgorithm;
         boolean useDithering = ditherAlg != DitheringAlgorithms.NONE;
         if (useDithering)
             errorsArray = new int[ditherAlg.rowsNumber * width * 3];
@@ -257,7 +256,7 @@ public class MapartImageConverter {
                 bufferedImage = preprocessImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                convertToBlocksPalette(bufferedImage, MapartHelperClient.conversionConfig.use3D(), logExecutionTime);
+                convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D(), logExecutionTime);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);

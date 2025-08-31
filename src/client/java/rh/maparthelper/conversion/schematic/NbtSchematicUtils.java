@@ -8,15 +8,17 @@ import net.minecraft.nbt.NbtInt;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
-import rh.maparthelper.MapartHelperClient;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.UseAuxBlocks;
-import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.config.palette.PaletteGenerator;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.config.palette.PaletteGenerator;
+import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class NbtSchematicUtils {
     private static final List<Block> blocks_list = new ArrayList<>();
@@ -83,7 +85,7 @@ public class NbtSchematicUtils {
         if (y == 0) return;
 
         if (needsAuxBlock(block))
-            addBlockToNbt(nbt, x, y - 1, z, MapartHelperClient.conversionConfig.auxBlock);
+            addBlockToNbt(nbt, x, y - 1, z, MapartHelper.conversionSettings.auxBlock);
     }
 
     protected static NbtCompound createMapartNbt(int[] map, int mapsWidth, int mapsHeight) {
@@ -98,10 +100,10 @@ public class NbtSchematicUtils {
             System.arraycopy(map, y * width, colors[y], 0, width);
         }
 
-        StaircaseStyles staircase = MapartHelperClient.conversionConfig.staircaseStyle;
+        StaircaseStyles staircase = MapartHelper.conversionSettings.staircaseStyle;
         if (staircase == StaircaseStyles.FLAT_2D) {
             for (int x = 0; x < width; x++) {
-                addBlockToNbt(nbt, x, 0, 0, MapartHelperClient.conversionConfig.auxBlock);
+                addBlockToNbt(nbt, x, 0, 0, MapartHelper.conversionSettings.auxBlock);
             }
             for (int z = 1; z < height + 1; z++) {
                 for (int x = 0; x < width; x++) {
@@ -121,7 +123,7 @@ public class NbtSchematicUtils {
                 int y = converted.getFirst().get(x);
                 maxHeight = Math.max(y, maxHeight);
 
-                addBlockToNbt(nbt, x, y, 0, MapartHelperClient.conversionConfig.auxBlock);
+                addBlockToNbt(nbt, x, y, 0, MapartHelper.conversionSettings.auxBlock);
             }
             for (int z = 1; z < converted.size(); z++) {
                 for (int x = 0; x < converted.getFirst().size(); x++) {
@@ -154,7 +156,7 @@ public class NbtSchematicUtils {
     }
 
     public static boolean needsAuxBlock(Block block) {
-        if (MapartHelperClient.conversionConfig.useAuxBlocks == UseAuxBlocks.NO_AUX) return false;
+        if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX) return false;
         boolean canPlaceAtAir = block.getDefaultState().canPlaceAt(DummyWorldView.getInstance(), BlockPos.ORIGIN);
         boolean hasNoCollision = block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;

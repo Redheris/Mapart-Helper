@@ -34,7 +34,7 @@ public class PaletteColors {
                 int current = color.getRenderColor(brightness);
                 if (current == argb) return new MapColorEntry(color, brightness, new int[]{0, 0, 0});
 
-                double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);
+                double dist = ColorUtils.colorDistance(argb, current, MapartHelper.conversionSettings.useLAB);
                 if (dist < minDist) {
                     minDist = dist;
                     closestColor = color;
@@ -72,7 +72,7 @@ public class PaletteColors {
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);
             if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL, new int[]{0, 0, 0});
 
-            double dist = ColorUtils.colorDistance(argb, current, MapartHelper.config.conversionSettings.useLAB);
+            double dist = ColorUtils.colorDistance(argb, current, MapartHelper.conversionSettings.useLAB);
             if (dist < minDist) {
                 minDist = dist;
                 closest = color;

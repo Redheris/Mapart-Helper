@@ -2,10 +2,10 @@ package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -46,7 +46,7 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         if (CurrentConversionSettings.guiMapartImage != null) {
             context.drawTexture(
-                    RenderLayer::getGuiTextured,
+                    RenderPipelines.GUI_TEXTURED,
                     CurrentConversionSettings.guiMapartId,
                     x, y,
                     0.0F, 0.0F,

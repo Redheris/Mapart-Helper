@@ -81,6 +81,8 @@ public abstract class ScreenAdapted extends Screen {
                 selectedDropdownMenu = dropMenu;
             }
             return dropMenu.mouseClicked(mouseX, mouseY, button);
+        } else {
+            collapseDropdown();
         }
 
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
@@ -93,19 +95,16 @@ public abstract class ScreenAdapted extends Screen {
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
-
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
-
         for (Drawable drawable : this.drawables) {
-            if (selectedDropdownMenu != null && selectedDropdownMenu.isExpanded && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                if (drawable == selectedDropdownMenu)
-                    drawable.render(context, mouseX, mouseY, delta);
-                else
-                    drawable.render(context, 0, 0, delta);
-            } else
+            if (drawable != selectedDropdownMenu) {
                 drawable.render(context, mouseX, mouseY, delta);
+            }
+        }
+
+        if (selectedDropdownMenu != null) {
+            selectedDropdownMenu.render(context, mouseX, mouseY, delta);
         }
     }
 

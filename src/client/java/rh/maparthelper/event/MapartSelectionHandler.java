@@ -31,7 +31,7 @@ public class MapartSelectionHandler {
             Vec3d pos1 = ClientCommandsContext.getSelectedPos1();
             Vec3d pos2 = ClientCommandsContext.getSelectedPos2();
 
-            int selectionColor = MapartHelper.config.commonConfiguration.selectionColor;
+            int selectionColor = MapartHelper.commonConfig.selectionColor;
 
             if (pos1 != null) {
                 pos1 = pos1.offset(direction, 0.05);

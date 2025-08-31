@@ -5,14 +5,11 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.texture.TextureManager;
 import rh.maparthelper.command.ClientCommands;
 import rh.maparthelper.command.MapartToFile;
-import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.event.ModEventsHandler;
 import rh.maparthelper.event.PaletteLoader;
 
 public class MapartHelperClient implements ClientModInitializer {
-
-    public static ConversionConfiguration conversionConfig;
 
     @Override
     public void onInitializeClient() {
@@ -23,8 +20,6 @@ public class MapartHelperClient implements ClientModInitializer {
 
         PaletteLoader.init();
         registerClientStartedEvents();
-
-        conversionConfig = MapartHelper.config.conversionSettings;
     }
 
     private static void registerClientStartedEvents() {
