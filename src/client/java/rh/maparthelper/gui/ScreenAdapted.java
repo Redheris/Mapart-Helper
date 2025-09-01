@@ -103,7 +103,10 @@ public abstract class ScreenAdapted extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         for (Drawable drawable : this.drawables) {
             if (drawable != selectedDropdownMenu) {
-                drawable.render(context, mouseX, mouseY, delta);
+                if (selectedDropdownMenu != null && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY))
+                    drawable.render(context, 0, 0, delta);
+                else
+                    drawable.render(context, mouseX, mouseY, delta);
             }
         }
 
