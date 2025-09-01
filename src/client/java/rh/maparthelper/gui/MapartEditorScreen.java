@@ -70,7 +70,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         MapartImageConverter.MapColorCount[] colorsCounter = MapartImageConverter.getColorsCounter();
 
         this.auxBlockCount = CurrentConversionSettings.getWidth() * 128;
-        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, 24, MapartHelper.conversionSettings.auxBlock);
+        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock);
         auxBlockItemWidget.insertToTooltip(1, Text.translatable("maparthelper.aux_block").formatted(Formatting.GRAY));
         TextWidget auxAmountText = new TextWidget(Text.empty(), textRenderer);
         materialListAdder.add(auxBlockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
@@ -94,7 +94,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         Block block = palette.getBlockOfMapColor(MapColor.get(color.id()));
         if (block == null) return;
 
-        BlockItemWidget blockItemWidget = new BlockItemWidget(0, 0, 24, 24, block);
+        BlockItemWidget blockItemWidget = new BlockItemWidget(0, 0, 24, block);
         adder.add(blockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
         TextWidget amountText = new TextWidget(Text.of(getAmountString(color.amount(), block.asItem().getMaxCount())), textRenderer);
         adder.add(amountText);

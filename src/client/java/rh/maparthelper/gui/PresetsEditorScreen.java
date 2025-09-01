@@ -174,7 +174,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
             List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
-                    0, 0, squareSize, squareSize,
+                    0, 0, squareSize,
                     Blocks.BARRIER, mapColor,
                     (mx, my) -> {
                         presetsConfig.getPreset(editingPreset).removeColor(mapColor);
@@ -186,7 +186,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             adder.add(noneBlock, blocksList.grid.copyPositioner().alignHorizontalCenter());
             for (Block block : blocks) {
                 MapColorBlockWidget blockWidget = new MapColorBlockWidget(
-                        0, 0, squareSize, squareSize,
+                        0, 0, squareSize,
                         block, mapColor,
                         (mx, my) -> {
                             presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
@@ -354,8 +354,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         private final MapColor mapColor;
         private final ClickAction clickAction;
 
-        private MapColorBlockWidget(int x, int y, int width, int height, Block block, MapColor mapColor, ClickAction clickAction) {
-            super(x, y, width, height, block, true);
+        private MapColorBlockWidget(int x, int y, int squareSize, Block block, MapColor mapColor, ClickAction clickAction) {
+            super(x, y, squareSize, block, true);
             this.mapColor = mapColor;
             this.clickAction = clickAction;
         }
@@ -379,13 +379,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
             boolean flag = presetBlock == null && block == Blocks.BARRIER;
             flag = flag || (presetBlock != null && presetBlock == block);
             if (flag) {
-                Matrix3x2fStack matrixStack = context.getMatrices();
-                context.state.goUpLayer();
-                matrixStack.pushMatrix();
-                matrixStack.translate(0, 0);
+                context.state.createNewRootLayer();
                 context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
-                matrixStack.popMatrix();
-                context.state.goDownLayer();
             }
         }
 

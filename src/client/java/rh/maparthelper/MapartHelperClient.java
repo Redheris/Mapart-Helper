@@ -2,12 +2,14 @@ package rh.maparthelper;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry;
 import net.minecraft.client.texture.TextureManager;
 import rh.maparthelper.command.ClientCommands;
 import rh.maparthelper.command.MapartToFile;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.event.ModEventsHandler;
 import rh.maparthelper.event.PaletteLoader;
+import rh.maparthelper.gui.render.ScaledItemGuiElementRenderer;
 
 public class MapartHelperClient implements ClientModInitializer {
 
@@ -20,6 +22,8 @@ public class MapartHelperClient implements ClientModInitializer {
 
         PaletteLoader.init();
         registerClientStartedEvents();
+
+        SpecialGuiElementRegistry.register(ctx -> new ScaledItemGuiElementRenderer(ctx.vertexConsumers()));
     }
 
     private static void registerClientStartedEvents() {
