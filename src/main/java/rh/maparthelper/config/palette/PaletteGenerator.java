@@ -40,10 +40,7 @@ public class PaletteGenerator {
             }
         }
 
-        for (int colorId : palette.keySet()) {
-            if (!palette.get(colorId).isEmpty())
-                addARGBMapColorEntries(MapColor.get(colorId));
-        }
+        initARGBMapColor(palette);
 
         ItemStack[] toolItems = {
                 new ItemStack(Items.NETHERITE_SWORD),
@@ -55,6 +52,13 @@ public class PaletteGenerator {
         };
         for (int colorId : palette.keySet()) {
             palette.get(colorId).sort(Comparator.comparingDouble(b -> getBlockScore(b, toolItems)));
+        }
+    }
+
+    public static void initARGBMapColor(Map<Integer, List<Block>> palette) {
+        for (int colorId : palette.keySet()) {
+            if (!palette.get(colorId).isEmpty())
+                addARGBMapColorEntries(MapColor.get(colorId));
         }
     }
 
@@ -80,6 +84,8 @@ public class PaletteGenerator {
 
     private static boolean useBlockInPalette(Block block) {
         var useInPalette = MapartHelper.commonConfig.useInPalette;
+
+        if (block == Blocks.RAW_IRON_BLOCK) return false;
 
         if (useInPalette.anyBlocks) return true;
         if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;

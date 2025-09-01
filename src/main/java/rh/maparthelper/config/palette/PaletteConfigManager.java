@@ -45,6 +45,7 @@ public class PaletteConfigManager {
         try (FileReader reader = new FileReader(completePaletepath.toFile())) {
             completePalette = gson.fromJson(reader, CompletePalette.class);
             if (completePalette != null) {
+                PaletteGenerator.initARGBMapColor(completePalette.palette);
                 return true;
             }
         } catch (Exception e) {
