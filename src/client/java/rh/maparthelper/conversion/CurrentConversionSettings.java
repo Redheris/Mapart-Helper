@@ -26,7 +26,6 @@ public class CurrentConversionSettings {
 
     // Preview settings
     public static boolean doShowGrid = false;
-    public static double previewScale = 1.0;
 
     // Image preprocessing
     public static float brightness = 1.0f;
@@ -38,7 +37,6 @@ public class CurrentConversionSettings {
         guiMapartImage = null;
         MapartImageConverter.lastImagePath = null;
         MapartImageConverter.lastImage = null;
-        previewScale = 1.0;
     }
 
     public static int getWidth() {
