@@ -370,7 +370,8 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
-            return mapartPreview.keyPressed(keyCode, scanCode, modifiers);
+            if (mapartPreview.keyPressed(keyCode, scanCode, modifiers))
+                return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
@@ -378,7 +379,8 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
-            return mapartPreview.keyReleased(keyCode, scanCode, modifiers);
+            if (mapartPreview.keyReleased(keyCode, scanCode, modifiers))
+                return true;
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
