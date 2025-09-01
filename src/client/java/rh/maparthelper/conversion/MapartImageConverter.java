@@ -131,8 +131,7 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    public static void convertToBlocksPalette(BufferedImage image, boolean use3D, boolean logExecutionTime) {
-        long startTime = System.currentTimeMillis();
+    public static void convertToBlocksPalette(BufferedImage image, boolean use3D) {
         PaletteColors.clearColorCache();
         colorsCounter.clear();
 
@@ -183,11 +182,6 @@ public class MapartImageConverter {
                 }
                 Arrays.fill(errorsArray, (ditherAlg.rowsNumber - 1) * width * 3, ditherAlg.rowsNumber * width * 3, 0);
             }
-        }
-
-        if (logExecutionTime) {
-            double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-            MapartHelper.LOGGER.info("[{}] Colors conversion took {} seconds", use3D ? "3D" : "2D", timeLeft);
         }
 
         conversionProgress.set(1.0);
@@ -285,7 +279,7 @@ public class MapartImageConverter {
                 bufferedImage = preprocessImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D(), logExecutionTime);
+                convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D());
                 if (Thread.currentThread().isInterrupted()) return;
 
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
