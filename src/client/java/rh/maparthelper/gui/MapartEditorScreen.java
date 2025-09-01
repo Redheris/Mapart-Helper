@@ -313,7 +313,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsRight.add(presetsEditor);
 
         settingsRight.add(
-                new TextWidget(Text.translatable("maparthelper.gui.material_list_label") , textRenderer),
+                new TextWidget(Text.translatable("maparthelper.gui.material_list_label"), textRenderer),
                 settingsRightPositioner.copy().marginTop(15)
         );
 
@@ -355,6 +355,16 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(20, 20).build();
         showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
         mapartOptions.add(showInWorldButton);
+
+        ButtonWidget resetMapartButton = ButtonWidget.builder(
+                Text.of("⟲"),
+                b -> {
+                    CurrentConversionSettings.resetMapart();
+                    updateMaterialList();
+                }
+        ).size(20, 20).build();
+        resetMapartButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.reset_mapart")));
+        mapartOptions.add(resetMapartButton);
 
         mapartOptions.refreshPositions();
         mapartOptions.forEachChild(this::addDrawableChild);

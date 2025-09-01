@@ -48,6 +48,7 @@
 
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
   "maparthelper.gui.shulker_box_abbr": "SB",
+  "maparthelper.gui.reset_mapart": "Reset mapart",
   "maparthelper.gui.mapart_name_field": "Mapart name",
   "maparthelper.gui.cropMode": "Cropping: ",
   "maparthelper.gui.staircaseStyle": "Staircase style: ",
