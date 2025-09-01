@@ -231,19 +231,21 @@ public class MapartEditorScreen extends ScreenAdapted {
                 settingLeftPositioner.copy().marginTop(15)
         );
         String currentAuxBlock = Registries.BLOCK.getId(MapartHelper.conversionSettings.auxBlock).toString();
-        currentAuxBlock = currentAuxBlock.substring(currentAuxBlock.indexOf("minecraft:") + 10);
-        TextFieldWidget auxBlockId = createTextInputFieldWidget(
-                baseElementWidth,
+        if (currentAuxBlock.contains("minecraft:"))
+            currentAuxBlock = currentAuxBlock.substring(10);
+        BlockItemWidget auxBlockPreview = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock, false);
+        TextFieldWidget auxBlockIdField = createTextInputFieldWidget(
+                baseElementWidth - auxBlockPreview.getWidth() - 5,
                 currentAuxBlock,
                 -1
         );
-        auxBlockId.setChangedListener(s -> {
-            auxBlockId.setEditableColor(Colors.WHITE);
+        auxBlockIdField.setChangedListener(s -> {
+            auxBlockIdField.setEditableColor(Colors.WHITE);
             int delimiterInd = s.indexOf(':');
             if (delimiterInd != -1 && !Identifier.isNamespaceValid(s.substring(0, delimiterInd))
                     || !Identifier.isPathValid(s.substring(delimiterInd + 1))
             ) {
-                auxBlockId.setEditableColor(Colors.LIGHT_RED);
+                auxBlockIdField.setEditableColor(Colors.LIGHT_RED);
                 return;
             }
             if (s.equals(Registries.BLOCK.getId(MapartHelper.conversionSettings.auxBlock).toString()))
@@ -252,13 +254,19 @@ public class MapartEditorScreen extends ScreenAdapted {
             Block newBlock = Registries.BLOCK.get(id);
             if (newBlock != Blocks.AIR && !NbtSchematicUtils.needsAuxBlock(newBlock)) {
                 MapartHelper.conversionSettings.auxBlock = newBlock;
+                auxBlockPreview.setBlock(newBlock);
                 updateMaterialList();
                 AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
             } else {
-                auxBlockId.setEditableColor(Colors.LIGHT_RED);
+                auxBlockIdField.setEditableColor(Colors.LIGHT_RED);
             }
         });
-        settingsLeft.add(auxBlockId);
+        GridWidget auxBlock = new GridWidget().setSpacing(5);
+        auxBlock.getMainPositioner().alignVerticalCenter();
+        GridWidget.Adder adder = auxBlock.createAdder(2);
+        adder.add(auxBlockIdField);
+        adder.add(auxBlockPreview);
+        settingsLeft.add(auxBlock);
 
         EnumDropdownMenuWidget useAuxBlocks = new EnumDropdownMenuWidget(
                 this, 0, 0,

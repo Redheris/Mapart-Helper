@@ -376,8 +376,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
             PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
             Block presetBlock = preset.colors.get(mapColor);
-            boolean flag = presetBlock == null && block == Blocks.BARRIER;
-            flag = flag || (presetBlock != null && presetBlock == block);
+            boolean flag = presetBlock == null && this.getBlock() == Blocks.BARRIER;
+            flag = flag || (presetBlock != null && presetBlock == this.getBlock());
             if (flag) {
                 context.state.createNewRootLayer();
                 context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);

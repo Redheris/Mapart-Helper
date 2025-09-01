@@ -28,8 +28,8 @@ public class BlockItemWidget extends ClickableWidget {
     private final int squareSize;
     private final boolean hasClickAction;
 
-    protected final Block block;
-    protected final Item blockItem;
+    private Block block;
+    private Item blockItem;
     private List<OrderedText> tooltip;
 
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
@@ -37,12 +37,7 @@ public class BlockItemWidget extends ClickableWidget {
         this.x = x;
         this.y = y;
         this.squareSize = squareSize;
-        this.block = block;
-        if (block instanceof FluidBlock) {
-            this.blockItem = Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem();
-        } else {
-            this.blockItem = block.asItem();
-        }
+        this.setBlock(block);
         List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
         this.tooltip = new ArrayList<>(tooltip.stream().map(Text::asOrderedText).toList());
         this.hasClickAction = hasClickAction;
@@ -50,6 +45,15 @@ public class BlockItemWidget extends ClickableWidget {
 
     public BlockItemWidget(int x, int y, int squareSize, Block block) {
         this(x, y, squareSize, block, false);
+    }
+
+    public void setBlock(Block block) {
+        this.block = block;
+        if (block instanceof FluidBlock) {
+            this.blockItem = Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem();
+        } else {
+            this.blockItem = block.asItem();
+        }
     }
 
     public void setTooltip(Text tooltip) {
@@ -93,6 +97,10 @@ public class BlockItemWidget extends ClickableWidget {
         if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
             context.drawTooltip(this.tooltip, mouseX, mouseY);
         }
+    }
+
+    public Block getBlock() {
+        return block;
     }
 
     @Override
