@@ -17,7 +17,7 @@ import net.minecraft.text.Text;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 import rh.maparthelper.gui.PresetsEditorScreen;
-import rh.maparthelper.gui.render.ScaledItemGuiElementRenderer;
+import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 import java.util.ArrayList;
 import java.util.List;

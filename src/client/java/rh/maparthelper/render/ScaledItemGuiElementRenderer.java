@@ -1,4 +1,4 @@
-package rh.maparthelper.gui.render;
+package rh.maparthelper.render;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.ScreenRect;

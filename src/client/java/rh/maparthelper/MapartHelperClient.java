@@ -9,7 +9,7 @@ import rh.maparthelper.command.MapartToFile;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.event.ModEventsHandler;
 import rh.maparthelper.event.PaletteLoader;
-import rh.maparthelper.gui.render.ScaledItemGuiElementRenderer;
+import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 public class MapartHelperClient implements ClientModInitializer {
 
