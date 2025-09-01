@@ -87,9 +87,13 @@ public abstract class ScreenAdapted extends Screen {
 
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
             selectedTextWidget = textField;
-            textField.setSelectionStart(0);
-            textField.setSelectionEnd(textField.getText().length());
             this.setFocused(textField);
+            if (button == 0) {
+                textField.setSelectionStart(0);
+                textField.setSelectionEnd(textField.getText().length());
+            } else if (button == 1) {
+                textField.setText("");
+            }
             return true;
         }
 
