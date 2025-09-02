@@ -156,6 +156,7 @@ public class PaletteGenerator {
 
     public static PalettePresetsConfig.PalettePreset getDefaultPreset() {
         Map<MapColor, Block> palette = PaletteConfigManager.completePalette.palette.entrySet().stream()
+                .filter(entry -> !entry.getValue().isEmpty())
                 .collect(Collectors.toMap(
                         entry -> MapColor.get(entry.getKey()),
                         entry -> entry.getValue().getFirst()
