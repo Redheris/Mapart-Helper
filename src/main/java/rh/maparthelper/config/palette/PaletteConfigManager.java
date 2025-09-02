@@ -137,8 +137,8 @@ public class PaletteConfigManager {
             for (Path path : stream) {
                 try (FileReader reader = new FileReader(path.toFile())) {
                     PalettePresetsConfig.PalettePreset preset = gson.fromJson(reader, PalettePresetsConfig.PalettePreset.class);
-                    if (preset == null || preset.colors == null || preset.colors.isEmpty()) {
-                        MapartHelper.LOGGER.info("JSON file \"{}\" is not a preset or empty, ignoring", path);
+                    if (preset == null || preset.colors == null) {
+                        MapartHelper.LOGGER.info("JSON file \"{}\" is not a preset, ignoring", path);
                         continue;
                     }
                     String filename = path.getFileName().toString();
