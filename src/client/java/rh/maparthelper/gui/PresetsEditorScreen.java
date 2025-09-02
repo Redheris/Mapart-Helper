@@ -172,7 +172,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
             GridWidget.Adder adder = blocksList.grid.createAdder(1);
             adder.add(EmptyWidget.ofWidth(blocksList.getWidth()));
 
-            List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
                     0, 0, squareSize,
                     Blocks.BARRIER, mapColor,
@@ -184,16 +183,20 @@ public class PresetsEditorScreen extends ScreenAdapted {
             noneBlock.setTooltip(Text.translatable("maparthelper.gui.presets.remove_color"));
 
             adder.add(noneBlock, blocksList.grid.copyPositioner().alignHorizontalCenter());
-            for (Block block : blocks) {
-                MapColorBlockWidget blockWidget = new MapColorBlockWidget(
-                        0, 0, squareSize,
-                        block, mapColor,
-                        (mx, my) -> {
-                            presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
-                            updatedPresets.add(editingPreset);
-                        }
-                );
-                adder.add(blockWidget, blocksList.grid.copyPositioner().alignHorizontalCenter());
+
+            List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
+            if (blocks != null) {
+                for (Block block : blocks) {
+                    MapColorBlockWidget blockWidget = new MapColorBlockWidget(
+                            0, 0, squareSize,
+                            block, mapColor,
+                            (mx, my) -> {
+                                presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
+                                updatedPresets.add(editingPreset);
+                            }
+                    );
+                    adder.add(blockWidget, blocksList.grid.copyPositioner().alignHorizontalCenter());
+                }
             }
 
             colorsGrid.add(
