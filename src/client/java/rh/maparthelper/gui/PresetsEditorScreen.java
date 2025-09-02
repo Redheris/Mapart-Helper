@@ -38,6 +38,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private PresetsDropdownMenuWidget presetsListDropdown;
     private TextFieldWidget presetNameField;
+    private ScrollableGridWidget colorsEditor;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
         super(Text.translatable("maparthelper.gui.presets_editor_screen"));
@@ -148,7 +149,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         int squareSize = 24;
         int columns = (boxWidth - 5) / (squareSize + 5);
-        ScrollableGridWidget colorsEditor = new ScrollableGridWidget(
+        colorsEditor = new ScrollableGridWidget(
                 null,
                 x, y + 31, boxWidth, boxHeight - 31,
                 y, y + boxHeight, 6
@@ -283,6 +284,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount))
+            return true;
+        return colorsEditor.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
+
+    @Override
     public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         Matrix3x2fStack matrixStack = context.getMatrices();
 
@@ -299,14 +307,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
         context.fill(x, y, x + w, y + h, 0x77000000);
         context.fill(x, y, x + w, y + 30, 0x44000000);
         context.drawBorder(x - 1, y - 1, w + 2, h + 2, 0x44FFFFFF);
-        context.drawHorizontalLine(x, x + w, y + 30, 0x77FFFFFF);
+        context.drawHorizontalLine(x, x + w - 1, y + 30, 0x77FFFFFF);
 
         super.render(context, mouseX, mouseY, deltaTicks);
     }
 
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-//        context.applyBlur();
     }
 
     @Override
