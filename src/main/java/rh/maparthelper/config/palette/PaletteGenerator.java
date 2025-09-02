@@ -85,8 +85,6 @@ public class PaletteGenerator {
     private static boolean useBlockInPalette(Block block) {
         var useInPalette = MapartHelper.commonConfig.useInPalette;
 
-        if (block == Blocks.RAW_IRON_BLOCK) return false;
-
         if (useInPalette.anyBlocks) return true;
         if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;
 
