@@ -87,8 +87,8 @@ public class PalettePresetsConfig {
             return this.presets.get(presetFilename);
         }
 
-        public String createNewPreset() {
-            return super.createNewPreset(false);
+        public String createNewPreset(boolean createDefault) {
+            return super.createNewPreset(createDefault);
         }
 
         public Editable deletePreset(String filename) {

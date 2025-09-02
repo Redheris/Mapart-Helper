@@ -92,18 +92,17 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 presetsListDropdown.updateNames(presetsConfig.presetFiles.values());
         });
 
-
-        ButtonWidget updateFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.updateFiles())
+        ButtonWidget createEmptyPreset = ButtonWidget.builder(Text.of("\uD83D\uDDCB"), b -> this.createNewPreset(false))
                 .size(17, 20)
                 .build();
-        updateFiles.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
-        presetBarLeft.add(updateFiles);
+        createEmptyPreset.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.createEmptyPreset_tooltip")));
+        presetBarLeft.add(createEmptyPreset);
 
-        ButtonWidget createNewPreset = ButtonWidget.builder(Text.of("➕"), b -> this.createNewPreset())
+        ButtonWidget createDefaultPreset = ButtonWidget.builder(Text.of("➕"), b -> this.createNewPreset(true))
                 .size(17, 20)
                 .build();
-        createNewPreset.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.createNewPreset_tooltip")));
-        presetBarLeft.add(createNewPreset);
+        createDefaultPreset.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.createDefaultPreset_tooltip")));
+        presetBarLeft.add(createDefaultPreset);
 
         ButtonWidget duplicatePreset = ButtonWidget.builder(Text.of("\uD83D\uDDD0"), b -> this.duplicatePreset())
                 .size(17, 20)
@@ -124,6 +123,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
         DirectionalLayoutWidget presetBarRight = DirectionalLayoutWidget.horizontal();
         presetBarRight.setPosition(0, y + 5);
         presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(1);
+
+        ButtonWidget updateFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.updateFiles())
+                .size(17, 20)
+                .build();
+        updateFiles.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
+        presetBarRight.add(updateFiles);
 
         ButtonWidget save = ButtonWidget.builder(Text.translatable("maparthelper.gui.save"), b -> saveChanges())
                 .size(60, 20)
@@ -248,8 +253,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         clearAndInit();
     }
 
-    private void createNewPreset() {
-        String newPreset = presetsConfig.createNewPreset();
+    private void createNewPreset(boolean createDefault) {
+        String newPreset = presetsConfig.createNewPreset(createDefault);
         updatedPresets.add(newPreset);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);
