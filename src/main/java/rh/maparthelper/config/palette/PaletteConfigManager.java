@@ -139,23 +139,23 @@ public class PaletteConfigManager {
                     PalettePresetsConfig.PalettePreset preset = gson.fromJson(reader, PalettePresetsConfig.PalettePreset.class);
                     if (preset == null || preset.colors == null) {
                         MapartHelper.LOGGER.info("JSON file \"{}\" is not a preset, ignoring", path);
+                        hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                         continue;
                     }
                     String filename = path.getFileName().toString();
-                    if (presetsConfig.presetFiles.containsKey(filename)) {
-                        presetsConfig.presets.put(filename, preset);
-                    } else {
+                    presetsConfig.presets.put(filename, preset);
+                    if (!presetsConfig.presetFiles.containsKey(filename)) {
                         presetsConfig.presetFiles.put(filename, FilenameUtils.getBaseName(filename));
-                        presetsConfig.presets.put(filename, preset);
                         hasChanges = true;
                     }
                     MapartHelper.LOGGER.info("Preset file \"{}\" successfully read", path);
-                } catch (JsonSyntaxException e) {
+                }
+                catch (JsonSyntaxException e) {
                     MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", path, e.getMessage());
-                    presetsConfig.presetFiles.remove(path.getFileName().toString());
+                    hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                 } catch (IOException e) {
                     MapartHelper.LOGGER.error("Failed to read preset \"{}\"", path, e);
-                    presetsConfig.presetFiles.remove(path.getFileName().toString());
+                    hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                 }
             }
         } catch (IOException e) {
@@ -171,12 +171,7 @@ public class PaletteConfigManager {
                 Files.createDirectory(presetsPath);
             }
             for (var entry : presetsConfig.presetFiles.entrySet()) {
-                try (FileWriter writer = new FileWriter(presetsPath.resolve(entry.getKey()).toFile())) {
-                    PalettePresetsConfig.PalettePreset preset = presetsConfig.presets.get(entry.getKey());
-                    gson.toJson(preset, writer);
-                } catch (IOException e) {
-                    MapartHelper.LOGGER.error("Failed to write preset \"{}\"", entry.getKey(), e);
-                }
+                savePresetFile(entry.getKey());
             }
         } catch (IOException e) {
             MapartHelper.LOGGER.error("Failed to write presets directory", e);
@@ -189,7 +184,7 @@ public class PaletteConfigManager {
             PalettePresetsConfig.PalettePreset preset = presetsConfig.presets.get(filename);
             gson.toJson(preset, writer);
         } catch (IOException e) {
-            MapartHelper.LOGGER.error("Failed to save preset \"{}\"", filename, e);
+            MapartHelper.LOGGER.error("Failed to write preset \"{}\"", filename, e);
         }
     }
 
