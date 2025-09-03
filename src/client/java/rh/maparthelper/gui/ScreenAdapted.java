@@ -14,11 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Extended Screed class with adjustments of interactions and rendering of {@link TextFieldWidget} and {@link DropdownMenuWidget}
+ * Extended Screed class with adjustments of behavior and rendering of {@link TextFieldWidget} and {@link DropdownMenuWidget}
  */
 public abstract class ScreenAdapted extends Screen {
     private final List<Drawable> drawables = new ArrayList<>();
-    DropdownMenuWidget selectedDropdownMenu;
     TextFieldWidget selectedTextWidget;
 
     protected ScreenAdapted(Text title) {
@@ -62,29 +61,20 @@ public abstract class ScreenAdapted extends Screen {
             selectedTextWidget.setSelectionEnd(0);
             selectedTextWidget = null;
         }
-        if (selectedDropdownMenu != null && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-            return selectedDropdownMenu.mouseClicked(mouseX, mouseY, button);
-        }
-
         Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
-        if (optional.isEmpty()) {
-            this.setFocused(null);
-            collapseDropdown();
-            return false;
-        }
 
-        Element element = optional.get();
-        if (element instanceof DropdownMenuWidget dropMenu) {
-            this.setFocused(element);
-            if (element != selectedDropdownMenu) {
-                collapseDropdown();
-                selectedDropdownMenu = dropMenu;
+        DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
+        if (dropdownMenu != null) {
+            if (dropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
+                return dropdownMenu.mouseClicked(mouseX, mouseY, button);
+            } else if (dropdownMenu.isMouseOver(mouseX, mouseY)) {
+                return dropdownMenu.mouseClicked(mouseX, mouseY, button);
             }
-            return dropMenu.mouseClicked(mouseX, mouseY, button);
-        } else {
-            collapseDropdown();
         }
+        collapseDropdown();
 
+        if (optional.isEmpty()) return false;
+        Element element = optional.get();
         if (!element.isFocused() && element instanceof TextFieldWidget textField) {
             selectedTextWidget = textField;
             this.setFocused(textField);
@@ -99,27 +89,34 @@ public abstract class ScreenAdapted extends Screen {
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        for (Drawable drawable : this.drawables) {
-            if (drawable != selectedDropdownMenu) {
-                if (selectedDropdownMenu != null && selectedDropdownMenu.isMouseOverMenu(mouseX, mouseY))
-                    drawable.render(context, 0, 0, delta);
-                else
-                    drawable.render(context, mouseX, mouseY, delta);
-            }
+        DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
+        for (Drawable drawable : drawables) {
+            if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY))
+                drawable.render(context, 0, 0, delta);
+            else
+                drawable.render(context, mouseX, mouseY, delta);
         }
 
-        if (selectedDropdownMenu != null) {
-            selectedDropdownMenu.render(context, mouseX, mouseY, delta);
+        if (dropdownMenu != null) {
+            dropdownMenu.renderMenu(context, mouseX, mouseY, delta);
         }
     }
 
+    @Override
+    public void close() {
+        assert this.client != null;
+        super.close();
+        DropdownMenuWidget.expandedOne = null;
+    }
+
     private void collapseDropdown() {
-        if (this.selectedDropdownMenu != null) {
+        DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
+        if (dropdownMenu != null) {
             this.setFocused(null);
-            this.selectedDropdownMenu.switchExpanded(false);
-            this.selectedDropdownMenu = null;
+            dropdownMenu.toggleExpanded(false);
         }
     }
 }

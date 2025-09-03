@@ -7,7 +7,6 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.LayoutWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.text.Text;
-import org.joml.Matrix3x2fStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +25,9 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     private int bottomYExpanded;
 
     private boolean needRelayout = false;
-    public boolean isExpanded = false;
 
     public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text message) {
-        super(x, y, width, height, message,
-                btn -> ((DropdownMenuWidget) btn).switchExpanded(!((DropdownMenuWidget) btn).isExpanded),
-                DEFAULT_NARRATION_SUPPLIER
-        );
+        super(x, y, width, height, message, btn -> {}, DEFAULT_NARRATION_SUPPLIER);
         this.parent = parent;
         this.topYExpanded = y;
         this.bottomYExpanded = y + height;
@@ -79,20 +74,22 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         elements.forEach(consumer);
     }
 
-    public void switchExpanded(boolean value) {
-        if (value && expandedOne != null) {
-            expandedOne.isExpanded = false;
+    public void toggleExpanded(boolean expand) {
+        if (expand && expandedOne != null) {
             expandedOne.elements.forEach(c -> c.visible = false);
         }
-        isExpanded = value;
-        elements.forEach(c -> c.visible = value);
-        if (value)
-            expandedOne = this;
+        elements.forEach(c -> c.visible = expand);
+        expandedOne = expand ? this : null;
+    }
+
+    @Override
+    public void onClick(double mouseX, double mouseY) {
+        toggleExpanded(expandedOne == null);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isExpanded) {
+        if (expandedOne != null) {
             for (ClickableWidget w : elements) {
                 if (w.isMouseOver(mouseX, mouseY)) {
                     parent.setFocused(w);
@@ -105,7 +102,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     public boolean isMouseOverMenu(double mouseX, double mouseY) {
-        return isExpanded && mouseX >= getMenuX() && mouseX < getMenuX() + menuWidth && mouseY >= topYExpanded && mouseY < bottomYExpanded;
+        return (expandedOne != null) && mouseX >= getMenuX() && mouseX < getMenuX() + menuWidth && mouseY >= topYExpanded && mouseY < bottomYExpanded;
     }
 
     @Override
@@ -124,21 +121,17 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
             this.needRelayout = false;
         }
 
-        if (isExpanded) {
-            context.enableScissor(getMenuX(), topYExpanded, getMenuX() + menuWidth, bottomYExpanded);
-            Matrix3x2fStack matrixStack = context.getMatrices();
-            matrixStack.pushMatrix();
-            matrixStack.translate(0, 0);
-            if (expandUpwards)
-                context.fill(getMenuX(), getY() - menuHeight, getMenuX() + menuWidth, getY(), 0x99FFFFFF);
-            else
-                context.fill(getMenuX(), getY() + height, getMenuX() + menuWidth, getY() + height + menuHeight, 0x99FFFFFF);
-            elements.forEach(
-                    e -> e.render(context, mouseX, mouseY, deltaTicks));
-            matrixStack.popMatrix();
-            context.disableScissor();
-        }
-
         super.renderWidget(context, mouseX, mouseY, deltaTicks);
+    }
+
+    public void renderMenu(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        context.enableScissor(getMenuX(), topYExpanded, getMenuX() + menuWidth, bottomYExpanded);
+        if (expandUpwards)
+            context.fill(getMenuX(), getY() - menuHeight, getMenuX() + menuWidth, getY(), 0x99FFFFFF);
+        else
+            context.fill(getMenuX(), getY() + height, getMenuX() + menuWidth, getY() + height + menuHeight, 0x99FFFFFF);
+        elements.forEach(
+                e -> e.render(context, mouseX, mouseY, deltaTicks));
+        context.disableScissor();
     }
 }

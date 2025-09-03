@@ -155,6 +155,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget size = createSizeSettingsGrid();
         settingsLeft.add(size);
 
+        settingsLeft.refreshPositions();
+        settingsLeft.forEachChild(this::addDrawableChild);
+
+        int listTop = settingsLeft.getY() + settingsLeft.getHeight();
+        ScrollableGridWidget settingsLeftScrollable = new ScrollableGridWidget(
+                null,
+                settingsLeft.getX(), listTop,
+                baseElementWidth + 6, height - listTop,
+                listTop, height, 6
+        );
+        settingsLeftScrollable.grid.getMainPositioner().marginTop(5);
+        GridWidget.Adder adder = settingsLeftScrollable.grid.createAdder(1);
+
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.translatable("maparthelper.gui.cropMode"),
@@ -168,7 +181,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CroppingMode.values()
         );
         croppingMode.forEachEntry(this::addSelectableChild);
-        settingsLeft.add(croppingMode);
+        adder.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
@@ -187,7 +200,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 StaircaseStyles.values()
         );
         staircaseStyle.forEachEntry(this::addSelectableChild);
-        settingsLeft.add(staircaseStyle);
+        adder.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
@@ -203,7 +216,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 DitheringAlgorithms.values()
         );
         ditheringAlg.forEachEntry(this::addSelectableChild);
-        settingsLeft.add(ditheringAlg);
+        adder.add(ditheringAlg);
 
         Text isOn = Text.translatable("maparthelper.gui.isOn");
         Text isOff = Text.translatable("maparthelper.gui.isOff");
@@ -220,13 +233,13 @@ public class MapartEditorScreen extends ScreenAdapted {
             useLAB.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.useLAB_tooltip")));
             useLAB.setTooltipDelay(Duration.ofMillis(500));
         }
-        settingsLeft.add(useLAB);
+        adder.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
         imagePreprocessing.forEachEntry(this::addSelectableChild);
-        settingsLeft.add(imagePreprocessing);
+        adder.add(imagePreprocessing);
 
-        settingsLeft.add(
+        adder.add(
                 new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),
                 settingLeftPositioner.copy().marginTop(15)
         );
@@ -263,10 +276,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         });
         GridWidget auxBlock = new GridWidget().setSpacing(5);
         auxBlock.getMainPositioner().alignVerticalCenter();
-        GridWidget.Adder adder = auxBlock.createAdder(2);
-        adder.add(auxBlockIdField);
-        adder.add(auxBlockPreview);
-        settingsLeft.add(auxBlock);
+        GridWidget.Adder auxAdder = auxBlock.createAdder(2);
+        auxAdder.add(auxBlockIdField);
+        auxAdder.add(auxBlockPreview);
+        adder.add(auxBlock);
 
         EnumDropdownMenuWidget useAuxBlocks = new EnumDropdownMenuWidget(
                 this, 0, 0,
@@ -286,10 +299,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 UseAuxBlocks.values()
         );
         useAuxBlocks.forEachEntry(this::addSelectableChild);
-        settingsLeft.add(useAuxBlocks);
+        adder.add(useAuxBlocks);
 
-        settingsLeft.refreshPositions();
-        settingsLeft.forEachChild(this::addDrawableChild);
+        settingsLeftScrollable.refreshPositions();
+        this.addDrawableChild(settingsLeftScrollable);
 
         // =========== Presets and Material List area ===========
 
