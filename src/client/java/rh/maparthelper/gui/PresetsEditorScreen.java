@@ -265,6 +265,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private void createNewPreset(boolean createDefault) {
         String newPreset = presetsConfig.createNewPreset(createDefault, updatedPresets, deletedPresets);
         updatedPresets.add(newPreset);
+        deletedPresets.remove(newPreset);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);
         clearAndInit();
