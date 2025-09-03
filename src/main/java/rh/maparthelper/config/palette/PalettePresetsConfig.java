@@ -1,29 +1,26 @@
 package rh.maparthelper.config.palette;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.util.Utils;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class PalettePresetsConfig {
     String currentPresetFile;
     public Map<String, String> presetFiles = new HashMap<>();
-    transient Map<String, PalettePreset> presets = new HashMap<>();
+    transient Map<String, @NotNull PalettePreset> presets = new HashMap<>();
 
     static PalettePresetsConfig createDefaultConfig() {
         PalettePresetsConfig config = new PalettePresetsConfig();
-        config.currentPresetFile = config.createNewPreset(true);
+        config.currentPresetFile = config.createDefaultPreset();
         return config;
-    }
-
-    public PalettePresetsConfig copyConfig() {
-        PalettePresetsConfig clone = new PalettePresetsConfig();
-        clone.currentPresetFile = this.currentPresetFile;
-        clone.presetFiles = new HashMap<>(this.presetFiles);
-        clone.presets = new HashMap<>(this.presets);
-        return clone;
     }
 
     public Editable getEditable() {
@@ -59,16 +56,17 @@ public class PalettePresetsConfig {
             this.currentPresetFile = presetFilename;
     }
 
-    String createNewPreset(boolean createDefault) {
-        String presetName = Utils.makeUniqueFilename(presetFiles::containsKey, "new_preset", "json", "%s_%d");
-        PalettePreset preset;
-        if (createDefault)
-            preset = new PalettePreset(PaletteGenerator.getDefaultPreset());
-        else
-            preset = new PalettePreset();
-        presetFiles.put(presetName, "New Preset");
-        presets.put(presetName, preset);
-        return presetName;
+    void addPreset(String filename, PalettePreset preset) {
+        String presetName = Utils.makeUniqueName(presetFiles.values()::contains, "New preset", null, "%s (%d)");
+        presetFiles.put(filename, presetName);
+        presets.put(filename, preset);
+    }
+
+    String createDefaultPreset() {
+        Path presetsDir = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("presets");
+        String presetFilename = Utils.makeUniqueFilename(presetsDir, "new_preset", "json", "%s_%d");
+        this.addPreset(presetFilename, PaletteGenerator.getDefaultPreset());
+        return presetFilename;
     }
 
     public static class Editable extends PalettePresetsConfig {
@@ -87,25 +85,37 @@ public class PalettePresetsConfig {
             return this.presets.get(presetFilename);
         }
 
-        public String createNewPreset(boolean createDefault) {
-            return super.createNewPreset(createDefault);
+        public String createNewPreset(boolean createDefault, Set<String> updatedPresets, Set<String> deletedPresets) {
+            Path presetsDir = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("presets");
+            String presetFilename = Utils.makeUniqueName(filename ->
+                    (updatedPresets.contains(filename) || Files.exists(presetsDir.resolve(filename))) && !deletedPresets.contains(filename),
+                    "new_preset", "json", "%s_%d"
+            );
+            PalettePreset preset;
+            if (createDefault)
+                preset = PaletteGenerator.getDefaultPreset();
+            else
+                preset = new PalettePreset();
+            this.addPreset(presetFilename, preset);
+            return presetFilename;
         }
 
-        public Editable deletePreset(String filename) {
+        public Editable deletePreset(String filename, Set<String> updatedPresets, Set<String> deletedPresets) {
             if (presetFiles.size() == 1) {
-                return new Editable(createDefaultConfig());
+                Editable newConfig = new Editable(new PalettePresetsConfig());
+                newConfig.currentPresetFile = newConfig.createNewPreset(true, updatedPresets, deletedPresets);
+                return newConfig;
             }
-            PalettePresetsConfig newConfig = this.copyConfig();
-            newConfig.presetFiles.remove(filename);
-            newConfig.presets.remove(filename);
-            newConfig.currentPresetFile = newConfig.presetFiles.keySet().iterator().next();
-            return new Editable(newConfig);
+            this.presetFiles.remove(filename);
+            this.presets.remove(filename);
+            this.currentPresetFile = presetFiles.keySet().iterator().next();
+            return this;
         }
 
         public String duplicatePreset(String filename) {
             PalettePreset preset = new PalettePreset(presets.get(filename));
             String newFilename = FilenameUtils.getBaseName(filename) + " (Copy)";
-            newFilename = Utils.makeUniqueFilename(presetFiles::containsKey, newFilename, "json", "%s_%d");
+            newFilename = Utils.makeUniqueName(presetFiles::containsKey, newFilename, "json", "%s_%d");
             presets.put(newFilename, preset);
             presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
             return newFilename;

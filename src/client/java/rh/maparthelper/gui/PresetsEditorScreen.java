@@ -244,10 +244,18 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void deletePreset() {
-        presetsConfig = presetsConfig.deletePreset(editingPreset);
-        updatedPresets.remove(editingPreset);
-        if (PaletteConfigManager.presetsConfig.presetFiles.containsKey(editingPreset)) {
-            deletedPresets.add(editingPreset);
+        deletedPresets.add(editingPreset);
+        PalettePresetsConfig.Editable updatedConfig = presetsConfig.deletePreset(editingPreset, updatedPresets, deletedPresets);
+        boolean configEmptied = updatedConfig != presetsConfig;
+        if (configEmptied) {
+            updatedPresets.clear();
+            updatedPresets.add(updatedConfig.getCurrentPresetFilename());
+            if (updatedConfig.getCurrentPresetFilename().equals(editingPreset)) {
+                deletedPresets.remove(editingPreset);
+            }
+            presetsConfig = updatedConfig;
+        } else {
+            updatedPresets.remove(editingPreset);
         }
         presetsListDropdown = null;
         changeEditingPreset(presetsConfig.getCurrentPresetFilename());
@@ -255,7 +263,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void createNewPreset(boolean createDefault) {
-        String newPreset = presetsConfig.createNewPreset(createDefault);
+        String newPreset = presetsConfig.createNewPreset(createDefault, updatedPresets, deletedPresets);
         updatedPresets.add(newPreset);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);

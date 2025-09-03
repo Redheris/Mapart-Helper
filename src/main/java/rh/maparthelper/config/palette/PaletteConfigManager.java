@@ -8,6 +8,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.adapter.MapColorEntryAdapter;
@@ -28,8 +29,8 @@ public class PaletteConfigManager {
             .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorEntryAdapter())
             .create();
 
-    public static PalettePresetsConfig presetsConfig;
-    public static CompletePalette completePalette;
+    public static @NotNull PalettePresetsConfig presetsConfig = new PalettePresetsConfig();
+    public static @NotNull CompletePalette completePalette = new CompletePalette();
 
     public static void regenerateCompletePalette() {
         completePalette = CompletePalette.generate();
@@ -110,7 +111,7 @@ public class PaletteConfigManager {
     private static boolean validatePresetsConfig() {
         boolean hasChanges = false;
         if (presetsConfig.presetFiles.isEmpty()) {
-            presetsConfig.currentPresetFile = presetsConfig.createNewPreset(true);
+            presetsConfig.currentPresetFile = presetsConfig.createDefaultPreset();
             savePresetFiles();
             hasChanges = true;
         } else if (!presetsConfig.presetFiles.containsKey(presetsConfig.currentPresetFile)) {
