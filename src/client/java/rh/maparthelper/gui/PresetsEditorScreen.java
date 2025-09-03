@@ -151,8 +151,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int columns = (boxWidth - 5) / (squareSize + 5);
         colorsEditor = new ScrollableGridWidget(
                 null,
-                x, y + 31, boxWidth, boxHeight - 31,
-                y, y + boxHeight, 6
+                x, y + 31,
+                boxWidth, boxHeight - 31, 6
         );
         GridWidget colorsGrid = colorsEditor.grid;
         colorsGrid.add(EmptyWidget.ofWidth(boxWidth - 11), 0, 0, 1, columns);
@@ -171,8 +171,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
             ScrollableGridWidget blocksList = new ScrollableGridWidget(
                     colorsEditor,
-                    0, 0, squareSize + 5, 150,
-                    colorsEditor.getY(), y + boxHeight, 3
+                    0, 0,
+                    squareSize + 5, 150, 3
             );
             blocksList.grid.getMainPositioner().alignHorizontalCenter().alignVerticalCenter();
             GridWidget.Adder adder = blocksList.grid.createAdder(1);

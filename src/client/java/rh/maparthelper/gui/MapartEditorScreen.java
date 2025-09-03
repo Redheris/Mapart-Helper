@@ -58,8 +58,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         materialList = new ScrollableGridWidget(
                 null,
                 settingsRight.getX() - 6, listTop,
-                width - settingsRight.getX() - 1, height - listTop,
-                listTop, height, 6
+                width - settingsRight.getX() - 1, height - listTop, 6
         );
         materialList.setLeftScroll(true);
         materialList.grid.setColumnSpacing(0);
@@ -162,8 +161,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ScrollableGridWidget settingsLeftScrollable = new ScrollableGridWidget(
                 null,
                 settingsLeft.getX(), listTop,
-                baseElementWidth + 6, height - listTop,
-                listTop, height, 6
+                baseElementWidth + 6, height - listTop, 6
         );
         settingsLeftScrollable.grid.getMainPositioner().marginTop(5);
         GridWidget.Adder adder = settingsLeftScrollable.grid.createAdder(1);
@@ -207,6 +205,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.translatable("maparthelper.gui.ditheringAlg"),
                 Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.ditheringAlgorithm.name())
         );
+        ditheringAlg.setLeftScroll(true);
         ditheringAlg.addEntries(
                 e -> {
                     MapartHelper.conversionSettings.ditheringAlgorithm = (DitheringAlgorithms) e;
@@ -547,7 +546,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(80, 20).build();
 
         DropdownMenuWidget imagePreprocessing = new DropdownMenuWidget(
-                this, 0, 0, 100, 20, baseElementWidth + 4,
+                this, 0, 0, 100, 20, baseElementWidth + 4, -1,
                 Text.translatable("maparthelper.gui.image_preprocessing")
         );
         imagePreprocessing.addEntry(reset);
@@ -582,7 +581,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> MapartToNBT.saveNBTAsZip()
         ).size(156, 20).build();
 
-        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, Text.of("\uD83D\uDDAB"));
+        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Text.of("\uD83D\uDDAB"));
         saveMapart.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.save_mapart_as")));
         saveMapart.addEntry(saveImage);
         saveMapart.addEntry(saveNBT);

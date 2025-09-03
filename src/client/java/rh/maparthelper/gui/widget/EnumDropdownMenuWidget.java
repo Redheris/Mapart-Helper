@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     private final Text fieldName;
     public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption) {
-        super(parent, x, y, width, height, menuWidth, fieldName.copy().append(initOption));
+        super(parent, x, y, width, height, menuWidth, -1, fieldName.copy().append(initOption));
         this.fieldName = fieldName;
     }
 

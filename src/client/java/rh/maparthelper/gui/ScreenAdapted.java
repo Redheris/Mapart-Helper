@@ -5,9 +5,11 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
+import rh.maparthelper.gui.widget.ScrollableGridWidget;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +67,7 @@ public abstract class ScreenAdapted extends Screen {
 
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         if (dropdownMenu != null) {
-            if (dropdownMenu.isMouseOverMenu(mouseX, mouseY)) {
-                return dropdownMenu.mouseClicked(mouseX, mouseY, button);
-            } else if (dropdownMenu.isMouseOver(mouseX, mouseY)) {
+            if (dropdownMenu.isMouseOverMenu(mouseX, mouseY) || dropdownMenu.isMouseOver(mouseX, mouseY)) {
                 return dropdownMenu.mouseClicked(mouseX, mouseY, button);
             }
         }
@@ -75,7 +75,23 @@ public abstract class ScreenAdapted extends Screen {
 
         if (optional.isEmpty()) return false;
         Element element = optional.get();
-        if (!element.isFocused() && element instanceof TextFieldWidget textField) {
+
+        if (element instanceof ScrollableGridWidget layout) {
+            List<ClickableWidget> elements = new ArrayList<>();
+            layout.grid.forEachChild(elements::add);
+
+            for (ClickableWidget w : elements) {
+                if (w.isMouseOver(mouseX, mouseY) && w instanceof TextFieldWidget) {
+                    element = w;
+                    break;
+                }
+            }
+        }
+
+        if (element instanceof TextFieldWidget textField) {
+            if (element.isFocused()) {
+                return element.mouseClicked(mouseX, mouseY, button);
+            }
             selectedTextWidget = textField;
             this.setFocused(textField);
             if (button == 0) {
@@ -88,6 +104,16 @@ public abstract class ScreenAdapted extends Screen {
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (DropdownMenuWidget.expandedOne != null && DropdownMenuWidget.expandedOne.isMouseOverMenu(mouseX, mouseY)) {
+            if (DropdownMenuWidget.expandedOne.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)) {
+                return true;
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     @Override

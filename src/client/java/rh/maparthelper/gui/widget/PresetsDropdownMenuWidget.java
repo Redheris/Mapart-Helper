@@ -13,12 +13,12 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
     private boolean dynamicText = false;
 
     public PresetsDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text initOption, boolean dynamicText) {
-        super(parent, x, y, width, height, menuWidth, initOption);
+        super(parent, x, y, width, height, menuWidth, 120, initOption);
         this.dynamicText = dynamicText;
     }
 
     public PresetsDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName) {
-        super(parent, x, y, width, height, menuWidth, fieldName);
+        super(parent, x, y, width, height, menuWidth, 120, fieldName);
     }
 
     public void addEntry(Consumer<String> action, String presetFile, String presetName) {
@@ -31,7 +31,7 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
                             action.accept(presetFile);
                         }
                 )
-                .size(menuWidth - 4, 15)
+                .size(menuWidth - 6, 15)
                 .build();
         super.addEntry(widget);
     }

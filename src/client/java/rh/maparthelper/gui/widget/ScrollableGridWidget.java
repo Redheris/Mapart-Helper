@@ -1,7 +1,9 @@
 package rh.maparthelper.gui.widget;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
@@ -16,18 +18,16 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     private final Element parentWidget;
     public final GridWidget grid;
     private final int scrollWidth;
-    private final int minY;
-    private final int maxY;
+    private int visibleTopY;
     private boolean needRelayout = false;
-    private boolean leftScroll = false;
+    protected boolean leftScroll = false;
 
-    public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int minY, int maxY, int scrollWidth) {
+    public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int scrollWidth) {
         super(x, y, width, height, Text.empty());
         this.parentWidget = parentWidget;
         this.grid = new GridWidget(x, y);
-        this.minY = minY;
-        this.maxY = maxY;
         this.scrollWidth = scrollWidth;
+        this.visibleTopY = y;
     }
 
     public void setLeftScroll(boolean leftScroll) {
@@ -62,6 +62,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     @Override
     public void setY(int y) {
         super.setY(y);
+        this.visibleTopY = y;
         this.needRelayout = true;
     }
 
@@ -103,7 +104,10 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
             grid.refreshPositions();
             this.needRelayout = false;
         }
-        context.enableScissor(getX(), Math.max(getY(), minY), getRight(), Math.min(getBottom(), maxY));
+        if (parentWidget instanceof Widget w)
+            context.enableScissor(getX(), Math.max(visibleTopY, w.getY()), getRight(), Math.min(visibleTopY + getHeight(), w.getY() + w.getHeight()));
+        else
+            context.enableScissor(getX(), visibleTopY, getRight(), visibleTopY + getHeight());
         grid.forEachChild(w -> w.render(context, mouseX, mouseY, deltaTicks));
         drawScrollbar(context);
         context.disableScissor();
@@ -122,14 +126,19 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (mouseY < minY || mouseY > maxY || !this.isMouseOver(mouseX, mouseY)) return false;
+        if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY)) return false;
         if (this.checkScrollbarDragged(mouseX, mouseY, button)) return true;
 
         List<ClickableWidget> children = collectChildrenList();
         for (ClickableWidget child : children) {
             if (!child.visible) continue;
-            if (child.mouseClicked(mouseX, mouseY, button)) {
-                return true;
+            if (child.isMouseOver(mouseX, mouseY)) {
+                Screen currentScreen = MinecraftClient.getInstance().currentScreen;
+                if (currentScreen != null) {
+                    currentScreen.setFocused(child);
+                    currentScreen.setDragging(true);
+                }
+                return child.mouseClicked(mouseX, mouseY, button);
             }
         }
         return true;
