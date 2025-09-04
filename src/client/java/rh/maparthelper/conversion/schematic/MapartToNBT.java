@@ -27,7 +27,10 @@ import java.util.zip.ZipOutputStream;
 public class MapartToNBT {
     private static final Path SCHEMATICS = FabricLoader.getInstance().getGameDir().resolve("schematics");
 
-    private static final ExecutorService nbtBuilderExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Schematic").build());
+    private static final ExecutorService nbtBuilderExecutor = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setNameFormat(MapartHelper.MOD_NAME + "/Schematic")
+                    .build()
+    );
 
     private static void saveNBT(boolean asSingleFile, ZipOutputStream zipOut, File zipFile) {
         assert CurrentConversionSettings.guiMapartImage.getImage() != null;

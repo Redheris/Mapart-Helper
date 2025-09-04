@@ -218,23 +218,17 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.addDrawableChild(colorsEditor);
     }
 
-    private void duplicatePreset() {
-        String newPreset = presetsConfig.duplicatePreset(editingPreset, updatedPresets, deletedPresets);
-        updatedPresets.add(newPreset);
-        deletedPresets.remove(newPreset);
+    private void createNewPreset(boolean createDefault) {
+        String newPreset = presetsConfig.createNewPreset(createDefault, updatedPresets, deletedPresets);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);
         clearAndInit();
     }
 
     private void deletePreset() {
-        deletedPresets.add(editingPreset);
         PalettePresetsConfig.Editable updatedConfig = presetsConfig.deletePreset(editingPreset, updatedPresets, deletedPresets);
         boolean configEmptied = updatedConfig != presetsConfig;
         if (configEmptied) {
-            updatedPresets.clear();
-            updatedPresets.add(updatedConfig.getCurrentPresetFilename());
-            deletedPresets.remove(updatedConfig.getCurrentPresetFilename());
             presetsConfig = updatedConfig;
         } else {
             updatedPresets.remove(editingPreset);
@@ -244,10 +238,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         clearAndInit();
     }
 
-    private void createNewPreset(boolean createDefault) {
-        String newPreset = presetsConfig.createNewPreset(createDefault, updatedPresets, deletedPresets);
-        updatedPresets.add(newPreset);
-        deletedPresets.remove(newPreset);
+    private void duplicatePreset() {
+        String newPreset = presetsConfig.duplicatePreset(editingPreset, updatedPresets, deletedPresets);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);
         clearAndInit();
@@ -271,13 +263,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void saveChanges() {
+        boolean updateMapart = !presetsConfig.getCurrentPresetFilename().equals(PaletteConfigManager.presetsConfig.getCurrentPresetFilename());
+        updateMapart |= updatedPresets.contains(presetsConfig.getCurrentPresetFilename());
         PaletteConfigManager.presetsConfig = presetsConfig;
         if (!updatedPresets.isEmpty()) {
             for (String filename : updatedPresets) {
                 PaletteConfigManager.savePresetFile(filename);
-                if (filename.equals(PaletteConfigManager.presetsConfig.getCurrentPresetFilename())) {
-                    MapartImageConverter.updateMapart();
-                }
             }
             updatedPresets.clear();
         }
@@ -287,7 +278,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             }
             deletedPresets.clear();
         }
-
+        if (updateMapart) MapartImageConverter.updateMapart();
         PaletteConfigManager.savePresetsConfigFile();
     }
 

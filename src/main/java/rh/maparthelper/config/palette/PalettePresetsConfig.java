@@ -1,16 +1,15 @@
 package rh.maparthelper.config.palette;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.MapartHelper;
 import rh.maparthelper.util.Utils;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
+
+import static rh.maparthelper.config.palette.PaletteConfigManager.PRESETS_PATH;
 
 public class PalettePresetsConfig {
     String currentPresetFile;
@@ -63,8 +62,7 @@ public class PalettePresetsConfig {
     }
 
     String createDefaultPreset() {
-        Path presetsDir = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("presets");
-        String presetFilename = Utils.makeUniqueFilename(presetsDir, "new_preset", "json", "%s_%d");
+        String presetFilename = Utils.makeUniqueFilename(PRESETS_PATH, "new_preset", "json", "%s_%d");
         this.addPreset(presetFilename, PaletteGenerator.getDefaultPreset());
         return presetFilename;
     }
@@ -86,11 +84,12 @@ public class PalettePresetsConfig {
         }
 
         public String createNewPreset(boolean createDefault, Set<String> updatedPresets, Set<String> deletedPresets) {
-            Path presetsDir = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("presets");
             String presetFilename = Utils.makeUniqueName(filename ->
-                    (updatedPresets.contains(filename) || Files.exists(presetsDir.resolve(filename))) && !deletedPresets.contains(filename),
+                    (updatedPresets.contains(filename) || Files.exists(PRESETS_PATH.resolve(filename))) && !deletedPresets.contains(filename),
                     "new_preset", "json", "%s_%d"
             );
+            updatedPresets.add(presetFilename);
+            deletedPresets.remove(presetFilename);
             PalettePreset preset;
             if (createDefault)
                 preset = PaletteGenerator.getDefaultPreset();
@@ -101,11 +100,17 @@ public class PalettePresetsConfig {
         }
 
         public Editable deletePreset(String filename, Set<String> updatedPresets, Set<String> deletedPresets) {
+            if (Files.exists(PRESETS_PATH.resolve(filename)))
+                deletedPresets.add(filename);
             if (presetFiles.size() == 1) {
                 Editable newConfig = new Editable(new PalettePresetsConfig());
                 newConfig.currentPresetFile = newConfig.createNewPreset(true, updatedPresets, deletedPresets);
+                updatedPresets.clear();
+                updatedPresets.add(newConfig.currentPresetFile);
+                deletedPresets.remove(newConfig.currentPresetFile);
                 return newConfig;
             }
+            updatedPresets.remove(filename);
             this.presetFiles.remove(filename);
             this.presets.remove(filename);
             this.currentPresetFile = presetFiles.keySet().iterator().next();
@@ -115,12 +120,12 @@ public class PalettePresetsConfig {
         public String duplicatePreset(String filename, Set<String> updatedPresets, Set<String> deletedPresets) {
             PalettePreset preset = new PalettePreset(presets.get(filename));
             String newFilename = FilenameUtils.getBaseName(filename) + " (Copy)";
-            newFilename = Utils.makeUniqueName(presetFiles::containsKey, newFilename, "json", "%s_%d");
-            Path presetsDir = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("presets");
             newFilename = Utils.makeUniqueName(fName ->
-                            (updatedPresets.contains(fName) || Files.exists(presetsDir.resolve(fName))) && !deletedPresets.contains(fName),
+                            (presetFiles.containsKey(fName) || updatedPresets.contains(fName) || Files.exists(PRESETS_PATH.resolve(fName))) && !deletedPresets.contains(fName),
                     newFilename, "json", "%s_%d"
             );
+            updatedPresets.add(newFilename);
+            deletedPresets.remove(newFilename);
             presets.put(newFilename, preset);
             presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
             return newFilename;

@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.colors.ColorUtils;
 import rh.maparthelper.conversion.colors.MapColorEntry;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
@@ -41,7 +42,10 @@ public class MapartImageConverter {
 
     private final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
-    private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("Mart Helper Image").build());
+    private static final ExecutorService convertingExecutor = Executors.newSingleThreadExecutor(
+            new ThreadFactoryBuilder().setNameFormat(MapartHelper.MOD_NAME + "/Image Converter")
+                    .build()
+    );
     private static Future<?> currentConvertingFuture;
 
     public static void readAndUpdateMapartImage(Path path) {
@@ -279,7 +283,10 @@ public class MapartImageConverter {
                 bufferedImage = preprocessImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D());
+                if (PaletteConfigManager.presetsConfig.getCurrentPresetColors().isEmpty())
+                    bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                else
+                    convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D());
                 if (Thread.currentThread().isInterrupted()) return;
 
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
@@ -293,7 +300,7 @@ public class MapartImageConverter {
                 }
 
             } catch (Exception e) {
-                CurrentConversionSettings.imagePath = null;
+                CurrentConversionSettings.resetMapart();
                 MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
                 throw new RuntimeException(e);
             } finally {

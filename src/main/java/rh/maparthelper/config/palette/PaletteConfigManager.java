@@ -4,7 +4,6 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import org.apache.commons.io.FilenameUtils;
@@ -21,8 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import static rh.maparthelper.MapartHelper.CONFIG_PATH;
+
 public class PaletteConfigManager {
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID);
+    final static Path PRESETS_PATH = CONFIG_PATH.resolve("presets");
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
@@ -96,10 +97,9 @@ public class PaletteConfigManager {
 
     private static boolean removeUnexist() {
         boolean hasChanges = false;
-        Path presetsPath = CONFIG_PATH.resolve("presets");
         var it = presetsConfig.presetFiles.keySet().iterator();
         while (it.hasNext()) {
-            Path presetPath = presetsPath.resolve(it.next());
+            Path presetPath = PRESETS_PATH.resolve(it.next());
             if (!Files.exists(presetPath)) {
                 it.remove();
                 hasChanges = true;
@@ -111,10 +111,12 @@ public class PaletteConfigManager {
     private static boolean validatePresetsConfig() {
         boolean hasChanges = false;
         if (presetsConfig.presetFiles.isEmpty()) {
+            MapartHelper.LOGGER.info("No preset files found, generating a default");
             presetsConfig.currentPresetFile = presetsConfig.createDefaultPreset();
             savePresetFiles();
             hasChanges = true;
         } else if (!presetsConfig.presetFiles.containsKey(presetsConfig.currentPresetFile)) {
+            MapartHelper.LOGGER.info("Selected preset file \"{}\" is no longer exist, switching current preset", presetsConfig.currentPresetFile);
             presetsConfig.currentPresetFile = presetsConfig.presetFiles.keySet().iterator().next();
             hasChanges = true;
         }
@@ -131,12 +133,12 @@ public class PaletteConfigManager {
 
     private static boolean readPresetsFiles() {
         boolean hasChanges = false;
-        Path presetsPath = CONFIG_PATH.resolve("presets");
-        if (!Files.exists(presetsPath))
+        if (!Files.exists(PRESETS_PATH))
             return false;
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(presetsPath, "*.json")) {
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(PRESETS_PATH, "*.json")) {
             for (Path path : stream) {
                 try (FileReader reader = new FileReader(path.toFile())) {
+                    MapartHelper.LOGGER.info("Reading JSON file: \"{}\"", path);
                     PalettePresetsConfig.PalettePreset preset = gson.fromJson(reader, PalettePresetsConfig.PalettePreset.class);
                     if (preset == null || preset.colors == null) {
                         MapartHelper.LOGGER.info("JSON file \"{}\" is not a preset, ignoring", path);
@@ -167,9 +169,8 @@ public class PaletteConfigManager {
 
     private static void savePresetFiles() {
         try {
-            Path presetsPath = CONFIG_PATH.resolve("presets");
-            if (!Files.exists(presetsPath)) {
-                Files.createDirectory(presetsPath);
+            if (!Files.exists(PRESETS_PATH)) {
+                Files.createDirectory(PRESETS_PATH);
             }
             for (var entry : presetsConfig.presetFiles.entrySet()) {
                 savePresetFile(entry.getKey());
@@ -180,19 +181,19 @@ public class PaletteConfigManager {
     }
 
     public static void savePresetFile(String filename) {
-        Path presetsPath = CONFIG_PATH.resolve("presets");
-        try (FileWriter writer = new FileWriter(presetsPath.resolve(filename).toFile())) {
+        Path presetFilePath = PRESETS_PATH.resolve(filename);
+        try (FileWriter writer = new FileWriter(presetFilePath.toFile())) {
+            MapartHelper.LOGGER.info("Saving preset \"{}\" JSON file: \"{}\"", presetsConfig.presetFiles.get(filename), presetFilePath);
             PalettePresetsConfig.PalettePreset preset = presetsConfig.presets.get(filename);
             gson.toJson(preset, writer);
         } catch (IOException e) {
-            MapartHelper.LOGGER.error("Failed to write preset \"{}\"", filename, e);
+            MapartHelper.LOGGER.error("Failed to write preset \"{}\" to file \"{}\"", filename, presetFilePath, e);
         }
     }
 
     public static void deletePresetFile(String filename) {
         try {
-            Path presetsPath = CONFIG_PATH.resolve("presets");
-            Files.delete(presetsPath.resolve(filename));
+            Files.delete(PRESETS_PATH.resolve(filename));
         } catch (IOException e) {
             MapartHelper.LOGGER.error("Failed to delete preset \"{}\"", filename, e);
         }
