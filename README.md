@@ -49,5 +49,5 @@ Please keep this in mind if you want to use both tools for the same mapart.
 - [GitHub](https://github.com/Redheris/Mapart-Helper/)
 
 ## Contacts
-- GitHub: https://github.com/Redheris/PreventBuild/issues
+- GitHub: https://github.com/Redheris/Mapart-Helper/issues
 - Discord: [Server](https://discord.gg/QTykTF8D5p) or @redheris
