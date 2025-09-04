@@ -21,6 +21,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     private int visibleTopY;
     private boolean needRelayout = false;
     protected boolean leftScroll = false;
+    private int scrollBarColor = 0xFFC8C8C8;
 
     public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int scrollWidth) {
         super(x, y, width, height, Text.empty());
@@ -32,6 +33,10 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     public void setLeftScroll(boolean leftScroll) {
         this.leftScroll = leftScroll;
+    }
+
+    public void setScrollBarColor(int color) {
+        this.scrollBarColor = color;
     }
 
     @Override
@@ -120,7 +125,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
             int j = this.getScrollbarThumbHeight();
             int k = this.getScrollbarThumbY();
             context.fill(i, this.getY(), i + scrollWidth, getY() + this.getHeight(), 0xFF555555);
-            context.fill(i, k, i + scrollWidth, k + j, 0xFFA8A8A8);
+            context.fill(i, k, i + scrollWidth, k + j, scrollBarColor);
         }
     }
 

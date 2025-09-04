@@ -34,6 +34,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
                 menuWidth, this.maxMenuHeight, 4
         );
         menu.visible = false;
+        menu.setScrollBarColor(0xFFFCFCFC);
         menu.grid.getMainPositioner().margin(2, 2, 0, 2);
         menu.grid.setRowSpacing(-2);
         this.menuAdder = this.menu.grid.createAdder(1);
