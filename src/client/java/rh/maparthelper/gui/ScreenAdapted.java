@@ -64,6 +64,11 @@ public abstract class ScreenAdapted extends Screen {
             selectedTextWidget = null;
         }
         Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
+        if (optional.isEmpty()) {
+            this.setFocused(null);
+            collapseDropdown();
+            return false;
+        }
 
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         if (dropdownMenu != null) {
@@ -73,7 +78,6 @@ public abstract class ScreenAdapted extends Screen {
         }
         collapseDropdown();
 
-        if (optional.isEmpty()) return false;
         Element element = optional.get();
 
         if (element instanceof ScrollableGridWidget layout) {
@@ -81,7 +85,7 @@ public abstract class ScreenAdapted extends Screen {
             layout.grid.forEachChild(elements::add);
 
             for (ClickableWidget w : elements) {
-                if (w.isMouseOver(mouseX, mouseY) && w instanceof TextFieldWidget) {
+                if (w != selectedTextWidget && w.isMouseOver(mouseX, mouseY) && w instanceof TextFieldWidget) {
                     element = w;
                     break;
                 }
@@ -92,6 +96,7 @@ public abstract class ScreenAdapted extends Screen {
             if (element.isFocused()) {
                 return element.mouseClicked(mouseX, mouseY, button);
             }
+
             selectedTextWidget = textField;
             this.setFocused(textField);
             if (button == 0) {
