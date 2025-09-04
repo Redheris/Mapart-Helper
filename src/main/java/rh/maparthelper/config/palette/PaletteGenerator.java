@@ -155,17 +155,23 @@ public class PaletteGenerator {
     }
 
     public static PalettePresetsConfig.PalettePreset getDefaultPreset() {
-        Map<MapColor, Block> palette = PaletteConfigManager.completePalette.palette.entrySet().stream()
+        Map<Integer, List<Block>> completePalette = PaletteConfigManager.completePalette.palette;
+        Map<MapColor, Block> palette = completePalette.entrySet().stream()
                 .filter(entry -> !entry.getValue().isEmpty())
                 .collect(Collectors.toMap(
                         entry -> MapColor.get(entry.getKey()),
-                        entry -> entry.getValue().getFirst()
+                        entry -> entry.getValue().isEmpty() ? Blocks.AIR : entry.getValue().getFirst()
                 ));
-        palette.put(MapColor.PALE_GREEN, Blocks.GRASS_BLOCK);
+
         palette.remove(MapColor.WATER_BLUE);
-        palette.put(MapColor.OAK_TAN, Blocks.OAK_PLANKS);
-        palette.put(MapColor.GOLD, Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE);
-        palette.put(MapColor.SPRUCE_BROWN, Blocks.SPRUCE_PLANKS);
+        if (completePalette.get(MapColor.PALE_GREEN.id).contains(Blocks.GRASS_BLOCK))
+            palette.replace(MapColor.OAK_TAN, Blocks.GRASS_BLOCK);
+        if (completePalette.get(MapColor.PALE_GREEN.id).contains(Blocks.OAK_PLANKS))
+            palette.replace(MapColor.GOLD, Blocks.OAK_PLANKS);
+        if (completePalette.get(MapColor.PALE_GREEN.id).contains(Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE))
+            palette.replace(MapColor.SPRUCE_BROWN, Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE);
+        if (completePalette.get(MapColor.PALE_GREEN.id).contains(Blocks.SPRUCE_PLANKS))
+            palette.replace(MapColor.SPRUCE_BROWN, Blocks.SPRUCE_PLANKS);
 
         return new PalettePresetsConfig.PalettePreset(palette);
     }
