@@ -14,7 +14,7 @@ import java.util.*;
 
 public class PalettePresetsConfig {
     String currentPresetFile;
-    public Map<String, String> presetFiles = new HashMap<>();
+    public Map<String, String> presetFiles = new TreeMap<>();
     transient Map<String, @NotNull PalettePreset> presets = new HashMap<>();
 
     static PalettePresetsConfig createDefaultConfig() {
@@ -72,8 +72,8 @@ public class PalettePresetsConfig {
     public static class Editable extends PalettePresetsConfig {
         public Editable(PalettePresetsConfig config) {
             this.currentPresetFile = config.currentPresetFile;
-            this.presetFiles = new HashMap<>(config.presetFiles);
-            this.presets = new HashMap<>(config.presets);
+            this.presetFiles = new TreeMap<>(config.presetFiles);
+            this.presets = new TreeMap<>(config.presets);
         }
 
         public void setCurrentPreset(String presetFilename) {
