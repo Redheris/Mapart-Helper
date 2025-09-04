@@ -1,10 +1,14 @@
  # <img src="src/main/resources/assets/maparthelper/icon.png" width="96" alt="icon"> Mapart Helper
 
+> Note: The mod is still quite new and needs more testing and polishing.
+> If you run into any bugs or rough edges, please report them on the
+> [Issues](https://github.com/Redheris/Mapart-Helper/issues) page — your feedback will be a huge help.
+
+
 Mapart Helper aims to make working with maparts as convenient and enjoyable as possible.
-It provides a user-friendly interface for generating a mapart from an image and settings
-for image preprocessing.
-By default, you can open the screen with the **Y** key. This can
-be changed at the setting. 
+It provides a user-friendly interface for generating maparts from images.
+By default, you can open the screen with the `Y` key (This can
+be changed at the setting).
 
 The mod generates palette directly from the client, giving you a complete list of blocks
 available for each specific color.
@@ -14,16 +18,16 @@ displaying beams at the starting coordinates of map areas.
 
 ## Commands
 The following commands can be used everywhere, including servers:
-- /mart beams - Toggles displaying the beams at the map areas' start points
-- /mart save frame \[filename\] - Saves the map's image you are looking at to the `saved_maps` folder
-- /mart save hand \[filename\] - Saves the map's image you are looking at to the `saved_maps` folder
-- /mart save selection \[filename\] - Saves the image from the selection area to the `saved_maps` folder
-- /mart palette regenerate - Regenerates blocks palette
-- /mart palette update - Updates palette and presets from config files
+- `/mart beams` - Toggles displaying the beams at the map areas' start points
+- `/mart save frame [filename]` - Saves the map's image you are looking at to the `saved_maps` folder
+- `/mart save hand [filename]` - Saves the map's image you are looking at to the `saved_maps` folder
+- `/mart save selection [filename]` - Saves the image from the selection area to the `saved_maps` folder
+- `/mart palette regenerate` - Regenerates blocks palette
+- `/mart palette update` - Updates palette and presets from config files
 
-There are also some miscellaneous singleplayer-only commands:
-- /mart-creative palette give-map-palette - Replaces an image of the holding filled map with the image of the complete palette
-- /mart-creative palette place <height> - Places all blocks from the generated blocks palette into the world from the current map area's starting coordinates and at the given y-coordinate
+There are also several miscellaneous singleplayer-only commands, almost for debugging or for some unique cases:
+- `/mart-creative palette give-map-palette` - Replaces an image of the holding filled map with the image of the complete palette
+- `/mart-creative palette place <height>` - Places all blocks from the generated blocks palette into the world from the current map area's starting coordinates and at the given y-coordinate
 
 ### Rebane's MapartCraft
 As someone who builds maparts in survival, I have always used this great website for that purpose.

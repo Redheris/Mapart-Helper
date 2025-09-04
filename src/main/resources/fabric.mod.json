@@ -3,7 +3,7 @@
 	"id": "mapart-helper",
 	"version": "${version}",
 	"name": "Mapart Helper",
-	"description": "Aims to improve the experience of working with maparts in the game: flexibly generate a schematic, save map textures as an image file, and more",
+	"description": "Aims to to make mapart creation as convenient and enjoyable as possible right in the game: flexibly generate a schematic, save maps as an image files, and more",
 	"authors": [
 		"Redheris"
 	],
@@ -31,8 +31,5 @@
 		"java": ">=21",
 		"fabric-api": "*",
 		"cloth-config": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
