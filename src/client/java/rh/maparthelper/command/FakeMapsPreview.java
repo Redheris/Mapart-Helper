@@ -30,7 +30,6 @@ public class FakeMapsPreview {
         for (int[] map : maps) {
             addFakeItemFrame(map, player);
         }
-        showFakeFrames(player, CurrentConversionSettings.getWidth(), CurrentConversionSettings.getHeight());
         return true;
     }
 
