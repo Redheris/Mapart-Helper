@@ -112,10 +112,15 @@ public class PalettePresetsConfig {
             return this;
         }
 
-        public String duplicatePreset(String filename) {
+        public String duplicatePreset(String filename, Set<String> updatedPresets, Set<String> deletedPresets) {
             PalettePreset preset = new PalettePreset(presets.get(filename));
             String newFilename = FilenameUtils.getBaseName(filename) + " (Copy)";
             newFilename = Utils.makeUniqueName(presetFiles::containsKey, newFilename, "json", "%s_%d");
+            Path presetsDir = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID).resolve("presets");
+            newFilename = Utils.makeUniqueName(fName ->
+                            (updatedPresets.contains(fName) || Files.exists(presetsDir.resolve(fName))) && !deletedPresets.contains(fName),
+                    newFilename, "json", "%s_%d"
+            );
             presets.put(newFilename, preset);
             presetFiles.put(newFilename, presetFiles.get(filename) + " (Copy)");
             return newFilename;

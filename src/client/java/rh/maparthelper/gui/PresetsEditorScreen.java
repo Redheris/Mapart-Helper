@@ -218,26 +218,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.addDrawableChild(colorsEditor);
     }
 
-    private void changeEditingPreset(String presetFile) {
-        this.editingPreset = presetFile;
-        this.presetNameField.setText(presetsConfig.presetFiles.get(presetFile));
-    }
-
-    private void updateFiles() {
-        PaletteConfigManager.updateCompletePalette();
-        PaletteConfigManager.readPresetsConfigFile();
-
-        this.presetsConfig = PaletteConfigManager.presetsConfig.getEditable();
-        this.editingPreset = presetsConfig.getCurrentPresetFilename();
-
-        this.deletedPresets.clear();
-        this.updatedPresets.clear();
-        clearAndInit();
-    }
-
     private void duplicatePreset() {
-        String newPreset = presetsConfig.duplicatePreset(editingPreset);
+        String newPreset = presetsConfig.duplicatePreset(editingPreset, updatedPresets, deletedPresets);
         updatedPresets.add(newPreset);
+        deletedPresets.remove(newPreset);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);
         clearAndInit();
@@ -250,9 +234,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         if (configEmptied) {
             updatedPresets.clear();
             updatedPresets.add(updatedConfig.getCurrentPresetFilename());
-            if (updatedConfig.getCurrentPresetFilename().equals(editingPreset)) {
-                deletedPresets.remove(editingPreset);
-            }
+            deletedPresets.remove(updatedConfig.getCurrentPresetFilename());
             presetsConfig = updatedConfig;
         } else {
             updatedPresets.remove(editingPreset);
@@ -268,6 +250,23 @@ public class PresetsEditorScreen extends ScreenAdapted {
         deletedPresets.remove(newPreset);
         presetsListDropdown = null;
         changeEditingPreset(newPreset);
+        clearAndInit();
+    }
+
+    private void changeEditingPreset(String presetFile) {
+        this.editingPreset = presetFile;
+        this.presetNameField.setText(presetsConfig.presetFiles.get(presetFile));
+    }
+
+    private void updateFiles() {
+        PaletteConfigManager.updateCompletePalette();
+        PaletteConfigManager.readPresetsConfigFile();
+
+        this.presetsConfig = PaletteConfigManager.presetsConfig.getEditable();
+        this.editingPreset = presetsConfig.getCurrentPresetFilename();
+
+        this.deletedPresets.clear();
+        this.updatedPresets.clear();
         clearAndInit();
     }
 
