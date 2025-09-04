@@ -4,20 +4,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.PresetsEditorScreen;
-import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,29 +67,25 @@ public class BlockItemWidget extends ClickableWidget {
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         ItemStack blockItem = this.blockItem.getDefaultStack();
-        Matrix3x2fStack matrixStack = context.getMatrices();
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        KeyedItemRenderState keyedItemRenderState = new KeyedItemRenderState();
-        mc.getItemModelManager().clearAndUpdate(keyedItemRenderState, blockItem, ItemDisplayContext.GUI, mc.world, mc.player, 0);
-        ItemGuiElementRenderState itemRenderState = new ItemGuiElementRenderState(
-                blockItem.getItem().getName().toString(),
-                new Matrix3x2f(matrixStack),
-                keyedItemRenderState,
-                x, y,
-                context.scissorStack.peekLast()
-        );
-        context.state.addSpecialElement(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
-                itemRenderState,
-                x, y,
-                x + width, y + height,
-                squareSize
-        ));
+        Matrix3x2fStack matrixStack = context.getMatrices();
+        matrixStack.pushMatrix();
+
+        if (MapartHelper.commonConfig.scaleBlockWidgets) {
+            matrixStack.translate(x, y);
+            matrixStack.scale(squareSize / 16f, squareSize / 16f);
+            matrixStack.translate(-x, -y);
+        } else {
+            matrixStack.translate(4, 4);
+        }
+        context.drawItem(blockItem, x, y);
+
+        matrixStack.popMatrix();
 
         boolean isMouseOverBlock = mouseX >= x
-                && mouseX < x + width
+                && mouseX < x + squareSize
                 && mouseY >= y
-                && mouseY < y + height;
+                && mouseY < y + squareSize;
         if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
             context.drawTooltip(this.tooltip, mouseX, mouseY);
         }
