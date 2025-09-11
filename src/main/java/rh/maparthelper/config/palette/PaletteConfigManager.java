@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +48,11 @@ public class PaletteConfigManager {
         try (FileReader reader = new FileReader(completePaletepath.toFile())) {
             completePalette = gson.fromJson(reader, CompletePalette.class);
             if (completePalette != null) {
+                completePalette.palette.replaceAll((color, blocks) ->
+                        blocks.stream()
+                                .filter(b -> b != Blocks.AIR)
+                                .toList()
+                );
                 PaletteGenerator.initARGBMapColor(completePalette.palette);
                 return true;
             }
