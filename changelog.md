@@ -5,6 +5,7 @@
 <details>
 <summary>Fixes and minor changes</summary>
 
-- Fixed reading air and unexisting blocks from complete_palette.json
+- Fixed reading air and unexisting blocks from complete_palette.json;
+- The Valley staircasing algorithm has been rewritten and optimized;
 
 </details>

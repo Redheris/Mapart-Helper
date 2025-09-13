@@ -1,7 +1,6 @@
 package rh.maparthelper.conversion.staircases;
 
 import net.minecraft.block.MapColor;
-import rh.maparthelper.config.palette.PaletteColors;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,13 +10,9 @@ public class Valley3DStaircase implements IMapartStaircase {
 
     @Override
     public List<List<Integer>> getStaircase(int[][] colors) {
+        int[][] brights = getBrightnesses(colors);
         int height = colors.length + 1;
         int width = colors[0].length;
-
-        List<List<Integer>> highBrightnessStairs = new ArrayList<>();
-        for (int i = 0; i < width; i++) {
-            highBrightnessStairs.add(new ArrayList<>());
-        }
 
         List<List<Integer>> staircase = new ArrayList<>();
         for (int z = 0; z < height; z++) {
@@ -25,63 +20,71 @@ public class Valley3DStaircase implements IMapartStaircase {
             staircase.add(row);
         }
 
-        for (int x = 0; x < width; x++) {
-            for (int z = height - 2; z >= 0; z--) {
-                if (z > 1 && colors[z - 1][x] == 0) continue;
-                while (z > 0 && getBrightness(colors, x, z) != MapColor.Brightness.HIGH) {
-                    staircase.get(z).set(x, staircase.get(z + 1).get(x) + getHeightShift(colors, x, z));
-                    z--;
-                }
-
-                staircase.get(z).set(x, staircase.get(z + 1).get(x) + getHeightShift(colors, x, z));
-                if (z == 0 || colors[z - 1][x] == 0) continue;
-
-                highBrightnessStairs.get(x).add(z - 1);
-                while (z > 0 && getBrightness(colors, x, z) == MapColor.Brightness.HIGH) {
-                    z--;
-                }
-                highBrightnessStairs.get(x).add(z + 1);
-            }
-        }
-
-        for (int x = 0; x < highBrightnessStairs.size(); x++) {
-            List<Integer> col = highBrightnessStairs.get(x).reversed();
-            for (int i = 0; i < col.size(); i += 2) {
-                int z0 = col.get(i);
-                int z1 = col.get(i + 1);
-                int aboveHeight = z0 == 0 ? 1 : staircase.get(z0 - 1).get(x) + 1;
-                if (z0 > 1 && colors[z0 - 2][x] == 0)
-                    aboveHeight = 0;
-                for (int z = z0; z <= z1; z++) {
-                    staircase.get(z).set(x, aboveHeight++);
-                }
-                aboveHeight--;
-
-                if (aboveHeight >= staircase.get(z1 + 1).get(x)) {
-                    staircase.get(++z1).set(x, ++aboveHeight);
-                }
-                while (z1 < staircase.size() - 1 && colors[z1][x] != 0 && getBrightness(colors, x, z1 + 1) == MapColor.Brightness.NORMAL) {
-                    staircase.get(++z1).set(x, aboveHeight);
-                }
-            }
-        }
-        int z = height - 1;
-        for (int x = 0; x < width; x++) {
-            if (getBrightness(colors, x, z) == MapColor.Brightness.HIGH)
-                staircase.get(z).set(x, staircase.get(z - 1).get(x) + 1);
+        for (int column = 0; column < width; column++) {
+            applyValleyToColumn(brights, staircase, column);
         }
 
         return staircase;
     }
 
-    private static MapColor.Brightness getBrightness(int[][] colors, int x, int z) {
-        return PaletteColors.getMapColorEntryByARGB(colors[z - 1][x]).brightness();
-    }
+    static void applyValleyToColumn(int[][] brights, List<List<Integer>> staircase, int col) {
+        final int LOW = MapColor.Brightness.LOW.id;
+        final int HIGH = MapColor.Brightness.HIGH.id;
+        int row = staircase.size() - 1;
 
-    private static int getHeightShift(int[][] colors, int x, int z) {
-        if (z == colors.length) return 0;
-        MapColor.Brightness brightness = getBrightness(colors, x, z + 1);
-        if (brightness == MapColor.Brightness.LOW) return 1;
-        return 0;
+        // Forward pass (ascending stairs)
+        while (row > 0) {
+            int prev = brights[row - 1][col];
+            row--;
+            if (prev == LOW) { // Structuring an ascending stairs
+                while (row >= 0 && prev != HIGH) {
+                    int prevH = staircase.get(row + 1).get(col);
+                    if (prev == LOW) {
+                        staircase.get(row).set(col, prevH + 1);
+                    } else {
+                        staircase.get(row).set(col, prevH);
+                    }
+                    if (row == 0) break;
+                    prev = brights[row - 1][col];
+                    row--;
+                }
+            }
+        }
+
+        // Backward pass (descending stairs)
+        row = 1;
+        while (row < staircase.size()) {
+            int cur = brights[row - 1][col];
+            int next = row < brights.length ? brights[row][col] : -1;
+            if (cur == HIGH && staircase.get(row).get(col) == 0) { // Structuring a descending stairs
+                while (row < staircase.size() && next != LOW && staircase.get(row).get(col) == 0) {
+                    int prevH = staircase.get(row - 1).get(col);
+                    if (cur == HIGH) {
+                        staircase.get(row).set(col, prevH + 1);
+                    } else {
+                        staircase.get(row).set(col, prevH);
+                    }
+                    if (row >= brights.length) break;
+                    row++;
+                    cur = brights[row - 1][col];
+                    next = row < brights.length ? brights[row][col] : -1;
+                }
+
+                // Adjustment of boundary blocks
+                if (cur != LOW && row < staircase.size() - 1) {
+                    if (cur == HIGH) {
+                        staircase.get(row).set(col,
+                                Math.max(staircase.get(row).get(col), staircase.get(row - 1).get(col) + 1)
+                        );
+                    }
+                    while (next == 1) {
+                        row++;
+                        staircase.get(row).set(col, staircase.get(row - 1).get(col));
+                        next = brights[row][col];
+                    }
+                }
+            }
+            row++;
+        }
     }
 }
