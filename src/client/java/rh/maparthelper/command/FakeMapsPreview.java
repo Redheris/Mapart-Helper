@@ -17,7 +17,7 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
-import rh.maparthelper.conversion.colors.MapColorEntry;
+import rh.maparthelper.colors.MapColorEntry;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {

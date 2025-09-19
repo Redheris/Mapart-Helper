@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.colors;
+package rh.maparthelper.colors;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

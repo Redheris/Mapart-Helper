@@ -57,7 +57,7 @@
   "maparthelper.gui.isOff": "Off",
   "maparthelper.gui.useLAB_tooltip": "Improves color matching. May slow down processing, so for medium and large maparts it's recommended to apply §cafter configuring other settings",
   "maparthelper.gui.previewMapart":  "Mapart",
-  "maparthelper.gui.previewOriginal": "Original (no color adaption)",
+  "maparthelper.gui.previewOriginal": "Without color adaption",
   "maparthelper.gui.previewMode": "Preview mode:",
   "maparthelper.gui.current_preset_label": "Current preset:",
   "maparthelper.gui.material_list_label": "Material list",

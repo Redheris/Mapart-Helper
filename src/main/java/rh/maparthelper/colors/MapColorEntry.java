@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.colors;
+package rh.maparthelper.colors;
 
 import net.minecraft.block.MapColor;
 

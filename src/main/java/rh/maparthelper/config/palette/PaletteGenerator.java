@@ -7,7 +7,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.state.property.Properties;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.conversion.colors.MapColorEntry;
+import rh.maparthelper.colors.MapColorEntry;
 
 import java.util.*;
 import java.util.stream.Collectors;
