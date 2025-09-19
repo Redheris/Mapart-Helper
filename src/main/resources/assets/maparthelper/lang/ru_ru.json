@@ -56,6 +56,9 @@
   "maparthelper.gui.isOn": "Вкл",
   "maparthelper.gui.isOff": "Выкл",
   "maparthelper.gui.useLAB_tooltip": "Улучшает подбор цветов. Влияет на скорость обработки, поэтому для средних и больших мапартов рекомендуется применять §cпосле настройки остальных параметров",
+  "maparthelper.gui.previewMapart":  "Мапарт",
+  "maparthelper.gui.previewOriginal": "Без адаптации цветов",
+  "maparthelper.gui.previewMode": "Режим предпросмотра:",
   "maparthelper.gui.current_preset_label": "Текущий пресет:",
   "maparthelper.gui.material_list_label": "Список материалов",
   "maparthelper.aux_block": "Вспомогательный блок",
@@ -73,6 +76,7 @@
   "maparthelper.gui.saveEveryNBT": "Сохранить NBT каждой карты",
   "maparthelper.gui.saveZip": "Сохранить NBT в архиве",
   "maparthelper.gui.save_mapart_as": "Сохранить мапарт как...",
+
   "maparthelper.gui.preset": "Пресет:",
   "maparthelper.gui.presets.choose_preset": "Выбрать пресет",
   "maparthelper.gui.presets.preset_name": "Название пресета",

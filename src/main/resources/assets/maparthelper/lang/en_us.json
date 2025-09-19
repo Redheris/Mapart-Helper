@@ -56,6 +56,9 @@
   "maparthelper.gui.isOn": "On",
   "maparthelper.gui.isOff": "Off",
   "maparthelper.gui.useLAB_tooltip": "Improves color matching. May slow down processing, so for medium and large maparts it's recommended to apply §cafter configuring other settings",
+  "maparthelper.gui.previewMapart":  "Mapart",
+  "maparthelper.gui.previewOriginal": "Original (no color adaption)",
+  "maparthelper.gui.previewMode": "Preview mode:",
   "maparthelper.gui.current_preset_label": "Current preset:",
   "maparthelper.gui.material_list_label": "Material list",
   "maparthelper.aux_block": "Auxiliary block",
@@ -73,6 +76,7 @@
   "maparthelper.gui.saveEveryNBT": "Save NBT for each map",
   "maparthelper.gui.saveZip": "Save NBT in a ZIP archive",
   "maparthelper.gui.save_mapart_as": "Save mapart as...",
+
   "maparthelper.gui.preset": "Preset",
   "maparthelper.gui.presets.choose_preset": "Choose preset",
   "maparthelper.gui.presets.preset_name": "Preset name",

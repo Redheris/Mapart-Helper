@@ -57,7 +57,9 @@ public class MapartImageConverter {
             future = new FutureTask<>(new ConvertImageFileRunnable(path, logExecutionTime), null);
         }
 
-        if (currentConvertingFuture != null)
+        // A very crutch to make moving the cropping frame faster
+        // TODO: Replace this dozen-threads-per-time crutch with caching the image and shifting within it
+        if (!MapartHelper.conversionSettings.showOriginalImage && currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
         currentConvertingFuture = convertingExecutor.submit(future);
     }
@@ -136,9 +138,6 @@ public class MapartImageConverter {
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
     public static void convertToBlocksPalette(BufferedImage image, boolean use3D) {
-        PaletteColors.clearColorCache();
-        colorsCounter.clear();
-
         int width = image.getWidth();
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         double progressStep = 1.0 / pixels.length;
@@ -283,10 +282,14 @@ public class MapartImageConverter {
                 bufferedImage = preprocessImage(bufferedImage);
                 if (Thread.currentThread().isInterrupted()) return;
 
-                if (PaletteConfigManager.presetsConfig.getCurrentPresetColors().isEmpty())
-                    bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                else
-                    convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D());
+                PaletteColors.clearColorCache();
+                colorsCounter.clear();
+                if (!MapartHelper.conversionSettings.showOriginalImage) {
+                    if (PaletteConfigManager.presetsConfig.getCurrentPresetColors().isEmpty())
+                        bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    else
+                        convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D());
+                }
                 if (Thread.currentThread().isInterrupted()) return;
 
                 NativeImage image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);

@@ -132,7 +132,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         super.init();
         settingsLeft = DirectionalLayoutWidget.vertical();
         settingsLeft.setPosition(5, 20);
-        Positioner settingLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
+        Positioner settingsLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
 
         TextFieldWidget mapartName = createTextInputFieldWidget(baseElementWidth, CurrentConversionSettings.mapartName, -1);
         mapartName.setChangedListener(value -> {
@@ -149,7 +149,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             CurrentConversionSettings.mapartName = value;
         });
         settingsLeft.add(new TextWidget(Text.translatable("maparthelper.gui.mapart_name_field"), textRenderer));
-        settingsLeft.add(mapartName, settingLeftPositioner.copy().marginTop(0));
+        settingsLeft.add(mapartName, settingsLeftPositioner.copy().marginTop(0));
 
         GridWidget size = createSizeSettingsGrid();
         settingsLeft.add(size);
@@ -165,6 +165,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         settingsLeftScrollable.grid.getMainPositioner().marginTop(5);
         GridWidget.Adder adder = settingsLeftScrollable.grid.createAdder(1);
+
+        Text previewMapart = Text.translatable("maparthelper.gui.previewMapart");
+        Text previewOriginal = Text.translatable("maparthelper.gui.previewOriginal").formatted(Formatting.GOLD);
+        ButtonWidget previewMode = ButtonWidget.builder(
+                MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart,
+                (btn) -> {
+                    MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
+                    btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
+                    MapartImageConverter.updateMapart();
+                }
+        ).size(baseElementWidth, 20).build();
+        adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
+        adder.add(previewMode, settingsLeftPositioner.copy().marginTop(0));
 
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
@@ -240,7 +253,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         adder.add(
                 new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),
-                settingLeftPositioner.copy().marginTop(15)
+                settingsLeftPositioner.copy().marginTop(15)
         );
         String currentAuxBlock = Registries.BLOCK.getId(MapartHelper.conversionSettings.auxBlock).toString();
         if (currentAuxBlock.contains("minecraft:"))

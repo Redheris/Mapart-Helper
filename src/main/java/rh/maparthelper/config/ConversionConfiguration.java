@@ -14,6 +14,7 @@ public class ConversionConfiguration implements ConfigData {
     public Block auxBlock = Blocks.NETHERRACK;
     public DitheringAlgorithms ditheringAlgorithm = DitheringAlgorithms.NONE;
     public transient boolean useLAB = false;
+    public transient boolean showOriginalImage = false;
 
     public boolean use3D() {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
