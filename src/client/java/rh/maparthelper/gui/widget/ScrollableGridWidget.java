@@ -95,8 +95,10 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        if (overflows()) {
-            return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        if (parentWidget == null || parentWidget.isMouseOver(mouseX, mouseY)) {
+            if (overflows()) {
+                return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            }
         }
         return parentWidget != null && parentWidget.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
