@@ -7,9 +7,11 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import org.joml.Matrix3x2fStack;
+import rh.maparthelper.colors.MapColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageConverter;
@@ -23,8 +25,8 @@ import java.util.Set;
 
 public class PresetsEditorScreen extends ScreenAdapted {
     private final MapartEditorScreen parent;
-    private final int x;
-    private final int y;
+    private final int boxX;
+    private final int boxY;
     private final int marginRight;
     private final int marginBottom;
     private int boxWidth;
@@ -43,8 +45,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
     protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
         super(Text.translatable("maparthelper.gui.presets_editor_screen"));
         this.parent = parent;
-        this.x = x;
-        this.y = y;
+        this.boxX = x;
+        this.boxY = y;
         this.marginRight = marginRight;
         this.marginBottom = marginBottom;
     }
@@ -56,11 +58,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         parent.clearChildren();
         parent.init();
 
-        this.boxWidth = parent.width - x - marginRight;
-        this.boxHeight = parent.height - y - marginBottom;
+        this.boxWidth = parent.width - boxX - marginRight;
+        this.boxHeight = parent.height - boxY - marginBottom;
 
         DirectionalLayoutWidget presetBarLeft = DirectionalLayoutWidget.horizontal();
-        presetBarLeft.setPosition(x + 5, y + 5);
+        presetBarLeft.setPosition(boxX + 5, boxY + 5);
         Positioner presetBarLeftPositioner = presetBarLeft.getMainPositioner().alignVerticalCenter();
 
         TextWidget presetNameLabel = new TextWidget(Text.translatable("maparthelper.gui.preset"), textRenderer);
@@ -122,7 +124,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
 
         DirectionalLayoutWidget presetBarRight = DirectionalLayoutWidget.horizontal();
-        presetBarRight.setPosition(0, y + 5);
+        presetBarRight.setPosition(0, boxY + 5);
         presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(1);
 
         ButtonWidget updateFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.updateFiles())
@@ -142,7 +144,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarRight.add(close);
 
         presetBarRight.refreshPositions();
-        presetBarRight.setX(x + boxWidth - presetBarRight.getWidth());
+        presetBarRight.setX(boxX + boxWidth - presetBarRight.getWidth());
         presetBarRight.forEachChild(this::addDrawableChild);
 
         // =========== Colors editing area ===========
@@ -151,7 +153,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int columns = (boxWidth - 5) / (squareSize + 5);
         colorsEditor = new ScrollableGridWidget(
                 null,
-                x, y + 31,
+                boxX, boxY + 31,
                 boxWidth, boxHeight - 31, 6
         );
         GridWidget colorsGrid = colorsEditor.grid;
@@ -303,10 +305,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         int w = boxWidth;
         int h = boxHeight;
-        context.fill(x, y, x + w, y + h, 0x77000000);
-        context.fill(x, y, x + w, y + 30, 0x44000000);
-        context.drawBorder(x - 1, y - 1, w + 2, h + 2, 0x44FFFFFF);
-        context.drawHorizontalLine(x, x + w - 1, y + 30, 0x77FFFFFF);
+        context.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
+        context.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
+        context.drawBorder(boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
+        context.drawHorizontalLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
 
         super.render(context, mouseX, mouseY, deltaTicks);
     }
@@ -322,28 +324,21 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private static class MapColorWidget extends ClickableWidget {
-        private int x;
-        private int y;
         private final int squareSize;
 
         public final MapColor color;
+        private final Text tooltipColorName;
 
         private MapColorWidget(int x, int y, int squareSize, MapColor color) {
             super(x, y, squareSize, squareSize, Text.empty());
-            this.x = x;
-            this.y = y;
             this.squareSize = squareSize;
             this.color = color;
-        }
-
-        @Override
-        public void setX(int x) {
-            this.x = x;
-        }
-
-        @Override
-        public void setY(int y) {
-            this.y = y;
+            this.tooltipColorName = Text.literal(MapColors.findByMapColor(color).name());
+            if (tooltipColorName.getString().contains("BLACK")) {
+                ((MutableText) tooltipColorName).withColor(MapColor.GRAY.color);
+            } else {
+                ((MutableText) tooltipColorName).withColor(color.color);
+            }
         }
 
         @Override
@@ -352,6 +347,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+            int x = getX();
+            int y = getY();
             if (color == MapColor.WATER_BLUE) {
                 context.fill(x, y, x + squareSize, y + squareSize, color.getRenderColor(MapColor.Brightness.NORMAL));
             } else {
@@ -361,6 +358,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 context.fill(x, y + partHeight * 2, x + squareSize, y + squareSize, color.getRenderColor(MapColor.Brightness.HIGH));
             }
             context.drawBorder(x, y, squareSize, squareSize, 0xFF555555);
+
+            if (context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+                context.drawTooltip(tooltipColorName, mouseX, mouseY);
+            }
         }
     }
 
