@@ -92,4 +92,8 @@ public class CurrentConversionSettings {
         CurrentConversionSettings.croppingFrameWidth = frameWidth;
         CurrentConversionSettings.croppingFrameHeight = frameHeight;
     }
+
+    public static boolean isMapartConverted() {
+        return !MapartHelper.conversionSettings.showOriginalImage && guiMapartImage != null;
+    }
 }

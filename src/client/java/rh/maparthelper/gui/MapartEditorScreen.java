@@ -38,11 +38,16 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
-    DirectionalLayoutWidget settingsLeft;
-    DirectionalLayoutWidget settingsRight;
-    ScrollableGridWidget materialList;
-    MapartPreviewWidget mapartPreview;
+    private DirectionalLayoutWidget settingsLeft;
+    private DirectionalLayoutWidget settingsRight;
+    private ScrollableGridWidget materialList;
+    private MapartPreviewWidget mapartPreview;
     private final int baseElementWidth = 165;
+
+    private ButtonWidget saveNBT;
+    private ButtonWidget saveSplitNBT;
+    private ButtonWidget saveZipNBT;
+    private ButtonWidget showInWorldButton;
 
     private int auxBlockCount = 0;
 
@@ -370,7 +375,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         showGridButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showGrid_tooltip")));
         mapartOptions.add(showGridButton);
 
-        ButtonWidget showInWorldButton = ButtonWidget.builder(
+        showInWorldButton = ButtonWidget.builder(
                 Text.of("\uD83C\uDF0D"),
                 (btn) -> {
                     if (client == null || client.player == null) return;
@@ -387,6 +392,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.of("⟲"),
                 b -> {
                     CurrentConversionSettings.resetMapart();
+                    updateMapartOutputButtons();
                     updateMaterialList();
                 }
         ).size(20, 20).build();
@@ -395,6 +401,8 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         mapartOptions.refreshPositions();
         mapartOptions.forEachChild(this::addDrawableChild);
+
+        updateMapartOutputButtons();
     }
 
     @Override
@@ -573,17 +581,17 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
         ).size(156, 20).build();
 
-        ButtonWidget saveNBT = ButtonWidget.builder(
+        saveNBT = ButtonWidget.builder(
                 Text.translatable("maparthelper.gui.saveNBT"),
                 (btn) -> MapartToNBT.saveNBT(true)
         ).size(156, 20).build();
 
-        ButtonWidget saveSplitNBT = ButtonWidget.builder(
+        saveSplitNBT = ButtonWidget.builder(
                 Text.translatable("maparthelper.gui.saveEveryNBT"),
                 (btn) -> MapartToNBT.saveNBT(false)
         ).size(156, 20).build();
 
-        ButtonWidget saveZipNBT = ButtonWidget.builder(
+        saveZipNBT = ButtonWidget.builder(
                 Text.translatable("maparthelper.gui.saveZip"),
                 (btn) -> MapartToNBT.saveNBTAsZip()
         ).size(156, 20).build();
@@ -596,5 +604,21 @@ public class MapartEditorScreen extends ScreenAdapted {
         saveMapart.addEntry(saveZipNBT);
 
         return saveMapart;
+    }
+
+    public void updateMapartOutputButtons() {
+        boolean active = CurrentConversionSettings.isMapartConverted();
+        saveNBT.active = active;
+        saveSplitNBT.active = active;
+        saveZipNBT.active = active;
+        showInWorldButton.active = active;
+        Tooltip tooltip = null;
+        if (!active) {
+            tooltip = Tooltip.of(Text.translatable("maparthelper.gui.enableColorAdaptation"));
+        }
+        saveNBT.setTooltip(tooltip);
+        saveSplitNBT.setTooltip(tooltip);
+        saveZipNBT.setTooltip(tooltip);
+        showInWorldButton.setTooltip(tooltip);
     }
 }

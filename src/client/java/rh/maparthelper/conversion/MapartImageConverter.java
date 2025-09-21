@@ -310,6 +310,7 @@ public class MapartImageConverter {
                 MinecraftClient.getInstance().execute(() -> {
                     if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen) {
                         editorScreen.updateMaterialList();
+                        editorScreen.updateMapartOutputButtons();
                     }
                 });
             }

@@ -76,6 +76,7 @@
   "maparthelper.gui.saveEveryNBT": "Save NBT for each map",
   "maparthelper.gui.saveZip": "Save NBT in a ZIP archive",
   "maparthelper.gui.save_mapart_as": "Save mapart as...",
+  "maparthelper.gui.enableColorAdaptation": "Color adaptation is disabled or the image is missing",
 
   "maparthelper.gui.preset": "Preset",
   "maparthelper.gui.presets.choose_preset": "Choose preset",

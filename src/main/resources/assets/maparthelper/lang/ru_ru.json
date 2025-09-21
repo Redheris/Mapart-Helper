@@ -76,6 +76,7 @@
   "maparthelper.gui.saveEveryNBT": "Сохранить NBT каждой карты",
   "maparthelper.gui.saveZip": "Сохранить NBT в архиве",
   "maparthelper.gui.save_mapart_as": "Сохранить мапарт как...",
+  "maparthelper.gui.enableColorAdaptation": "Адаптация цветов выключена или изображение отсутствует",
 
   "maparthelper.gui.preset": "Пресет:",
   "maparthelper.gui.presets.choose_preset": "Выбрать пресет",
