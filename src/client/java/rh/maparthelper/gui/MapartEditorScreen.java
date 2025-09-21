@@ -191,7 +191,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 CroppingMode.values()
         );
-        croppingMode.forEachEntry(this::addSelectableChild);
         adder.add(croppingMode);
 
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
@@ -210,7 +209,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 StaircaseStyles.values()
         );
-        staircaseStyle.forEachEntry(this::addSelectableChild);
         adder.add(staircaseStyle);
 
         EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
@@ -227,7 +225,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 DitheringAlgorithms.values()
         );
-        ditheringAlg.forEachEntry(this::addSelectableChild);
         adder.add(ditheringAlg);
 
         Text isOn = Text.translatable("maparthelper.gui.isOn");
@@ -248,7 +245,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         adder.add(useLAB);
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
-        imagePreprocessing.forEachEntry(this::addSelectableChild);
         adder.add(imagePreprocessing);
 
         adder.add(
@@ -310,7 +306,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 UseAuxBlocks.values()
         );
-        useAuxBlocks.forEachEntry(this::addSelectableChild);
         adder.add(useAuxBlocks);
 
         settingsLeftScrollable.refreshPositions();
@@ -333,7 +328,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 PaletteConfigManager.presetsConfig.presetFiles
         );
         settingsRight.add(new TextWidget(Text.translatable("maparthelper.gui.current_preset_label"), textRenderer));
-        presetsList.forEachEntry(this::addSelectableChild);
         settingsRight.add(presetsList, settingsRightPositioner.copy().marginTop(0));
 
         ButtonWidget presetsEditor = ButtonWidget.builder(

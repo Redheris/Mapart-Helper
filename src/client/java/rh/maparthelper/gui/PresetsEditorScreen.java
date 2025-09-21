@@ -81,7 +81,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetsListDropdown.setMenuXOffset(-presetNameField.getWidth());
         presetsListDropdown.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.choose_preset")));
         presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.presetFiles);
-        presetsListDropdown.forEachEntry(this::addSelectableChild);
         presetBarLeft.add(presetsListDropdown);
 
         presetNameField.setChangedListener(value -> {

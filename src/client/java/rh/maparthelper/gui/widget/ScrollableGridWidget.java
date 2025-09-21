@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidget {
     @Nullable
     private final Element parentWidget;
-    public final GridWidget grid;
+    public final InnerGridWidget grid;
     private final int scrollWidth;
     private int visibleTopY;
     private boolean needRelayout = false;
@@ -26,7 +26,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int scrollWidth) {
         super(x, y, width, height, Text.empty());
         this.parentWidget = parentWidget;
-        this.grid = new GridWidget(x, y);
+        this.grid = new InnerGridWidget(x, y);
         this.scrollWidth = scrollWidth;
         this.visibleTopY = y;
     }
@@ -136,8 +136,8 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY)) return false;
         if (this.checkScrollbarDragged(mouseX, mouseY, button)) return true;
 
-        List<ClickableWidget> children = collectChildrenList();
-        for (ClickableWidget child : children) {
+        for (Widget w : grid.children) {
+            if (!(w instanceof ClickableWidget child)) continue;
             if (!child.visible) continue;
             if (child.isMouseOver(mouseX, mouseY)) {
                 Screen currentScreen = MinecraftClient.getInstance().currentScreen;
@@ -155,9 +155,21 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
     }
 
-    private List<ClickableWidget> collectChildrenList() {
-        ArrayList<ClickableWidget> list = new ArrayList<>();
-        this.grid.forEachChild(list::add);
-        return list;
+    public static class InnerGridWidget extends GridWidget {
+        private final List<Widget> children = new ArrayList<>();
+
+        public InnerGridWidget(int x, int y) {
+            super(x, y);
+        }
+
+        public boolean isChild(Widget widget) {
+            return children.contains(widget);
+        }
+
+        @Override
+        public <T extends Widget> T add(T widget, int row, int column, int occupiedRows, int occupiedColumns, Positioner positioner) {
+            children.add(widget);
+            return super.add(widget, row, column, occupiedRows, occupiedColumns, positioner);
+        }
     }
 }

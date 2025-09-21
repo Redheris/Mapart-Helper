@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     public static DropdownMenuWidget expandedOne;
+
     private final Screen parent;
     private final ScrollableGridWidget menu;
     private final GridWidget.Adder menuAdder;
@@ -55,6 +56,10 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     public final void addEntry(ClickableWidget widget) {
         widget.visible = false;
         menuAdder.add(widget);
+    }
+
+    public final boolean isChild(Widget widget) {
+        return widget == menu || menu.grid.isChild(widget);
     }
 
     @Override
