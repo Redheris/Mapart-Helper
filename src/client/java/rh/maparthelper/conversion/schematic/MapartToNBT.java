@@ -47,19 +47,19 @@ public class MapartToNBT {
         if (asSingleFile) {
             maps = new int[][]{CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb()};
         } else {
-            maps = NativeImageUtils.divideMapartByMaps();
+            maps = NativeImageUtils.divideMapartByMaps(CurrentConversionSettings.mapart);
         }
         assert maps != null;
 
         for (int i = 0; i < maps.length; i++) {
-            String filename = CurrentConversionSettings.mapartName;
+            String filename = CurrentConversionSettings.mapart.mapartName;
 
             NbtCompound mapartNbt;
             if (asSingleFile)
                 mapartNbt = NbtSchematicUtils.createMapartNbt();
             else {
                 mapartNbt = NbtSchematicUtils.createMapartNbt(maps[i], 1, 1);
-                filename += " (" + (i % CurrentConversionSettings.getWidth()) + "_" + (i / CurrentConversionSettings.getWidth()) + ")";
+                filename += " (" + (i % CurrentConversionSettings.getMapartWidth()) + "_" + (i / CurrentConversionSettings.getMapartWidth()) + ")";
             }
 
             String writeFilename = Utils.makeUniqueFilename(SCHEMATICS, filename, "nbt");
@@ -79,6 +79,7 @@ public class MapartToNBT {
             }
         }
 
+        String mapartName = CurrentConversionSettings.mapart.mapartName;
         PlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             Text openFile;
@@ -97,14 +98,14 @@ public class MapartToNBT {
             }
             MutableText message;
             if (asSingleFile)
-                message = Text.translatable("maparthelper.nbt_file_saved", CurrentConversionSettings.mapartName, openFile);
+                message = Text.translatable("maparthelper.nbt_file_saved", mapartName, openFile);
             else if (zipOut == null)
-                message = Text.translatable("maparthelper.nbt_files_saved", maps.length, CurrentConversionSettings.mapartName, openFile);
+                message = Text.translatable("maparthelper.nbt_files_saved", maps.length, mapartName, openFile);
             else
-                message = Text.translatable("maparthelper.nbt_zip_saved", maps.length, CurrentConversionSettings.mapartName, openFile);
+                message = Text.translatable("maparthelper.nbt_zip_saved", maps.length, mapartName, openFile);
             player.sendMessage(message.formatted(Formatting.GREEN), false);
         }
-        MapartHelper.LOGGER.info("{} NBT file(s) for \"{}\" successfully saved", maps.length, CurrentConversionSettings.mapartName);
+        MapartHelper.LOGGER.info("{} NBT file(s) for \"{}\" successfully saved", maps.length, mapartName);
     }
 
     public static void saveNBT(boolean asSingleFile) {
@@ -116,7 +117,7 @@ public class MapartToNBT {
     public static void saveNBTAsZip() {
         if (CurrentConversionSettings.guiMapartImage == null)
             return;
-        String filename = Utils.makeUniqueFilename(SCHEMATICS, CurrentConversionSettings.mapartName, "zip");
+        String filename = Utils.makeUniqueFilename(SCHEMATICS, CurrentConversionSettings.mapart.mapartName, "zip");
         File fileToZip = SCHEMATICS.resolve(filename).toFile();
 
         nbtBuilderExecutor.execute(() -> {
@@ -129,5 +130,4 @@ public class MapartToNBT {
             }
         });
     }
-
 }

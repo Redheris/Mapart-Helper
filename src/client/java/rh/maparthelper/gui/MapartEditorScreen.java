@@ -23,6 +23,7 @@ import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
+import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
@@ -38,6 +39,8 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
+    protected final ConvertedMapartImage mapart = CurrentConversionSettings.mapart;
+
     private DirectionalLayoutWidget settingsLeft;
     private DirectionalLayoutWidget settingsRight;
     private ScrollableGridWidget materialList;
@@ -57,7 +60,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public void updateMaterialList() {
         this.remove(materialList);
-        if (CurrentConversionSettings.imagePath == null) return;
+        if (!CurrentConversionSettings.isMapartConverted()) return;
         int listTop = settingsRight.getY() + settingsRight.getHeight();
 
         materialList = new ScrollableGridWidget(
@@ -71,16 +74,16 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
 
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
-        MapartImageConverter.MapColorCount[] colorsCounter = MapartImageConverter.getColorsCounter();
+        ConvertedMapartImage.MapColorCount[] colorsCounter = mapart.getColorCounts();
 
-        this.auxBlockCount = CurrentConversionSettings.getWidth() * 128;
+        this.auxBlockCount = mapart.getWidth() * 128;
         BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock);
         auxBlockItemWidget.insertToTooltip(1, Text.translatable("maparthelper.aux_block").formatted(Formatting.GRAY));
         TextWidget auxAmountText = new TextWidget(Text.empty(), textRenderer);
         materialListAdder.add(auxBlockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
         materialListAdder.add(auxAmountText);
 
-        for (MapartImageConverter.MapColorCount colorCount : colorsCounter) {
+        for (ConvertedMapartImage.MapColorCount colorCount : colorsCounter) {
             addBlockToMaterialList(materialListAdder, palette, colorCount);
         }
 
@@ -93,7 +96,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         this.addDrawableChild(materialList);
     }
 
-    private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, MapartImageConverter.MapColorCount color) {
+    private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, ConvertedMapartImage.MapColorCount color) {
         if (color.amount() == 0) return;
         Block block = palette.getBlockOfMapColor(MapColor.get(color.id()));
         if (block == null) return;
@@ -139,7 +142,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.setPosition(5, 20);
         Positioner settingsLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
 
-        TextFieldWidget mapartName = createTextInputFieldWidget(baseElementWidth, CurrentConversionSettings.mapartName, -1);
+        TextFieldWidget mapartName = createTextInputFieldWidget(baseElementWidth, mapart.mapartName, -1);
         mapartName.setChangedListener(value -> {
             mapartName.setEditableColor(Colors.WHITE);
             if (value.isEmpty()) {
@@ -151,7 +154,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 mapartName.setEditableColor(Colors.LIGHT_RED);
                 return;
             }
-            CurrentConversionSettings.mapartName = value;
+            mapart.mapartName = value;
         });
         settingsLeft.add(new TextWidget(Text.translatable("maparthelper.gui.mapart_name_field"), textRenderer));
         settingsLeft.add(mapartName, settingsLeftPositioner.copy().marginTop(0));
@@ -178,7 +181,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
                     btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 }
         ).size(baseElementWidth, 20).build();
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
@@ -192,7 +195,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         croppingMode.addEntries(
                 e -> {
                     CurrentConversionSettings.cropMode = (CroppingMode) e;
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 },
                 CroppingMode.values()
         );
@@ -209,7 +212,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     boolean was3D = config.use3D();
                     config.staircaseStyle = (StaircaseStyles) e;
                     if (config.use3D() != was3D)
-                        MapartImageConverter.updateMapart();
+                        MapartImageConverter.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 StaircaseStyles.values()
@@ -225,7 +228,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ditheringAlg.addEntries(
                 e -> {
                     MapartHelper.conversionSettings.ditheringAlgorithm = (DitheringAlgorithms) e;
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 DitheringAlgorithms.values()
@@ -239,7 +242,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     MapartHelper.conversionSettings.useLAB = !MapartHelper.conversionSettings.useLAB;
                     btn.setMessage(Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB ? isOn : isOff));
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 }
         ).size(80, 20).build();
 
@@ -328,7 +331,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         presetsList.addEntries(
                 s -> {
                     PaletteConfigManager.changeCurrentPreset(s);
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
         );
@@ -357,7 +360,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         // =========== Mapart preview area ===========
 
-        mapartPreview = new MapartPreviewWidget(
+        mapartPreview = new MapartPreviewWidget(mapart,
                 settingsLeft.getX() + settingsLeft.getWidth() + 15, 33,
                 settingsRight.getX() - 15, this.height - 20
         );
@@ -379,8 +382,8 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.of("\uD83C\uDF0D"),
                 (btn) -> {
                     if (client == null || client.player == null) return;
-                    if (FakeMapsPreview.createFakeFramesFromMapart(client.player)) {
-                        FakeMapsPreview.showFakeFrames(client.player, CurrentConversionSettings.getWidth(), CurrentConversionSettings.getHeight());
+                    if (FakeMapsPreview.createFakeFramesFromMapart(mapart, client.player)) {
+                        FakeMapsPreview.showFakeFrames(client.player, mapart.getWidth(), mapart.getHeight());
                         this.close();
                     }
                 }
@@ -440,8 +443,8 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
-        CurrentConversionSettings.imagePath = paths.getFirst();
-        MapartImageConverter.readAndUpdateMapartImage(CurrentConversionSettings.imagePath);
+//        mapart.setImagePath(paths.getFirst());
+        MapartImageConverter.readAndUpdateMapartImage(mapart, paths.getFirst());
     }
 
 
@@ -461,7 +464,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget.Adder adder = size.createAdder(2);
 
         TextFieldWidget widthInput = createTextInputFieldWidget(
-                30, "" + CurrentConversionSettings.getWidth(), 3
+                30, "" + mapart.getWidth(), 3
         );
         widthInput.setChangedListener(value -> {
             widthInput.setEditableColor(Colors.WHITE);
@@ -471,8 +474,8 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             widthInput.setSuggestion(null);
             try {
-                if (CurrentConversionSettings.setWidth(Integer.parseInt(value))) {
-                    MapartImageConverter.updateMapart();
+                if (CurrentConversionSettings.setMapartWidth(Integer.parseInt(value))) {
+                    MapartImageConverter.updateMapart(mapart);
                 }
             } catch (NumberFormatException e) {
                 widthInput.setEditableColor(Colors.LIGHT_RED);
@@ -480,7 +483,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         });
 
         TextFieldWidget heightInput = createTextInputFieldWidget(
-                30, "" + CurrentConversionSettings.getHeight(), 3
+                30, "" + mapart.getHeight(), 3
         );
         heightInput.setChangedListener(value -> {
             heightInput.setEditableColor(Colors.WHITE);
@@ -490,8 +493,8 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             heightInput.setSuggestion(null);
             try {
-                if (CurrentConversionSettings.setHeight(Integer.parseInt(value))) {
-                    MapartImageConverter.updateMapart();
+                if (CurrentConversionSettings.setMapartHeight(Integer.parseInt(value))) {
+                    MapartImageConverter.updateMapart(mapart);
                 }
             } catch (NumberFormatException e) {
                 heightInput.setEditableColor(Colors.LIGHT_RED);
@@ -511,7 +514,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.brightness,
                 value -> {
                     CurrentConversionSettings.brightness = value.floatValue();
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 },
                 value -> String.format(brightness.getString() + ": %.2f", value)
         );
@@ -524,7 +527,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.contrast,
                 value -> {
                     CurrentConversionSettings.contrast = value.floatValue();
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 },
                 value -> String.format(contrast.getString() + ": %.0f", value)
         );
@@ -537,7 +540,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.saturation,
                 value -> {
                     CurrentConversionSettings.saturation = value.floatValue();
-                    MapartImageConverter.updateMapart();
+                    MapartImageConverter.updateMapart(mapart);
                 },
                 value -> String.format(saturation.getString() + ": %.2f", value)
         );
@@ -577,7 +580,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.translatable("maparthelper.gui.savePNG"),
                 (btn) -> {
                     PlayerEntity player = client != null ? client.player : null;
-                    MapartImageConverter.saveMapartImage(CurrentConversionSettings.mapartName, player);
+                    mapart.saveMapartImage(player);
                 }
         ).size(156, 20).build();
 

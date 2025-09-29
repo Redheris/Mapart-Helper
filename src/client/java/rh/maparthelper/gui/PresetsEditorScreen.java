@@ -279,7 +279,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             }
             deletedPresets.clear();
         }
-        if (updateMapart) MapartImageConverter.updateMapart();
+        if (updateMapart) MapartImageConverter.updateMapart(parent.mapart);
         PaletteConfigManager.savePresetsConfigFile();
     }
 

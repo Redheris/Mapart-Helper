@@ -18,15 +18,14 @@ public class NativeImageUtils {
         textureManager.registerTexture(CurrentConversionSettings.guiMapartId, CurrentConversionSettings.guiMapartImage);
     }
 
-    public static int[][] divideMapartByMaps() {
+    public static int[][] divideMapartByMaps(ConvertedMapartImage mapart) {
         if (CurrentConversionSettings.guiMapartImage == null || CurrentConversionSettings.guiMapartImage.getImage() == null)
             return null;
-
-        int height = CurrentConversionSettings.getHeight();
-        int width = CurrentConversionSettings.getWidth();
+        int width = mapart.getWidth();
+        int height = mapart.getHeight();
         int imageWidth = width * 128;
 
-        int[] mapart = CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb();
+        int[] pixels = mapart.image.copyPixelsArgb();
         int[][] maps = new int[width * height][];
         for (int i = 0; i < maps.length; i++) {
             maps[i] = new int[16384];
@@ -36,7 +35,7 @@ public class NativeImageUtils {
             for (int y = 0; y < height; y++) {
                 for (int i = 0; i < 128; i++) {
                     int rowStart = x * 128 + (y * 128 + i) * imageWidth;
-                    System.arraycopy(mapart, rowStart, maps[x + y * width], i * 128, 128);
+                    System.arraycopy(pixels, rowStart, maps[x + y * width], i * 128, 128);
                 }
             }
         }

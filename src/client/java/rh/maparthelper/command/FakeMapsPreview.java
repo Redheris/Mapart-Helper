@@ -15,17 +15,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.colors.MapColorEntry;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {
-    public static boolean createFakeFramesFromMapart(ClientPlayerEntity player) {
+    public static boolean createFakeFramesFromMapart(ConvertedMapartImage mapart, ClientPlayerEntity player) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return false;
         removeFakeItemFrames(player.clientWorld);
-        int[][] maps = NativeImageUtils.divideMapartByMaps();
+        int[][] maps = NativeImageUtils.divideMapartByMaps(mapart);
         if (maps == null) return false;
         for (int[] map : maps) {
             addFakeItemFrame(map, player);
