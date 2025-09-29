@@ -615,13 +615,17 @@ public class MapartEditorScreen extends ScreenAdapted {
         saveSplitNBT.active = active;
         saveZipNBT.active = active;
         showInWorldButton.active = active;
-        Tooltip tooltip = null;
-        if (!active) {
-            tooltip = Tooltip.of(Text.translatable("maparthelper.gui.enableColorAdaptation"));
+        if (active) {
+            saveNBT.setTooltip(null);
+            saveSplitNBT.setTooltip(null);
+            saveZipNBT.setTooltip(null);
+            showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
+        } else {
+            Tooltip disabled = Tooltip.of(Text.translatable("maparthelper.gui.enableColorAdaptation"));
+            saveNBT.setTooltip(disabled);
+            saveSplitNBT.setTooltip(disabled);
+            saveZipNBT.setTooltip(disabled);
+            showInWorldButton.setTooltip(disabled);
         }
-        saveNBT.setTooltip(tooltip);
-        saveSplitNBT.setTooltip(tooltip);
-        saveZipNBT.setTooltip(tooltip);
-        showInWorldButton.setTooltip(tooltip);
     }
 }
