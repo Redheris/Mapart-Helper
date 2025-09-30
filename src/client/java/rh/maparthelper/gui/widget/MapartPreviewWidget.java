@@ -108,42 +108,13 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     private boolean scaleImageCrop(double mouseX, double mouseY, double verticalAmount) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP && CurrentConversionSettings.guiMapartImage != null) {
-            int imageWidth = mapart.getOriginalWidth();
-            int imageHeight = mapart.getOriginalHeight();
-            double mapartAspect = (double) mapart.getWidth() / mapart.getHeight();
-            double imageAspect = (double) imageWidth / imageHeight;
-
-            int delta = (int) verticalAmount * 5;
-            double scaleX = 0.5;
-            double scaleY = 0.5;
-            if (this.scaleToCursor) {
-                scaleX = (mouseX - getX()) / width;
-                scaleY = (mouseY - getY()) / height;
-            }
-
-            int minSize = Math.min(imageWidth, Math.min(imageHeight, 64));
-            int cropWidth = mapart.getCroppingFrameWidth();
-            int cropHeight = mapart.getCroppingFrameHeight();
-            int centerX = (int) (mapart.getCroppingFrameX() + cropWidth * scaleX);
-            int centerY = (int) (mapart.getCroppingFrameY() + cropHeight * scaleY);
-
-            if (imageAspect < mapartAspect) {
-                cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
-                cropHeight = (int) (cropWidth / mapartAspect);
+            if (scaleToCursor) {
+                double scaleX = (mouseX - getX()) / width;
+                double scaleY = (mouseY - getY()) / height;
+                mapart.scaleToPoint(scaleX, scaleY, verticalAmount);
             } else {
-                cropHeight = Math.clamp(cropHeight - 2L * delta, minSize, imageHeight);
-                cropWidth = (int) (cropHeight * mapartAspect);
+                mapart.scaleToCenter(verticalAmount);
             }
-
-            int frameX = Math.clamp(centerX - (int) (cropWidth * scaleX), 0, Math.max(imageWidth - cropWidth, 0));
-            int frameY = Math.clamp(centerY - (int) (cropHeight * scaleY), 0, Math.max(imageHeight - cropHeight, 0));
-
-            mapart.setCroppingFrameX(frameX);
-            mapart.setCroppingFrameY(frameY);
-            mapart.setCroppingFrameWidth(cropWidth);
-            mapart.setCroppingFrameHeight(cropHeight);
-
-            MapartImageConverter.updateMapart(mapart);
         }
         return true;
     }
@@ -168,18 +139,9 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || !mapart.hasOriginal() || button != 0)
+        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
             return false;
-
-        int diffX = (int) deltaX;
-        int diffY = (int) deltaY;
-        int imageWidth = mapart.getOriginalWidth();
-        int imageHeight = mapart.getOriginalHeight();
-
-        mapart.setCroppingFrameX(Math.clamp(mapart.getCroppingFrameX() - diffX, 0, imageWidth - mapart.getCroppingFrameWidth()));
-        mapart.setCroppingFrameY(Math.clamp(mapart.getCroppingFrameY() - diffY, 0, imageHeight - mapart.getCroppingFrameHeight()));
-        MapartImageConverter.updateMapart(mapart);
-
+        mapart.moveCroppingFrame((int) deltaX, (int) deltaY);
         return true;
     }
 

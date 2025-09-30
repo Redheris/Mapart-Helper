@@ -146,33 +146,52 @@ public final class ConvertedMapartImage {
         return croppingFrameHeight;
     }
 
-    // TODO: Replace this part with moving manual cropping logic here from MapartPreviewWidget
-    public boolean hasOriginal() {
-        return original != null;
+    public void scaleToCenter(double scale) {
+        scaleToPoint(0.5, 0.5, scale);
     }
 
-    public int getOriginalWidth() {
-        return original.getWidth();
+    public void scaleToPoint(double scaleX, double scaleY, double scale) {
+        int imageWidth = original.getWidth();
+        int imageHeight = original.getHeight();
+        double mapartAspect = (double) width / height;
+        double imageAspect = (double) imageWidth / imageHeight;
+
+        int delta = (int) scale * 5;
+
+        int minSize = Math.min(imageWidth, Math.min(imageHeight, 64));
+        int cropWidth = croppingFrameWidth;
+        int cropHeight = croppingFrameHeight;
+        int centerX = (int) (croppingFrameX + cropWidth * scaleX);
+        int centerY = (int) (croppingFrameY + cropHeight * scaleY);
+
+        if (imageAspect < mapartAspect) {
+            cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
+            cropHeight = (int) (cropWidth / mapartAspect);
+        } else {
+            cropHeight = Math.clamp(cropHeight - 2L * delta, minSize, imageHeight);
+            cropWidth = (int) (cropHeight * mapartAspect);
+        }
+
+        int frameX = Math.clamp(centerX - (int) (cropWidth * scaleX), 0, Math.max(imageWidth - cropWidth, 0));
+        int frameY = Math.clamp(centerY - (int) (cropHeight * scaleY), 0, Math.max(imageHeight - cropHeight, 0));
+
+        croppingFrameX = frameX;
+        croppingFrameY = frameY;
+        croppingFrameWidth = cropWidth;
+        croppingFrameHeight = cropHeight;
+
+        MapartImageConverter.updateMapart(this);
     }
 
-    public int getOriginalHeight() {
-        return original.getHeight();
-    }
+    public void moveCroppingFrame(int dx, int dy) {
+        if (original == null) return;
 
-    public void setCroppingFrameX(int croppingFrameX) {
-        this.croppingFrameX = croppingFrameX;
-    }
+        int imageWidth = original.getWidth();
+        int imageHeight = original.getHeight();
+        croppingFrameX = Math.clamp(croppingFrameX - dx, 0, imageWidth - croppingFrameWidth);
+        croppingFrameY = Math.clamp(croppingFrameY - dy, 0, imageHeight - croppingFrameHeight);
 
-    public void setCroppingFrameY(int croppingFrameY) {
-        this.croppingFrameY = croppingFrameY;
-    }
-
-    public void setCroppingFrameWidth(int croppingFrameWidth) {
-        this.croppingFrameWidth = croppingFrameWidth;
-    }
-
-    public void setCroppingFrameHeight(int croppingFrameHeight) {
-        this.croppingFrameHeight = croppingFrameHeight;
+        MapartImageConverter.updateMapart(this);
     }
 
     public record MapColorCount(int id, int amount) {
