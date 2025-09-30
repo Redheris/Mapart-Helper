@@ -144,6 +144,11 @@ public abstract class ScreenAdapted extends Screen {
         DropdownMenuWidget.expandedOne = null;
     }
 
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+
     private void collapseDropdown() {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         if (dropdownMenu != null) {

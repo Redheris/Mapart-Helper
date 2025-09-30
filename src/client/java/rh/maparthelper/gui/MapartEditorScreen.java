@@ -443,7 +443,6 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
-//        mapart.setImagePath(paths.getFirst());
         MapartImageConverter.readAndUpdateMapartImage(mapart, paths.getFirst());
     }
 
