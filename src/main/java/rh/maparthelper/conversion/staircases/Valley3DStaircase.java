@@ -21,13 +21,13 @@ public class Valley3DStaircase implements IMapartStaircase {
         }
 
         for (int column = 0; column < width; column++) {
-            applyValleyToColumn(brights, staircase, column);
+            applyValleyToColumn(colors, brights, staircase, column);
         }
 
         return staircase;
     }
 
-    static void applyValleyToColumn(int[][] brights, List<List<Integer>> staircase, int col) {
+    static void applyValleyToColumn(int[][] colors, int[][] brights, List<List<Integer>> staircase, int col) {
         final int LOW = MapColor.Brightness.LOW.id;
         final int HIGH = MapColor.Brightness.HIGH.id;
         int row = staircase.size() - 1;
@@ -38,6 +38,10 @@ public class Valley3DStaircase implements IMapartStaircase {
             row--;
             if (prev == LOW) { // Structuring an ascending stairs
                 while (row >= 0 && prev != HIGH) {
+                    if (row > 0 && colors[row - 1][col] == 0) {
+                        row--;
+                        break;
+                    }
                     int prevH = staircase.get(row + 1).get(col);
                     if (prev == LOW) {
                         staircase.get(row).set(col, prevH + 1);
@@ -58,8 +62,12 @@ public class Valley3DStaircase implements IMapartStaircase {
             int next = row < brights.length ? brights[row][col] : -1;
             if (cur == HIGH && staircase.get(row).get(col) == 0) { // Structuring a descending stairs
                 while (row < staircase.size() && next != LOW && staircase.get(row).get(col) == 0) {
+                    if (row > 0 && colors[row - 1][col] == 0) {
+                        row++;
+                        continue;
+                    }
                     int prevH = staircase.get(row - 1).get(col);
-                    if (cur == HIGH) {
+                    if (cur == HIGH && (row == 1 || colors[row - 2][col] != 0)) {
                         staircase.get(row).set(col, prevH + 1);
                     } else {
                         staircase.get(row).set(col, prevH);
