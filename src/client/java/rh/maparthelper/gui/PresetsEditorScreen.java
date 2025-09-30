@@ -345,6 +345,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
 
         @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            return true;
+        }
+
+        @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
             int x = getX();
             int y = getY();
