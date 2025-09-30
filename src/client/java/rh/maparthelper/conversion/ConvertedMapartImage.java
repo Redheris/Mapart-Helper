@@ -28,10 +28,7 @@ public final class ConvertedMapartImage {
     private int width = 1;
     private int height = 1;
 
-    private int croppingFrameX = 0;
-    private int croppingFrameY = 0;
-    private int croppingFrameWidth = 1;
-    private int croppingFrameHeight = 1;
+    CroppingFrame croppingFrame = new CroppingFrame();
 
     public void reset() {
         this.original = null;
@@ -123,27 +120,10 @@ public final class ConvertedMapartImage {
             frameHeight = (int) (frameWidth / mapartAspect);
             frameY = (imageHeight - frameHeight) / 2;
         }
-        croppingFrameX = frameX;
-        croppingFrameY = frameY;
-        croppingFrameWidth = frameWidth;
-        croppingFrameHeight = frameHeight;
-    }
-
-
-    public int getCroppingFrameX() {
-        return croppingFrameX;
-    }
-
-    public int getCroppingFrameY() {
-        return croppingFrameY;
-    }
-
-    public int getCroppingFrameWidth() {
-        return croppingFrameWidth;
-    }
-
-    public int getCroppingFrameHeight() {
-        return croppingFrameHeight;
+        croppingFrame.setX(frameX);
+        croppingFrame.setY(frameY);
+        croppingFrame.setWidth(frameWidth);
+        croppingFrame.setHeight(frameHeight);
     }
 
     public void scaleToCenter(double scale) {
@@ -159,10 +139,10 @@ public final class ConvertedMapartImage {
         int delta = (int) scale * 5;
 
         int minSize = Math.min(imageWidth, Math.min(imageHeight, 64));
-        int cropWidth = croppingFrameWidth;
-        int cropHeight = croppingFrameHeight;
-        int centerX = (int) (croppingFrameX + cropWidth * scaleX);
-        int centerY = (int) (croppingFrameY + cropHeight * scaleY);
+        int cropWidth = croppingFrame.width;
+        int cropHeight = croppingFrame.height;
+        int centerX = (int) (croppingFrame.x + cropWidth * scaleX);
+        int centerY = (int) (croppingFrame.y + cropHeight * scaleY);
 
         if (imageAspect < mapartAspect) {
             cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
@@ -175,10 +155,10 @@ public final class ConvertedMapartImage {
         int frameX = Math.clamp(centerX - (int) (cropWidth * scaleX), 0, Math.max(imageWidth - cropWidth, 0));
         int frameY = Math.clamp(centerY - (int) (cropHeight * scaleY), 0, Math.max(imageHeight - cropHeight, 0));
 
-        croppingFrameX = frameX;
-        croppingFrameY = frameY;
-        croppingFrameWidth = cropWidth;
-        croppingFrameHeight = cropHeight;
+        croppingFrame.setX(frameX);
+        croppingFrame.setY(frameY);
+        croppingFrame.setWidth(cropWidth);
+        croppingFrame.setHeight(cropHeight);
 
         MapartImageConverter.updateMapart(this);
     }
@@ -188,8 +168,8 @@ public final class ConvertedMapartImage {
 
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
-        croppingFrameX = Math.clamp(croppingFrameX - dx, 0, imageWidth - croppingFrameWidth);
-        croppingFrameY = Math.clamp(croppingFrameY - dy, 0, imageHeight - croppingFrameHeight);
+        croppingFrame.setX(Math.clamp(croppingFrame.x - dx, 0, imageWidth - croppingFrame.width));
+        croppingFrame.setY(Math.clamp(croppingFrame.y - dy, 0, imageHeight - croppingFrame.height));
 
         MapartImageConverter.updateMapart(this);
     }
@@ -210,6 +190,47 @@ public final class ConvertedMapartImage {
 
         void clear() {
             this.counter = new int[63];
+        }
+    }
+
+    public class CroppingFrame {
+        private int x = 0;
+        private int y = 0;
+        private int width = 1;
+        private int height = 1;
+
+        public int getX() {
+            return x;
+        }
+
+        private void setX(int x) {
+            if (x < 0 || x > original.getWidth()) return;
+            this.x = x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        private void setY(int y) {
+            if (y < 0 || y > original.getHeight()) return;
+            this.y = y;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        private void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        private void setHeight(int height) {
+            this.height = height;
         }
     }
 }

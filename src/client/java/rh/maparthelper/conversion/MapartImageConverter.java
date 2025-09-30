@@ -153,8 +153,8 @@ public class MapartImageConverter {
         }
     }
 
-    public static BufferedImage cropAndScaleImage(BufferedImage image, int frameX, int frameY, int frameWidth, int frameHeight, int mapartWidth, int mapartHeight) {
-        BufferedImage subimage = image.getSubimage(frameX, frameY, frameWidth, frameHeight);
+    public static BufferedImage cropAndScaleImage(BufferedImage image, ConvertedMapartImage.CroppingFrame frame, int mapartWidth, int mapartHeight) {
+        BufferedImage subimage = image.getSubimage(frame.getX(), frame.getY(), frame.getWidth(), frame.getHeight());
         return scaleImage(subimage, mapartWidth, mapartHeight);
     }
 
@@ -165,11 +165,7 @@ public class MapartImageConverter {
             case NO_CROP: yield scaleImage(image, mapartWidth, mapartHeight);
             case AUTO_CROP: mapart.centerCroppingFrame();
             case USER_CROP: {
-                int frameX = mapart.getCroppingFrameX();
-                int frameY = mapart.getCroppingFrameY();
-                int frameWidth = mapart.getCroppingFrameWidth();
-                int frameHeight = mapart.getCroppingFrameHeight();
-                yield cropAndScaleImage(image, frameX, frameY, frameWidth, frameHeight, mapartWidth, mapartHeight);
+                yield cropAndScaleImage(image, mapart.croppingFrame, mapartWidth, mapartHeight);
             }
         };
     }
