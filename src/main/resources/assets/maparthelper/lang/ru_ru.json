@@ -61,7 +61,7 @@
   "maparthelper.gui.previewMode": "Режим предпросмотра:",
   "maparthelper.gui.current_preset_label": "Текущий пресет:",
   "maparthelper.gui.material_list_label": "Список материалов",
-  "maparthelper.aux_block": "Вспомогательный блок",
+  "maparthelper.aux_block": "Вспомогательные блоки",
   "maparthelper.gui.use_aux": "Добавлять: ",
   "maparthelper.gui.showGrid_tooltip": "Переключить отображение сетки",
   "maparthelper.gui.showInWorld_tooltip": "Временно отобразить на фейковых картах в мире",
@@ -77,6 +77,8 @@
   "maparthelper.gui.saveZip": "Сохранить NBT в архиве",
   "maparthelper.gui.save_mapart_as": "Сохранить мапарт как...",
   "maparthelper.gui.enableColorAdaptation": "Адаптация цветов выключена или изображение отсутствует",
+  "maparthelper.gui.backgroundColor": "Заполнение фона:",
+  "maparthelper.gui.background_color_clear": "Без",
 
   "maparthelper.gui.preset": "Пресет:",
   "maparthelper.gui.presets.choose_preset": "Выбрать пресет",

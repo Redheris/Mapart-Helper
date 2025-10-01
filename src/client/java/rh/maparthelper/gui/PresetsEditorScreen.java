@@ -4,18 +4,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import org.joml.Matrix3x2fStack;
-import rh.maparthelper.colors.MapColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.gui.widget.BlockItemWidget;
+import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
 
@@ -163,7 +161,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
             MapColor mapColor = MapColor.get(i + 1);
             if (mapColor == MapColor.CLEAR) break;
 
-            MapColorWidget color = new MapColorWidget(0, 0, squareSize, mapColor);
+            MapColorWidget color = new MapColorWidget(0, 0, squareSize, squareSize, mapColor, false);
+            color.showColorName(true);
             int row = 2 * columns * (i / columns);
             if (row == 0)
                 colorsGrid.add(color, row, i % columns);
@@ -320,53 +319,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
     public void close() {
         assert this.client != null;
         this.client.setScreen(this.parent);
-    }
-
-    private static class MapColorWidget extends ClickableWidget {
-        private final int squareSize;
-
-        public final MapColor color;
-        private final Text tooltipColorName;
-
-        private MapColorWidget(int x, int y, int squareSize, MapColor color) {
-            super(x, y, squareSize, squareSize, Text.empty());
-            this.squareSize = squareSize;
-            this.color = color;
-            this.tooltipColorName = Text.literal(MapColors.findByMapColor(color).name());
-            if (tooltipColorName.getString().contains("BLACK")) {
-                ((MutableText) tooltipColorName).withColor(MapColor.GRAY.color);
-            } else {
-                ((MutableText) tooltipColorName).withColor(color.color);
-            }
-        }
-
-        @Override
-        protected void appendClickableNarrations(NarrationMessageBuilder builder) {
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            return true;
-        }
-
-        @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-            int x = getX();
-            int y = getY();
-            if (color == MapColor.WATER_BLUE) {
-                context.fill(x, y, x + squareSize, y + squareSize, color.getRenderColor(MapColor.Brightness.NORMAL));
-            } else {
-                int partHeight = squareSize / 3;
-                context.fill(x, y, x + squareSize, y + partHeight, color.getRenderColor(MapColor.Brightness.LOW));
-                context.fill(x, y + partHeight, x + squareSize, y + partHeight * 2, color.getRenderColor(MapColor.Brightness.NORMAL));
-                context.fill(x, y + partHeight * 2, x + squareSize, y + squareSize, color.getRenderColor(MapColor.Brightness.HIGH));
-            }
-            context.drawBorder(x, y, squareSize, squareSize, 0xFF555555);
-
-            if (context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-                context.drawTooltip(tooltipColorName, mouseX, mouseY);
-            }
-        }
     }
 
     private class MapColorBlockWidget extends BlockItemWidget {

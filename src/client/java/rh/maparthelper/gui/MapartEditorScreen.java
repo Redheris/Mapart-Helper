@@ -17,6 +17,7 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
@@ -254,6 +255,28 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
         adder.add(imagePreprocessing);
+
+        GridWidget bgColor = new GridWidget().setColumnSpacing(2);
+        bgColor.getMainPositioner().alignVerticalCenter();
+        GridWidget.Adder bgAdder = bgColor.createAdder(2);
+        DropdownMenuWidget colorPicker = new MapColorPickerWidget(this, 0, 0, 20, 20, baseElementWidth, 180, 4,
+                () -> MapartHelper.conversionSettings.backgroundColor
+        );
+        new MapColorsPaletteWidget(
+                0, 2, baseElementWidth - 4, 20, 4,
+                c -> {
+                    MapColorEntry current = MapartHelper.conversionSettings.backgroundColor;
+                    if (current.mapColor() != c.mapColor() || current.brightness() != c.brightness()) {
+                        MapartHelper.conversionSettings.backgroundColor = c;
+                        AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
+                        MapartImageConverter.updateMapart(mapart);
+                    }
+                }
+        ).forEachChild(colorPicker::addEntry);
+
+        bgAdder.add(new TextWidget(Text.translatable("maparthelper.gui.backgroundColor"), textRenderer));
+        bgAdder.add(colorPicker);
+        adder.add(bgColor);
 
         adder.add(
                 new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),

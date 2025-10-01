@@ -22,7 +22,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
 
     private boolean needRelayout = false;
 
-    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text message) {
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, int columns, Text message) {
         super(x, y, width, height, message, btn -> {}, DEFAULT_NARRATION_SUPPLIER);
         expandedOne = null;
         this.parent = parent;
@@ -38,7 +38,11 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         menu.setScrollBarColor(0xFFFCFCFC);
         menu.grid.getMainPositioner().margin(2, 2, 0, 2);
         menu.grid.setRowSpacing(-2);
-        this.menuAdder = this.menu.grid.createAdder(1);
+        this.menuAdder = this.menu.grid.createAdder(columns);
+    }
+
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text message) {
+        this(parent, x, y, width, height, menuWidth, maxMenuHeight, 1, message);
     }
 
     public void setLeftScroll(boolean leftScroll) {

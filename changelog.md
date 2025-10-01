@@ -1,6 +1,7 @@
 ### Changes and new features
 
-- A new option to display the original image (without color adaptation) as a preview;
+- New option to display the original image (without color adaptation) as a preview;
+- New option for filling transparent background with a specific map color;
 
 <details>
 <summary>Fixes and minor changes</summary>
@@ -10,5 +11,6 @@
 - Fixed reading air and unexisting blocks from complete_palette.json;
 - Fixed mouse scroll behavior in the preset editor above and below the window box;
 - Added disabling of some buttons which requires mapart with color adaptation;
+- Glass blocks are no longer placed as transparent pixels;
 
 </details>
