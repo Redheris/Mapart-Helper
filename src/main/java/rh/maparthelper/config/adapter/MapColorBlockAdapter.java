@@ -12,7 +12,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class MapColorEntryAdapter implements JsonSerializer<Map<MapColor, Block>>, JsonDeserializer<Map<MapColor, Block>> {
+public class MapColorBlockAdapter implements JsonSerializer<Map<MapColor, Block>>, JsonDeserializer<Map<MapColor, Block>> {
     @Override
     public JsonElement serialize(Map<MapColor, Block> src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject obj = new JsonObject();
