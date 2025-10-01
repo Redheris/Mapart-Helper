@@ -92,7 +92,9 @@ public class MapartImageConverter {
                     return;
                 }
                 int argb = pixels[x + y * width];
-                if (argb == 0) continue;
+                if (argb == 0 && MapartHelper.conversionSettings.backgroundColor == MapColorEntry.CLEAR) {
+                    continue;
+                }
                 if (useDithering) {
                     int ind = x * 3;
                     int[] argb0 = ColorUtils.getARGB(argb);
@@ -103,12 +105,19 @@ public class MapartImageConverter {
                 }
                 int newArgb;
                 MapColorEntry color = PaletteColors.getClosestColor(argb, use3D, useDithering);
-                if (useDithering)
+                if (color == MapColorEntry.CLEAR) {
+                    color = MapartHelper.conversionSettings.backgroundColor;
+                }
+                if (useDithering && color != MapColorEntry.CLEAR)
                     ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
                 if (y > 0 && pixels[x + (y - 1) * width] == 0)
                     newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
-                else
-                    newArgb = color.mapColor().getRenderColor(color.brightness());
+                else {
+                    if (use3D)
+                        newArgb = color.mapColor().getRenderColor(color.brightness());
+                    else
+                        newArgb = color.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
+                }
                 pixels[x + y * width] = newArgb;
                 if (color != MapColorEntry.CLEAR) {
                     colorsCounter.increment(color.mapColor().id);
