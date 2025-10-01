@@ -11,8 +11,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+// To be honest, I would like to rewrite the drop-down menu widget and this one someday.
+// The processing of their behavior looks... not very elegant.
+// But rewriting will take some time, so I'll save this comment here for my future self
 public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidget {
     @Nullable
     private final Element parentWidget;
@@ -69,6 +73,13 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         super.setY(y);
         this.visibleTopY = y;
         this.needRelayout = true;
+    }
+
+    public Optional<Widget> hoveredElement(double mouseX, double mouseY) {
+        return grid.children.stream().filter(w ->
+                (!(w instanceof ClickableWidget cw) || cw.active && cw.visible) &&
+                mouseX >= w.getX() && mouseX < w.getX() + w.getWidth() && mouseY >= w.getY() && mouseY < w.getY() + w.getHeight()
+        ).findFirst();
     }
 
     @Override
@@ -168,7 +179,11 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
         @Override
         public <T extends Widget> T add(T widget, int row, int column, int occupiedRows, int occupiedColumns, Positioner positioner) {
-            children.add(widget);
+            if (widget instanceof LayoutWidget layoutWidget) {
+                layoutWidget.forEachChild(children::add);
+            } else {
+                children.add(widget);
+            }
             return super.add(widget, row, column, occupiedRows, occupiedColumns, positioner);
         }
     }

@@ -5,7 +5,6 @@ import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.text.Text;
@@ -82,15 +81,9 @@ public abstract class ScreenAdapted extends Screen {
         Element element = optional.get();
 
         if (element instanceof ScrollableGridWidget layout) {
-            List<ClickableWidget> elements = new ArrayList<>();
-            layout.grid.forEachChild(elements::add);
-
-            for (ClickableWidget w : elements) {
-                if (w != selectedTextWidget && w.isMouseOver(mouseX, mouseY) && w instanceof TextFieldWidget) {
-                    element = w;
-                    break;
-                }
-            }
+            Optional<Widget> optional2 = layout.hoveredElement(mouseX, mouseY);
+            if (optional2.isEmpty()) return false;
+            element = (Element) optional2.get();
         }
 
         if (element instanceof TextFieldWidget textField) {
