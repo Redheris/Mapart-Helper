@@ -354,6 +354,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         presetsList.addEntries(
                 s -> {
                     PaletteConfigManager.changeCurrentPreset(s);
+                    MapColor oldBgColor = MapartHelper.conversionSettings.backgroundColor.mapColor();
+                    if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
+                        MapartHelper.conversionSettings.backgroundColor = MapColorEntry.CLEAR;
+                    }
                     MapartImageConverter.updateMapart(mapart);
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
