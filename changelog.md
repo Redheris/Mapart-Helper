@@ -10,8 +10,8 @@
 - Added displaying of the color names in the preset editor; 
 - Fixed reading air and unexisting blocks from complete_palette.json;
 - Fixed mouse scroll behavior in the preset editor above and below the window box;
-- Added disabling of some buttons which requires mapart with color adaptation;
+- Added blocking of some buttons which requires mapart with color adaptation;
 - Fixed errors when working with transparent pixels;
-- Glass blocks are no longer placed as transparent pixels; 
+- Glass blocks are no longer placed as transparent pixels;
 
 </details>

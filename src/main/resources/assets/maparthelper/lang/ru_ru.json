@@ -79,6 +79,7 @@
   "maparthelper.gui.enableColorAdaptation": "Адаптация цветов выключена или изображение отсутствует",
   "maparthelper.gui.backgroundColor": "Заполнение фона:",
   "maparthelper.gui.background_color_clear": "Без",
+  "maparthelper.gui.color_without_block": "Этого цвета нет в текущем пресете",
 
   "maparthelper.gui.preset": "Пресет:",
   "maparthelper.gui.presets.choose_preset": "Выбрать пресет",

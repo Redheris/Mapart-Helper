@@ -76,6 +76,12 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     }
 
     public Optional<Widget> hoveredElement(double mouseX, double mouseY) {
+        boolean onScroll = this.overflows()
+                && mouseX >= this.getScrollbarX()
+                && mouseX <= this.getScrollbarX() + scrollWidth
+                && mouseY >= this.getY()
+                && mouseY < this.getBottom();
+        if (onScroll) return Optional.of(this);
         return grid.children.stream().filter(w ->
                 (!(w instanceof ClickableWidget cw) || cw.active && cw.visible) &&
                 mouseX >= w.getX() && mouseX < w.getX() + w.getWidth() && mouseY >= w.getY() && mouseY < w.getY() + w.getHeight()
@@ -102,6 +108,14 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     @Override
     protected int getScrollbarX() {
         return this.leftScroll ? this.getX() : this.getRight() - scrollWidth;
+    }
+
+    public boolean isOverScroll(double x, double y) {
+        return this.overflows()
+                && x >= this.getScrollbarX()
+                && x <= this.getScrollbarX() + scrollWidth
+                && y >= this.getY()
+                && y < this.getBottom();
     }
 
     @Override
