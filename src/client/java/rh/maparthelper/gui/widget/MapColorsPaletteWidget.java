@@ -7,8 +7,10 @@ import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import java.util.function.Consumer;
 
@@ -55,6 +57,14 @@ public class MapColorsPaletteWidget extends ClickableWidget {
         @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
+            if (color != MapColor.CLEAR && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
+                setAlpha(0.2f);
+                if (this.isMouseOver(mouseX, mouseY) && context.scissorContains(mouseX, mouseY)) {
+                    context.drawTooltip(Text.translatable("maparthelper.gui.color_without_block").withColor(Colors.LIGHT_RED), mouseX, mouseY);
+                }
+            } else {
+                setAlpha(1.0f);
+            }
         }
 
         @Override
@@ -63,6 +73,9 @@ public class MapColorsPaletteWidget extends ClickableWidget {
             if (color == MapColor.CLEAR) {
                 colorSetter.accept(MapColorEntry.CLEAR);
                 return true;
+            }
+            if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
+                return false;
             }
             if (color == MapColor.WATER_BLUE) {
                 colorSetter.accept(new MapColorEntry(MapColor.WATER_BLUE, MapColor.Brightness.NORMAL, new int[3]));
