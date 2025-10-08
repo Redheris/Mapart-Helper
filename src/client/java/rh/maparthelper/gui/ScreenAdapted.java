@@ -1,9 +1,6 @@
 package rh.maparthelper.gui;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.Widget;
@@ -57,7 +54,7 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         if (selectedTextWidget != null) {
             selectedTextWidget.setSelectionStart(0);
             selectedTextWidget.setSelectionEnd(0);
@@ -66,13 +63,13 @@ public abstract class ScreenAdapted extends Screen {
 
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         if (dropdownMenu != null) {
-            if (dropdownMenu.isMouseOverMenu(mouseX, mouseY) || dropdownMenu.isMouseOver(mouseX, mouseY)) {
-                return dropdownMenu.mouseClicked(mouseX, mouseY, button);
+            if (dropdownMenu.isMouseOverMenu(click.x(), click.y()) || dropdownMenu.isMouseOver(click.x(), click.y())) {
+                return dropdownMenu.mouseClicked(click, doubled);
             }
         }
         collapseDropdown();
 
-        Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
+        Optional<Element> optional = this.hoveredElement(click.x(), click.y());
         if (optional.isEmpty()) {
             this.setFocused(null);
             collapseDropdown();
@@ -81,28 +78,28 @@ public abstract class ScreenAdapted extends Screen {
         Element element = optional.get();
 
         if (element instanceof ScrollableGridWidget layout) {
-            Optional<Widget> optional2 = layout.hoveredElement(mouseX, mouseY);
+            Optional<Widget> optional2 = layout.hoveredElement(click.x(), click.y());
             if (optional2.isEmpty()) return false;
             element = (Element) optional2.get();
         }
 
         if (element instanceof TextFieldWidget textField) {
             if (element.isFocused()) {
-                return element.mouseClicked(mouseX, mouseY, button);
+                return element.mouseClicked(click, doubled);
             }
 
             selectedTextWidget = textField;
             this.setFocused(textField);
-            if (button == 0) {
+            if (click.button() == 0) {
                 textField.setSelectionStart(0);
                 textField.setSelectionEnd(textField.getText().length());
-            } else if (button == 1) {
+            } else if (click.button() == 1) {
                 textField.setText("");
             }
             return true;
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

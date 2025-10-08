@@ -3,6 +3,7 @@ package rh.maparthelper.gui.widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -138,15 +139,15 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
+    public boolean mouseDragged(Click click, double offsetX, double offsetY) {
+        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || click.button() != 0)
             return false;
-        mapart.moveCroppingFrame((int) deltaX, (int) deltaY);
+        mapart.moveCroppingFrame((int) offsetX, (int) offsetY);
         return true;
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         return true;
     }
 }
