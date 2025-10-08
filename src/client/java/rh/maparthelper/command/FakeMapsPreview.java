@@ -25,7 +25,7 @@ public class FakeMapsPreview {
     public static boolean createFakeFramesFromMapart(ConvertedMapartImage mapart, ClientPlayerEntity player) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return false;
-        removeFakeItemFrames(player.clientWorld);
+        removeFakeItemFrames((ClientWorld) player.getEntityWorld());
         int[][] maps = NativeImageUtils.divideMapartByMaps(mapart);
         if (maps == null) return false;
         for (int[] map : maps) {
@@ -55,11 +55,11 @@ public class FakeMapsPreview {
         MapIdComponent mapId = new MapIdComponent(-1 - ClientCommandsContext.fakeItemFrames.size());
         mapItem.set(DataComponentTypes.MAP_ID, mapId);
 
-        ItemFrameEntity itemFrame = new ItemFrameEntity(player.clientWorld, player.getBlockPos(), player.getMovementDirection().getOpposite());
+        ItemFrameEntity itemFrame = new ItemFrameEntity(player.getEntityWorld(), player.getBlockPos(), player.getMovementDirection().getOpposite());
         itemFrame.setHeldItemStack(mapItem);
         itemFrame.setInvisible(true);
 
-        player.clientWorld.putClientsideMapState(mapId, mapState);
+        ((ClientWorld) player.getEntityWorld()).putClientsideMapState(mapId, mapState);
 
         ClientCommandsContext.fakeItemFrames.add(itemFrame);
     }
@@ -100,12 +100,12 @@ public class FakeMapsPreview {
                 posZ -= direction.getOffsetZ() * 0.03;
 
                 itemFrame.setPos(posX, pos.getY() - 0.5, posZ);
-                player.clientWorld.addEntity(itemFrame);
+                ((ClientWorld) player.getEntityWorld()).addEntity(itemFrame);
                 pos.move(LEFT.getOpposite());
             }
             pos.move(LEFT, width);
             pos.move(Direction.DOWN);
         }
-        ClientCommandsContext.fakeFramesBornTime = player.clientWorld.getTime();
+        ClientCommandsContext.fakeFramesBornTime = player.getEntityWorld().getTime();
     }
 }

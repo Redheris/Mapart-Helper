@@ -37,7 +37,7 @@ public class ServerCommands {
                             int y = IntegerArgumentType.getInteger(ctx, "height");
                             Entity source = ctx.getSource().getEntity();
 
-                            MapUtils.placeBlocksFromPalette(source.getWorld(), source.getBlockX(), y, source.getBlockZ());
+                            MapUtils.placeBlocksFromPalette(source.getEntityWorld(), source.getBlockX(), y, source.getBlockZ());
                             return 1;
                         })))
                         .then(literal("give-map-palette")
@@ -56,7 +56,7 @@ public class ServerCommands {
                                     return 0;
                                 }
 
-                                MapState mapState = FilledMapItem.getMapState(itemStack, player.getWorld());
+                                MapState mapState = FilledMapItem.getMapState(itemStack, player.getEntityWorld());
                                 assert mapState != null;
                                 for (int i = 0; i < 128; i++) {
                                     for (int j = 0; j < 128; j++) {
