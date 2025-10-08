@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
@@ -443,21 +444,21 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(KeyInput input) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
-            if (mapartPreview.keyPressed(keyCode, scanCode, modifiers))
+            if (mapartPreview.keyPressed(input))
                 return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+    public boolean keyReleased(KeyInput input) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
-            if (mapartPreview.keyReleased(keyCode, scanCode, modifiers))
+            if (mapartPreview.keyReleased(input))
                 return true;
         }
-        return super.keyReleased(keyCode, scanCode, modifiers);
+        return super.keyReleased(input);
     }
 
     @Override

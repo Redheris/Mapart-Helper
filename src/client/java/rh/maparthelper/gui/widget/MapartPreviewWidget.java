@@ -7,10 +7,10 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
-import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
@@ -121,8 +121,8 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.hasShift()) {
             this.scaleToCursor = false;
             return true;
         }
@@ -130,8 +130,8 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+    public boolean keyReleased(KeyInput input) {
+        if (input.hasShift()) {
             this.scaleToCursor = true;
             return true;
         }

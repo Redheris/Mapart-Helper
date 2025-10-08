@@ -23,7 +23,7 @@ public class ClientTickHandler {
                 "key.maparthelper.openScreen",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_Y,
-                KeyBinding.UI_CATEGORY
+                KeyBinding.Category.MISC
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
