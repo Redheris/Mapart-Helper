@@ -4,6 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.render.RenderUtils;
 
 import java.util.function.Supplier;
 
@@ -20,6 +21,6 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         MapColorEntry colorEntry = colorGetter.get();
         int color = colorEntry.mapColor().getRenderColor(colorEntry.brightness());
         context.fill(getX(), getY(), getRight(), getBottom(), color);
-        context.drawBorder(getX(), getY(), getWidth(), getHeight(), 0xFF555555);
+        RenderUtils.drawBorder(context, getX(), getY(), getWidth(), getHeight(), 0xFF555555);
     }
 }

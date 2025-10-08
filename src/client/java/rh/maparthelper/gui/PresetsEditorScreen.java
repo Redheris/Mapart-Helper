@@ -17,6 +17,7 @@ import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.render.RenderUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -306,7 +307,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int h = boxHeight;
         context.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
         context.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
-        context.drawBorder(boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
+        RenderUtils.drawBorder(context, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
         context.drawHorizontalLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
 
         super.render(context, mouseX, mouseY, deltaTicks);
@@ -352,7 +353,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             flag = flag || (presetBlock != null && presetBlock == this.getBlock());
             if (flag) {
                 context.state.createNewRootLayer();
-                context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
+                RenderUtils.drawBorder(context, this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
             }
         }
 

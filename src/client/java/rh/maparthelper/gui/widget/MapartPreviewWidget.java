@@ -15,6 +15,7 @@ import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.render.RenderUtils;
 
 import java.util.List;
 
@@ -95,7 +96,7 @@ public class MapartPreviewWidget extends ClickableWidget {
             );
         }
 
-        context.drawBorder(x - 1, y - 1, width + 2, height + 2, Colors.CYAN);
+        RenderUtils.drawBorder(context, x - 1, y - 1, width + 2, height + 2, Colors.CYAN);
     }
 
     @Override

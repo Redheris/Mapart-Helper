@@ -11,6 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.math.ColorHelper;
 import rh.maparthelper.colors.MapColors;
+import rh.maparthelper.render.RenderUtils;
 
 public class MapColorWidget extends ClickableWidget {
     public final MapColor color;
@@ -71,7 +72,7 @@ public class MapColorWidget extends ClickableWidget {
                 context.fill(x + segWidth * 2, y, x + width, y + height, high);
             }
         }
-        context.drawBorder(x, y, width, height, ColorHelper.withAlpha(alpha, 0xFF555555));
+        RenderUtils.drawBorder(context, x, y, width, height, ColorHelper.withAlpha(alpha, 0xFF555555));
 
         if (tooltipColorName != null && context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
             context.drawTooltip(tooltipColorName, mouseX, mouseY);
