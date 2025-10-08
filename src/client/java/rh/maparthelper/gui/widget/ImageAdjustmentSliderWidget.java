@@ -1,10 +1,9 @@
 package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.input.KeyCodes;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -65,16 +64,16 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (KeyCodes.isToggle(keyCode)) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.isEnterOrSpace()) {
             this.setFocused(!this.isFocused());
             return true;
         } else {
-            if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT)
+            if (input.hasShift())
                 shiftPressed = true;
             else if (this.isFocused()) {
-                boolean bl = keyCode == 263;
-                if (bl || keyCode == 262) {
+                boolean bl = input.isLeft();
+                if (bl || input.isRight()) {
                     float diff = bl ? -diffByKey : diffByKey;
                     if (shiftPressed) diff *= 10;
                     this.setValue(this.value + diff);
@@ -86,8 +85,8 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+    public boolean keyReleased(KeyInput input) {
+        if (input.hasShift()) {
             shiftPressed = false;
             return true;
         }

@@ -48,7 +48,7 @@ public class MapartSelectionHandler {
 
 
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea() || !player.getWorld().isClient())
+            if (ClientCommandsContext.isNotSelectingFramesArea() || !player.getEntityWorld().isClient())
                 return ActionResult.PASS;
 
             // Offset from center to the item frame's box
@@ -71,7 +71,7 @@ public class MapartSelectionHandler {
         });
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea() || !player.getWorld().isClient())
+            if (ClientCommandsContext.isNotSelectingFramesArea() || !player.getEntityWorld().isClient())
                 return ActionResult.PASS;
 
             Vec3d currentPos = hitResult.getBlockPos().toCenterPos().offset(hitResult.getSide(), 0.53);

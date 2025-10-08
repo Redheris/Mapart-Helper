@@ -3,6 +3,7 @@ package rh.maparthelper.gui.widget;
 import net.minecraft.block.Block;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -102,8 +103,8 @@ public class BlockItemWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        return this.hasClickAction && super.mouseClicked(mouseX, mouseY, button);
+    public boolean mouseClicked(Click click, boolean doubled) {
+        return this.hasClickAction && super.mouseClicked(click, doubled);
     }
 
     @Override

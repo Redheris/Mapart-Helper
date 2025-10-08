@@ -9,6 +9,8 @@ import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderStat
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.RenderDispatcher;
 import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +37,10 @@ public class ScaledItemGuiElementRenderer extends SpecialGuiElementRenderer<Scal
             MinecraftClient.getInstance().gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.ITEMS_3D);
         }
 
-        keyedItemRenderState.render(matrixStack, this.vertexConsumers, 15728880, OverlayTexture.DEFAULT_UV);
+        RenderDispatcher renderDispatcher = MinecraftClient.getInstance().gameRenderer.getEntityRenderDispatcher();
+        OrderedRenderCommandQueue queue = renderDispatcher.getQueue();
+        keyedItemRenderState.render(matrixStack, queue, 15728880, OverlayTexture.DEFAULT_UV, 0);
+        renderDispatcher.render();
     }
 
     public void renderElement(ScaledItemGuiElementRenderState state, GuiRenderState guiRenderState) {

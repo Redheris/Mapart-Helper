@@ -2,6 +2,7 @@ package rh.maparthelper.gui.widget;
 
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -68,7 +69,7 @@ public class MapColorsPaletteWidget extends ClickableWidget {
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        public boolean mouseClicked(Click click, boolean doubled) {
             this.playDownSound(MinecraftClient.getInstance().getSoundManager());
             if (color == MapColor.CLEAR) {
                 colorSetter.accept(MapColorEntry.CLEAR);
@@ -81,7 +82,7 @@ public class MapColorsPaletteWidget extends ClickableWidget {
                 colorSetter.accept(new MapColorEntry(MapColor.WATER_BLUE, MapColor.Brightness.NORMAL, new int[3]));
                 return true;
             }
-            int brightnessId = (int) Math.min((mouseX - this.getX()) / segWidth, 2);
+            int brightnessId = (int) Math.min((click.x() - this.getX()) / segWidth, 2);
             colorSetter.accept(new MapColorEntry(color, MapColor.Brightness.validateAndGet(brightnessId), new int[3]));
             return true;
         }

@@ -1,6 +1,7 @@
 package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
@@ -141,12 +142,12 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         else
             context.enableScissor(getX(), visibleTopY, getRight(), visibleTopY + getHeight());
         grid.forEachChild(w -> w.render(context, mouseX, mouseY, deltaTicks));
-        drawScrollbar(context);
+        drawScrollbar(context, mouseX, mouseY);
         context.disableScissor();
     }
 
     @Override
-    protected void drawScrollbar(DrawContext context) {
+    protected void drawScrollbar(DrawContext context, int mouseX, int mouseY) {
         if (this.overflows()) {
             int i = this.getScrollbarX();
             int j = this.getScrollbarThumbHeight();
@@ -157,20 +158,20 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY)) return false;
-        if (this.checkScrollbarDragged(mouseX, mouseY, button)) return true;
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (click.y() < visibleTopY || click.y() > visibleTopY + getHeight() || !this.isMouseOver(click.x(), click.y())) return false;
+        if (this.checkScrollbarDragged(click)) return true;
 
         for (Widget w : grid.children) {
             if (!(w instanceof ClickableWidget child)) continue;
             if (!child.visible) continue;
-            if (child.isMouseOver(mouseX, mouseY)) {
+            if (child.isMouseOver(click.x(), click.y())) {
                 Screen currentScreen = MinecraftClient.getInstance().currentScreen;
                 if (currentScreen != null) {
                     currentScreen.setFocused(child);
                     currentScreen.setDragging(true);
                 }
-                return child.mouseClicked(mouseX, mouseY, button);
+                return child.mouseClicked(click, doubled);
             }
         }
         return true;

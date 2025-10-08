@@ -3,17 +3,19 @@ package rh.maparthelper.gui.widget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
-import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.render.RenderUtils;
 
 import java.util.List;
 
@@ -94,7 +96,7 @@ public class MapartPreviewWidget extends ClickableWidget {
             );
         }
 
-        context.drawBorder(x - 1, y - 1, width + 2, height + 2, Colors.CYAN);
+        RenderUtils.drawBorder(context, x - 1, y - 1, width + 2, height + 2, Colors.CYAN);
     }
 
     @Override
@@ -120,8 +122,8 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+    public boolean keyPressed(KeyInput input) {
+        if (input.hasShift()) {
             this.scaleToCursor = false;
             return true;
         }
@@ -129,8 +131,8 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+    public boolean keyReleased(KeyInput input) {
+        if (input.hasShift()) {
             this.scaleToCursor = true;
             return true;
         }
@@ -138,15 +140,15 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
+    public boolean mouseDragged(Click click, double offsetX, double offsetY) {
+        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || click.button() != 0)
             return false;
-        mapart.moveCroppingFrame((int) deltaX, (int) deltaY);
+        mapart.moveCroppingFrame((int) offsetX, (int) offsetY);
         return true;
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         return true;
     }
 }
