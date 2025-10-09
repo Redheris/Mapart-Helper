@@ -5,7 +5,7 @@
   "maparthelper.stop_selecting": "Type the command again to cancel the selection",
   "maparthelper.selecting_stopped": "Selection canceled",
   "maparthelper.selecting_succeeded": "Selection succeeded. Type /mart save selection <filename> to save",
-  "maparthelper.mapart_saved": "The mapart successfully saved into the folder saved_maps as \"%s\"",
+  "maparthelper.mapart_saved": "The mapart successfully saved to the \"saved_maps\" folder as \"%s\"",
   "maparthelper.selection_not_flat": "Selection isn't flat. Choose another point",
   "maparthelper.selection_has_no_maps": "Selection contains no item frame with a filled map",
   "maparthelper.open_file": "[Click to open the file]",
