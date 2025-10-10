@@ -28,12 +28,16 @@ public final class ConvertedMapartImage {
     private int width = 1;
     private int height = 1;
 
-    CroppingFrame croppingFrame = new CroppingFrame();
+    final CroppingFrame croppingFrame = new CroppingFrame();
+    BufferedImage scaledImage;
+    private int insertionX = 0;
+    private int insertionY = 0;
 
     public void reset() {
         this.original = null;
         this.image = null;
         this.imagePath = null;
+        this.scaledImage = null;
     }
 
     public MapColorCount[] getColorCounts() {
@@ -100,6 +104,22 @@ public final class ConvertedMapartImage {
         this.height = height;
     }
 
+    public int getInsertionX() {
+        return insertionX;
+    }
+
+    public void setInsertionX(int insertionX) {
+        this.insertionX = insertionX;
+    }
+
+    public int getInsertionY() {
+        return insertionY;
+    }
+
+    public void setInsertionY(int insertionY) {
+        this.insertionY = insertionY;
+    }
+
     public void centerCroppingFrame() {
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
@@ -124,6 +144,8 @@ public final class ConvertedMapartImage {
         croppingFrame.setY(frameY);
         croppingFrame.setWidth(frameWidth);
         croppingFrame.setHeight(frameHeight);
+        insertionX = 0;
+        insertionY = 0;
     }
 
     public void scaleToCenter(double scale) {
@@ -145,12 +167,18 @@ public final class ConvertedMapartImage {
         int centerY = (int) (croppingFrame.y + cropHeight * scaleY);
 
         if (imageAspect < mapartAspect) {
-            cropWidth = Math.clamp(cropWidth - 2L * delta, minSize, imageWidth);
-            cropHeight = (int) (cropWidth / mapartAspect);
+            cropWidth = Math.max(cropWidth - 2 * delta, minSize);
+            cropHeight = (int) Math.round(cropWidth / mapartAspect);
         } else {
-            cropHeight = Math.clamp(cropHeight - 2L * delta, minSize, imageHeight);
-            cropWidth = (int) (cropHeight * mapartAspect);
+            cropHeight = Math.max(cropHeight - 2 * delta, minSize);
+            cropWidth = (int) Math.round(cropHeight * mapartAspect);
         }
+        int mapartW = width * 128;
+        int mapartH = height * 128;
+        int mapartScaledW = (int) Math.min(mapartW, Math.round(mapartW * ((double) imageWidth / cropWidth)));
+        int mapartScaledH = (int) Math.min(mapartH, Math.round(mapartH * ((double) imageHeight / cropHeight)));
+        setInsertionX(Math.max(0, (mapartW - mapartScaledW) / 2));
+        setInsertionY(Math.max(0, (mapartH - mapartScaledH) / 2));
 
         int frameX = Math.clamp(centerX - (int) (cropWidth * scaleX), 0, Math.max(imageWidth - cropWidth, 0));
         int frameY = Math.clamp(centerY - (int) (cropHeight * scaleY), 0, Math.max(imageHeight - cropHeight, 0));
@@ -166,12 +194,27 @@ public final class ConvertedMapartImage {
     public void moveCroppingFrame(int dx, int dy) {
         if (original == null) return;
 
+        boolean needRescale = false;
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
-        croppingFrame.setX(Math.clamp(croppingFrame.x - dx, 0, imageWidth - croppingFrame.width));
-        croppingFrame.setY(Math.clamp(croppingFrame.y - dy, 0, imageHeight - croppingFrame.height));
+        int mapartWidth = width * 128;
+        int mapartHeight = height * 128;
+        if (scaledImage.getWidth() < mapartWidth)
+            insertionX = Math.clamp(insertionX + dx, 0, mapartWidth - scaledImage.getWidth());
+        else {
+            insertionX = 0;
+            croppingFrame.setX(Math.clamp(croppingFrame.x - dx, 0, imageWidth - croppingFrame.width));
+            needRescale = true;
+        }
+        if (scaledImage.getHeight() < mapartHeight)
+            insertionY = Math.clamp(insertionY + dy, 0, mapartHeight - scaledImage.getHeight());
+        else {
+            insertionY = 0;
+            croppingFrame.setY(Math.clamp(croppingFrame.y - dy, 0, imageHeight - croppingFrame.height));
+            needRescale = true;
+        }
 
-        MapartImageConverter.updateMapart(this);
+        MapartImageConverter.updateMapart(this, needRescale);
     }
 
     public record MapColorCount(int id, int amount) {
