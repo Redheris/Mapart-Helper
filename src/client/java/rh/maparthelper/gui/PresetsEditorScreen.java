@@ -11,7 +11,7 @@ import net.minecraft.util.Colors;
 import org.joml.Matrix3x2fStack;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
-import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
@@ -278,7 +278,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             }
             deletedPresets.clear();
         }
-        if (updateMapart) MapartImageConverter.updateMapart(parent.mapart);
+        if (updateMapart) MapartImageUpdater.updateMapart(parent.mapart);
         PaletteConfigManager.savePresetsConfigFile();
     }
 

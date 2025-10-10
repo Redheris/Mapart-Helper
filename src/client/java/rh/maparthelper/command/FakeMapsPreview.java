@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.ConvertedMapartImage;
+import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.colors.MapColorEntry;

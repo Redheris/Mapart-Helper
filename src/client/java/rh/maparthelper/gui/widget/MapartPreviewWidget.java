@@ -10,10 +10,11 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import org.lwjgl.glfw.GLFW;
-import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.conversion.MapartImageUpdater;
+import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 
 import java.util.List;
 
@@ -109,11 +110,11 @@ public class MapartPreviewWidget extends ClickableWidget {
     private boolean scaleImageCrop(double mouseX, double mouseY, double verticalAmount) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP && CurrentConversionSettings.guiMapartImage != null) {
             if (scaleToCursor) {
-                double scaleX = (mouseX - getX()) / width;
-                double scaleY = (mouseY - getY()) / height;
-                mapart.scaleToPoint(scaleX, scaleY, verticalAmount);
+                double pointX = (mouseX - getX()) / width;
+                double pointY = (mouseY - getY()) / height;
+                MapartImageUpdater.scaleToPointAndUpdateMapart(mapart, pointX, pointY, verticalAmount);
             } else {
-                mapart.scaleToCenter(verticalAmount);
+                MapartImageUpdater.scaleToCenterAndUpdateMapart(mapart, verticalAmount);
             }
         }
         return true;
@@ -141,7 +142,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
             return false;
-        mapart.moveCroppingFrame((int) deltaX, (int) deltaY);
+        MapartImageUpdater.moveAndUpdateMapart(mapart, (int) deltaX, (int) deltaY);
         return true;
     }
 

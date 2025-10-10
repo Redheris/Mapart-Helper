@@ -24,11 +24,11 @@ import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
-import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
-import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.schematic.NbtSchematicUtils;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
@@ -182,7 +182,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
                     btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(baseElementWidth, 20).build();
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
@@ -196,7 +196,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         croppingMode.addEntries(
                 e -> {
                     CurrentConversionSettings.cropMode = (CroppingMode) e;
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 CroppingMode.values()
         );
@@ -213,7 +213,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     boolean was3D = config.use3D();
                     config.staircaseStyle = (StaircaseStyles) e;
                     if (config.use3D() != was3D)
-                        MapartImageConverter.updateMapart(mapart);
+                        MapartImageUpdater.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 StaircaseStyles.values()
@@ -229,7 +229,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ditheringAlg.addEntries(
                 e -> {
                     MapartHelper.conversionSettings.ditheringAlgorithm = (DitheringAlgorithms) e;
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 DitheringAlgorithms.values()
@@ -243,7 +243,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     MapartHelper.conversionSettings.useLAB = !MapartHelper.conversionSettings.useLAB;
                     btn.setMessage(Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB ? isOn : isOff));
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(80, 20).build();
 
@@ -269,7 +269,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     if (current.mapColor() != c.mapColor() || current.brightness() != c.brightness()) {
                         MapartHelper.conversionSettings.backgroundColor = c;
                         AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
-                        MapartImageConverter.updateMapart(mapart);
+                        MapartImageUpdater.updateMapart(mapart);
                     }
                 }
         ).forEachChild(colorPicker::addEntry);
@@ -358,7 +358,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
                         MapartHelper.conversionSettings.backgroundColor = MapColorEntry.CLEAR;
                     }
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
         );
@@ -470,7 +470,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
-        MapartImageConverter.readAndUpdateMapartImage(mapart, paths.getFirst(), true);
+        MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst(), true);
     }
 
 
@@ -500,8 +500,10 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             widthInput.setSuggestion(null);
             try {
-                if (CurrentConversionSettings.setMapartWidth(Integer.parseInt(value))) {
-                    MapartImageConverter.updateMapart(mapart);
+                int newWidth = Integer.parseInt(value);
+                if (newWidth != mapart.getWidth()) {
+                    CurrentConversionSettings.guiMapartImage = null;
+                    MapartImageUpdater.resizeAndUpdateMapart(mapart, newWidth, mapart.getHeight());
                 }
             } catch (NumberFormatException e) {
                 widthInput.setEditableColor(Colors.LIGHT_RED);
@@ -519,8 +521,10 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             heightInput.setSuggestion(null);
             try {
-                if (CurrentConversionSettings.setMapartHeight(Integer.parseInt(value))) {
-                    MapartImageConverter.updateMapart(mapart);
+                int newHeight = Integer.parseInt(value);
+                if (newHeight != mapart.getHeight()) {
+                    CurrentConversionSettings.guiMapartImage = null;
+                    MapartImageUpdater.resizeAndUpdateMapart(mapart, mapart.getWidth(), newHeight);
                 }
             } catch (NumberFormatException e) {
                 heightInput.setEditableColor(Colors.LIGHT_RED);
@@ -540,7 +544,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.brightness,
                 value -> {
                     CurrentConversionSettings.brightness = value.floatValue();
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 value -> String.format(brightness.getString() + ": %.2f", value)
         );
@@ -553,7 +557,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.contrast,
                 value -> {
                     CurrentConversionSettings.contrast = value.floatValue();
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 value -> String.format(contrast.getString() + ": %.0f", value)
         );
@@ -566,7 +570,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.saturation,
                 value -> {
                     CurrentConversionSettings.saturation = value.floatValue();
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 value -> String.format(saturation.getString() + ": %.2f", value)
         );
