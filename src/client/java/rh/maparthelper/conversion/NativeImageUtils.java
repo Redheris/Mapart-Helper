@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
+import rh.maparthelper.colors.MapColorEntry;
 
 import java.awt.image.BufferedImage;
 
@@ -42,7 +43,7 @@ public class NativeImageUtils {
         return maps;
     }
 
-    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image) {
+    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image, MapColorEntry bgColor) {
         int width = image.getWidth();
         int height = image.getHeight();
 
@@ -51,7 +52,10 @@ public class NativeImageUtils {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 int argb = image.getRGB(x, y);
-                nativeImage.setColorArgb(x, y, argb);
+                if (argb == 0)
+                    nativeImage.setColorArgb(x, y, bgColor.getRenderColor());
+                else
+                    nativeImage.setColorArgb(x, y, argb);
             }
         }
 

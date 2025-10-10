@@ -114,7 +114,7 @@ public class MapartImageConverter {
                     newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
                 else {
                     if (use3D)
-                        newArgb = color.mapColor().getRenderColor(color.brightness());
+                        newArgb = color.getRenderColor();
                     else
                         newArgb = color.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
                 }
@@ -220,7 +220,7 @@ public class MapartImageConverter {
                 }
                 if (Thread.currentThread().isInterrupted()) return;
 
-                mapart.image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage);
+                mapart.image = NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage, MapartHelper.conversionSettings.backgroundColor);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(mapart.image));
