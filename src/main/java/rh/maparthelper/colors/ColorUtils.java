@@ -105,7 +105,9 @@ public class ColorUtils {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int[] argb = getARGB(image.getRGB(x, y));
+                int argbInt = image.getRGB(x, y);
+                if (argbInt == 0) continue;
+                int[] argb = getARGB(argbInt);
 
                 if (!neutralBrightness) applyBrightness(argb, brightnessFactor);
                 if (!neutralContrast) applyContrast(argb, contrastFactor);
@@ -136,7 +138,10 @@ public class ColorUtils {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int[] argb = getARGB(image.getRGB(x, y));
+                int argbInt = image.getRGB(x, y);
+                if (argbInt == 0) continue;
+                int[] argb = getARGB(argbInt);
+
                 float[] hsb = Color.RGBtoHSB(argb[1], argb[2], argb[3], null);
                 float hue = hsb[0];
                 float saturation = hsb[1];
@@ -145,7 +150,7 @@ public class ColorUtils {
                 saturation = Math.max(0f, Math.min(1f, saturation * saturationFactor));
 
                 int rgb = Color.HSBtoRGB(hue, saturation, brightness);
-                result.setRGB(x, y, argb[0] << 24 | rgb);
+                result.setRGB(x, y, rgb);
             }
         }
 
