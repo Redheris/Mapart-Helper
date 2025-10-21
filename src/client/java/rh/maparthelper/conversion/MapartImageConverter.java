@@ -38,9 +38,7 @@ public class MapartImageConverter {
     public static void readAndUpdateMapartImage(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, boolean rescale) {
         FutureTask<Void> future = getVoidFutureTask(updatingMapart, processingMapart, path, rescale);
 
-        // A very crutch to make moving the cropping frame faster
-        // TODO: Replace this dozen-threads-per-time crutch with caching the image and shifting within it
-        if (!MapartHelper.conversionSettings.showOriginalImage && currentConvertingFuture != null)
+        if (currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
         currentConvertingFuture = convertingExecutor.submit(future);
     }
@@ -48,7 +46,7 @@ public class MapartImageConverter {
     private static @NotNull FutureTask<Void> getVoidFutureTask(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, boolean rescale) {
         FutureTask<Void> future;
         boolean logExecutionTime = MapartHelper.commonConfig.logConversionTime;
-        if (path.equals(processingMapart.getImagePath()))
+        if (!updatingMapart.isReset() && path.equals(processingMapart.getImagePath()))
             future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, null, logExecutionTime, rescale), null);
         else {
             future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, path, logExecutionTime, rescale), null);

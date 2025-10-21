@@ -21,7 +21,11 @@ public class MapartImageResizer {
         int mapartH = mapart.getHeight() * 128;
         int mapartScaledW = (int) Math.min(mapartW, Math.round(mapartW * ((double) imageW / visibleW)));
         int mapartScaledH = (int) Math.min(mapartH, Math.round(mapartH * ((double) imageH / visibleH)));
-        mapart.setScaledImage(scaleImage(image, mapartScaledW, mapartScaledH));
+
+        if (mapartScaledW > 1 && mapartScaledH > 1) {
+            mapart.setScaledImage(scaleImage(image, mapartScaledW, mapartScaledH));
+            mapart.setScale(Math.min((double) mapartScaledW / visibleW, (double) mapartScaledH / visibleH));
+        }
 
         return placeOnMapartCanvas(mapart, mapartW, mapartH);
     }
@@ -44,6 +48,8 @@ public class MapartImageResizer {
     }
 
     public static BufferedImage scaleImage(BufferedImage image, int width, int height) {
+        if (width <= 0 || height <= 0) return image;
+
         boolean scaleUp = width > image.getWidth() || height > image.getHeight();
         BufferedImage scaledImage;
         if (scaleUp) {

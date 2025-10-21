@@ -82,8 +82,6 @@ public class ProcessingMapartImage extends MapartImage {
         croppingFrame.setY(frameY);
         croppingFrame.setWidth(cropWidth);
         croppingFrame.setHeight(cropHeight);
-
-//        MapartImageConverter.updateMapart(this);
     }
 
     public boolean moveCroppingFrame(int dx, int dy) {
@@ -108,8 +106,6 @@ public class ProcessingMapartImage extends MapartImage {
             croppingFrame.setY(Math.clamp(croppingFrame.getY() - dy, 0, imageHeight - croppingFrame.getHeight()));
             needRescale = true;
         }
-
-//        MapartImageConverter.updateMapart(this, needRescale);
         return needRescale;
     }
 
@@ -127,6 +123,10 @@ public class ProcessingMapartImage extends MapartImage {
 
     public void setScaledImage(BufferedImage scaledImage) {
         this.scaledImage = scaledImage;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
     }
 
     public void setWidth(int width) {

@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public final class ConvertedMapartImage extends MapartImage {
+    private boolean reset = true;
+
     public ConvertedMapartImage() {
     }
 
@@ -30,6 +32,7 @@ public final class ConvertedMapartImage extends MapartImage {
         this.insertionX = mapart.insertionX;
         this.insertionY = mapart.insertionY;
         this.scaledImage = mapart.scaledImage;
+        this.scale = mapart.scale;
 
         this.croppingFrame.setX(mapart.croppingFrame.getX());
         this.croppingFrame.setY(mapart.croppingFrame.getY());
@@ -40,10 +43,15 @@ public final class ConvertedMapartImage extends MapartImage {
     }
 
     public void reset() {
-        this.original = null;
-        this.nativeImage = null;
-        this.imagePath = null;
-        this.scaledImage = null;
+        this.reset = true;
+    }
+
+    public void reset(boolean isReset) {
+        this.reset = isReset;
+    }
+
+    public boolean isReset() {
+        return reset;
     }
 
     public MapColorCount[] getColorCounts() {

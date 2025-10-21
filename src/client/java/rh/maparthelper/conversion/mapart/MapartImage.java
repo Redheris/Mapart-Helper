@@ -19,6 +19,7 @@ public abstract class MapartImage {
 
     protected final CroppingFrame croppingFrame = new CroppingFrame();
     protected BufferedImage scaledImage;
+    protected double scale = 1; // How much the image scaled
     protected int insertionX = 0;
     protected int insertionY = 0;
 
@@ -37,6 +38,7 @@ public abstract class MapartImage {
         this.insertionX = mapart.insertionX;
         this.insertionY = mapart.insertionY;
         this.scaledImage = mapart.scaledImage;
+        this.scale = mapart.scale;
 
         this.croppingFrame.x = mapart.croppingFrame.x;
         this.croppingFrame.y = mapart.croppingFrame.y;
