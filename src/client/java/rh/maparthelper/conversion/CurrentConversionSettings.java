@@ -13,6 +13,7 @@ public class CurrentConversionSettings {
 
     public static CroppingMode cropMode = CroppingMode.AUTO_CROP;
     public static boolean doShowGrid = false;
+    public static boolean doShowTransparent = false;
 
     // Image preprocessing
     public static float brightness = 1.0f;

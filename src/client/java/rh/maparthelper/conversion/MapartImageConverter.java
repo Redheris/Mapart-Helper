@@ -206,7 +206,11 @@ public class MapartImageConverter {
                     if (Thread.currentThread().isInterrupted()) return;
                 }
 
-                mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage, MapartHelper.conversionSettings.backgroundColor));
+                mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(
+                        bufferedImage,
+                        MapartHelper.conversionSettings.backgroundColor,
+                        CurrentConversionSettings.doShowTransparent)
+                );
                 if (Thread.currentThread().isInterrupted()) return;
 
                 ConvertedMapartImage result = mapart.release(updatingMapart);

@@ -8,6 +8,7 @@ import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 
 public class NativeImageUtils {
 
@@ -44,19 +45,32 @@ public class NativeImageUtils {
         return maps;
     }
 
-    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image, MapColorEntry bgColor) {
+    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image, MapColorEntry bgColor, boolean useTransparent) {
         int width = image.getWidth();
         int height = image.getHeight();
 
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         NativeImage nativeImage = new NativeImage(width, height, false);
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int argb = image.getRGB(x, y);
-                if (argb == 0)
+                int argb = pixels[x + y * width];
+
+                if (useTransparent ? argb == 0 : ((argb >> 24) & 0xFF) < 80) {
                     nativeImage.setColorArgb(x, y, bgColor.getRenderColor());
-                else
+                } else {
+                    nativeImage.setColorArgb(x, y, useTransparent ? argb : argb | 0xFF000000);
+                }
+
+                if (useTransparent) {
+                    if (argb == 0) continue;
                     nativeImage.setColorArgb(x, y, argb);
+                } else {
+                    if (((argb >> 24) & 0xFF) < 80)
+                        nativeImage.setColorArgb(x, y, bgColor.getRenderColor());
+                    else
+                        nativeImage.setColorArgb(x, y, argb | 0xFF000000);
+                }
             }
         }
 

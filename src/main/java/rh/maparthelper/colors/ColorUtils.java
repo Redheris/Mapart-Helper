@@ -2,6 +2,7 @@ package rh.maparthelper.colors;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,26 +97,33 @@ public class ColorUtils {
         boolean neutralContrast = Float.compare(contrastFactor, 1.0f) == 0;
         boolean neutralSaturation = Float.compare(saturationFactor, 1.0f) == 0;
 
-        if (neutralBrightness && neutralContrast)
-            return neutralSaturation ? image : applySaturation(image, saturationFactor);
+        if (neutralBrightness && neutralContrast && neutralSaturation)
+            return image;
 
         int width = image.getWidth();
         int height = image.getHeight();
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        int[] pixelsFrom = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        int[] pixels = ((DataBufferInt) result.getRaster().getDataBuffer()).getData();
+        System.arraycopy(pixelsFrom, 0, pixels, 0, pixels.length);
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int argbInt = image.getRGB(x, y);
+        if (!neutralBrightness || !neutralContrast) {
+            for (int pixel = 0; pixel < width * height; pixel++) {
+                int argbInt = pixels[pixel];
                 if (argbInt == 0) continue;
                 int[] argb = getARGB(argbInt);
 
                 if (!neutralBrightness) applyBrightness(argb, brightnessFactor);
                 if (!neutralContrast) applyContrast(argb, contrastFactor);
 
-                result.setRGB(x, y, getARGB(argb));
+                pixels[pixel] = getARGB(argb);
             }
         }
-        return neutralSaturation ? result : applySaturation(result, saturationFactor);
+
+        if (!neutralSaturation)
+            applySaturation(pixels, saturationFactor);
+
+        return result;
     }
 
     private static void applyBrightness(int[] argb, float brightnessFactor) {
@@ -130,31 +138,22 @@ public class ColorUtils {
         argb[3] = clamp((int) (contrastFactor * (argb[3] - 128) + 128), 0, 255);
     }
 
-    private static BufferedImage applySaturation(BufferedImage image, float saturationFactor) {
-        int width = image.getWidth();
-        int height = image.getHeight();
+    private static void applySaturation(int[] pixels, float saturationFactor) {
+        for (int pixel = 0; pixel < pixels.length; pixel++) {
+            int argbInt = pixels[pixel];
+            if (((argbInt >> 24) & 0xFF) < 80) continue;
+            int[] argb = getARGB(argbInt);
 
-        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            float[] hsb = Color.RGBtoHSB(argb[1], argb[2], argb[3], null);
+            float hue = hsb[0];
+            float saturation = hsb[1];
+            float brightness = hsb[2];
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int argbInt = image.getRGB(x, y);
-                if (argbInt == 0) continue;
-                int[] argb = getARGB(argbInt);
+            saturation = Math.max(0f, Math.min(1f, saturation * saturationFactor));
 
-                float[] hsb = Color.RGBtoHSB(argb[1], argb[2], argb[3], null);
-                float hue = hsb[0];
-                float saturation = hsb[1];
-                float brightness = hsb[2];
-
-                saturation = Math.max(0f, Math.min(1f, saturation * saturationFactor));
-
-                int rgb = Color.HSBtoRGB(hue, saturation, brightness);
-                result.setRGB(x, y, rgb);
-            }
+            int rgb = Color.HSBtoRGB(hue, saturation, brightness);
+            pixels[pixel] = (argb[0] << 24) | (rgb & 0x00FFFFFF);
         }
-
-        return result;
     }
 
     public static int[] getRGB(int argb) {
