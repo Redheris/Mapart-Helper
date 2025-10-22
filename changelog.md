@@ -2,7 +2,7 @@
 
 - New option to display the original image (without color adaptation) as a preview;
 - New option for filling transparent background with a specific map color;
-- The original image now can be scaled to a size smaller than the mapart;
+- The image can now be scaled to a size smaller than the mapart;
 
 <details>
 <summary>Fixes and minor changes</summary>

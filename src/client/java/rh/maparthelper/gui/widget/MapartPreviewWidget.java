@@ -112,9 +112,9 @@ public class MapartPreviewWidget extends ClickableWidget {
             if (scaleToCursor) {
                 double pointX = (mouseX - getX()) / width;
                 double pointY = (mouseY - getY()) / height;
-                MapartImageUpdater.scaleToPointAndUpdateMapart(mapart, pointX, pointY, verticalAmount);
+                MapartImageUpdater.scaleToPoint(mapart, pointX, pointY, verticalAmount);
             } else {
-                MapartImageUpdater.scaleToCenterAndUpdateMapart(mapart, verticalAmount);
+                MapartImageUpdater.scaleToCenter(mapart, verticalAmount);
             }
         }
         return true;
@@ -142,7 +142,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
             return false;
-        MapartImageUpdater.moveAndUpdateMapart(mapart, (int) deltaX, (int) deltaY);
+        MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, (int) deltaX, (int) deltaY);
         return true;
     }
 

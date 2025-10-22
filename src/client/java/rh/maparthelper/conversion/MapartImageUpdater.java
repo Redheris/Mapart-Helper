@@ -13,16 +13,20 @@ public class MapartImageUpdater {
         mapart.reset(false);
     }
 
-    public static void updateMapart(ConvertedMapartImage mapart, boolean rescale) {
-        if (!mapart.isReset())
-            readAndUpdateMapartImage(mapart, mapart.getImagePath(), rescale);
-    }
-
     public static void updateMapart(ConvertedMapartImage mapart) {
-        updateMapart(mapart, true);
+        if (!mapart.isReset())
+            readAndUpdateMapartImage(mapart, mapart.getImagePath(), true);
     }
 
-    public static void resizeAndUpdateMapart(ConvertedMapartImage mapart, int width, int height) {
+    public static void changeCroppingMode(ConvertedMapartImage mapart, CroppingMode cropMode) {
+        if (mapart.isReset()) return;
+        ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
+        if (!mapart.isReset() && cropMode == CroppingMode.USER_CROP)
+            processingMapart.centerCroppingFrame();
+        MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
+    }
+
+    public static void resizeMapartImage(ConvertedMapartImage mapart, int width, int height) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         processingMapart.setWidth(width);
@@ -33,21 +37,21 @@ public class MapartImageUpdater {
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
-    public static void scaleToPointAndUpdateMapart(ConvertedMapartImage mapart, double pointX, double pointY, double scale) {
+    public static void scaleToPoint(ConvertedMapartImage mapart, double pointX, double pointY, double scale) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         processingMapart.scaleToPoint(pointX, pointY, scale);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
-    public static void scaleToCenterAndUpdateMapart(ConvertedMapartImage mapart, double scale) {
+    public static void scaleToCenter(ConvertedMapartImage mapart, double scale) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         processingMapart.scaleToCenter(scale);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
-    public static void moveAndUpdateMapart(ConvertedMapartImage mapart, int dx, int dy) {
+    public static void moveCroppingFrameOrMapartImage(ConvertedMapartImage mapart, int dx, int dy) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         boolean needRescale = processingMapart.moveCroppingFrame(dx, dy);

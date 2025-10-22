@@ -146,11 +146,13 @@ public class MapartImageConverter {
         return switch (CurrentConversionSettings.cropMode) {
             case NO_CROP:
                 yield MapartImageResizer.scaleImage(mapart, mapartWidth, mapartHeight);
-            case AUTO_CROP:
-                mapart.centerCroppingFrame();
-            case USER_CROP: {
+            case AUTO_CROP, FIT:
+                if (CurrentConversionSettings.cropMode == CroppingMode.FIT)
+                    mapart.fitOriginalCroppingFrame();
+                else
+                    mapart.centerCroppingFrame();
+            case USER_CROP:
                 yield MapartImageResizer.adjustToMapartSize(mapart);
-            }
         };
     }
 

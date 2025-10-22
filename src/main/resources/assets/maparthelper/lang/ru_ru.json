@@ -28,9 +28,10 @@
   "maparthelper.gui.mapart_editor_screen": "Редактор мапартов",
   "maparthelper.gui.presets_editor_screen": "Редактор пресетов",
 
-  "maparthelper.gui.option.NO_CROP": "Отключено",
-  "maparthelper.gui.option.AUTO_CROP": "Центр",
+  "maparthelper.gui.option.NO_CROP": "Растянуть",
+  "maparthelper.gui.option.AUTO_CROP": "Авто",
   "maparthelper.gui.option.USER_CROP": "Ручное",
+  "maparthelper.gui.option.FIT": "Вписать",
   "maparthelper.gui.option.FLAT_2D": "Выкл. (2D)",
   "maparthelper.gui.option.VALLEY_3D": "Впадина",
   "maparthelper.gui.option.WAVES_3D": "Волны",

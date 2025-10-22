@@ -195,8 +195,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         croppingMode.addEntries(
                 e -> {
-                    CurrentConversionSettings.cropMode = (CroppingMode) e;
-                    MapartImageUpdater.updateMapart(mapart);
+                    CroppingMode cropMode = (CroppingMode) e;
+                    CurrentConversionSettings.cropMode = cropMode;
+                    MapartImageUpdater.changeCroppingMode(mapart, cropMode);
                 },
                 CroppingMode.values()
         );
@@ -503,7 +504,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 int newWidth = Integer.parseInt(value);
                 if (newWidth != mapart.getWidth()) {
                     CurrentConversionSettings.guiMapartImage = null;
-                    MapartImageUpdater.resizeAndUpdateMapart(mapart, newWidth, mapart.getHeight());
+                    MapartImageUpdater.resizeMapartImage(mapart, newWidth, mapart.getHeight());
                 }
             } catch (NumberFormatException e) {
                 widthInput.setEditableColor(Colors.LIGHT_RED);
@@ -524,7 +525,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 int newHeight = Integer.parseInt(value);
                 if (newHeight != mapart.getHeight()) {
                     CurrentConversionSettings.guiMapartImage = null;
-                    MapartImageUpdater.resizeAndUpdateMapart(mapart, mapart.getWidth(), newHeight);
+                    MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), newHeight);
                 }
             } catch (NumberFormatException e) {
                 heightInput.setEditableColor(Colors.LIGHT_RED);

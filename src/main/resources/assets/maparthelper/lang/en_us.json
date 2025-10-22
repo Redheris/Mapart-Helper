@@ -28,9 +28,10 @@
   "maparthelper.gui.mapart_editor_screen": "Mapart Editor",
   "maparthelper.gui.presets_editor_screen": "Presets Editor",
 
-  "maparthelper.gui.option.NO_CROP": "Off",
-  "maparthelper.gui.option.AUTO_CROP": "Center",
+  "maparthelper.gui.option.NO_CROP": "Stretch",
+  "maparthelper.gui.option.AUTO_CROP": "Auto",
   "maparthelper.gui.option.USER_CROP": "Manual",
+  "maparthelper.gui.option.FIT": "Fit",
   "maparthelper.gui.option.FLAT_2D": "Off (2D)",
   "maparthelper.gui.option.VALLEY_3D": "Valley",
   "maparthelper.gui.option.WAVES_3D": "Waves",
