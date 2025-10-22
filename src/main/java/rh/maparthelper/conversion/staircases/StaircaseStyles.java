@@ -6,9 +6,9 @@ public enum StaircaseStyles {
     FLAT_2D(null),
     VALLEY_3D(new Valley3DStaircase()),
     WAVES_3D(new Waves3DStaircase());
-//    SMART_3D(null);
+//    SMOOTH_3D(new Smooth3DStaircase()); // Postponed for now
 
-    final IMapartStaircase staircase;
+    private final IMapartStaircase staircase;
 
     StaircaseStyles(IMapartStaircase staircase) {
         this.staircase = staircase;
