@@ -6,6 +6,9 @@ import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
 import java.nio.file.Path;
 
 public class MapartImageUpdater {
+    static double moveDx = 0;
+    static double moveDy = 0;
+    static double scale = 0;
 
     public static void readAndUpdateMapartImage(ConvertedMapartImage mapart, Path path, boolean rescale) {
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
@@ -39,22 +42,26 @@ public class MapartImageUpdater {
 
     public static void scaleToPoint(ConvertedMapartImage mapart, double pointX, double pointY, double scale) {
         if (mapart.isReset()) return;
+        MapartImageUpdater.scale += scale;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        processingMapart.scaleToPoint(pointX, pointY, scale);
+        processingMapart.scaleToPoint(pointX, pointY, MapartImageUpdater.scale);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
     public static void scaleToCenter(ConvertedMapartImage mapart, double scale) {
         if (mapart.isReset()) return;
+        MapartImageUpdater.scale += scale;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        processingMapart.scaleToCenter(scale);
+        processingMapart.scaleToCenter(MapartImageUpdater.scale);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
     public static void moveCroppingFrameOrMapartImage(ConvertedMapartImage mapart, int dx, int dy) {
         if (mapart.isReset()) return;
+        moveDx += dx;
+        moveDy += dy;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        boolean needRescale = processingMapart.moveCroppingFrame(dx, dy);
+        boolean needRescale = processingMapart.moveCroppingFrame((int) moveDx, (int) moveDy);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), needRescale);
     }
 }
