@@ -13,12 +13,13 @@ import java.awt.image.DataBufferInt;
 public class NativeImageUtils {
 
     public synchronized static void updateMapartImageTexture(NativeImage image) {
-        CurrentConversionSettings.guiMapartImage = new NativeImageBackedTexture(
+        NativeImageBackedTexture backedTexture = new NativeImageBackedTexture(
                 () -> "mapart_gui_texture",
                 image
         );
         TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-        textureManager.registerTexture(CurrentConversionSettings.guiMapartId, CurrentConversionSettings.guiMapartImage);
+        textureManager.registerTexture(CurrentConversionSettings.guiMapartId, backedTexture);
+        CurrentConversionSettings.guiMapartImage = backedTexture;
     }
 
     public static int[][] divideMapartByMaps(ConvertedMapartImage mapart) {

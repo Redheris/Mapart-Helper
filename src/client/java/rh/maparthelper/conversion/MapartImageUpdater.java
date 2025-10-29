@@ -56,7 +56,7 @@ public class MapartImageUpdater {
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
-    public static void moveCroppingFrameOrMapartImage(ConvertedMapartImage mapart, int dx, int dy) {
+    public static void moveCroppingFrameOrMapartImage(ConvertedMapartImage mapart, double dx, double dy) {
         if (mapart.isReset()) return;
         moveDx += dx;
         moveDy += dy;

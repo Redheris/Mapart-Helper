@@ -389,7 +389,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         // =========== Mapart preview area ===========
 
         mapartPreview = new MapartPreviewWidget(mapart,
-                settingsLeft.getX() + settingsLeft.getWidth() + 15, 33,
+                settingsLeft.getX() + settingsLeft.getWidth() + 9, 33,
                 settingsRight.getX() - 15, this.height - 20
         );
         this.addDrawableChild(mapartPreview);

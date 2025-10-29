@@ -3,6 +3,7 @@
 - New option to display the original image (without color adaptation) as a preview;
 - New option for filling transparent background with a specific map color;
 - The image can now be scaled to a size smaller than the mapart;
+- Added UI buttons for manual cropping;
 
 <details>
 <summary>Fixes and minor changes</summary>
