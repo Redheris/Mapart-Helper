@@ -176,19 +176,25 @@ public class ProcessingMapartImage extends MapartImage {
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
         int mapartHeight = height * 128;
-        if (scaledImage.getWidth() < mapartWidth)
-            insertionX = Math.clamp(insertionX + dx, 0, mapartWidth - scaledImage.getWidth());
-        else {
-            insertionX = 0;
-            croppingFrame.setX(Math.clamp(croppingFrame.getX() - dx, 0, imageWidth - croppingFrame.getWidth()));
-            needRescale = true;
+
+        if (dx != 0) {
+            if (scaledImage.getWidth() < mapartWidth)
+                insertionX = Math.clamp(insertionX + dx, 0, mapartWidth - scaledImage.getWidth());
+            else {
+                insertionX = 0;
+                croppingFrame.setX(Math.clamp(croppingFrame.getX() - dx, 0, imageWidth - croppingFrame.getWidth()));
+                needRescale = true;
+            }
         }
-        if (scaledImage.getHeight() < mapartHeight)
-            insertionY = Math.clamp(insertionY + dy, 0, mapartHeight - scaledImage.getHeight());
-        else {
-            insertionY = 0;
-            croppingFrame.setY(Math.clamp(croppingFrame.getY() - dy, 0, imageHeight - croppingFrame.getHeight()));
-            needRescale = true;
+
+        if (dy != 0) {
+            if (scaledImage.getHeight() < mapartHeight)
+                insertionY = Math.clamp(insertionY + dy, 0, mapartHeight - scaledImage.getHeight());
+            else {
+                insertionY = 0;
+                croppingFrame.setY(Math.clamp(croppingFrame.getY() - dy, 0, imageHeight - croppingFrame.getHeight()));
+                needRescale = true;
+            }
         }
         return needRescale;
     }
