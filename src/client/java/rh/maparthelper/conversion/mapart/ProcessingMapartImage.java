@@ -15,7 +15,7 @@ public class ProcessingMapartImage extends MapartImage {
         return mapart.update(this);
     }
 
-    public void centerCroppingFrame() {
+    public void autoCropOriginalImage() {
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         double mapartAspect = (double) width / height;
@@ -43,21 +43,42 @@ public class ProcessingMapartImage extends MapartImage {
         insertionY = 0;
     }
 
-    public void fitOriginalCroppingFrame() {
-        croppingFrame.setX(0);
-        croppingFrame.setY(0);
+    private int fittingAxis() {
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
         int mapartHeight = height * 128;
 
         if ((double) imageWidth / mapartWidth > (double) imageHeight / mapartHeight)
+            return 0;
+        return 1;
+    }
+
+    public void fitOriginalCroppingFrame() {
+        croppingFrame.setX(0);
+        croppingFrame.setY(0);
+
+        if (fittingAxis() == 0)
             fitByWidth();
         else
             fitByHeight();
     }
 
-    public void fitByWidth() {
+    public void fitBySide(int side) {
+        if (fittingAxis() == side) {
+            croppingFrame.setX(0);
+            croppingFrame.setY(0);
+            if (side == 0) {
+                fitByWidth();
+            } else {
+                fitByHeight();
+            }
+        } else {
+            autoCropOriginalImage();
+        }
+    }
+
+    private void fitByWidth() {
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -70,7 +91,7 @@ public class ProcessingMapartImage extends MapartImage {
         insertionY = (int) ((mapartHeight - imageHeight * scale) / 2);
     }
 
-    public void fitByHeight() {
+    private void fitByHeight() {
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -81,6 +102,29 @@ public class ProcessingMapartImage extends MapartImage {
         croppingFrame.setWidth((int) (croppingFrame.getHeight() * mapartAspect));
         insertionX = (int) ((mapartWidth - imageWidth * scale) / 2);
         insertionY = (int) ((mapartHeight - imageHeight * scale) / 2);
+    }
+
+    public void centerImage() {
+        int imageWidth = scaledImage.getWidth();
+        int imageHeight = scaledImage.getHeight();
+        int mapartWidth = width * 128;
+        int mapartHeight = height * 128;
+        if (imageWidth < mapartWidth) {
+            croppingFrame.setX(0);
+            insertionX = (mapartWidth - imageWidth) / 2;
+        }
+        else {
+            insertionX = 0;
+            croppingFrame.setX((original.getWidth() - croppingFrame.getWidth()) / 2);
+        }
+        if (imageHeight < mapartHeight) {
+            croppingFrame.setY(0);
+            insertionY = (mapartHeight - imageHeight) / 2;
+        }
+        else {
+            insertionY = 0;
+            croppingFrame.setY((original.getHeight() - croppingFrame.getHeight()) / 2);
+        }
     }
 
     public void scaleToCenter(double scale) {

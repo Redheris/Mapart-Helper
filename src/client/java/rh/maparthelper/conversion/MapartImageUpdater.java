@@ -25,7 +25,7 @@ public class MapartImageUpdater {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         if (!mapart.isReset() && cropMode == CroppingMode.USER_CROP)
-            processingMapart.centerCroppingFrame();
+            processingMapart.autoCropOriginalImage();
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
@@ -35,7 +35,7 @@ public class MapartImageUpdater {
         processingMapart.setWidth(width);
         processingMapart.setHeight(height);
         if (processingMapart.getOriginal() != null) {
-            processingMapart.centerCroppingFrame();
+            processingMapart.autoCropOriginalImage();
         }
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
@@ -63,5 +63,19 @@ public class MapartImageUpdater {
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         boolean needRescale = processingMapart.moveCroppingFrame((int) moveDx, (int) moveDy);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), needRescale);
+    }
+
+    public static void centerCroppingFrameAndMapartImage(ConvertedMapartImage mapart) {
+        if (mapart.isReset()) return;
+        ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
+        processingMapart.centerImage();
+        MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
+    }
+
+    public static void fitImageBySide(ConvertedMapartImage mapart, int side) {
+        if (mapart.isReset()) return;
+        ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
+        processingMapart.fitBySide(side);
+        MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 }

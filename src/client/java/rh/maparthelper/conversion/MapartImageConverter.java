@@ -150,7 +150,7 @@ public class MapartImageConverter {
                 if (CurrentConversionSettings.cropMode == CroppingMode.FIT)
                     mapart.fitOriginalCroppingFrame();
                 else
-                    mapart.centerCroppingFrame();
+                    mapart.autoCropOriginalImage();
             case USER_CROP:
                 yield MapartImageResizer.adjustToMapartSize(mapart);
         };
@@ -180,7 +180,7 @@ public class MapartImageConverter {
                     mapart.setImagePath(null);
                     mapart.setOriginal(ImageIO.read(newImagePath.toFile()));
                     mapart.setImagePath(newImagePath);
-                    mapart.centerCroppingFrame();
+                    mapart.autoCropOriginalImage();
                 }
                 if (Thread.currentThread().isInterrupted()) return;
 

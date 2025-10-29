@@ -419,15 +419,15 @@ public class MapartPreviewWidget extends ClickableWidget {
         ),
         CENTER_IMAGE(
                 CENTER_IMAGE_TEXTURE, CENTER_IMAGE_HIGHLIGHTED_TEXTURE,
-                mapart -> {}
+                MapartImageUpdater::centerCroppingFrameAndMapartImage
         ),
         FIT_BY_WIDTH(
                 FIT_BY_WIDTH_TEXTURE, FIT_BY_WIDTH_HIGHLIGHTED_TEXTURE,
-                mapart -> {}
+                mapart -> MapartImageUpdater.fitImageBySide(mapart, 0)
         ),
         FIT_BY_HEIGHT(
                 FIT_BY_HEIGHT_TEXTURE, FIT_BY_HEIGHT_HIGHLIGHTED_TEXTURE,
-                mapart -> {}
+                mapart -> MapartImageUpdater.fitImageBySide(mapart, 1)
         ),
         ZOOM_IN(
                 ZOOM_IN_TEXTURE, ZOOM_IN_HIGHLIGHTED_TEXTURE,
