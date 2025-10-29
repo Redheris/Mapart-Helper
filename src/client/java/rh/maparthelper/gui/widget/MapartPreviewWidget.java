@@ -178,7 +178,6 @@ public class MapartPreviewWidget extends ClickableWidget {
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP)
             return true;
         if (hoveredAction != null && button == 0) {
-            hoveredAction.perform(mapart);
             repeater.start(() -> hoveredAction.perform(mapart), 500, 100);
             return true;
         }
