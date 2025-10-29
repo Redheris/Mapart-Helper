@@ -169,7 +169,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         if (mouseX < getImageX() || isMouseOverActionsArea(mouseX, mouseY))
             return false;
         setHoveredAction(null);
-        MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, deltaX, deltaY);
+        MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, deltaX, deltaY, true);
         return true;
     }
 
@@ -196,7 +196,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         float xCenter = getImageX() + width / 2.f;
         float yCenter = getY() + height / 2.f;
         return (Math.abs(xCenter - mouseX) < 15 && Math.abs(yCenter - mouseY) < 15)
-                || mouseX < getImageX() + 14 || mouseY < getY() + 14 || mouseX > getRight() - 14 || mouseY > getBottom() - 14;
+                || mouseX < getImageX() + 16 || mouseY < getY() + 16 || mouseX > getRight() - 16 || mouseY > getBottom() - 16;
     }
 
     private void setHoveredAction(ManualCroppingAction action) {
@@ -452,7 +452,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         }
 
         static void move(ConvertedMapartImage mapart, int dx, int dy) {
-            MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, dx, dy);
+            MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, dx, dy, false);
         }
     }
 }

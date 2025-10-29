@@ -56,12 +56,13 @@ public class MapartImageUpdater {
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), true);
     }
 
-    public static void moveCroppingFrameOrMapartImage(ConvertedMapartImage mapart, double dx, double dy) {
+    public static void moveCroppingFrameOrMapartImage(ConvertedMapartImage mapart, double dx, double dy, boolean withMouse) {
         if (mapart.isReset()) return;
         moveDx += dx;
         moveDy += dy;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        boolean needRescale = processingMapart.moveCroppingFrame((int) moveDx, (int) moveDy);
+        int type = withMouse ? -1 : 1;
+        boolean needRescale = processingMapart.moveCroppingFrame((int) moveDx, (int) moveDy, type);
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), needRescale);
     }
 

@@ -168,7 +168,7 @@ public class ProcessingMapartImage extends MapartImage {
         croppingFrame.setHeight(cropHeight);
     }
 
-    public boolean moveCroppingFrame(int dx, int dy) {
+    public boolean moveCroppingFrame(int dx, int dy, int type) {
         if (original == null) return false;
 
         boolean needRescale = false;
@@ -179,21 +179,23 @@ public class ProcessingMapartImage extends MapartImage {
 
         if (dx != 0) {
             if (scaledImage.getWidth() < mapartWidth)
-                insertionX = Math.clamp(insertionX + dx, 0, mapartWidth - scaledImage.getWidth());
+                insertionX = Math.clamp(insertionX - (long) dx * type, 0, mapartWidth - scaledImage.getWidth());
             else {
                 insertionX = 0;
-                croppingFrame.setX(Math.clamp(croppingFrame.getX() - dx, 0, imageWidth - croppingFrame.getWidth()));
-                needRescale = true;
+                int oldCropX = croppingFrame.getX();
+                croppingFrame.setX(Math.clamp(oldCropX - dx, 0, imageWidth - croppingFrame.getWidth()));
+                needRescale = croppingFrame.getX() != oldCropX;
             }
         }
 
         if (dy != 0) {
             if (scaledImage.getHeight() < mapartHeight)
-                insertionY = Math.clamp(insertionY + dy, 0, mapartHeight - scaledImage.getHeight());
+                insertionY = Math.clamp(insertionY - (long) dy * type, 0, mapartHeight - scaledImage.getHeight());
             else {
                 insertionY = 0;
-                croppingFrame.setY(Math.clamp(croppingFrame.getY() - dy, 0, imageHeight - croppingFrame.getHeight()));
-                needRescale = true;
+                int oldCropY = croppingFrame.getY();
+                croppingFrame.setY(Math.clamp(oldCropY - dy, 0, imageHeight - croppingFrame.getHeight()));
+                needRescale = croppingFrame.getY() != oldCropY;
             }
         }
         return needRescale;
