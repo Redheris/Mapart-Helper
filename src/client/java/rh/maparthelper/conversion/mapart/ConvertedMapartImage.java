@@ -42,6 +42,13 @@ public final class ConvertedMapartImage extends MapartImage {
         return this;
     }
 
+    public void setMapartSize(int width, int height) {
+        if (reset) {
+            this.width = width;
+            this.height = height;
+        }
+    }
+
     public void reset() {
         this.reset = true;
     }
