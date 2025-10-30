@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     public static DropdownMenuWidget expandedOne;
+
     private final Screen parent;
     private final ScrollableGridWidget menu;
     private final GridWidget.Adder menuAdder;
@@ -21,7 +22,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
 
     private boolean needRelayout = false;
 
-    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text message) {
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, int columns, Text message) {
         super(x, y, width, height, message, btn -> {}, DEFAULT_NARRATION_SUPPLIER);
         expandedOne = null;
         this.parent = parent;
@@ -37,7 +38,11 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         menu.setScrollBarColor(0xFFFCFCFC);
         menu.grid.getMainPositioner().margin(2, 2, 0, 2);
         menu.grid.setRowSpacing(-2);
-        this.menuAdder = this.menu.grid.createAdder(1);
+        this.menuAdder = this.menu.grid.createAdder(columns);
+    }
+
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text message) {
+        this(parent, x, y, width, height, menuWidth, maxMenuHeight, 1, message);
     }
 
     public void setLeftScroll(boolean leftScroll) {
@@ -55,6 +60,10 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     public final void addEntry(ClickableWidget widget) {
         widget.visible = false;
         menuAdder.add(widget);
+    }
+
+    public final boolean isChild(Widget widget) {
+        return widget == menu || menu.grid.isChild(widget);
     }
 
     @Override
@@ -83,7 +92,6 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     @Override
     public void forEachChild(Consumer<ClickableWidget> consumer) {
         super.forEachChild(consumer);
-        consumer.accept(menu);
     }
 
     public void forEachEntry(Consumer<ClickableWidget> consumer) {
@@ -108,9 +116,13 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (expandedOne != null) {
-            boolean bl = menu.checkScrollbarDragged(mouseX, mouseY, button);
             if (menu.isMouseOver(mouseX, mouseY)) {
-                return menu.mouseClicked(mouseX, mouseY, button) || bl;
+                if (menu.isOverScroll(mouseX, mouseY)) {
+                    parent.setFocused(menu);
+                    if (button == 0)
+                        parent.setDragging(true);
+                }
+                return menu.mouseClicked(mouseX, mouseY, button);
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
@@ -123,7 +135,12 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     public boolean isMouseOverMenu(double mouseX, double mouseY) {
-        return (expandedOne != null) && mouseX >= getMenuX() && mouseX < getMenuX() + menu.getWidth() && mouseY >= topYExpanded && mouseY < topYExpanded + menu.getHeight();
+        int left = menu.leftScroll ? getMenuX() - 4 : getMenuX();
+        return expandedOne != null
+                && mouseX >= left
+                && mouseX < getMenuX() + menu.getWidth()
+                && mouseY >= topYExpanded
+                && mouseY < topYExpanded + menu.getHeight();
     }
 
     @Override
@@ -162,11 +179,16 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     public void renderMenu(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        if (expandUpwards)
+        int left = menu.leftScroll ? getMenuX() - 4 : getMenuX();
+        if (expandUpwards) {
             context.fill(getMenuX(), getY() - menu.getHeight() - 2, getMenuX() + menu.getWidth(), getY(), 0x99FFFFFF);
-        else
+            context.enableScissor(left, getY() - menu.getHeight() - 2, getMenuX() + menu.getWidth(), getY());
+        }
+        else {
             context.fill(getMenuX(), getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight(), 0x99FFFFFF);
-
+            context.enableScissor(left, getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight());
+        }
         this.menu.render(context, mouseX, mouseY, deltaTicks);
+        context.disableScissor();
     }
 }

@@ -10,11 +10,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.ServerCommands;
 import rh.maparthelper.config.CommonConfiguration;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.MapartHelperConfig;
+import rh.maparthelper.config.adapter.MapColorEntryAdapter;
 
 import java.nio.file.Path;
 
@@ -30,6 +32,7 @@ public class MapartHelper implements ModInitializer {
     public void onInitialize() {
         Gson gson = new GsonBuilder()
                 .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
+                .registerTypeAdapter(MapColorEntry.class, new MapColorEntryAdapter())
                 .setPrettyPrinting()
                 .create();
         AutoConfig.register(

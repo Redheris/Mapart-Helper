@@ -1,0 +1,25 @@
+name: Publish
+
+on: [workflow_dispatch]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    container:
+      image: mcr.microsoft.com/openjdk/jdk:21-ubuntu
+      options: --user root
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: publish mod
+        run: ./gradlew build publishMods
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}

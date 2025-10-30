@@ -110,8 +110,6 @@ public class NbtSchematicUtils {
                     MapColor color = PaletteColors.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
                     if (color != MapColor.CLEAR)
                         addColorToNbt(nbt, x, 0, z, color);
-                    else
-                        addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
                 }
             }
             addSizeToNbt(nbt, width, 1, height + 1);
@@ -133,8 +131,6 @@ public class NbtSchematicUtils {
                     MapColor color = PaletteColors.getMapColorEntryByARGB(colors[z - 1][x]).mapColor();
                     if (color != MapColor.CLEAR)
                         addColorToNbt(nbt, x, y, z, color);
-                    else
-                        addBlockToNbt(nbt, x, 0, z, Blocks.GLASS);
                 }
             }
             addSizeToNbt(nbt, width, maxHeight + 1, height + 1);
@@ -147,8 +143,8 @@ public class NbtSchematicUtils {
     }
 
     protected static NbtCompound createMapartNbt() {
-        int mapsWidth = CurrentConversionSettings.getWidth();
-        int mapsHeight = CurrentConversionSettings.getHeight();
+        int mapsWidth = CurrentConversionSettings.getMapartWidth();
+        int mapsHeight = CurrentConversionSettings.getMapartHeight();
         if (CurrentConversionSettings.guiMapartImage.getImage() != null) {
             return createMapartNbt(CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb(), mapsWidth, mapsHeight);
         }

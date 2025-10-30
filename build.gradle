@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
+	id "me.modmuss50.mod-publish-plugin" version "1.0.0"
 }
 
 version = project.mod_version
@@ -41,8 +42,8 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modApi "me.shedaniel.cloth:cloth-config-fabric:19.0.147"
-	modApi "com.terraformersmc:modmenu:15.0.0"
+	modApi "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}"
+	modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 processResources {
@@ -71,20 +72,58 @@ jar {
 	from "LICENSE"
 }
 
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
-			from components.java
-		}
-	}
+publishMods {
+	file = remapJar.archiveFile
+	changelog = file("changelog.md").text
+	type = STABLE
+	modLoaders.add("fabric")
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+	curseforge {
+		projectId = "1343604"
+		projectSlug = "mapart-helper"
+		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+		announcementTitle = "CurseForge"
+
+		minecraftVersions.add(minecraft_version)
+//		minecraftVersionRange {
+//			start = "1.21.6"
+//			end = "1.21.7"
+//		}
+
+		requires("fabric-api")
+		requires("cloth-config")
+		optional("modmenu")
+	}
+	modrinth {
+		projectId = "qRKpqkGI"
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		announcementTitle = "Modrinth"
+
+		minecraftVersions.add(minecraft_version)
+//		minecraftVersionRange {
+//			start = "1.21.6"
+//			end = "1.21.7"
+//		}
+
+		requires("fabric-api")
+		requires("cloth-config")
+		optional("modmenu")
+	}
+	github {
+		accessToken = providers.environmentVariable("GITHUB_TOKEN")
+		announcementTitle = "GitHub"
+		repository = "Redheris/Mapart-Helper"
+		commitish = "main"
+	}
+	discord {
+		webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
+		username = "Release publisher"
+		avatarUrl = "https://i.imgur.com/NiTaw1Z.png"
+		content = changelog.map { "# Mapart Helper v" + project.version + "\n" + ((String)it).replace("<summary>", "### ").replaceAll("<.*?>", "")}
+		style {
+			look = "MODERN"
+			thumbnailUrl = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
+			color = "#7419CA"
+		}
 	}
 }

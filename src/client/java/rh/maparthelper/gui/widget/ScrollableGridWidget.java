@@ -11,12 +11,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
+// To be honest, I would like to rewrite the drop-down menu widget and this one someday.
+// The processing of their behavior looks... not very elegant.
+// But rewriting will take some time, so I'll save this comment here for my future self
 public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidget {
     @Nullable
     private final Element parentWidget;
-    public final GridWidget grid;
+    public final InnerGridWidget grid;
     private final int scrollWidth;
     private int visibleTopY;
     private boolean needRelayout = false;
@@ -26,7 +30,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int scrollWidth) {
         super(x, y, width, height, Text.empty());
         this.parentWidget = parentWidget;
-        this.grid = new GridWidget(x, y);
+        this.grid = new InnerGridWidget(x, y);
         this.scrollWidth = scrollWidth;
         this.visibleTopY = y;
     }
@@ -71,6 +75,19 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         this.needRelayout = true;
     }
 
+    public Optional<Widget> hoveredElement(double mouseX, double mouseY) {
+        boolean onScroll = this.overflows()
+                && mouseX >= this.getScrollbarX()
+                && mouseX <= this.getScrollbarX() + scrollWidth
+                && mouseY >= this.getY()
+                && mouseY < this.getBottom();
+        if (onScroll) return Optional.of(this);
+        return grid.children.stream().filter(w ->
+                (!(w instanceof ClickableWidget cw) || cw.active && cw.visible) &&
+                mouseX >= w.getX() && mouseX < w.getX() + w.getWidth() && mouseY >= w.getY() && mouseY < w.getY() + w.getHeight()
+        ).findFirst();
+    }
+
     @Override
     protected int getContentsHeightWithPadding() {
         return grid.getHeight();
@@ -93,10 +110,20 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         return this.leftScroll ? this.getX() : this.getRight() - scrollWidth;
     }
 
+    public boolean isOverScroll(double x, double y) {
+        return this.overflows()
+                && x >= this.getScrollbarX()
+                && x <= this.getScrollbarX() + scrollWidth
+                && y >= this.getY()
+                && y < this.getBottom();
+    }
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        if (overflows()) {
-            return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        if (parentWidget == null || parentWidget.isMouseOver(mouseX, mouseY)) {
+            if (overflows()) {
+                return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+            }
         }
         return parentWidget != null && parentWidget.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
@@ -134,8 +161,8 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY)) return false;
         if (this.checkScrollbarDragged(mouseX, mouseY, button)) return true;
 
-        List<ClickableWidget> children = collectChildrenList();
-        for (ClickableWidget child : children) {
+        for (Widget w : grid.children) {
+            if (!(w instanceof ClickableWidget child)) continue;
             if (!child.visible) continue;
             if (child.isMouseOver(mouseX, mouseY)) {
                 Screen currentScreen = MinecraftClient.getInstance().currentScreen;
@@ -153,9 +180,25 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     protected void appendClickableNarrations(NarrationMessageBuilder builder) {
     }
 
-    private List<ClickableWidget> collectChildrenList() {
-        ArrayList<ClickableWidget> list = new ArrayList<>();
-        this.grid.forEachChild(list::add);
-        return list;
+    public static class InnerGridWidget extends GridWidget {
+        private final List<Widget> children = new ArrayList<>();
+
+        public InnerGridWidget(int x, int y) {
+            super(x, y);
+        }
+
+        public boolean isChild(Widget widget) {
+            return children.contains(widget);
+        }
+
+        @Override
+        public <T extends Widget> T add(T widget, int row, int column, int occupiedRows, int occupiedColumns, Positioner positioner) {
+            if (widget instanceof LayoutWidget layoutWidget) {
+                layoutWidget.forEachChild(children::add);
+            } else {
+                children.add(widget);
+            }
+            return super.add(widget, row, column, occupiedRows, occupiedColumns, positioner);
+        }
     }
 }

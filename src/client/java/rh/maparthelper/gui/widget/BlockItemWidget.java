@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockItemWidget extends ClickableWidget {
-    private int x;
-    private int y;
     private final int squareSize;
     private final boolean hasClickAction;
 
@@ -30,8 +28,6 @@ public class BlockItemWidget extends ClickableWidget {
 
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
         super(x, y, squareSize, squareSize, Text.of(block.getName()));
-        this.x = x;
-        this.y = y;
         this.squareSize = squareSize;
         this.setBlock(block);
         List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
@@ -66,6 +62,8 @@ public class BlockItemWidget extends ClickableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        int x = getX();
+        int y = getY();
         ItemStack blockItem = this.blockItem.getDefaultStack();
 
         Matrix3x2fStack matrixStack = context.getMatrices();
@@ -98,26 +96,6 @@ public class BlockItemWidget extends ClickableWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return this.hasClickAction && super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    @Override
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    @Override
-    public int getX() {
-        return this.x;
-    }
-
-    @Override
-    public int getY() {
-        return this.y;
     }
 
     @Override

@@ -5,12 +5,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.adapter.BlockTypeAdapter;
-import rh.maparthelper.config.adapter.MapColorEntryAdapter;
+import rh.maparthelper.config.adapter.MapColorBlockAdapter;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -27,7 +28,7 @@ public class PaletteConfigManager {
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
-            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorEntryAdapter())
+            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorBlockAdapter())
             .create();
 
     public static @NotNull PalettePresetsConfig presetsConfig = new PalettePresetsConfig();
@@ -47,6 +48,11 @@ public class PaletteConfigManager {
         try (FileReader reader = new FileReader(completePaletepath.toFile())) {
             completePalette = gson.fromJson(reader, CompletePalette.class);
             if (completePalette != null) {
+                completePalette.palette.replaceAll((color, blocks) ->
+                        blocks.stream()
+                                .filter(b -> b != Blocks.AIR)
+                                .toList()
+                );
                 PaletteGenerator.initARGBMapColor(completePalette.palette);
                 return true;
             }

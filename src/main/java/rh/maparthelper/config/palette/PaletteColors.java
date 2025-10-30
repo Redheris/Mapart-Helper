@@ -2,8 +2,8 @@ package rh.maparthelper.config.palette;
 
 import net.minecraft.block.MapColor;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.conversion.colors.ColorUtils;
-import rh.maparthelper.conversion.colors.MapColorEntry;
+import rh.maparthelper.colors.ColorUtils;
+import rh.maparthelper.colors.MapColorEntry;
 
 import java.util.HashMap;
 import java.util.Map;
