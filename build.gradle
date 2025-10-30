@@ -84,11 +84,11 @@ publishMods {
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
 		announcementTitle = "CurseForge"
 
-		minecraftVersions.add(minecraft_version)
-//		minecraftVersionRange {
-//			start = "1.21.6"
-//			end = "1.21.7"
-//		}
+//		minecraftVersions.add(minecraft_version)
+		minecraftVersionRange {
+			start = "1.21.6"
+			end = "1.21.7"
+		}
 
 		requires("fabric-api")
 		requires("cloth-config")
@@ -99,11 +99,11 @@ publishMods {
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		announcementTitle = "Modrinth"
 
-		minecraftVersions.add(minecraft_version)
-//		minecraftVersionRange {
-//			start = "1.21.6"
-//			end = "1.21.7"
-//		}
+//		minecraftVersions.add(minecraft_version)
+		minecraftVersionRange {
+			start = "1.21.6"
+			end = "1.21.7"
+		}
 
 		requires("fabric-api")
 		requires("cloth-config")
@@ -115,15 +115,15 @@ publishMods {
 		repository = "Redheris/Mapart-Helper"
 		commitish = "main"
 	}
-	discord {
-		webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
-		username = "Release publisher"
-		avatarUrl = "https://i.imgur.com/NiTaw1Z.png"
-		content = changelog.map { "# Mapart Helper v" + project.version + "\n" + ((String)it).replace("<summary>", "### ").replaceAll("<.*?>", "")}
-		style {
-			look = "MODERN"
-			thumbnailUrl = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
-			color = "#7419CA"
-		}
-	}
+//	discord {
+//		webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
+//		username = "Release publisher"
+//		avatarUrl = "https://i.imgur.com/NiTaw1Z.png"
+//		content = changelog.map { "# Mapart Helper v" + project.version + "\n" + ((String)it).replace("<summary>", "### ").replaceAll("<.*?>", "")}
+//		style {
+//			look = "MODERN"
+//			thumbnailUrl = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
+//			color = "#7419CA"
+//		}
+//	}
 }
