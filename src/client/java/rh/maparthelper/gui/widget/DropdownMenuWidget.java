@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.widget;
 
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
@@ -109,23 +110,23 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     @Override
-    public void onClick(double mouseX, double mouseY) {
+    public void onClick(Click click, boolean doubled) {
         toggleExpanded(expandedOne == null);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         if (expandedOne != null) {
-            if (menu.isMouseOver(mouseX, mouseY)) {
-                if (menu.isOverScroll(mouseX, mouseY)) {
+            if (menu.isMouseOver(click.x(), click.y())) {
+                if (menu.isOverScroll(click.x(), click.y())) {
                     parent.setFocused(menu);
-                    if (button == 0)
+                    if (click.button() == 0)
                         parent.setDragging(true);
                 }
-                return menu.mouseClicked(mouseX, mouseY, button);
+                return menu.mouseClicked(click, doubled);
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

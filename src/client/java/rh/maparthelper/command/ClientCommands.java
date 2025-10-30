@@ -107,7 +107,7 @@ public class ClientCommands {
             return 0;
         }
 
-        MapState mapState = FilledMapItem.getMapState(itemStack, player.getWorld());
+        MapState mapState = FilledMapItem.getMapState(itemStack, player.getEntityWorld());
         assert mapState != null;
         byte[] mapColors = mapState.colors.clone();
 
@@ -154,7 +154,7 @@ public class ClientCommands {
         String filename = StringArgumentType.getString(ctx, "filename");
         ClientPlayerEntity player = (ClientPlayerEntity)ctx.getSource().getEntity();
 
-        MapartToFile.saveImageFromItemFramesArea(player, player.getWorld(), filename);
+        MapartToFile.saveImageFromItemFramesArea(player, player.getEntityWorld(), filename);
 
         return 1;
     }

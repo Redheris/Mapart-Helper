@@ -3,6 +3,7 @@ package rh.maparthelper.gui;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
@@ -16,6 +17,7 @@ import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.render.RenderUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -181,7 +183,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
                     0, 0, squareSize,
                     Blocks.BARRIER, mapColor,
-                    (mx, my) -> {
+                    (click, doubled) -> {
                         presetsConfig.getPreset(editingPreset).removeColor(mapColor);
                         updatedPresets.add(editingPreset);
                     }
@@ -196,7 +198,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                     MapColorBlockWidget blockWidget = new MapColorBlockWidget(
                             0, 0, squareSize,
                             block, mapColor,
-                            (mx, my) -> {
+                            (click, doubled) -> {
                                 presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
                                 updatedPresets.add(editingPreset);
                             }
@@ -305,7 +307,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int h = boxHeight;
         context.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
         context.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
-        context.drawBorder(boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
+        RenderUtils.drawBorder(context, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
         context.drawHorizontalLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
 
         super.render(context, mouseX, mouseY, deltaTicks);
@@ -332,13 +334,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
 
         @Override
-        public void onClick(double mouseX, double mouseY) {
-            this.clickAction.click(mouseX, mouseY);
+        public void onClick(Click click, boolean doubled) {
+            this.clickAction.click(click, doubled);
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            return super.mouseClicked(mouseX, mouseY, button);
+        public boolean mouseClicked(Click click, boolean doubled) {
+            return super.mouseClicked(click, doubled);
         }
 
         @Override
@@ -351,12 +353,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
             flag = flag || (presetBlock != null && presetBlock == this.getBlock());
             if (flag) {
                 context.state.createNewRootLayer();
-                context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
+                RenderUtils.drawBorder(context, this.getX(), this.getY(), this.getWidth(), this.getHeight(), Colors.CYAN);
             }
         }
 
         interface ClickAction {
-            void click(double mouseX, double mouseY);
+            void click(Click click, boolean doubled);
         }
     }
 }

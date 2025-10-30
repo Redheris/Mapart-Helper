@@ -168,7 +168,7 @@ public class MapartToFile {
     public static byte[] getMapColorsFromItemFrame(ItemFrameEntity itemFrame) {
         if (!itemFrame.containsMap())
             return null;
-        MapState mapState = FilledMapItem.getMapState(itemFrame.getHeldItemStack(), itemFrame.getWorld());
+        MapState mapState = FilledMapItem.getMapState(itemFrame.getHeldItemStack(), itemFrame.getEntityWorld());
         assert mapState != null;
         return rotateMap(mapState.colors.clone(), itemFrame.getRotation());
     }
@@ -182,7 +182,7 @@ public class MapartToFile {
         if (entity.getEntity() instanceof ItemFrameEntity itemFrame) {
             if (!itemFrame.containsMap())
                 return null;
-            MapState mapState = FilledMapItem.getMapState(itemFrame.getHeldItemStack(), itemFrame.getWorld());
+            MapState mapState = FilledMapItem.getMapState(itemFrame.getHeldItemStack(), itemFrame.getEntityWorld());
             assert mapState != null;
             return rotateMap(mapState.colors.clone(), itemFrame.getRotation());
         }
