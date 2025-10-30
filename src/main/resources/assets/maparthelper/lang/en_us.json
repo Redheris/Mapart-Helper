@@ -1,4 +1,12 @@
 {
+  "maparthelper.commands_list_1": "Mapart Helper Commands:",
+  "maparthelper.commands_list_2": "§7/mart save hand [filename]§f — Save image from held map",
+  "maparthelper.commands_list_3": "§7/mart save frame [filename]§f — Save image from item frame you're looking at",
+  "maparthelper.commands_list_4": "§7/mart save selection [filename]§f — Save image from selected frames area",
+  "maparthelper.commands_list_5": "§7/mart beams§f — Toggle visibility of beams at maps' starting positions",
+  "maparthelper.commands_list_6": "§7/mart palette regenerate§f — Regenerate blocks palette and update complete_palette.json",
+  "maparthelper.commands_list_7": "§7/mart palette update§f — Update palette and presets from the config files",
+
   "maparthelper.is_holding_filled_map": "Make sure you are holding a filled map",
   "maparthelper.is_looking_at_frame_with_map": "Make sure you are looking at an item frame with a filled map",
   "maparthelper.pos_selecting": "Select two points with LMB and RMB",
