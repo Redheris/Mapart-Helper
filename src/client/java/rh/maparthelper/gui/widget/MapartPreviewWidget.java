@@ -33,7 +33,6 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     private boolean scaleToCursor = true;
     private ManualCroppingAction hoveredAction = null;
-    private boolean hoveringAction = false;
 
     public MapartPreviewWidget(ConvertedMapartImage mapart, int x, int y, int maxX, int maxY) {
         super(x, y, mapart.getWidth(), mapart.getHeight(), Text.empty());
@@ -179,14 +178,12 @@ public class MapartPreviewWidget extends ClickableWidget {
             return true;
         if (hoveredAction != null && button == 0) {
             repeater.start(() -> hoveredAction.perform(mapart), 500, 100);
-            return true;
         }
-        return !hoveringAction;
+        return true;
     }
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
-        hoveringAction = false;
         repeater.stop();
     }
 
@@ -202,8 +199,6 @@ public class MapartPreviewWidget extends ClickableWidget {
     private void setHoveredAction(ManualCroppingAction action) {
         if (hoveredAction != action) {
             hoveredAction = action;
-            if (action != null)
-                hoveringAction = true;
         }
     }
 
@@ -231,21 +226,23 @@ public class MapartPreviewWidget extends ClickableWidget {
         int mBottom = getBottom() - mouseY;
         boolean highlight = isMouseOverActionsArea(mouseX, mouseY);
 
+        boolean hoveringAction = false;
+
         // Two-axis moving buttons
 
-        renderEdgeArrow(context, mLeft, mTop, getImageX(), getY(),
+        hoveringAction |= renderEdgeArrow(context, mLeft, mTop, getImageX(), getY(),
                 ManualCroppingAction.LEFT_UP_BIG, ManualCroppingAction.LEFT_UP_SMALL,
                 highlight, size
         );
-        renderEdgeArrow(context, mRight, mTop, getRight() - size, getY(),
+        hoveringAction |= renderEdgeArrow(context, mRight, mTop, getRight() - size, getY(),
                 ManualCroppingAction.RIGHT_UP_BIG, ManualCroppingAction.RIGHT_UP_SMALL,
                 highlight, size
         );
-        renderEdgeArrow(context, mLeft, mBottom, getImageX(), getBottom() - size,
+        hoveringAction |= renderEdgeArrow(context, mLeft, mBottom, getImageX(), getBottom() - size,
                 ManualCroppingAction.LEFT_DOWN_BIG, ManualCroppingAction.LEFT_DOWN_SMALL,
                 highlight, size
         );
-        renderEdgeArrow(context, mRight, mBottom, getRight() - size, getBottom() - size,
+        hoveringAction |= renderEdgeArrow(context, mRight, mBottom, getRight() - size, getBottom() - size,
                 ManualCroppingAction.RIGHT_DOWN_BIG, ManualCroppingAction.RIGHT_DOWN_SMALL,
                 highlight, size
         );
@@ -260,30 +257,30 @@ public class MapartPreviewWidget extends ClickableWidget {
         int mStartX = mouseX - xStart;
         int mStartY = mouseY - yStart;
 
-        renderAxisArrow(context, mStartX, mTop, xStart, getY(),
+        hoveringAction |= renderAxisArrow(context, mStartX, mTop, xStart, getY(),
                 ManualCroppingAction.UP_BIG, ManualCroppingAction.UP_SMALL,
                 highlight, size
         );
-        renderAxisArrow(context, mStartY, mRight, getRight() - size, yStart,
+        hoveringAction |= renderAxisArrow(context, mStartY, mRight, getRight() - size, yStart,
                 ManualCroppingAction.RIGHT_BIG, ManualCroppingAction.RIGHT_SMALL,
                 highlight, size
         );
-        renderAxisArrow(context, mStartX, mBottom, xStart, getBottom() - size,
+        hoveringAction |= renderAxisArrow(context, mStartX, mBottom, xStart, getBottom() - size,
                 ManualCroppingAction.DOWN_BIG, ManualCroppingAction.DOWN_SMALL,
                 highlight, size
         );
-        renderAxisArrow(context, mStartY, mLeft, getImageX(), yStart,
+        hoveringAction |= renderAxisArrow(context, mStartY, mLeft, getImageX(), yStart,
                 ManualCroppingAction.LEFT_BIG, ManualCroppingAction.LEFT_SMALL,
                 highlight, size
         );
 
         // Zooming buttons
 
-        renderManualCroppingActionSprite(
+        hoveringAction |= renderManualCroppingActionSprite(
                 context, ManualCroppingAction.ZOOM_IN, getX(), getY(), 14, 14,
                 () -> mouseX < getImageX() && mouseX > getX() && mouseY > getY() && mouseY < getY() + 14
         );
-        renderManualCroppingActionSprite(
+        hoveringAction |= renderManualCroppingActionSprite(
                 context, ManualCroppingAction.ZOOM_OUT, getX(), getY() + 14, 14, 14,
                 () -> mouseX < getImageX() && mouseX > getX() && mouseY > getY() + 14 && mouseY < getY() + 28
         );
@@ -293,15 +290,15 @@ public class MapartPreviewWidget extends ClickableWidget {
         double dist = Math.sqrt((xCenter - mouseX) * (xCenter - mouseX) + (yCenter - mouseY) * (yCenter - mouseY));
         int alpha = isMouseOver(mouseX, mouseY) ? dist < width / 3.0 ? Math.clamp((int) (255 / dist * 16), 0, 255) : 30 : 0;
 
-        renderManualCroppingActionSprite(
+        hoveringAction |= renderManualCroppingActionSprite(
                 context, ManualCroppingAction.CENTER_IMAGE, xCenter - 16, yCenter - 16, 32, 32, alpha,
                 () -> Math.abs(xCenter - mouseX - 1) <= 8 && Math.abs(yCenter - mouseY - 1) <= 8
         );
-        renderManualCroppingActionSprite(
+        hoveringAction |= renderManualCroppingActionSprite(
                 context, ManualCroppingAction.FIT_BY_WIDTH, xCenter - 16, yCenter - 16, 32, 32, alpha,
                 () -> Math.abs(xCenter - mouseX - 1) <= 8 && mouseY > yCenter - 20 && mouseY < yCenter - 8
         );
-        renderManualCroppingActionSprite(
+        hoveringAction |= renderManualCroppingActionSprite(
                 context, ManualCroppingAction.FIT_BY_HEIGHT, xCenter - 16, yCenter - 16, 32, 32, alpha,
                 () -> Math.abs(yCenter - mouseY - 1) <= 8 && mouseX > xCenter - 20 && mouseX < xCenter - 8
         );
@@ -311,44 +308,51 @@ public class MapartPreviewWidget extends ClickableWidget {
         }
     }
 
-    private void renderManualCroppingActionSprite(DrawContext context, ManualCroppingAction action, int x, int y,
+    private boolean renderManualCroppingActionSprite(DrawContext context, ManualCroppingAction action, int x, int y,
                                     int width, int height, int alpha, Supplier<Boolean> isHovered) {
         if (isHovered.get()) {
             renderSprite(context, action.highlighted, x, y, width, height);
             setHoveredAction(action);
-        } else
+            return true;
+        } else {
             renderSprite(context, action.normal, x, y, width, height, alpha);
+            return false;
+        }
     }
 
-    private void renderManualCroppingActionSprite(DrawContext context, ManualCroppingAction action, int x, int y,
+    private boolean renderManualCroppingActionSprite(DrawContext context, ManualCroppingAction action, int x, int y,
                                     int width, int height, Supplier<Boolean> isHovered) {
-        renderManualCroppingActionSprite(context, action, x, y, width, height, 255, isHovered);
+        return renderManualCroppingActionSprite(context, action, x, y, width, height, 255, isHovered);
     }
 
-    private void renderEdgeArrow(DrawContext context, int dx, int dy, int x, int y,
+    private boolean renderEdgeArrow(DrawContext context, int dx, int dy, int x, int y,
                                  ManualCroppingAction bigArrow, ManualCroppingAction smallArrow,
                                  boolean highlight, int size) {
-        renderManualCroppingActionSprite(
+        boolean hovering = false;
+        hovering |= renderManualCroppingActionSprite(
                 context, bigArrow, x, y,size, size,
                 () -> highlight && (dx < size && dy < 7 || dx < 7 && dy < size)
                 );
-        renderManualCroppingActionSprite(
+        hovering |= renderManualCroppingActionSprite(
                 context, smallArrow, x, y,size, size,
                 () -> dx > 6 && dy > 6 && (dx < 14 + 4 && dy < 39 || dx < 39 && dy < 14 + 4)
         );
+        return hovering;
     }
 
-    private void renderAxisArrow(DrawContext context, int dStart, int dSide, int x, int y,
+    private boolean renderAxisArrow(DrawContext context, int dStart, int dSide, int x, int y,
                                  ManualCroppingAction bigArrow, ManualCroppingAction smallArrow,
                                  boolean highlight, int size) {
-        renderManualCroppingActionSprite(
+        boolean hovering = false;
+        hovering |= renderManualCroppingActionSprite(
                 context, bigArrow, x, y,size, size,
                 () -> highlight && (dStart >= 0 && dStart <= size && dSide < 9)
         );
-        renderManualCroppingActionSprite(
+        hovering |= renderManualCroppingActionSprite(
                 context, smallArrow, x, y,size, size,
                 () -> dSide > 8 && dSide < 14 + 4 && dStart >= 8 && dStart <= 42
         );
+        return hovering;
     }
 
     private enum ManualCroppingAction {
