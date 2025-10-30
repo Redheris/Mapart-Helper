@@ -35,21 +35,21 @@ public class MapartImageConverter {
     );
     private static Future<?> currentConvertingFuture;
 
-    public static void readAndUpdateMapartImage(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, boolean rescale) {
-        FutureTask<Void> future = getVoidFutureTask(updatingMapart, processingMapart, path, rescale);
+    public static void readAndUpdateMapartImage(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
+        FutureTask<Void> future = getVoidFutureTask(updatingMapart, processingMapart, path, imageChangeResult);
 
         if (currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
         currentConvertingFuture = convertingExecutor.submit(future);
     }
 
-    private static @NotNull FutureTask<Void> getVoidFutureTask(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, boolean rescale) {
+    private static @NotNull FutureTask<Void> getVoidFutureTask(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
         FutureTask<Void> future;
         boolean logExecutionTime = MapartHelper.commonConfig.logConversionTime;
         if (!updatingMapart.isReset() && path.equals(processingMapart.getImagePath()))
-            future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, null, logExecutionTime, rescale), null);
+            future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, null, logExecutionTime, imageChangeResult), null);
         else {
-            future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, path, logExecutionTime, rescale), null);
+            future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, path, logExecutionTime, imageChangeResult), null);
         }
         return future;
     }
@@ -74,7 +74,7 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    private static void convertToBlocksPalette(BufferedImage image, boolean use3D, ColorsCounter colorsCounter) {
+    private static void convertToBlocksPalette(BufferedImage image, MapColorEntry bgColor, boolean use3D, ColorsCounter colorsCounter) {
         int width = image.getWidth();
         int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         double progressStep = 1.0 / pixels.length;
@@ -93,7 +93,7 @@ public class MapartImageConverter {
                     return;
                 }
                 int argb = pixels[x + y * width];
-                if (argb == 0 && MapartHelper.conversionSettings.backgroundColor == MapColorEntry.CLEAR) {
+                if (argb == 0 && bgColor == MapColorEntry.CLEAR) {
                     continue;
                 }
                 if (useDithering) {
@@ -107,7 +107,7 @@ public class MapartImageConverter {
                 int newArgb;
                 MapColorEntry color = PaletteColors.getClosestColor(argb, use3D, useDithering);
                 if (color == MapColorEntry.CLEAR) {
-                    color = MapartHelper.conversionSettings.backgroundColor;
+                    color = bgColor;
                 }
                 if (useDithering && color != MapColorEntry.CLEAR)
                     ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
@@ -161,14 +161,14 @@ public class MapartImageConverter {
         private final ProcessingMapartImage mapart;
         private final Path newImagePath;
         private final boolean logExecutionTime;
-        private final boolean rescale;
+        private final ImageChangeResult imageChangeResult;
 
-        public ConvertImageFileRunnable(ConvertedMapartImage updatingMapart, ProcessingMapartImage mapart, Path path, boolean logExecutionTime, boolean rescale) {
+        public ConvertImageFileRunnable(ConvertedMapartImage updatingMapart, ProcessingMapartImage mapart, Path path, boolean logExecutionTime, ImageChangeResult imageChangeResult) {
             this.updatingMapart = updatingMapart;
             this.mapart = mapart;
             this.newImagePath = path;
             this.logExecutionTime = logExecutionTime;
-            this.rescale = rescale;
+            this.imageChangeResult = imageChangeResult;
         }
 
         @Override
@@ -176,6 +176,10 @@ public class MapartImageConverter {
             try {
                 long startTime = System.currentTimeMillis();
                 conversionProgress = new AtomicDouble(0.0);
+
+                boolean showOriginalImage = MapartHelper.conversionSettings.showOriginalImage;
+                MapColorEntry bgColor = MapartHelper.conversionSettings.backgroundColor;
+
                 if (newImagePath != null) {
                     mapart.setImagePath(null);
                     mapart.setOriginal(ImageIO.read(newImagePath.toFile()));
@@ -184,20 +188,24 @@ public class MapartImageConverter {
                 }
                 if (Thread.currentThread().isInterrupted()) return;
 
-                BufferedImage bufferedImage = cropAndScaleToMapSize(mapart, rescale);
+                BufferedImage bufferedImage = cropAndScaleToMapSize(
+                        mapart,
+                        imageChangeResult == ImageChangeResult.NEED_RESCALE
+                                || imageChangeResult == ImageChangeResult.TOP_LINE_CHANGED && bgColor == MapColorEntry.CLEAR && !showOriginalImage
+                );
                 if (Thread.currentThread().isInterrupted()) return;
 
-                if (rescale) {
+                if (imageChangeResult != ImageChangeResult.SIMPLE) {
                     bufferedImage = preprocessImage(bufferedImage);
                     if (Thread.currentThread().isInterrupted()) return;
 
                     PaletteColors.clearColorCache();
                     mapart.getColorsCounter().clear();
-                    if (!MapartHelper.conversionSettings.showOriginalImage) {
+                    if (!showOriginalImage) {
                         if (PaletteConfigManager.presetsConfig.getCurrentPresetColors().isEmpty())
                             bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                         else
-                            convertToBlocksPalette(bufferedImage, MapartHelper.conversionSettings.use3D(), mapart.getColorsCounter());
+                            convertToBlocksPalette(bufferedImage, bgColor, MapartHelper.conversionSettings.use3D(), mapart.getColorsCounter());
                     }
                     if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
                         mapart.setScaledImage(bufferedImage.getSubimage(
@@ -210,7 +218,7 @@ public class MapartImageConverter {
 
                 mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(
                         bufferedImage,
-                        MapartHelper.conversionSettings.backgroundColor,
+                        bgColor,
                         CurrentConversionSettings.doShowTransparent)
                 );
                 if (Thread.currentThread().isInterrupted()) return;

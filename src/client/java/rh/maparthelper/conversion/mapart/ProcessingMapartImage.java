@@ -1,6 +1,7 @@
 package rh.maparthelper.conversion.mapart;
 
 import net.minecraft.client.texture.NativeImage;
+import rh.maparthelper.conversion.ImageChangeResult;
 
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
@@ -168,10 +169,10 @@ public class ProcessingMapartImage extends MapartImage {
         croppingFrame.setHeight(cropHeight);
     }
 
-    public boolean moveCroppingFrame(int dx, int dy, int type) {
-        if (original == null) return false;
+    public ImageChangeResult moveCroppingFrame(int dx, int dy, int type) {
+        if (original == null) return ImageChangeResult.SIMPLE;
 
-        boolean needRescale = false;
+        ImageChangeResult imageChangeResult = ImageChangeResult.SIMPLE;
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -184,21 +185,27 @@ public class ProcessingMapartImage extends MapartImage {
                 insertionX = 0;
                 int oldCropX = croppingFrame.getX();
                 croppingFrame.setX(Math.clamp(oldCropX - dx, 0, imageWidth - croppingFrame.getWidth()));
-                needRescale = croppingFrame.getX() != oldCropX;
+                if (croppingFrame.getX() != oldCropX)
+                    imageChangeResult = ImageChangeResult.NEED_RESCALE;
             }
         }
 
         if (dy != 0) {
-            if (scaledImage.getHeight() < mapartHeight)
+            if (scaledImage.getHeight() < mapartHeight) {
+                boolean wasTop = insertionY == 0;
                 insertionY = Math.clamp(insertionY - (long) dy * type, 0, mapartHeight - scaledImage.getHeight());
+                if (wasTop != (insertionY == 0))
+                    imageChangeResult = ImageChangeResult.TOP_LINE_CHANGED;
+            }
             else {
                 insertionY = 0;
                 int oldCropY = croppingFrame.getY();
                 croppingFrame.setY(Math.clamp(oldCropY - dy, 0, imageHeight - croppingFrame.getHeight()));
-                needRescale = croppingFrame.getY() != oldCropY;
+                if (croppingFrame.getY() != oldCropY)
+                    imageChangeResult = ImageChangeResult.NEED_RESCALE;
             }
         }
-        return needRescale;
+        return imageChangeResult;
     }
 
     public void setNativeImage(NativeImage nativeImage) {

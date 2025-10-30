@@ -471,7 +471,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
-        MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst(), true);
+        MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst());
     }
 
 
