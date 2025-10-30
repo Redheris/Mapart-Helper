@@ -51,16 +51,21 @@ public class ClientCommands {
                 )
                 .then(literal("beams")
                         .executes(ctx -> {
-                            ClientCommandsContext.showMapartStartPos = !ClientCommandsContext.showMapartStartPos;
-                            Text status;
-                            if (ClientCommandsContext.showMapartStartPos)
-                                status = Text.translatable("maparthelper.beams_on").formatted(Formatting.GREEN);
-                            else
-                                status = Text.translatable("maparthelper.beams_off").formatted(Formatting.RED);
+//                            ClientCommandsContext.showMapartStartPos = !ClientCommandsContext.showMapartStartPos;
+//                            Text status;
+//                            if (ClientCommandsContext.showMapartStartPos)
+//                                status = Text.translatable("maparthelper.beams_on").formatted(Formatting.GREEN);
+//                            else
+//                                status = Text.translatable("maparthelper.beams_off").formatted(Formatting.RED);
+//                            ctx.getSource().getPlayer().sendMessage(
+//                                    Text.translatable("maparthelper.beams_change_status", status)
+//                                            .formatted(Formatting.DARK_AQUA),
+//                                    true
+//                            );
                             ctx.getSource().getPlayer().sendMessage(
-                                    Text.translatable("maparthelper.beams_change_status", status)
-                                            .formatted(Formatting.DARK_AQUA),
-                                    true
+                                    Text.translatable("maparthelper.beams_temporarily_disabled")
+                                            .formatted(Formatting.RED),
+                                    false
                             );
                             return 1;
                         })

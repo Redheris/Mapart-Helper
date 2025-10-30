@@ -1,4 +1,6 @@
 {
+  "maparthelper.beams_temporarily_disabled": "Команда /beams временно отключена в 1.21.9+ по техническим причинам",
+
   "maparthelper.commands_list_1": "Команды Mapart Helper:",
   "maparthelper.commands_list_2": "§7/mart save hand [имя_файла]§f — Сохранить изображение карты в руке",
   "maparthelper.commands_list_3": "§7/mart save frame [имя_файла]§f — Сохранить изображение из рамки, на которую вы смотрите",
