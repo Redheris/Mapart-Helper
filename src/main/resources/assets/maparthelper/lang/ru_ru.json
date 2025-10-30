@@ -59,6 +59,7 @@
 
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
   "maparthelper.gui.shulker_box_abbr": "Ш",
+  "maparthelper.gui.toggle_manual_cropping_buttons": "Переключить отображение кнопок для ручного кадрирования",
   "maparthelper.gui.reset_mapart": "Сброс мапарта",
   "maparthelper.gui.mapart_name_field": "Название мапарта",
   "maparthelper.gui.cropMode": "Кадрирование: ",

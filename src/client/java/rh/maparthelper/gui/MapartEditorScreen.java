@@ -188,6 +188,17 @@ public class MapartEditorScreen extends ScreenAdapted {
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
         adder.add(previewMode, settingsLeftPositioner.copy().marginTop(0));
 
+        // The button will be added in the Mapart preview area below
+        ButtonWidget toggleManualCroppingButtonsButton = ButtonWidget.builder(
+                Text.literal("\uD83D\uDDBC").formatted(CurrentConversionSettings.doShowManualCroppingButtons ? Formatting.RESET : Formatting.DARK_GRAY),
+                (btn) -> {
+                    boolean doShowManualCroppingButtons = !CurrentConversionSettings.doShowManualCroppingButtons;
+                    CurrentConversionSettings.doShowManualCroppingButtons = doShowManualCroppingButtons;
+                    btn.setMessage(btn.getMessage().copy().formatted(doShowManualCroppingButtons ? Formatting.RESET : Formatting.DARK_GRAY));
+                }
+        ).size(20, 20).build();
+        // ===============================================
+
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.translatable("maparthelper.gui.cropMode"),
@@ -197,6 +208,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 e -> {
                     CroppingMode cropMode = (CroppingMode) e;
                     CurrentConversionSettings.cropMode = cropMode;
+                    toggleManualCroppingButtonsButton.active = cropMode == CroppingMode.USER_CROP;
                     MapartImageUpdater.changeCroppingMode(mapart, cropMode);
                 },
                 CroppingMode.values()
@@ -401,8 +413,12 @@ public class MapartEditorScreen extends ScreenAdapted {
         mapartOptions.add(createSaveMapartDropdown());
 
         ButtonWidget showGridButton = ButtonWidget.builder(
-                Text.of("#"),
-                (btn) -> CurrentConversionSettings.doShowGrid = !CurrentConversionSettings.doShowGrid
+                Text.literal("#").formatted(CurrentConversionSettings.doShowGrid ? Formatting.AQUA : Formatting.RESET),
+                (btn) -> {
+                    boolean doShowGrid = !CurrentConversionSettings.doShowGrid;
+                    CurrentConversionSettings.doShowGrid = doShowGrid;
+                    btn.setMessage(btn.getMessage().copy().formatted(doShowGrid ? Formatting.AQUA : Formatting.RESET));
+                }
         ).size(20, 20).build();
         showGridButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showGrid_tooltip")));
         mapartOptions.add(showGridButton);
@@ -419,6 +435,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(20, 20).build();
         showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
         mapartOptions.add(showInWorldButton);
+
+        toggleManualCroppingButtonsButton.active = CurrentConversionSettings.cropMode == CroppingMode.USER_CROP;
+        toggleManualCroppingButtonsButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.toggle_manual_cropping_buttons")));
+        mapartOptions.add(toggleManualCroppingButtonsButton);
 
         ButtonWidget resetMapartButton = ButtonWidget.builder(
                 Text.of("⟲"),
