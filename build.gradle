@@ -111,12 +111,12 @@ publishMods {
 		requires("cloth-config")
 		optional("modmenu")
 	}
-	github {
-		accessToken = providers.environmentVariable("GITHUB_TOKEN")
-		announcementTitle = "GitHub"
-		repository = "Redheris/Mapart-Helper"
-		commitish = "main"
-	}
+//	github {
+//		accessToken = providers.environmentVariable("GITHUB_TOKEN")
+//		announcementTitle = "GitHub"
+//		repository = "Redheris/Mapart-Helper"
+//		commitish = "main"
+//	}
 //	discord {
 //		webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
 //		username = "Release publisher"
