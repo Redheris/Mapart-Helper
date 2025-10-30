@@ -208,6 +208,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.translatable("maparthelper.gui.staircaseStyle"),
                 Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.staircaseStyle.name())
         );
+        staircaseStyle.toggleTooltips(MapartHelper.commonConfig.showStaircaseTooltips);
         staircaseStyle.addEntries(
                 e -> {
                     ConversionConfiguration config = MapartHelper.conversionSettings;

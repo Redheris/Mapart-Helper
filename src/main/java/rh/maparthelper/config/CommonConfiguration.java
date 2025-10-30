@@ -12,8 +12,9 @@ public class CommonConfiguration implements ConfigData {
     public int selectionColor = 0x9900ff;
 
     public int fakeItemFramesLiveTime = 100;
-    public boolean showUseLABTooltip = true;
     public boolean logConversionTime = false;
+    public boolean showUseLABTooltip = true;
+    public boolean showStaircaseTooltips = true;
 
     @ConfigEntry.Gui.Tooltip(count = 3)
     @ConfigEntry.Gui.CollapsibleObject
