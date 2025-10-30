@@ -3,6 +3,7 @@ package rh.maparthelper.conversion;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 
 public class CurrentConversionSettings {
     // GUI image
@@ -12,6 +13,8 @@ public class CurrentConversionSettings {
 
     public static CroppingMode cropMode = CroppingMode.AUTO_CROP;
     public static boolean doShowGrid = false;
+    public static boolean doShowTransparent = false;
+    public static boolean doShowManualCroppingButtons = true;
 
     // Image preprocessing
     public static float brightness = 1.0f;
@@ -27,30 +30,8 @@ public class CurrentConversionSettings {
         return mapart.getWidth();
     }
 
-    public static boolean setMapartWidth(int width) {
-        if (mapart.getWidth() == width) return false;
-
-        mapart.setWidth(width);
-        guiMapartImage = null;
-        if (mapart.original != null) {
-            mapart.centerCroppingFrame();
-        }
-        return true;
-    }
-
     public static int getMapartHeight() {
         return mapart.getHeight();
-    }
-
-    public static boolean setMapartHeight(int height) {
-        if (mapart.getHeight() == height) return false;
-
-        mapart.setHeight(height);
-        guiMapartImage = null;
-        if (mapart.original != null) {
-            mapart.centerCroppingFrame();
-        }
-        return true;
     }
 
     public static boolean isMapartConverted() {

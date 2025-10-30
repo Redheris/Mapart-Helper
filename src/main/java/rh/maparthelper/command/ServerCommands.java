@@ -23,10 +23,6 @@ public class ServerCommands {
     public static void registerCommands() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
             dispatcher.register(literal("mart-creative")
-                .executes(ctx -> {
-                    // Commands list
-                    return 1;
-                })
                 .then(literal("palette")
                     .then(literal("place").then(argument("height", IntegerArgumentType.integer())
                         .executes(ctx -> {

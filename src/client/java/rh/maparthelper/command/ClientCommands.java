@@ -24,7 +24,13 @@ public class ClientCommands {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
             dispatcher.register(literal("mart")
                 .executes(ctx -> {
-                    // Commands list
+                    var player = ctx.getSource().getPlayer();
+                    player.sendMessage(Text.empty(), false);
+                    player.sendMessage(Text.translatable("maparthelper.commands_list_1").formatted(Formatting.BOLD, Formatting.DARK_AQUA), false);
+                    for (int i = 2; i < 8; i++) {
+                        player.sendMessage(Text.translatable("maparthelper.commands_list_" + i), false);
+                    }
+                    player.sendMessage(Text.empty(), false);
                     return 1;
                 })
                 .then(literal("save")

@@ -25,11 +25,11 @@ import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
-import rh.maparthelper.conversion.ConvertedMapartImage;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
-import rh.maparthelper.conversion.MapartImageConverter;
+import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.schematic.NbtSchematicUtils;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
@@ -183,11 +183,22 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
                     btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(baseElementWidth, 20).build();
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
         adder.add(previewMode, settingsLeftPositioner.copy().marginTop(0));
+
+        // The button will be added in the Mapart preview area below
+        ButtonWidget toggleManualCroppingButtonsButton = ButtonWidget.builder(
+                Text.literal("\uD83D\uDDBC").formatted(CurrentConversionSettings.doShowManualCroppingButtons ? Formatting.RESET : Formatting.DARK_GRAY),
+                (btn) -> {
+                    boolean doShowManualCroppingButtons = !CurrentConversionSettings.doShowManualCroppingButtons;
+                    CurrentConversionSettings.doShowManualCroppingButtons = doShowManualCroppingButtons;
+                    btn.setMessage(btn.getMessage().copy().formatted(doShowManualCroppingButtons ? Formatting.RESET : Formatting.DARK_GRAY));
+                }
+        ).size(20, 20).build();
+        // ===============================================
 
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
@@ -196,8 +207,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         croppingMode.addEntries(
                 e -> {
-                    CurrentConversionSettings.cropMode = (CroppingMode) e;
-                    MapartImageConverter.updateMapart(mapart);
+                    CroppingMode cropMode = (CroppingMode) e;
+                    CurrentConversionSettings.cropMode = cropMode;
+                    toggleManualCroppingButtonsButton.active = cropMode == CroppingMode.USER_CROP;
+                    MapartImageUpdater.changeCroppingMode(mapart, cropMode);
                 },
                 CroppingMode.values()
         );
@@ -208,13 +221,14 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.translatable("maparthelper.gui.staircaseStyle"),
                 Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.staircaseStyle.name())
         );
+        staircaseStyle.toggleTooltips(MapartHelper.commonConfig.showStaircaseTooltips);
         staircaseStyle.addEntries(
                 e -> {
                     ConversionConfiguration config = MapartHelper.conversionSettings;
                     boolean was3D = config.use3D();
                     config.staircaseStyle = (StaircaseStyles) e;
                     if (config.use3D() != was3D)
-                        MapartImageConverter.updateMapart(mapart);
+                        MapartImageUpdater.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 StaircaseStyles.values()
@@ -230,7 +244,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         ditheringAlg.addEntries(
                 e -> {
                     MapartHelper.conversionSettings.ditheringAlgorithm = (DitheringAlgorithms) e;
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 DitheringAlgorithms.values()
@@ -244,7 +258,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     MapartHelper.conversionSettings.useLAB = !MapartHelper.conversionSettings.useLAB;
                     btn.setMessage(Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB ? isOn : isOff));
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(80, 20).build();
 
@@ -270,7 +284,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     if (current.mapColor() != c.mapColor() || current.brightness() != c.brightness()) {
                         MapartHelper.conversionSettings.backgroundColor = c;
                         AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
-                        MapartImageConverter.updateMapart(mapart);
+                        MapartImageUpdater.updateMapart(mapart);
                     }
                 }
         ).forEachChild(colorPicker::addEntry);
@@ -359,7 +373,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
                         MapartHelper.conversionSettings.backgroundColor = MapColorEntry.CLEAR;
                     }
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
         );
@@ -389,19 +403,23 @@ public class MapartEditorScreen extends ScreenAdapted {
         // =========== Mapart preview area ===========
 
         mapartPreview = new MapartPreviewWidget(mapart,
-                settingsLeft.getX() + settingsLeft.getWidth() + 15, 33,
+                settingsLeft.getX() + settingsLeft.getWidth() + 9, 33,
                 settingsRight.getX() - 15, this.height - 20
         );
         this.addDrawableChild(mapartPreview);
 
         DirectionalLayoutWidget mapartOptions = DirectionalLayoutWidget.horizontal().spacing(2);
-        mapartOptions.setPosition(mapartPreview.getX(), 10);
+        mapartOptions.setPosition(mapartPreview.getImageX(), 10);
 
         mapartOptions.add(createSaveMapartDropdown());
 
         ButtonWidget showGridButton = ButtonWidget.builder(
-                Text.of("#"),
-                (btn) -> CurrentConversionSettings.doShowGrid = !CurrentConversionSettings.doShowGrid
+                Text.literal("#").formatted(CurrentConversionSettings.doShowGrid ? Formatting.AQUA : Formatting.RESET),
+                (btn) -> {
+                    boolean doShowGrid = !CurrentConversionSettings.doShowGrid;
+                    CurrentConversionSettings.doShowGrid = doShowGrid;
+                    btn.setMessage(btn.getMessage().copy().formatted(doShowGrid ? Formatting.AQUA : Formatting.RESET));
+                }
         ).size(20, 20).build();
         showGridButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showGrid_tooltip")));
         mapartOptions.add(showGridButton);
@@ -418,6 +436,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(20, 20).build();
         showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
         mapartOptions.add(showInWorldButton);
+
+        toggleManualCroppingButtonsButton.active = CurrentConversionSettings.cropMode == CroppingMode.USER_CROP;
+        toggleManualCroppingButtonsButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.toggle_manual_cropping_buttons")));
+        mapartOptions.add(toggleManualCroppingButtonsButton);
 
         ButtonWidget resetMapartButton = ButtonWidget.builder(
                 Text.of("⟲"),
@@ -471,7 +493,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     @Override
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
-        MapartImageConverter.readAndUpdateMapartImage(mapart, paths.getFirst());
+        MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst());
     }
 
 
@@ -501,8 +523,14 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             widthInput.setSuggestion(null);
             try {
-                if (CurrentConversionSettings.setMapartWidth(Integer.parseInt(value))) {
-                    MapartImageConverter.updateMapart(mapart);
+                int newWidth = Integer.parseInt(value);
+                if (newWidth <= 0) {
+                    widthInput.setEditableColor(Colors.LIGHT_RED);
+                } else if (CurrentConversionSettings.mapart.isReset()) {
+                    CurrentConversionSettings.mapart.setMapartSize(newWidth, mapart.getHeight());
+                } else if (newWidth != mapart.getWidth()) {
+                    CurrentConversionSettings.guiMapartImage = null;
+                    MapartImageUpdater.resizeMapartImage(mapart, newWidth, mapart.getHeight());
                 }
             } catch (NumberFormatException e) {
                 widthInput.setEditableColor(Colors.LIGHT_RED);
@@ -520,8 +548,14 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             heightInput.setSuggestion(null);
             try {
-                if (CurrentConversionSettings.setMapartHeight(Integer.parseInt(value))) {
-                    MapartImageConverter.updateMapart(mapart);
+                int newHeight = Integer.parseInt(value);
+                if (newHeight <= 0) {
+                    heightInput.setEditableColor(Colors.LIGHT_RED);
+                } else if (CurrentConversionSettings.mapart.isReset()) {
+                    CurrentConversionSettings.mapart.setMapartSize(mapart.getWidth(), newHeight);
+                } else if (newHeight != mapart.getHeight()) {
+                    CurrentConversionSettings.guiMapartImage = null;
+                    MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), newHeight);
                 }
             } catch (NumberFormatException e) {
                 heightInput.setEditableColor(Colors.LIGHT_RED);
@@ -541,7 +575,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.brightness,
                 value -> {
                     CurrentConversionSettings.brightness = value.floatValue();
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 value -> String.format(brightness.getString() + ": %.2f", value)
         );
@@ -554,7 +588,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.contrast,
                 value -> {
                     CurrentConversionSettings.contrast = value.floatValue();
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 value -> String.format(contrast.getString() + ": %.0f", value)
         );
@@ -567,7 +601,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 CurrentConversionSettings.saturation,
                 value -> {
                     CurrentConversionSettings.saturation = value.floatValue();
-                    MapartImageConverter.updateMapart(mapart);
+                    MapartImageUpdater.updateMapart(mapart);
                 },
                 value -> String.format(saturation.getString() + ": %.2f", value)
         );
