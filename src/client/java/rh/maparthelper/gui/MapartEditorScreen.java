@@ -395,7 +395,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         this.addDrawableChild(mapartPreview);
 
         DirectionalLayoutWidget mapartOptions = DirectionalLayoutWidget.horizontal().spacing(2);
-        mapartOptions.setPosition(mapartPreview.getX(), 10);
+        mapartOptions.setPosition(mapartPreview.getImageX(), 10);
 
         mapartOptions.add(createSaveMapartDropdown());
 
