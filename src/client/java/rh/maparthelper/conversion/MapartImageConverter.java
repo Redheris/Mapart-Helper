@@ -188,15 +188,15 @@ public class MapartImageConverter {
                 }
                 if (Thread.currentThread().isInterrupted()) return;
 
-                BufferedImage bufferedImage = cropAndScaleToMapSize(
-                        mapart,
-                        imageChangeResult == ImageChangeResult.NEED_RESCALE
-                                || imageChangeResult == ImageChangeResult.TOP_LINE_CHANGED && bgColor == MapColorEntry.CLEAR && !showOriginalImage
-                );
+                boolean needReconvertingColors = imageChangeResult != ImageChangeResult.SIMPLE
+                        && (imageChangeResult == ImageChangeResult.NEED_RESCALE || bgColor == MapColorEntry.CLEAR && !showOriginalImage);
+
+                BufferedImage bufferedImage = cropAndScaleToMapSize(mapart, needReconvertingColors);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 if (imageChangeResult != ImageChangeResult.SIMPLE) {
-                    bufferedImage = preprocessImage(bufferedImage);
+                    if (needReconvertingColors)
+                        bufferedImage = preprocessImage(bufferedImage);
                     if (Thread.currentThread().isInterrupted()) return;
 
                     PaletteColors.clearColorCache();
