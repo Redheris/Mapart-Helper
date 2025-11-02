@@ -1,6 +1,4 @@
 {
-  "maparthelper.beams_temporarily_disabled": "The /beams command is temporarily disabled in 1.21.9+ for technical reasons",
-
   "maparthelper.commands_list_1": "Mapart Helper Commands:",
   "maparthelper.commands_list_2": "§7/mart save hand [filename]§f — Save image from held map",
   "maparthelper.commands_list_3": "§7/mart save frame [filename]§f — Save image from item frame you're looking at",
