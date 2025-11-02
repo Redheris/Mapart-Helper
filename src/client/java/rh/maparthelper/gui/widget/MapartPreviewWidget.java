@@ -12,6 +12,7 @@ import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
@@ -160,7 +161,7 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     @Override
     public boolean keyReleased(KeyInput input) {
-        if (input.hasShift()) {
+        if (input.key() == GLFW.GLFW_KEY_LEFT_SHIFT) {
             this.scaleToCursor = true;
             return true;
         }
