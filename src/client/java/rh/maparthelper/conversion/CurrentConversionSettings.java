@@ -3,6 +3,7 @@ package rh.maparthelper.conversion;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 
 public class CurrentConversionSettings {
@@ -22,6 +23,7 @@ public class CurrentConversionSettings {
     public static float saturation = 1.0f;
 
     public static void resetMapart() {
+        PaletteColors.clearIgnoringColors();
         guiMapartImage = null;
         mapart.reset();
     }

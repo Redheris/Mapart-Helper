@@ -8,14 +8,18 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.joml.Matrix3x2f;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
@@ -33,9 +37,11 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.schematic.NbtSchematicUtils;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
+import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -700,10 +706,18 @@ public class MapartEditorScreen extends ScreenAdapted {
         private static MaterialListBlockWidget fixedHighlight;
         private static boolean hoveringAny = false;
         private final MapColor mapColor;
+        private boolean confirmRemoving = false;
 
         public MaterialListBlockWidget(int x, int y, int squareSize, Block block, MapColor mapColor) {
             super(x, y, squareSize, block);
             this.mapColor = mapColor;
+            this.tooltip = new ArrayList<>(List.of(
+                    block.getName().asOrderedText(),
+                    Text.translatable("maparthelper.gui.LMB_to_highlight").formatted(Formatting.GRAY).asOrderedText(),
+                    Text.translatable("maparthelper.gui.RMB_to_remove").formatted(Formatting.GRAY).asOrderedText()
+            ));
+            if (client != null && client.options.advancedItemTooltips)
+                this.tooltip.add(Text.literal(Registries.BLOCK.getId(block).toString()).formatted(Formatting.DARK_GRAY).asOrderedText());
         }
 
         @Override
@@ -717,15 +731,53 @@ public class MapartEditorScreen extends ScreenAdapted {
                 mapartPreview.setHighlightingColor(mapColor);
                 hoveringAny = true;
             }
+            if (confirmRemoving && client != null) {
+                KeyedItemRenderState keyedItemRenderState = new KeyedItemRenderState();
+                client.getItemModelManager().clearAndUpdate(keyedItemRenderState, Blocks.BARRIER.asItem().getDefaultStack(), ItemDisplayContext.GUI, client.world, client.player, 0);
+                ItemGuiElementRenderState itemRenderState = new ItemGuiElementRenderState(
+                        "RemoveColor",
+                        new Matrix3x2f(context.getMatrices()),
+                        keyedItemRenderState,
+                        getX(), getY(),
+                        context.scissorStack.peekLast()
+                );
+                context.state.addSpecialElement(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
+                        itemRenderState,
+                        getX(), getY(),
+                        getX() + width, getY() + height,
+                        width
+                ));
+            }
         }
 
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (fixedHighlight == this) {
-                fixedHighlight = null;
-            } else {
-                fixedHighlight = this;
-                mapartPreview.setHighlightingColor(mapColor);
+            if (button == 0) {
+                if (confirmRemoving) {
+                    MapartImageUpdater.removeColorFromMapart(mapart, mapColor);
+                    return true;
+                }
+                if (fixedHighlight == this) {
+                    fixedHighlight = null;
+                } else {
+                    fixedHighlight = this;
+                    mapartPreview.setHighlightingColor(mapColor);
+                }
+                return true;
+            }
+            if (button == 1) {
+                if (fixedHighlight == this) {
+                    fixedHighlight = null;
+                }
+                if (!confirmRemoving) {
+                    confirmRemoving = true;
+                    tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_confirm").formatted(Formatting.RED).asOrderedText());
+                    tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_cancel").formatted(Formatting.RED).asOrderedText());
+                } else {
+                    confirmRemoving = false;
+                    tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_highlight").formatted(Formatting.GRAY).asOrderedText());
+                    tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_remove").formatted(Formatting.GRAY).asOrderedText());
+                }
             }
             return true;
         }

@@ -28,7 +28,7 @@ public class BlockItemWidget extends ClickableWidget {
 
     private Block block;
     private Item blockItem;
-    private List<OrderedText> tooltip;
+    protected List<OrderedText> tooltip;
 
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
         super(x, y, squareSize, squareSize, Text.of(block.getName()));

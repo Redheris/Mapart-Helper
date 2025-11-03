@@ -1,5 +1,7 @@
 package rh.maparthelper.conversion;
 
+import net.minecraft.block.MapColor;
+import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
 
@@ -77,6 +79,20 @@ public class MapartImageUpdater {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
         processingMapart.fitBySide(side);
+        MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
+    }
+
+    public static void removeColorFromMapart(ConvertedMapartImage mapart, MapColor mapColor) {
+        if (mapart.isReset()) return;
+        ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
+        if (PaletteColors.addIgnoringColor(mapColor))
+            MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
+    }
+
+    public static void revertRemovingColors(ConvertedMapartImage mapart) {
+        if (mapart.isReset()) return;
+        ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
+        PaletteColors.clearIgnoringColors();
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 }
