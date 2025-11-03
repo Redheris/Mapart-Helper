@@ -10,15 +10,24 @@ public class CommonConfiguration implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.ColorPicker
     public int selectionColor = 0x9900ff;
-
     public int fakeItemFramesLiveTime = 100;
-    public boolean logConversionTime = false;
-    public boolean showUseLABTooltip = true;
-    public boolean showStaircaseTooltips = true;
+
+    @ConfigEntry.Gui.CollapsibleObject()
+    public MapartEditorSettings mapartEditor = new MapartEditorSettings();
 
     @ConfigEntry.Gui.Tooltip(count = 3)
     @ConfigEntry.Gui.CollapsibleObject
     public UseInBlockPalette useInPalette = new UseInBlockPalette();
+
+    public static class MapartEditorSettings {
+        public boolean logConversionTime = false;
+        @ConfigEntry.Gui.Tooltip
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int previewHighlightingColor = 0xFF9900ff;
+        public boolean previewHighlightOnHover = true;
+        public boolean showUseLABTooltip = true;
+        public boolean showStaircaseTooltips = true;
+    }
 
     public static class UseInBlockPalette {
         @ConfigEntry.Gui.Tooltip(count = 2)

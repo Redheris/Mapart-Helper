@@ -85,7 +85,7 @@ public class MapartPreviewWidget extends ClickableWidget {
                         highlightingColor.getRenderColor(MapColor.Brightness.LOW),
                         highlightingColor.getRenderColor(MapColor.Brightness.NORMAL),
                         highlightingColor.getRenderColor(MapColor.Brightness.HIGH),
-                        0xFF9900ff
+                        MapartHelper.commonConfig.mapartEditor.previewHighlightingColor
                 );
             }
             context.drawTexture(

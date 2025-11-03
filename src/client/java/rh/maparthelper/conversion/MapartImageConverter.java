@@ -45,7 +45,7 @@ public class MapartImageConverter {
 
     private static @NotNull FutureTask<Void> getVoidFutureTask(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
         FutureTask<Void> future;
-        boolean logExecutionTime = MapartHelper.commonConfig.logConversionTime;
+        boolean logExecutionTime = MapartHelper.commonConfig.mapartEditor.logConversionTime;
         if (!updatingMapart.isReset() && path.equals(processingMapart.getImagePath()))
             future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, null, logExecutionTime, imageChangeResult), null);
         else {

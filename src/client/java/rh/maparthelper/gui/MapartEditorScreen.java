@@ -222,7 +222,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.translatable("maparthelper.gui.staircaseStyle"),
                 Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.staircaseStyle.name())
         );
-        staircaseStyle.toggleTooltips(MapartHelper.commonConfig.showStaircaseTooltips);
+        staircaseStyle.toggleTooltips(MapartHelper.commonConfig.mapartEditor.showStaircaseTooltips);
         staircaseStyle.addEntries(
                 e -> {
                     ConversionConfiguration config = MapartHelper.conversionSettings;
@@ -263,7 +263,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
         ).size(80, 20).build();
 
-        if (MapartHelper.commonConfig.showUseLABTooltip) {
+        if (MapartHelper.commonConfig.mapartEditor.showUseLABTooltip) {
             useLAB.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.useLAB_tooltip")));
             useLAB.setTooltipDelay(Duration.ofMillis(500));
         }
@@ -711,8 +711,9 @@ public class MapartEditorScreen extends ScreenAdapted {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
             if (fixedHighlight == this) {
                 context.createNewRootLayer();
-                context.drawBorder(getX(), getY(), this.width, this.height, 0xff9900ff);
-            } else if (context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+                context.drawBorder(getX(), getY(), this.width, this.height, MapartHelper.commonConfig.mapartEditor.previewHighlightingColor);
+            } else if (MapartHelper.commonConfig.mapartEditor.previewHighlightOnHover
+                    && context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 mapartPreview.setHighlightingColor(mapColor);
                 hoveringAny = true;
             }

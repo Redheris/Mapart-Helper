@@ -104,14 +104,20 @@
   "maparthelper.gui.save": "Сохранить",
   "maparthelper.gui.presets.remove_color": "Не использовать цвет",
 
+
   "key.maparthelper.openScreen": "Открыть редактор мапартов",
   "text.autoconfig.mapart-helper.title": "Mapart Helper",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "Для /mart save selection и /mart beams",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor": "Цвет при выделении мапарта",
   "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Длительность показа фейковых рамок (в тиках)",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.logConversionTime": "Выводить длительность обработки арта в логи",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.showUseLABTooltip": "Отображать подсказку для переключения LAB",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.showStaircaseTooltips": "Отображать подсказки для вариантов ступенчатости",
+
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor": "Настройки редактора мапартов:",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.logConversionTime": "Выводить длительность обработки арта в логи",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightingColor": "Цвет выделения на превью мапарта",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightingColor.@Tooltip": "Выделение всех вхождений определённого блока из списка материалов",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightOnHover": "Выделять цвет на превью при наведении",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showUseLABTooltip": "Отображать подсказку для переключения LAB",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Отображать подсказки для вариантов ступенчатости",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",
