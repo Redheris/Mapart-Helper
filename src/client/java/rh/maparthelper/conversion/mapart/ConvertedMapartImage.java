@@ -61,12 +61,13 @@ public final class ConvertedMapartImage extends MapartImage {
         return reset;
     }
 
-    public MapColorCount[] getColorCounts() {
+    public MapColorCount[] getColorCounts(boolean ascending) {
         MapColorCount[] countsSorted = new MapColorCount[63];
         for (int id = 1; id < 64; id++) {
             countsSorted[id - 1] = new MapColorCount(id, colorsCounter.get(id));
         }
-        Arrays.sort(countsSorted, Comparator.comparingInt(MapColorCount::amount).reversed());
+        Comparator<MapColorCount> comparator = Comparator.comparingInt(MapColorCount::amount);
+        Arrays.sort(countsSorted, ascending ? comparator : comparator.reversed());
         return countsSorted;
     }
 

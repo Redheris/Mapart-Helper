@@ -60,6 +60,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ButtonWidget showInWorldButton;
 
     private int auxBlockCount = 0;
+    private static boolean materialsAscendingOrder = false;
 
     public MapartEditorScreen() {
         super(Text.translatable("maparthelper.gui.mapart_editor_screen"));
@@ -82,7 +83,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
 
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
-        ConvertedMapartImage.MapColorCount[] colorsCounter = mapart.getColorCounts();
+        ConvertedMapartImage.MapColorCount[] colorsCounter = mapart.getColorCounts(materialsAscendingOrder);
 
         this.auxBlockCount = mapart.getWidth() * 128;
         BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock);
@@ -396,10 +397,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(baseElementWidth, 20).build();
         settingsRight.add(presetsEditor);
 
-        settingsRight.add(
-                new TextWidget(Text.translatable("maparthelper.gui.material_list_label"), textRenderer),
-                settingsRightPositioner.copy().marginTop(15)
-        );
+        DirectionalLayoutWidget materialListSettings = DirectionalLayoutWidget.horizontal().spacing(2);
+        materialListSettings.getMainPositioner().marginTop(5).alignBottom();
+        DecorativeButtonWidget sortMaterials = DecorativeButtonWidget.builder(
+                Text.of(materialsAscendingOrder ? "▲" : "▼"),
+                btn -> {
+                    materialsAscendingOrder = !materialsAscendingOrder;
+                    btn.setMessage(Text.of(materialsAscendingOrder ? "▲" : "▼"));
+                    updateMaterialList();
+                }
+        ).size(10, 10).build();
+        materialListSettings.add(sortMaterials);
+        materialListSettings.add(new TextWidget(Text.translatable("maparthelper.gui.material_list_label"), textRenderer));
+        settingsRight.add(materialListSettings);
 
         settingsRight.refreshPositions();
         settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);
