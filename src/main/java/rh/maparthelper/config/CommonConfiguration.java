@@ -5,7 +5,7 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import rh.maparthelper.MapartHelper;
 
-@Config(name = MapartHelper.MOD_ID)
+@Config(name = MapartHelper.CONFIG_DIR)
 public class CommonConfiguration implements ConfigData {
     @ConfigEntry.Gui.Tooltip
     @ConfigEntry.ColorPicker

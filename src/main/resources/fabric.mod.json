@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "mapart-helper",
+	"id": "maparthelper",
 	"version": "${version}",
 	"name": "Mapart Helper",
 	"description": "Aims to to make mapart creation as convenient and enjoyable as possible right in the game: flexibly generate a schematic, save maps as an image files, and more",
