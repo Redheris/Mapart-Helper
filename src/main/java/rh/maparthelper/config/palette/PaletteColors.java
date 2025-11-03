@@ -102,6 +102,10 @@ public class PaletteColors {
         return cachedClosestColors.computeIfAbsent(argb, c -> PaletteColors.getClosestColor2D(c, useDithering));
     }
 
+    public static int excludingColorsAmount() {
+        return ignoringColors.size();
+    }
+
     public static boolean addIgnoringColor(MapColor mapColor) {
         return ignoringColors.add(mapColor);
     }

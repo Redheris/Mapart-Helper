@@ -26,6 +26,7 @@ import rh.maparthelper.command.FakeMapsPreview;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.UseAuxBlocks;
+import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CroppingMode;
@@ -58,6 +59,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ButtonWidget saveSplitNBT;
     private ButtonWidget saveZipNBT;
     private ButtonWidget showInWorldButton;
+    private ButtonWidget resetExcludedColors;
 
     private int auxBlockCount = 0;
     private static boolean materialsAscendingOrder = false;
@@ -192,6 +194,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
                     btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
                     MapartImageUpdater.updateMapart(mapart);
+                    updateResetExcludedColorsButton();
                 }
         ).size(baseElementWidth, 20).build();
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
@@ -398,22 +401,37 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsRight.add(presetsEditor);
 
         DirectionalLayoutWidget materialListSettings = DirectionalLayoutWidget.horizontal().spacing(2);
-        materialListSettings.getMainPositioner().marginTop(5).alignBottom();
-        DecorativeButtonWidget sortMaterials = DecorativeButtonWidget.builder(
+        materialListSettings.getMainPositioner().alignBottom();
+        materialListSettings.add(DecorativeButtonWidget.builder(
                 Text.of(materialsAscendingOrder ? "▲" : "▼"),
                 btn -> {
                     materialsAscendingOrder = !materialsAscendingOrder;
                     btn.setMessage(Text.of(materialsAscendingOrder ? "▲" : "▼"));
                     updateMaterialList();
                 }
-        ).size(10, 10).build();
-        materialListSettings.add(sortMaterials);
+        ).size(10, 10).build());
         materialListSettings.add(new TextWidget(Text.translatable("maparthelper.gui.material_list_label"), textRenderer));
+        resetExcludedColors = ButtonWidget.builder(
+                Text.literal("⟲")
+                        .formatted(Formatting.BOLD)
+                        .formatted(PaletteColors.excludingColorsAmount() > 0 ? Formatting.GOLD : Formatting.WHITE),
+                btn -> {
+                    if (PaletteColors.excludingColorsAmount() == 0) return;
+                    MapartImageUpdater.revertRemovingColors(mapart);
+                    btn.setMessage(btn.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
+                    btn.setTooltip(null);
+                }
+        ).size(14, 14).build();
+        updateResetExcludedColorsButton();
+        materialListSettings.add(resetExcludedColors);
         settingsRight.add(materialListSettings);
 
         settingsRight.refreshPositions();
         settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);
         settingsRight.forEachChild(this::addDrawableChild);
+
+        // Widget positions adjustments
+        resetExcludedColors.setX(width - 5 - resetExcludedColors.getWidth());
 
         updateMaterialList();
 
@@ -459,11 +477,12 @@ public class MapartEditorScreen extends ScreenAdapted {
         mapartOptions.add(toggleManualCroppingButtonsButton);
 
         ButtonWidget resetMapartButton = ButtonWidget.builder(
-                Text.of("⟲"),
+                Text.literal("⟲").formatted(Formatting.BOLD),
                 b -> {
                     CurrentConversionSettings.resetMapart();
                     updateMapartOutputButtons();
                     updateMaterialList();
+                    updateResetExcludedColorsButton();
                 }
         ).size(20, 20).build();
         resetMapartButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.reset_mapart")));
@@ -516,8 +535,22 @@ public class MapartEditorScreen extends ScreenAdapted {
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
         MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst());
+        updateResetExcludedColorsButton();
     }
 
+    private void updateResetExcludedColorsButton() {
+        int excluded = PaletteColors.excludingColorsAmount();
+        if (excluded > 0) {
+            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.GOLD));
+            resetExcludedColors.setTooltip(Tooltip.of(
+                    Text.literal("Исключено блоков: " + PaletteColors.excludingColorsAmount()).formatted(Formatting.GOLD)
+                            .append(Text.literal("\nНажмите для сброса").formatted(Formatting.GRAY))
+            ));
+        } else {
+            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
+            resetExcludedColors.setTooltip(null);
+        }
+    }
 
     private TextFieldWidget createTextInputFieldWidget(int width, String initialValue, int maxLength) {
         TextFieldWidget textInputField = new TextFieldWidget(textRenderer,
@@ -682,7 +715,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> MapartToNBT.saveNBTAsZip()
         ).size(156, 20).build();
 
-        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Text.of("\uD83D\uDDAB"));
+        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Text.literal("\uD83D\uDDAB"));
         saveMapart.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.save_mapart_as")));
         saveMapart.addEntry(saveImage);
         saveMapart.addEntry(saveNBT);
@@ -765,6 +798,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             if (button == 0) {
                 if (confirmRemoving) {
                     MapartImageUpdater.removeColorFromMapart(mapart, mapColor);
+                    updateResetExcludedColorsButton();
                     return true;
                 }
                 if (fixedHighlight == this) {
