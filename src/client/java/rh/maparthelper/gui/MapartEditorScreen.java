@@ -60,6 +60,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     public void updateMaterialList() {
+        MaterialListBlockWidget.fixedHighlight = null;
         this.remove(materialList);
         if (!CurrentConversionSettings.isMapartConverted()) return;
         int listTop = settingsRight.getY() + settingsRight.getHeight();
@@ -99,10 +100,11 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, ConvertedMapartImage.MapColorCount color) {
         if (color.amount() == 0) return;
-        Block block = palette.getBlockOfMapColor(MapColor.get(color.id()));
+        MapColor mapColor = MapColor.get(color.id());
+        Block block = palette.getBlockOfMapColor(mapColor);
         if (block == null) return;
 
-        BlockItemWidget blockItemWidget = new BlockItemWidget(0, 0, 24, block);
+        MaterialListBlockWidget blockItemWidget = new MaterialListBlockWidget(0, 0, 24, block, mapColor);
         adder.add(blockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
         TextWidget amountText = new TextWidget(Text.of(getAmountString(color.amount(), block.asItem().getMaxCount())), textRenderer);
         adder.add(amountText);
@@ -462,6 +464,11 @@ public class MapartEditorScreen extends ScreenAdapted {
         context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
         context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
         super.render(context, mouseX, mouseY, delta);
+
+        if (!MaterialListBlockWidget.hoveringAny) {
+            MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
+        }
+        MaterialListBlockWidget.hoveringAny = false;
     }
 
     @Override
@@ -686,6 +693,47 @@ public class MapartEditorScreen extends ScreenAdapted {
             saveSplitNBT.setTooltip(disabled);
             saveZipNBT.setTooltip(disabled);
             showInWorldButton.setTooltip(disabled);
+        }
+    }
+
+    private class MaterialListBlockWidget extends BlockItemWidget {
+        private static MaterialListBlockWidget fixedHighlight;
+        private static boolean hoveringAny = false;
+        private final MapColor mapColor;
+
+        public MaterialListBlockWidget(int x, int y, int squareSize, Block block, MapColor mapColor) {
+            super(x, y, squareSize, block);
+            this.mapColor = mapColor;
+        }
+
+        @Override
+        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+            super.renderWidget(context, mouseX, mouseY, deltaTicks);
+            if (fixedHighlight == this) {
+                context.createNewRootLayer();
+                context.drawBorder(getX(), getY(), this.width, this.height, 0xff9900ff);
+            } else if (context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+                mapartPreview.setHighlightingColor(mapColor);
+                hoveringAny = true;
+            }
+        }
+
+        @Override
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (fixedHighlight == this) {
+                fixedHighlight = null;
+            } else {
+                fixedHighlight = this;
+                mapartPreview.setHighlightingColor(mapColor);
+            }
+            return true;
+        }
+
+        public static void setDefaultHighlight(MapartPreviewWidget mapartPreview) {
+            if (fixedHighlight == null)
+                mapartPreview.setHighlightingColor(MapColor.CLEAR);
+            else
+                mapartPreview.setHighlightingColor(fixedHighlight.mapColor);
         }
     }
 }
