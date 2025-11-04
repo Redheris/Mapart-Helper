@@ -33,10 +33,9 @@ public class MapartImageUpdater {
     }
 
     public static void resizeMapartImage(ConvertedMapartImage mapart, int width, int height) {
+        mapart.setMapartSize(width, height);
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        processingMapart.setWidth(width);
-        processingMapart.setHeight(height);
         if (processingMapart.getOriginal() != null) {
             processingMapart.autoCropOriginalImage();
         }

@@ -7,5 +7,6 @@
 <summary>Fixes and minor changes</summary>
 
 - Fixed multiple image preprocessing;
+- Added a button to open the config screen;
 
 </details>

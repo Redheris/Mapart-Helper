@@ -595,8 +595,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 int newWidth = Integer.parseInt(value);
                 if (newWidth <= 0) {
                     widthInput.setEditableColor(Colors.LIGHT_RED);
-                } else if (CurrentConversionSettings.mapart.isReset()) {
-                    CurrentConversionSettings.mapart.setMapartSize(newWidth, mapart.getHeight());
                 } else if (newWidth != mapart.getWidth()) {
                     CurrentConversionSettings.guiMapartImage = null;
                     MapartImageUpdater.resizeMapartImage(mapart, newWidth, mapart.getHeight());
@@ -620,8 +618,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 int newHeight = Integer.parseInt(value);
                 if (newHeight <= 0) {
                     heightInput.setEditableColor(Colors.LIGHT_RED);
-                } else if (CurrentConversionSettings.mapart.isReset()) {
-                    CurrentConversionSettings.mapart.setMapartSize(mapart.getWidth(), newHeight);
                 } else if (newHeight != mapart.getHeight()) {
                     CurrentConversionSettings.guiMapartImage = null;
                     MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), newHeight);
