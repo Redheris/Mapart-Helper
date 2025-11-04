@@ -54,8 +54,8 @@
   "maparthelper.gui.option.SIERRA": "Sierra",
   "maparthelper.gui.option.SIERRA_LITE": "Sierra Lite",
   "maparthelper.gui.option.SIERRA_2ROW": "Sierra Two-row",
-  "maparthelper.gui.option.NO_AUX": "Нет",
-  "maparthelper.gui.option.NEEDED": "Только нужные",
+  "maparthelper.gui.option.NO_AUX": "Верхний ряд",
+  "maparthelper.gui.option.NEEDED": "Важные",
 
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
   "maparthelper.gui.shulker_box_abbr": "Ш",

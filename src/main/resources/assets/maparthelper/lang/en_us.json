@@ -55,7 +55,7 @@
   "maparthelper.gui.option.SIERRA_LITE": "Sierra Lite",
   "maparthelper.gui.option.SIERRA_2ROW": "Sierra Two-row",
   "maparthelper.gui.option.NO_AUX": "Only top row",
-  "maparthelper.gui.option.NEEDED": "Needed",
+  "maparthelper.gui.option.NEEDED": "Important",
 
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
   "maparthelper.gui.shulker_box_abbr": "SB",
@@ -80,7 +80,7 @@
   "maparthelper.gui.excluded_colors_amount": "Excluded blocks: %d",
   "maparthelper.gui.revert_excluding_colors": "Click to reset",
   "maparthelper.aux_block": "Auxiliary blocks",
-  "maparthelper.gui.use_aux": "Include: ",
+  "maparthelper.gui.use_aux": "Place: ",
   "maparthelper.gui.showGrid_tooltip": "Toggle grid display",
   "maparthelper.gui.showInWorld_tooltip": "Temporarily preview fake maps in the world",
   "maparthelper.gui.mapart_size_label": "Mapart size",
