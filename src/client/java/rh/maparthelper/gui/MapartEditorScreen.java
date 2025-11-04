@@ -49,6 +49,7 @@ import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
+    private static final Identifier SETTINGS_TEXTURE = Identifier.of(MapartHelper.MOD_ID, "textures/gui/sprites/settings.png");
     protected final ConvertedMapartImage mapart = CurrentConversionSettings.mapart;
 
     private DirectionalLayoutWidget settingsLeft;
@@ -179,6 +180,14 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         settingsLeft.refreshPositions();
         settingsLeft.forEachChild(this::addDrawableChild);
+
+        this.addDrawableChild(
+                DecorativeButtonWidget.builder(
+                        SETTINGS_TEXTURE, btn -> MinecraftClient.getInstance().setScreen(
+                                AutoConfig.getConfigScreen(MapartHelperConfig.class, this).get()
+                        )
+                ).dimensions(2, 4, 14, 14).build()
+        );
 
         int listTop = settingsLeft.getY() + settingsLeft.getHeight();
         ScrollableGridWidget settingsLeftScrollable = new ScrollableGridWidget(
