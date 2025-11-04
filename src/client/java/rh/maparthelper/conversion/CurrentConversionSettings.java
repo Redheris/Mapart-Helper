@@ -23,7 +23,7 @@ public class CurrentConversionSettings {
     public static float saturation = 1.0f;
 
     public static void resetMapart() {
-        PaletteColors.clearIgnoringColors();
+        PaletteColors.clearExcludingColors();
         guiMapartImage = null;
         mapart.reset();
     }

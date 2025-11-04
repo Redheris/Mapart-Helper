@@ -72,7 +72,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public void updateMaterialList() {
         MaterialListBlockWidget.fixedHighlight = null;
-        MaterialListBlockWidget.chosenForRemoving.clear();
+        MaterialListBlockWidget.selectedForExcluding.clear();
         this.remove(materialList);
         if (!CurrentConversionSettings.isMapartConverted()) return;
         int listTop = settingsRight.getY() + settingsRight.getHeight();
@@ -382,7 +382,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         presetsList.addEntries(
                 s -> {
-                    PaletteColors.clearIgnoringColors();
+                    PaletteColors.clearExcludingColors();
                     updateResetExcludedColorsButton();
                     PaletteConfigManager.changeCurrentPreset(s);
                     MapColor oldBgColor = MapartHelper.conversionSettings.backgroundColor.mapColor();
@@ -751,7 +751,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     private class MaterialListBlockWidget extends BlockItemWidget {
-        private static final Set<MapColor> chosenForRemoving = new HashSet<>();
+        private static final Set<MapColor> selectedForExcluding = new HashSet<>();
         private static MaterialListBlockWidget fixedHighlight;
         private static boolean hoveringAny = false;
         private final MapColor mapColor;
@@ -803,8 +803,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (button == 0) {
                 if (confirmRemoving) {
-                    MapartImageUpdater.removeColorsFromMapart(mapart, chosenForRemoving);
+                    MapartImageUpdater.removeColorsFromMapart(mapart, selectedForExcluding);
                     updateResetExcludedColorsButton();
+                    selectedForExcluding.clear();
                     return true;
                 }
                 if (fixedHighlight == this) {
@@ -821,12 +822,12 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
                 if (!confirmRemoving) {
                     confirmRemoving = true;
-                    chosenForRemoving.add(mapColor);
+                    selectedForExcluding.add(mapColor);
                     tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_confirm").formatted(Formatting.RED).asOrderedText());
                     tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_cancel").formatted(Formatting.RED).asOrderedText());
                 } else {
                     confirmRemoving = false;
-                    chosenForRemoving.remove(mapColor);
+                    selectedForExcluding.remove(mapColor);
                     tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_highlight").formatted(Formatting.GRAY).asOrderedText());
                     tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_remove").formatted(Formatting.GRAY).asOrderedText());
                 }

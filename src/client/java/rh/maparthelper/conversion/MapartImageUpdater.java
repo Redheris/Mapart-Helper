@@ -86,14 +86,14 @@ public class MapartImageUpdater {
     public static void removeColorsFromMapart(ConvertedMapartImage mapart, Set<MapColor> excludingColors) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        if (PaletteColors.addIgnoringColors(excludingColors))
+        if (PaletteColors.addExcludingColors(excludingColors))
             MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 
     public static void revertRemovingColors(ConvertedMapartImage mapart) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        PaletteColors.clearIgnoringColors();
+        PaletteColors.clearExcludingColors();
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 }

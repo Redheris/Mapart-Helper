@@ -13,7 +13,7 @@ import java.util.Set;
 public class PaletteColors {
     static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
     static final Map<Integer, MapColorEntry> cachedClosestColors = new HashMap<>();
-    static final Set<MapColor> ignoringColors = new HashSet<>();
+    static final Set<MapColor> excludingColors = new HashSet<>();
 
     public static MapColorEntry getMapColorEntryByARGB(int argb) {
         if (argb == 0) return MapColorEntry.CLEAR;
@@ -31,7 +31,7 @@ public class PaletteColors {
             rgbOriginal = ColorUtils.getRGB(argb);
 
         for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
-            if (ignoringColors.contains(color)) continue;
+            if (excludingColors.contains(color)) continue;
             for (int brightId = 0; brightId < 3; brightId++) {
                 MapColor.Brightness brightness;
                 brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.NORMAL : MapColor.Brightness.validateAndGet(brightId);
@@ -73,7 +73,7 @@ public class PaletteColors {
             rgbOriginal = ColorUtils.getRGB(argb);
 
         for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
-            if (ignoringColors.contains(color)) continue;
+            if (excludingColors.contains(color)) continue;
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);
             if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL, new int[]{0, 0, 0});
 
@@ -106,15 +106,15 @@ public class PaletteColors {
     }
 
     public static int excludingColorsAmount() {
-        return ignoringColors.size();
+        return excludingColors.size();
     }
 
-    public static boolean addIgnoringColors(Set<MapColor> excludingColors) {
-        return ignoringColors.addAll(excludingColors);
+    public static boolean addExcludingColors(Set<MapColor> excludingColors) {
+        return PaletteColors.excludingColors.addAll(excludingColors);
     }
 
-    public static void clearIgnoringColors() {
-        ignoringColors.clear();
+    public static void clearExcludingColors() {
+        excludingColors.clear();
     }
 
     public static void clearColorCache() {
