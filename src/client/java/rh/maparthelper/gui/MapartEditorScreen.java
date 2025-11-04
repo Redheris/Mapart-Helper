@@ -50,7 +50,7 @@ import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
-    private static final Identifier SETTINGS_TEXTURE = Identifier.of(MapartHelper.MOD_ID, "textures/gui/sprites/settings.png");
+    private static final Identifier SETTINGS_TEXTURE = Identifier.of(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
     protected final ConvertedMapartImage mapart = CurrentConversionSettings.mapart;
 
     private DirectionalLayoutWidget settingsLeft;
