@@ -77,6 +77,8 @@
   "maparthelper.gui.RMB_to_remove": "ПКМ для удаления",
   "maparthelper.gui.LMB_to_confirm": "ЛКМ для подтверждения",
   "maparthelper.gui.RMB_to_cancel": "ПКМ для отмены",
+  "maparthelper.gui.excluded_colors_amount": "Исключено блоков: %d",
+  "maparthelper.gui.revert_excluding_colors": "Нажмите для сброса",
   "maparthelper.aux_block": "Вспомогательные блоки",
   "maparthelper.gui.use_aux": "Добавлять: ",
   "maparthelper.gui.showGrid_tooltip": "Переключить отображение сетки",

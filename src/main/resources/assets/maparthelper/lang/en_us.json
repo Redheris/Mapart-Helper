@@ -77,6 +77,8 @@
   "maparthelper.gui.RMB_to_remove": "RMB to remove",
   "maparthelper.gui.LMB_to_confirm": "LMB to confirm",
   "maparthelper.gui.RMB_to_cancel": "RMB to cancel",
+  "maparthelper.gui.excluded_colors_amount": "Excluded blocks: %d",
+  "maparthelper.gui.revert_excluding_colors": "Click to reset",
   "maparthelper.aux_block": "Auxiliary blocks",
   "maparthelper.gui.use_aux": "Include: ",
   "maparthelper.gui.showGrid_tooltip": "Toggle grid display",

@@ -15,6 +15,7 @@ import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
@@ -552,19 +553,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         updateResetExcludedColorsButton();
     }
 
-    private void updateResetExcludedColorsButton() {
-        int excluded = PaletteColors.excludingColorsAmount();
-        if (excluded > 0) {
-            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.GOLD));
-            resetExcludedColors.setTooltip(Tooltip.of(
-                    Text.literal("Исключено блоков: " + PaletteColors.excludingColorsAmount()).formatted(Formatting.GOLD)
-                            .append(Text.literal("\nНажмите для сброса").formatted(Formatting.GRAY))
-            ));
-        } else {
-            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
-            resetExcludedColors.setTooltip(null);
-        }
-    }
 
     private TextFieldWidget createTextInputFieldWidget(int width, String initialValue, int maxLength) {
         TextFieldWidget textInputField = new TextFieldWidget(textRenderer,
@@ -755,10 +743,26 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
     }
 
+    private void updateResetExcludedColorsButton() {
+        int excluded = PaletteColors.excludingColorsAmount();
+        if (excluded > 0) {
+            MutableText excludedAmount = Text.translatable("maparthelper.gui.excluded_colors_amount", excluded);
+            MutableText revertExcluding = Text.translatable("maparthelper.gui.revert_excluding_colors");
+            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.GOLD));
+            resetExcludedColors.setTooltip(Tooltip.of(
+                    excludedAmount.formatted(Formatting.GOLD).append("\n")
+                            .append(revertExcluding.formatted(Formatting.GRAY))
+            ));
+        } else {
+            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
+            resetExcludedColors.setTooltip(null);
+        }
+    }
+
     private class MaterialListBlockWidget extends BlockItemWidget {
-        private static final Set<MapColor> selectedForExcluding = new HashSet<>();
-        private static MaterialListBlockWidget fixedHighlight;
-        private static boolean hoveringAny = false;
+        static final Set<MapColor> selectedForExcluding = new HashSet<>();
+        static MaterialListBlockWidget fixedHighlight;
+        static boolean hoveringAny = false;
         private final MapColor mapColor;
         private boolean confirmRemoving = false;
 
