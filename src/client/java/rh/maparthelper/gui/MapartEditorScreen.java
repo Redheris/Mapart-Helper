@@ -382,6 +382,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         presetsList.addEntries(
                 s -> {
+                    PaletteColors.clearIgnoringColors();
+                    updateResetExcludedColorsButton();
                     PaletteConfigManager.changeCurrentPreset(s);
                     MapColor oldBgColor = MapartHelper.conversionSettings.backgroundColor.mapColor();
                     if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
