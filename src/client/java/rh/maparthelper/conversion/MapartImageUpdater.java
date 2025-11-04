@@ -6,6 +6,7 @@ import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 public class MapartImageUpdater {
     static double moveDx = 0;
@@ -82,10 +83,10 @@ public class MapartImageUpdater {
         MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 
-    public static void removeColorFromMapart(ConvertedMapartImage mapart, MapColor mapColor) {
+    public static void removeColorsFromMapart(ConvertedMapartImage mapart, Set<MapColor> excludingColors) {
         if (mapart.isReset()) return;
         ProcessingMapartImage processingMapart = new ProcessingMapartImage(mapart);
-        if (PaletteColors.addIgnoringColor(mapColor))
+        if (PaletteColors.addIgnoringColors(excludingColors))
             MapartImageConverter.readAndUpdateMapartImage(mapart, processingMapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 

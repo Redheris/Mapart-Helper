@@ -43,7 +43,9 @@ import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
@@ -70,6 +72,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public void updateMaterialList() {
         MaterialListBlockWidget.fixedHighlight = null;
+        MaterialListBlockWidget.chosenForRemoving.clear();
         this.remove(materialList);
         if (!CurrentConversionSettings.isMapartConverted()) return;
         int listTop = settingsRight.getY() + settingsRight.getHeight();
@@ -746,6 +749,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     private class MaterialListBlockWidget extends BlockItemWidget {
+        private static final Set<MapColor> chosenForRemoving = new HashSet<>();
         private static MaterialListBlockWidget fixedHighlight;
         private static boolean hoveringAny = false;
         private final MapColor mapColor;
@@ -797,7 +801,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (button == 0) {
                 if (confirmRemoving) {
-                    MapartImageUpdater.removeColorFromMapart(mapart, mapColor);
+                    MapartImageUpdater.removeColorsFromMapart(mapart, chosenForRemoving);
                     updateResetExcludedColorsButton();
                     return true;
                 }
@@ -815,10 +819,12 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
                 if (!confirmRemoving) {
                     confirmRemoving = true;
+                    chosenForRemoving.add(mapColor);
                     tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_confirm").formatted(Formatting.RED).asOrderedText());
                     tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_cancel").formatted(Formatting.RED).asOrderedText());
                 } else {
                     confirmRemoving = false;
+                    chosenForRemoving.remove(mapColor);
                     tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_highlight").formatted(Formatting.GRAY).asOrderedText());
                     tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_remove").formatted(Formatting.GRAY).asOrderedText());
                 }

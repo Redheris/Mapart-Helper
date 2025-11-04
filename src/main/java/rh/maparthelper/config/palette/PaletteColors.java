@@ -5,7 +5,10 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.MapColorEntry;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class PaletteColors {
     static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
@@ -106,15 +109,15 @@ public class PaletteColors {
         return ignoringColors.size();
     }
 
-    public static boolean addIgnoringColor(MapColor mapColor) {
-        return ignoringColors.add(mapColor);
+    public static boolean addIgnoringColors(Set<MapColor> excludingColors) {
+        return ignoringColors.addAll(excludingColors);
     }
 
     public static void clearIgnoringColors() {
         ignoringColors.clear();
     }
 
-    public static void clearColorCache(){
+    public static void clearColorCache() {
         cachedClosestColors.clear();
         ColorUtils.clearRgb2LabCache();
     }
