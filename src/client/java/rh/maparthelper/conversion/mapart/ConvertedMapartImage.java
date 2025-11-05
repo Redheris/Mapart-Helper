@@ -1,5 +1,6 @@
 package rh.maparthelper.conversion.mapart;
 
+import net.minecraft.block.MapColor;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.ClickEvent;
@@ -7,13 +8,13 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.util.Utils;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 public final class ConvertedMapartImage extends MapartImage {
     private boolean reset = true;
@@ -60,13 +61,17 @@ public final class ConvertedMapartImage extends MapartImage {
     }
 
     public MapColorCount[] getColorCounts(boolean ascending) {
-        MapColorCount[] countsSorted = new MapColorCount[63];
-        for (int id = 1; id < 64; id++) {
-            countsSorted[id - 1] = new MapColorCount(id, colorsCounter.get(id));
+        Comparator<MapColorCount> cmp = Comparator.comparingInt(MapColorCount::amount);
+        List<MapColorCount> counts = new ArrayList<>();
+
+        for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
+            int amount = colorsCounter.get(color.id);
+            if (amount > 0)
+                counts.add(new MapColorCount(color.id, amount));
         }
-        Comparator<MapColorCount> comparator = Comparator.comparingInt(MapColorCount::amount);
-        Arrays.sort(countsSorted, ascending ? comparator : comparator.reversed());
-        return countsSorted;
+
+        counts.sort(ascending ? cmp : cmp.reversed());
+        return counts.toArray(MapColorCount[]::new);
     }
 
     private boolean saveMapartImage(Path imagePath) {
