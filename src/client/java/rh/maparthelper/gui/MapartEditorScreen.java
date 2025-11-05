@@ -8,20 +8,16 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import org.joml.Matrix3x2f;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
@@ -40,8 +36,8 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.schematic.NbtSchematicUtils;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
-import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 import rh.maparthelper.util.InventoryItemsCounter;
+import rh.maparthelper.util.RenderUtils;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -844,22 +840,14 @@ public class MapartEditorScreen extends ScreenAdapted {
                 mapartPreview.setHighlightingColor(mapColor);
                 hoveringAny = true;
             }
-            if (confirmRemoving && client != null) {
-                KeyedItemRenderState keyedItemRenderState = new KeyedItemRenderState();
-                client.getItemModelManager().clearAndUpdate(keyedItemRenderState, Blocks.BARRIER.asItem().getDefaultStack(), ItemDisplayContext.GUI, client.world, client.player, 0);
-                ItemGuiElementRenderState itemRenderState = new ItemGuiElementRenderState(
+            if (confirmRemoving) {
+                RenderUtils.renderItemStack(
+                        context,
+                        Blocks.BARRIER.asItem().getDefaultStack(),
                         "RemoveColor",
-                        new Matrix3x2f(context.getMatrices()),
-                        keyedItemRenderState,
                         getX(), getY(),
-                        context.scissorStack.peekLast()
+                        width, height
                 );
-                context.state.addSpecialElement(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
-                        itemRenderState,
-                        getX(), getY(),
-                        getX() + width, getY() + height,
-                        width
-                ));
             }
         }
 
