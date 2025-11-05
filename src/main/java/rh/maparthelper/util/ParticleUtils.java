@@ -1,19 +1,19 @@
-package rh.maparthelper.event;
+package rh.maparthelper.util;
 
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import rh.maparthelper.MapartHelper;
 
 public class ParticleUtils {
 
-    public static void spawnParticle(ClientWorld world, ParticleEffect particle, Vec3d pos) {
+    public static void spawnParticle(World world, ParticleEffect particle, Vec3d pos) {
         world.addParticleClient(particle, pos.x, pos.y, pos.z, 0, 0, 0);
     }
 
-    public static void drawStraightLine(ClientWorld world, double x1, double y1, double z1,
+    public static void drawStraightLine(World world, double x1, double y1, double z1,
                                         double x2, double y2, double z2, ParticleEffect particle, double step) {
         int steps = (int) (Math.max(
                 Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)),
@@ -29,7 +29,7 @@ public class ParticleUtils {
         }
     }
 
-    public static void drawSelectionBox(ClientWorld world, Vec3d pos1, Vec3d pos2, Direction direction, double step) {
+    public static void drawSelectionBox(World world, Vec3d pos1, Vec3d pos2, Direction direction, double step) {
         if (world == null) return;
 
         DustParticleEffect particle = new DustParticleEffect(MapartHelper.commonConfig.selectionColor, 0.3f);

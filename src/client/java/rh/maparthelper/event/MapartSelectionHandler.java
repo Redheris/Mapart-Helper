@@ -18,6 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
+import rh.maparthelper.util.ParticleUtils;
 
 public class MapartSelectionHandler {
 
