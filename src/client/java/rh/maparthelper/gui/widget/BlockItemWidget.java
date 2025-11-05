@@ -4,35 +4,28 @@ import net.minecraft.block.Block;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.render.item.KeyedItemRenderState;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import org.joml.Matrix3x2f;
-import org.joml.Matrix3x2fStack;
 import rh.maparthelper.gui.PresetsEditorScreen;
-import rh.maparthelper.render.ScaledItemGuiElementRenderer;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlockItemWidget extends ClickableWidget {
-    private final int squareSize;
     private final boolean hasClickAction;
 
     private Block block;
     private Item blockItem;
-    private List<OrderedText> tooltip;
+    protected List<OrderedText> tooltip;
 
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
         super(x, y, squareSize, squareSize, Text.of(block.getName()));
-        this.squareSize = squareSize;
         this.setBlock(block);
         List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
         this.tooltip = new ArrayList<>(tooltip.stream().map(Text::asOrderedText).toList());
@@ -68,25 +61,9 @@ public class BlockItemWidget extends ClickableWidget {
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
-        ItemStack blockItem = this.blockItem.getDefaultStack();
-        Matrix3x2fStack matrixStack = context.getMatrices();
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        KeyedItemRenderState keyedItemRenderState = new KeyedItemRenderState();
-        mc.getItemModelManager().clearAndUpdate(keyedItemRenderState, blockItem, ItemDisplayContext.GUI, mc.world, mc.player, 0);
-        ItemGuiElementRenderState itemRenderState = new ItemGuiElementRenderState(
-                blockItem.getItem().getName().toString(),
-                new Matrix3x2f(matrixStack),
-                keyedItemRenderState,
-                x, y,
-                context.scissorStack.peekLast()
-        );
-        context.state.addSpecialElement(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
-                itemRenderState,
-                x, y,
-                x + width, y + height,
-                squareSize
-        ));
+        ItemStack blockItem = this.blockItem.getDefaultStack();
+        RenderUtils.renderItemStack(context, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
 
         boolean isMouseOverBlock = mouseX >= x
                 && mouseX < x + width

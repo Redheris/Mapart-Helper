@@ -21,10 +21,11 @@ import rh.maparthelper.config.adapter.MapColorEntryAdapter;
 import java.nio.file.Path;
 
 public class MapartHelper implements ModInitializer {
-    public static final String MOD_ID = "mapart-helper";
+    public static final String MOD_ID = "maparthelper";
     public static final String MOD_NAME = "Mapart Helper";
+    public static final String CONFIG_DIR = "mapart-helper";
+    public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(CONFIG_DIR);
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
-    public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(MapartHelper.MOD_ID);
     public static CommonConfiguration commonConfig;
     public static ConversionConfiguration conversionSettings;
 

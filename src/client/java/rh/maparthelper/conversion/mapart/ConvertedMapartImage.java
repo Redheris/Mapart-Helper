@@ -1,5 +1,6 @@
 package rh.maparthelper.conversion.mapart;
 
+import net.minecraft.block.MapColor;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.ClickEvent;
@@ -7,13 +8,13 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.util.Utils;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 public final class ConvertedMapartImage extends MapartImage {
     private boolean reset = true;
@@ -43,10 +44,8 @@ public final class ConvertedMapartImage extends MapartImage {
     }
 
     public void setMapartSize(int width, int height) {
-        if (reset) {
             this.width = width;
             this.height = height;
-        }
     }
 
     public void reset() {
@@ -61,13 +60,18 @@ public final class ConvertedMapartImage extends MapartImage {
         return reset;
     }
 
-    public MapColorCount[] getColorCounts() {
-        MapColorCount[] countsSorted = new MapColorCount[63];
-        for (int id = 1; id < 64; id++) {
-            countsSorted[id - 1] = new MapColorCount(id, colorsCounter.get(id));
+    public MapColorCount[] getColorCounts(boolean ascending) {
+        Comparator<MapColorCount> cmp = Comparator.comparingInt(MapColorCount::amount);
+        List<MapColorCount> counts = new ArrayList<>();
+
+        for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
+            int amount = colorsCounter.get(color.id);
+            if (amount > 0)
+                counts.add(new MapColorCount(color.id, amount));
         }
-        Arrays.sort(countsSorted, Comparator.comparingInt(MapColorCount::amount).reversed());
-        return countsSorted;
+
+        counts.sort(ascending ? cmp : cmp.reversed());
+        return counts.toArray(MapColorCount[]::new);
     }
 
     private boolean saveMapartImage(Path imagePath) {

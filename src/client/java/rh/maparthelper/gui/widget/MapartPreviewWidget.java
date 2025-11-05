@@ -1,5 +1,7 @@
 package rh.maparthelper.gui.widget;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
@@ -11,11 +13,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
+import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
+import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.scheduler.DelayedRepeater;
 
 import java.util.List;
@@ -33,12 +38,26 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     private boolean scaleToCursor = true;
     private ManualCroppingAction hoveredAction = null;
+    private MapColor highlightingColor = MapColor.CLEAR;
 
     public MapartPreviewWidget(ConvertedMapartImage mapart, int x, int y, int maxX, int maxY) {
         super(x, y, mapart.getWidth(), mapart.getHeight(), Text.empty());
         this.maxWidth = maxX - 16 - x;
         this.maxHeight = maxY - y;
         this.mapart = mapart;
+    }
+
+    public void setHighlightingColor(MapColor color) {
+        if (this.highlightingColor != color) {
+            this.highlightingColor = color;
+            if (color == MapColor.CLEAR) return;
+            ColorsHighlightUniform.set(
+                    highlightingColor.getRenderColor(MapColor.Brightness.LOW),
+                    highlightingColor.getRenderColor(MapColor.Brightness.NORMAL),
+                    highlightingColor.getRenderColor(MapColor.Brightness.HIGH),
+                    MapartHelper.commonConfig.selectionColor
+            );
+        }
     }
 
     @Override
@@ -59,8 +78,18 @@ public class MapartPreviewWidget extends ClickableWidget {
         }
 
         if (CurrentConversionSettings.guiMapartImage != null) {
+            RenderPipeline pipeline = RenderPipelines.GUI_TEXTURED;
+            if (!MapartHelper.conversionSettings.showOriginalImage && highlightingColor != MapColor.CLEAR) {
+                pipeline = CustomPipelines.PREVIEW_COLOR_HIGHLIGHT;
+                ColorsHighlightUniform.set(
+                        highlightingColor.getRenderColor(MapColor.Brightness.LOW),
+                        highlightingColor.getRenderColor(MapColor.Brightness.NORMAL),
+                        highlightingColor.getRenderColor(MapColor.Brightness.HIGH),
+                        MapartHelper.commonConfig.mapartEditor.previewHighlightingColor
+                );
+            }
             context.drawTexture(
-                    RenderPipelines.GUI_TEXTURED,
+                    pipeline,
                     CurrentConversionSettings.guiMapartId,
                     x, y,
                     0.0F, 0.0F,

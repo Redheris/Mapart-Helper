@@ -5,7 +5,7 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import rh.maparthelper.MapartHelper;
 
-@Config(name = MapartHelper.MOD_ID)
+@Config(name = MapartHelper.CONFIG_DIR)
 public class MapartHelperConfig extends PartitioningSerializer.GlobalData {
 
     @ConfigEntry.Gui.TransitiveObject
