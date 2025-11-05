@@ -74,7 +74,7 @@
   "maparthelper.gui.current_preset_label": "Current preset:",
   "maparthelper.gui.material_list_label": "Material list",
   "maparthelper.gui.LMB_to_highlight": "LMB to highlight",
-  "maparthelper.gui.RMB_to_remove": "RMB to remove",
+  "maparthelper.gui.RMB_to_remove": "RMB to exclude",
   "maparthelper.gui.LMB_to_confirm": "LMB to confirm",
   "maparthelper.gui.RMB_to_cancel": "RMB to cancel",
   "maparthelper.gui.excluded_colors_amount": "Excluded blocks: %d",

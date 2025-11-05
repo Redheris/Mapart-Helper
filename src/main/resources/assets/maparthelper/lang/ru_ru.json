@@ -74,7 +74,7 @@
   "maparthelper.gui.current_preset_label": "Текущий пресет:",
   "maparthelper.gui.material_list_label": "Список материалов",
   "maparthelper.gui.LMB_to_highlight": "ЛКМ для выделения",
-  "maparthelper.gui.RMB_to_remove": "ПКМ для удаления",
+  "maparthelper.gui.RMB_to_remove": "ПКМ для исключения",
   "maparthelper.gui.LMB_to_confirm": "ЛКМ для подтверждения",
   "maparthelper.gui.RMB_to_cancel": "ПКМ для отмены",
   "maparthelper.gui.excluded_colors_amount": "Исключено блоков: %d",

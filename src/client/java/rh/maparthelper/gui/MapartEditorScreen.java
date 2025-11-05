@@ -252,7 +252,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
                     btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
                     MapartImageUpdater.updateMapart(mapart);
-                    updateResetExcludedColorsButton();
                 }
         ).size(baseElementWidth, 20).build();
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
@@ -438,7 +437,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         presetsList.addEntries(
                 s -> {
                     PaletteColors.clearExcludingColors();
-                    updateResetExcludedColorsButton();
+                    updateResetExcludedColorsButton(false);
                     PaletteConfigManager.changeCurrentPreset(s);
                     MapColor oldBgColor = MapartHelper.conversionSettings.backgroundColor.mapColor();
                     if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
@@ -477,12 +476,11 @@ public class MapartEditorScreen extends ScreenAdapted {
                         .formatted(PaletteColors.excludingColorsAmount() > 0 ? Formatting.GOLD : Formatting.WHITE),
                 btn -> {
                     if (PaletteColors.excludingColorsAmount() == 0) return;
-                    MapartImageUpdater.revertRemovingColors(mapart);
-                    btn.setMessage(btn.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
-                    btn.setTooltip(null);
+                    MapartImageUpdater.revertExcludingColors(mapart);
+                    updateResetExcludedColorsButton(false);
                 }
         ).size(14, 14).build();
-        updateResetExcludedColorsButton();
+        updateResetExcludedColorsButton(PaletteColors.excludingColorsAmount() > 0);
         materialListSettings.add(resetExcludedColors);
         settingsRight.add(materialListSettings);
 
@@ -560,7 +558,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     CurrentConversionSettings.resetMapart();
                     updateMapartOutputButtons();
                     updateMaterialList();
-                    updateResetExcludedColorsButton();
+                    updateResetExcludedColorsButton(false);
                 }
         ).size(20, 20).build();
         resetMapartButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.reset_mapart")));
@@ -606,7 +604,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     public void onFilesDropped(List<Path> paths) {
         CurrentConversionSettings.resetMapart();
         MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst());
-        updateResetExcludedColorsButton();
+        updateResetExcludedColorsButton(false);
     }
 
 
@@ -799,19 +797,18 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
     }
 
-    private void updateResetExcludedColorsButton() {
-        int excluded = PaletteColors.excludingColorsAmount();
-        if (excluded > 0) {
-            MutableText excludedAmount = Text.translatable("maparthelper.gui.excluded_colors_amount", excluded);
+    private void updateResetExcludedColorsButton(boolean active) {
+        if (active) {
+            MutableText excludedAmount = Text.translatable("maparthelper.gui.excluded_colors_amount", PaletteColors.excludingColorsAmount());
             MutableText revertExcluding = Text.translatable("maparthelper.gui.revert_excluding_colors");
-            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.GOLD));
+            resetExcludedColors.setMessage(Text.literal("⟲").formatted(Formatting.BOLD, Formatting.GOLD));
             resetExcludedColors.setTooltip(Tooltip.of(
                     excludedAmount.formatted(Formatting.GOLD).append("\n")
                             .append(revertExcluding.formatted(Formatting.GRAY))
             ));
             resetExcludedColors.active = true;
         } else {
-            resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
+            resetExcludedColors.setMessage(Text.literal("⟲").formatted(Formatting.BOLD, Formatting.WHITE));
             resetExcludedColors.setTooltip(null);
             resetExcludedColors.active = false;
         }
@@ -870,8 +867,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (button == 0) {
                 if (confirmRemoving) {
-                    MapartImageUpdater.removeColorsFromMapart(mapart, selectedForExcluding);
-                    updateResetExcludedColorsButton();
+                    MapartImageUpdater.excludeColorsFromMapart(mapart, selectedForExcluding);
+                    updateResetExcludedColorsButton(true);
                     selectedForExcluding.clear();
                     return true;
                 }
