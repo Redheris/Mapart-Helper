@@ -809,9 +809,11 @@ public class MapartEditorScreen extends ScreenAdapted {
                     excludedAmount.formatted(Formatting.GOLD).append("\n")
                             .append(revertExcluding.formatted(Formatting.GRAY))
             ));
+            resetExcludedColors.active = true;
         } else {
             resetExcludedColors.setMessage(resetExcludedColors.getMessage().copy().formatted(Formatting.BOLD, Formatting.WHITE));
             resetExcludedColors.setTooltip(null);
+            resetExcludedColors.active = false;
         }
     }
 
