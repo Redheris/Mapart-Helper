@@ -18,7 +18,7 @@ import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
-import rh.maparthelper.render.RenderUtils;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.HashSet;
 import java.util.List;

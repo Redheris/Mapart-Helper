@@ -4,7 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.render.RenderUtils;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.function.Supplier;
 

@@ -11,7 +11,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.math.ColorHelper;
 import rh.maparthelper.colors.MapColors;
-import rh.maparthelper.render.RenderUtils;
+import rh.maparthelper.util.RenderUtils;
 
 public class MapColorWidget extends ClickableWidget {
     public final MapColor color;

@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
@@ -835,7 +836,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
             if (fixedHighlight == this) {
                 context.createNewRootLayer();
-                context.drawBorder(getX(), getY(), this.width, this.height, MapartHelper.commonConfig.mapartEditor.previewHighlightingColor);
+                RenderUtils.drawBorder(context, getX(), getY(), this.width, this.height, MapartHelper.commonConfig.mapartEditor.previewHighlightingColor);
             } else if (MapartHelper.commonConfig.mapartEditor.previewHighlightOnHover
                     && context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 mapartPreview.setHighlightingColor(mapColor);
@@ -853,8 +854,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
 
         @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button == 0) {
+        public boolean mouseClicked(Click click, boolean doubled) {
+            if (click.button() == 0) {
                 if (confirmRemoving) {
                     MapartImageUpdater.excludeColorsFromMapart(mapart, selectedForExcluding);
                     updateResetExcludedColorsButton(true);
@@ -869,7 +870,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
                 return true;
             }
-            if (button == 1) {
+            if (click.button() == 1) {
                 if (fixedHighlight == this) {
                     fixedHighlight = null;
                 }
