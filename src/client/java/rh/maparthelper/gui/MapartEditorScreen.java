@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FluidBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
@@ -104,14 +105,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         materialListAdder.add(auxBlockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
         materialListAdder.add(auxAmountText);
 
-        if (displayRemainingAmount) calculateRemainingCounts(colorsCounter);
+        boolean hasAuxBlockInColors = false;
+        if (displayRemainingAmount)
+            hasAuxBlockInColors = calculateRemainingCounts(colorsCounter);
 
         for (ConvertedMapartImage.MapColorCount colorCount : colorsCounter) {
             addBlockToMaterialList(materialListAdder, palette, colorCount);
         }
 
-        MutableText amountText = Text.literal(getAmountString(auxBlockCount, auxBlockItemWidget.getStackSize()));
-        if (auxBlockCount == 0)
+        if (displayRemainingAmount && !hasAuxBlockInColors)
+            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionSettings.auxBlock.asItem(), 0);
+
+        MutableText amountText = Text.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
+        if (auxBlockCount <= 0)
             amountText = amountText.formatted(Formatting.GREEN);
         auxAmountText.setWidth(textRenderer.getWidth(amountText));
         auxAmountText.setMessage(amountText);
@@ -141,14 +147,21 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
     }
 
-    private void calculateRemainingCounts(ConvertedMapartImage.MapColorCount[] colors) {
+    /// @return Whether the color-blocks list contains the same block as the auxiliary block.
+    private boolean calculateRemainingCounts(ConvertedMapartImage.MapColorCount[] colors) {
         PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player == null) return;
+        if (player == null) return false;
+        boolean hasAuxBlock = false;
 
         PalettePresetsConfig paletteConfig = PaletteConfigManager.presetsConfig;
 
         List<Item> countingBlocks = Arrays.stream(colors)
-                .map(c -> paletteConfig.getBlockOfMapColor(MapColor.get(c.id())).asItem())
+                .map(c -> {
+                    Block block = paletteConfig.getBlockOfMapColor(MapColor.get(c.id()));
+                    if (block instanceof FluidBlock)
+                        return Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem();
+                    return block.asItem();
+                })
                 .toList();
 
         Item auxBlockItem = MapartHelper.conversionSettings.auxBlock.asItem();
@@ -156,19 +169,19 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         for (int i = 0; i < colors.length; i++) {
             Item item = countingBlocks.get(i);
+
             int have = inventory.getOrDefault(item, 0);
             int remaining = colors[i].amount() - have;
             if (item == auxBlockItem) {
-                auxBlockCount = Math.max(0, auxBlockCount + Math.min(0, remaining));
+                auxBlockCount += Math.min(0, remaining);
+                hasAuxBlock = true;
             }
             colors[i] = new ConvertedMapartImage.MapColorCount(colors[i].id(), Math.max(0, remaining));
-        }
-        if (!countingBlocks.contains(auxBlockItem)) {
-            auxBlockCount = Math.max(0, auxBlockCount - inventory.getOrDefault(auxBlockItem, 0));
         }
 
         Comparator<ConvertedMapartImage.MapColorCount> cmp = Comparator.comparingInt(ConvertedMapartImage.MapColorCount::amount);
         Arrays.sort(colors, materialsAscendingOrder ? cmp : cmp.reversed());
+        return hasAuxBlock;
     }
 
     private String getAmountString(int amount, int stackSize) {
