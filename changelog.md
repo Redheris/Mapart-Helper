@@ -1,10 +1,13 @@
 ### Changes and new features
 
-- Updated to 1.21.9/1.21.10;
+- Highlighting specific colors on the preview when hovering the corresponding block in the material list;
+- Excluding specific colors from the mapart by removing the corresponding block from the material list;
+- Comparing total block counts with the player's inventory;
 
 <details>
 <summary>Fixes and minor changes</summary>
 
-- The /beams command is temporarily disabled in 1.21.9+ for technical reasons;
+- Fixed image preprocessing being applied multiple times;
+- Added a button to open the config screen;
 
 </details>

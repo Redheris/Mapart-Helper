@@ -78,17 +78,33 @@ publishMods {
 	type = STABLE
 	modLoaders.add("fabric")
 
+	def changelog_simple = changelog.get()
+			.replace("<summary>", "### ")
+			.replaceAll("(?m)^\\s*<details>\\s*", "\n")
+			.replaceAll("(?m)^\\s*</details>\\s*", "")
+			.replaceAll("<.*?>", "")
+	def supportedVersions = supported_versions.split(",")
+
 	curseforge {
 		projectId = "1343604"
 		projectSlug = "mapart-helper"
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
 		announcementTitle = "CurseForge"
+		changelog = changelog_simple
+		changelogType = "markdown"
 
-		minecraftVersions.add(minecraft_version)
-//		minecraftVersionRange {
-//			start = "1.21.6"
-//			end = "1.21.7"
-//		}
+		supportedVersions.each { String value ->
+			value = value.trim()
+			if (value.contains("--")) {
+				def versions = value.split("--")
+				minecraftVersionRange {
+					start = versions[0]
+					end = versions[1]
+				}
+			} else {
+				minecraftVersions.add(value)
+			}
+		}
 
 		requires("fabric-api")
 		requires("cloth-config")
@@ -99,31 +115,43 @@ publishMods {
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		announcementTitle = "Modrinth"
 
-		minecraftVersions.add(minecraft_version)
-//		minecraftVersionRange {
-//			start = "1.21.6"
-//			end = "1.21.7"
-//		}
+		supportedVersions.each { String value ->
+			value = value.trim()
+			if (value.contains("--")) {
+				def versions = value.split("--")
+				minecraftVersionRange {
+					start = versions[0]
+					end = versions[1]
+				}
+			} else {
+				minecraftVersions.add(value)
+			}
+		}
 
 		requires("fabric-api")
 		requires("cloth-config")
 		optional("modmenu")
 	}
-//	github {
-//		accessToken = providers.environmentVariable("GITHUB_TOKEN")
-//		announcementTitle = "GitHub"
-//		repository = "Redheris/Mapart-Helper"
-//		commitish = "main"
-//	}
-//	discord {
-//		webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
-//		username = "Release publisher"
-//		avatarUrl = "https://i.imgur.com/NiTaw1Z.png"
-//		content = changelog.map { "# Mapart Helper v" + project.version + "\n" + ((String)it).replace("<summary>", "### ").replaceAll("<.*?>", "")}
-//		style {
-//			look = "MODERN"
-//			thumbnailUrl = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
-//			color = "#7419CA"
-//		}
-//	}
+	// Do GitHub release and Discord announcement only for the main version
+	if (providers.environmentVariable("IS_DEFAULT_BRANCH").getOrElse("false") == "true") {
+		github {
+			accessToken = providers.environmentVariable("GITHUB_TOKEN")
+			repository = "Redheris/Mapart-Helper"
+			commitish = providers.environmentVariable("DEFAULT_BRANCH")
+			tagName = project.version
+			announcementTitle = "GitHub"
+		}
+		discord {
+			webhookUrl = providers.environmentVariable("DISCORD_WEBHOOK")
+			username = "Release publisher"
+			avatarUrl = "https://i.imgur.com/NiTaw1Z.png"
+			content = changelog.map { "# Mapart Helper v" + project.version + "\n" + changelog_simple }
+			style {
+				look = "MODERN"
+				thumbnailUrl = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
+				link = "BUTTON"
+				color = "#7419CA"
+			}
+		}
+	}
 }

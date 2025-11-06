@@ -45,7 +45,7 @@ public class MapartImageConverter {
 
     private static @NotNull FutureTask<Void> getVoidFutureTask(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
         FutureTask<Void> future;
-        boolean logExecutionTime = MapartHelper.commonConfig.logConversionTime;
+        boolean logExecutionTime = MapartHelper.commonConfig.mapartEditor.logConversionTime;
         if (!updatingMapart.isReset() && path.equals(processingMapart.getImagePath()))
             future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, null, logExecutionTime, imageChangeResult), null);
         else {
@@ -188,15 +188,15 @@ public class MapartImageConverter {
                 }
                 if (Thread.currentThread().isInterrupted()) return;
 
-                BufferedImage bufferedImage = cropAndScaleToMapSize(
-                        mapart,
-                        imageChangeResult == ImageChangeResult.NEED_RESCALE
-                                || imageChangeResult == ImageChangeResult.TOP_LINE_CHANGED && bgColor == MapColorEntry.CLEAR && !showOriginalImage
-                );
+                boolean needReconvertingColors = imageChangeResult != ImageChangeResult.SIMPLE
+                        && (imageChangeResult == ImageChangeResult.NEED_RESCALE || bgColor == MapColorEntry.CLEAR && !showOriginalImage);
+
+                BufferedImage bufferedImage = cropAndScaleToMapSize(mapart, needReconvertingColors);
                 if (Thread.currentThread().isInterrupted()) return;
 
                 if (imageChangeResult != ImageChangeResult.SIMPLE) {
-                    bufferedImage = preprocessImage(bufferedImage);
+                    if (needReconvertingColors)
+                        bufferedImage = preprocessImage(bufferedImage);
                     if (Thread.currentThread().isInterrupted()) return;
 
                     PaletteColors.clearColorCache();

@@ -9,6 +9,7 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import net.minecraft.util.Formatting;
 import org.joml.Matrix3x2fStack;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
@@ -126,8 +127,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarRight.setPosition(0, boxY + 5);
         presetBarRight.getMainPositioner().alignVerticalCenter().marginRight(1);
 
-        ButtonWidget updateFiles = ButtonWidget.builder(Text.of("⟲"), b -> this.updateFiles())
-                .size(17, 20)
+        ButtonWidget updateFiles = ButtonWidget.builder(Text.literal("⟲").formatted(Formatting.BOLD),b -> this.updateFiles())
+                .size(18, 20)
                 .build();
         updateFiles.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
         presetBarRight.add(updateFiles);
