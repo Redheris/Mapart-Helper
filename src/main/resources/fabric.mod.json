@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "mapart-helper",
+	"id": "maparthelper",
 	"version": "${version}",
 	"name": "Mapart Helper",
-	"description": "Aims to to make mapart creation as convenient and enjoyable as possible right in the game: flexibly generate a schematic, save maps as an image files, and more",
+	"description": "Aims to make mapart creation as convenient and enjoyable as possible right in the game: flexibly generate a schematic, save maps as image files, and more",
 	"authors": [
 		"Redheris"
 	],
@@ -22,9 +22,12 @@
 			"rh.maparthelper.MapartHelperClient"
 		],
 		"modmenu": [
-			"rh.maparthelper.config.ModMenuIntegration"
+			"rh.maparthelper.compat.ModMenuIntegration"
 		]
 	},
+	"mixins": [
+		"maparthelper-client.mixins.json"
+	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
 		"minecraft": ">=1.21.6 <=1.21.7",

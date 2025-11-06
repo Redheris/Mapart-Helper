@@ -11,24 +11,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import org.joml.Matrix3x2fStack;
-import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.PresetsEditorScreen;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BlockItemWidget extends ClickableWidget {
-    private final int squareSize;
     private final boolean hasClickAction;
 
     private Block block;
     private Item blockItem;
-    private List<OrderedText> tooltip;
+    protected List<OrderedText> tooltip;
 
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
         super(x, y, squareSize, squareSize, Text.of(block.getName()));
-        this.squareSize = squareSize;
         this.setBlock(block);
         List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
         this.tooltip = new ArrayList<>(tooltip.stream().map(Text::asOrderedText).toList());
@@ -64,26 +61,14 @@ public class BlockItemWidget extends ClickableWidget {
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
+
         ItemStack blockItem = this.blockItem.getDefaultStack();
-
-        Matrix3x2fStack matrixStack = context.getMatrices();
-        matrixStack.pushMatrix();
-
-        if (MapartHelper.commonConfig.scaleBlockWidgets) {
-            matrixStack.translate(x, y);
-            matrixStack.scale(squareSize / 16f, squareSize / 16f);
-            matrixStack.translate(-x, -y);
-        } else {
-            matrixStack.translate(4, 4);
-        }
-        context.drawItem(blockItem, x, y);
-
-        matrixStack.popMatrix();
+        RenderUtils.renderItemStack(context, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
 
         boolean isMouseOverBlock = mouseX >= x
-                && mouseX < x + squareSize
+                && mouseX < x + width
                 && mouseY >= y
-                && mouseY < y + squareSize;
+                && mouseY < y + height;
         if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
             context.drawTooltip(this.tooltip, mouseX, mouseY);
         }
