@@ -15,7 +15,7 @@ displaying beams at the north-western positions of map areas.
 
 ---
 
-![Example of creating a mapart](https://i.imgur.com/VPM78ыфвII.gif)
+![Example of creating a mapart](https://i.imgur.com/VPM78II.gif)
 
 ## How to:
 ### 🖼️ Create a Mapart:
@@ -33,7 +33,7 @@ Each preset is stored as a separate `.json` file inside
 You can:
 * **Create and edit presets** directly from the GUI.
 * **Add presets manually** by placing `.json` files into the folder — this is also how
-you can share your presets with others.
+  you can share your presets with others.
 
 All presets are also listed in the `config/mapart-helper/palette_presets.json` file, which maps preset filenames
 to their display names.
@@ -57,7 +57,7 @@ The following commands can be used everywhere, including servers:
 There are also several miscellaneous singleplayer-only commands, almost for debugging or for some unique cases:
 - `/mart-creative palette give-map-palette` — Fills the holding filled map with the image of the complete palette
 - `/mart-creative palette place <height>` — Places all blocks from the generated blocks palette into the world
-from the current map area's starting coordinates and at the given y-coordinate
+  from the current map area's starting coordinates and at the given y-coordinate
 
 ---
 
