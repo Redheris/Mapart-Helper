@@ -83,11 +83,7 @@ publishMods {
 			.replaceAll("(?m)^\\s*<details>\\s*", "\n")
 			.replaceAll("(?m)^\\s*</details>\\s*", "")
 			.replaceAll("<.*?>", "")
-
-	def supportedVersions = []
-	if (supported_versions != "none") {
-		supportedVersions = supported_versions.split(",")
-	}
+	def supportedVersions = supported_versions.split(",")
 
 	curseforge {
 		projectId = "1343604"
@@ -97,7 +93,6 @@ publishMods {
 		changelog = changelog_simple
 		changelogType = "markdown"
 
-		minecraftVersions.add(minecraft_version)
 		supportedVersions.each { String value ->
 			value = value.trim()
 			if (value.contains("--")) {
@@ -120,7 +115,6 @@ publishMods {
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		announcementTitle = "Modrinth"
 
-		minecraftVersions.add(minecraft_version)
 		supportedVersions.each { String value ->
 			value = value.trim()
 			if (value.contains("--")) {
