@@ -127,8 +127,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightOnHover": "Выделять цвет на превью при наведении",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showUseLABTooltip": "Отображать подсказку для переключения LAB",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Отображать подсказки для вариантов ступенчатости",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets": "Масштабировать блоки в GUI",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets.@Tooltip": "На версиях до 1.21.8 масштабирование блоков работает не самым красивым образом",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.scaleBlockWidgets": "Масштабировать блоки в GUI",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.scaleBlockWidgets.@Tooltip": "На версиях 1.21.6-1.21.7 масштабирование блоков работает не самым красивым образом",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",

@@ -127,8 +127,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightOnHover": "Highlight color on preview when hovered",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showUseLABTooltip": "Show tooltip for LAB toggle",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Show tooltips for staircase styles",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets": "Scale blocks in GUI",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.scaleBlockWidgets.@Tooltip": "On versions before 1.21.8, block scaling does not work in the most beautiful way",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.scaleBlockWidgets": "Scale blocks in GUI",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.scaleBlockWidgets.@Tooltip": "On versions 1.21.6-1.21.7, block scaling does not work in the most beautiful way",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Include in palette:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Which blocks will be used when generating the global palette",
