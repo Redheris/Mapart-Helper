@@ -23,5 +23,6 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          IS_DEFAULT_BRANCH: ${{ github.ref == github.event.repository.default_branch }}
+          DEBUG_CURRENT_BRANCH: ${{ github.ref_name }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          IS_DEFAULT_BRANCH: ${{ github.ref_name == github.event.repository.default_branch }}
