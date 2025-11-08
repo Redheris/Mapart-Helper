@@ -15,15 +15,17 @@ displaying beams at the north-western positions of map areas.
 
 ---
 
+![Example of creating a mapart](https://i.imgur.com/VPM78II.gif)
+
 ## How to:
 ### 🖼️ Create a Mapart:
 1. Launch the game with the mod installed
 2. Join a world or server
-3. Open the **Mapart editor** screen with the `Y` key *(this can be changed in the setting)*
-4. Use the intuitive, user-friendly GUI to create some cool maparts
+3. Open the **Mapart editor** screen with the `Y` key *(this can be changed in the settings)*
+4. Use the user-friendly GUI to create some cool maparts
 ### 🎨 Use palette presets:
 Palette presets let you quickly switch between different sets of blocks and colors used when creating maparts.
-You can manage them in the **Presets Editor** screen, accessible from the Mapart Editor.
+You can manage them in the **Presets Editor** screen, accessible from the Mapart editor screen.
 
 Each preset is stored as a separate `.json` file inside
 `{game root folder}/config/mapart-helper/presets`.
@@ -31,14 +33,14 @@ Each preset is stored as a separate `.json` file inside
 You can:
 * **Create and edit presets** directly from the GUI.
 * **Add presets manually** by placing `.json` files into the folder — this is also how
-you can share your presets with others.
+  you can share your presets with others.
 
 All presets are also listed in the `config/mapart-helper/palette_presets.json` file, which maps preset filenames
 to their display names.
 You can use this file to quickly identify a specific preset and to safely change its filename.
 
-If you change any of these files or add new presets, make sure to update the data in-game — either by pressing the
-“Update from files” button in the **Presets Editor**, or by running `/mart palette update`.
+If you change any of these files or add new presets while playing the game, make sure to update the data in-game — either by pressing the
+“Update from files” button in the Presets Editor, or by running `/mart palette update`.
 
 ---
 
@@ -55,7 +57,7 @@ The following commands can be used everywhere, including servers:
 There are also several miscellaneous singleplayer-only commands, almost for debugging or for some unique cases:
 - `/mart-creative palette give-map-palette` — Fills the holding filled map with the image of the complete palette
 - `/mart-creative palette place <height>` — Places all blocks from the generated blocks palette into the world
-from the current map area's starting coordinates and at the given y-coordinate
+  from the current map area's starting coordinates and at the given y-coordinate
 
 ---
 
