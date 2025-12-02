@@ -27,6 +27,7 @@ public class CommonConfiguration implements ConfigData {
         public boolean previewHighlightOnHover = true;
         public boolean showUseLABTooltip = true;
         public boolean showStaircaseTooltips = true;
+        public boolean showImageImportButton = true;
     }
 
     public static class UseInBlockPalette {

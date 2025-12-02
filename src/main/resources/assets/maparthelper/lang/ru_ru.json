@@ -58,6 +58,7 @@
   "maparthelper.gui.option.NEEDED": "Важные",
 
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
+  "maparthelper.gui.import_tooltip": "Выбрать изображение для создания мапарта",
   "maparthelper.gui.shulker_box_abbr": "Ш",
   "maparthelper.gui.toggle_manual_cropping_buttons": "Переключить отображение кнопок для ручного кадрирования",
   "maparthelper.gui.reset_mapart": "Сброс мапарта",
@@ -127,6 +128,7 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightOnHover": "Выделять цвет на превью при наведении",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showUseLABTooltip": "Отображать подсказку для переключения LAB",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Отображать подсказки для вариантов ступенчатости",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showImageImportButton": "Отображать кнопку выбора изображения",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",
