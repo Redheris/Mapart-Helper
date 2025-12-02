@@ -539,7 +539,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 btn -> openImageImportDialog()
         ).size(20, 20).build();
 
-        importButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.import_tooltip", "Import Image"))); // Ensure you have this key in lang file, or use literal
+        importButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.import_tooltip", "Import Image")));
         mapartOptions.add(importButton);
 
         mapartOptions.add(createSaveMapartDropdown());
