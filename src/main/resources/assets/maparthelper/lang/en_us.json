@@ -128,6 +128,7 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightOnHover": "Highlight color on preview when hovered",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showUseLABTooltip": "Show tooltip for LAB toggle",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Show tooltips for staircase styles",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showImageImportButton": "Show image import button",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Include in palette:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Which blocks will be used when generating the global palette",

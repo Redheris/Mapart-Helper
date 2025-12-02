@@ -534,13 +534,15 @@ public class MapartEditorScreen extends ScreenAdapted {
         DirectionalLayoutWidget mapartOptions = DirectionalLayoutWidget.horizontal().spacing(2);
         mapartOptions.setPosition(mapartPreview.getImageX(), 10);
 
-        ButtonWidget importButton = ButtonWidget.builder(
-                Text.literal("📂"),
-                btn -> openImageImportDialog()
-        ).size(20, 20).build();
+        if (MapartHelper.commonConfig.mapartEditor.showImageImportButton) {
+            ButtonWidget importButton = ButtonWidget.builder(
+                    Text.literal("📂"),
+                    btn -> openImageImportDialog()
+            ).size(20, 20).build();
 
-        importButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.import_tooltip", "Import Image")));
-        mapartOptions.add(importButton);
+            importButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.import_tooltip", "Import Image")));
+            mapartOptions.add(importButton);
+        }
 
         mapartOptions.add(createSaveMapartDropdown());
 
