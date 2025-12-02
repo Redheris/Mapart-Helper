@@ -58,6 +58,7 @@
   "maparthelper.gui.option.NEEDED": "Important",
 
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
+  "maparthelper.gui.import_tooltip": "Import an image to create a mapart",
   "maparthelper.gui.shulker_box_abbr": "SB",
   "maparthelper.gui.toggle_manual_cropping_buttons": "Toggle manual cropping buttons display",
   "maparthelper.gui.reset_mapart": "Reset mapart",
