@@ -19,6 +19,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
@@ -531,6 +534,16 @@ public class MapartEditorScreen extends ScreenAdapted {
         DirectionalLayoutWidget mapartOptions = DirectionalLayoutWidget.horizontal().spacing(2);
         mapartOptions.setPosition(mapartPreview.getImageX(), 10);
 
+        if (MapartHelper.commonConfig.mapartEditor.showImageImportButton) {
+            ButtonWidget importButton = ButtonWidget.builder(
+                    Text.literal("📂"),
+                    btn -> openImageImportDialog()
+            ).size(20, 20).build();
+
+            importButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.import_tooltip", "Import Image")));
+            mapartOptions.add(importButton);
+        }
+
         mapartOptions.add(createSaveMapartDropdown());
 
         ButtonWidget showGridButton = ButtonWidget.builder(
@@ -611,9 +624,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     @Override
     public void onFilesDropped(List<Path> paths) {
-        CurrentConversionSettings.resetMapart();
-        MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst());
-        updateResetExcludedColorsButton(false);
+        readImage(paths.getFirst());
     }
 
 
@@ -906,5 +917,35 @@ public class MapartEditorScreen extends ScreenAdapted {
             else
                 mapartPreview.setHighlightingColor(fixedHighlight.mapColor);
         }
+    }
+
+    private void readImage(Path filepath) {
+        CurrentConversionSettings.resetMapart();
+        MapartImageUpdater.readAndUpdateMapartImage(mapart, filepath);
+        updateResetExcludedColorsButton(false);
+    }
+
+    private void openImageImportDialog() {
+        new Thread(() -> {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                PointerBuffer filters = stack.mallocPointer(3);
+                filters.put(stack.UTF8("*.png"));
+                filters.put(stack.UTF8("*.jpg"));
+                filters.put(stack.UTF8("*.jpeg"));
+                filters.flip();
+
+                String path = TinyFileDialogs.tinyfd_openFileDialog(
+                        "Import Image",
+                        null,
+                        filters,
+                        "Image files",
+                        false
+                );
+
+                if (path != null) {
+                    MinecraftClient.getInstance().execute(() -> readImage(Path.of(path)));
+                }
+            }
+        }).start();
     }
 }
