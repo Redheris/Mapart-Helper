@@ -1,1 +1,3 @@
-* See changelog for 1.21.8
+### Changes and new features
+
+- Added an image import button (kvxd)
