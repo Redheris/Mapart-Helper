@@ -622,9 +622,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     @Override
     public void onFilesDropped(List<Path> paths) {
-        CurrentConversionSettings.resetMapart();
-        MapartImageUpdater.readAndUpdateMapartImage(mapart, paths.getFirst());
-        updateResetExcludedColorsButton(false);
+        readImage(paths.getFirst());
     }
 
 
@@ -919,32 +917,33 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
     }
 
+    private void readImage(Path filepath) {
+        CurrentConversionSettings.resetMapart();
+        MapartImageUpdater.readAndUpdateMapartImage(mapart, filepath);
+        updateResetExcludedColorsButton(false);
+    }
+
     private void openImageImportDialog() {
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            PointerBuffer filters = stack.mallocPointer(3);
-            filters.put(stack.UTF8("*.png"));
-            filters.put(stack.UTF8("*.jpg"));
-            filters.put(stack.UTF8("*.jpeg"));
-            filters.flip();
+        new Thread(() -> {
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                PointerBuffer filters = stack.mallocPointer(3);
+                filters.put(stack.UTF8("*.png"));
+                filters.put(stack.UTF8("*.jpg"));
+                filters.put(stack.UTF8("*.jpeg"));
+                filters.flip();
 
-            String path = TinyFileDialogs.tinyfd_openFileDialog(
-                    "Import Image",
-                    null,
-                    filters,
-                    "Image files",
-                    false
-            );
+                String path = TinyFileDialogs.tinyfd_openFileDialog(
+                        "Import Image",
+                        null,
+                        filters,
+                        "Image files",
+                        false
+                );
 
-            if (path != null) {
-                Path filePath = Path.of(path);
-
-                CurrentConversionSettings.resetMapart();
-                MapartImageUpdater.readAndUpdateMapartImage(mapart, filePath);
-                updateResetExcludedColorsButton(false);
-
-                updateMaterialList();
-                updateMapartOutputButtons();
+                if (path != null) {
+                    MinecraftClient.getInstance().execute(() -> readImage(Path.of(path)));
+                }
             }
-        }
+        }).start();
     }
 }
