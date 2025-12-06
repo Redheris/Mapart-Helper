@@ -2,6 +2,7 @@ package rh.maparthelper.gui.widget;
 
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.DrawnTextConsumer;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
@@ -52,7 +53,13 @@ public class MapColorWidget extends ClickableWidget {
         int y = getY();
         if (color == MapColor.CLEAR) {
             context.fill(x, y, x + width, y + height, MapColor.LIGHT_GRAY.getRenderColor(MapColor.Brightness.NORMAL));
-            drawScrollableText(context, MinecraftClient.getInstance().textRenderer, Text.translatable("maparthelper.gui.background_color_clear"), getX() + 2, getY(), getRight() - 2, getBottom(), Colors.LIGHT_RED);
+            context.getTextConsumer().text(
+                    Text.literal("Nonenone").withColor(Colors.LIGHT_RED),
+                    getX() + 2,
+                    getRight() - 2,
+                    getY(),
+                    getBottom()
+            );
         } else if (color == MapColor.WATER_BLUE) {
             int waterColor = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.NORMAL));
             context.fill(x, y, x + width, y + height, waterColor);

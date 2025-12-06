@@ -34,10 +34,12 @@ public class DecorativeButtonWidget extends PressableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        int i = ColorHelper.withAlpha(this.alpha, this.active ? Colors.WHITE : Colors.LIGHT_GRAY);
-        this.drawMessage(context, minecraftClient.textRenderer, i);
+    protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+//        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+//        int i = ColorHelper.withAlpha(this.alpha, this.active ? Colors.WHITE : Colors.LIGHT_GRAY);
+////        context
+//
+//        this.drawMessage(context, minecraftClient.textRenderer, i);
 
         if (texture != null) {
             context.drawTexture(
@@ -48,6 +50,8 @@ public class DecorativeButtonWidget extends PressableWidget {
                     width, height,
                     width, height
             );
+        } else {
+            this.drawLabel(context.getHoverListener(this, DrawContext.HoverType.NONE));
         }
     }
 

@@ -2,7 +2,6 @@ package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,17 +11,17 @@ import java.util.function.Consumer;
 public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
     private boolean dynamicText = false;
 
-    public PresetsDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text initOption, boolean dynamicText) {
+    public PresetsDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, net.minecraft.text.Text initOption, boolean dynamicText) {
         super(parent, x, y, width, height, menuWidth, 120, initOption);
         this.dynamicText = dynamicText;
     }
 
-    public PresetsDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName) {
+    public PresetsDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, net.minecraft.text.Text fieldName) {
         super(parent, x, y, width, height, menuWidth, 120, fieldName);
     }
 
     public void addEntry(Consumer<String> action, String presetFile, String presetName) {
-        Text valueText = Text.of("\"" + presetName + "\"");
+        net.minecraft.text.Text valueText = net.minecraft.text.Text.of("\"" + presetName + "\"");
         ButtonWidget widget = ButtonWidget.builder(
                         valueText,
                         btn -> {
@@ -44,6 +43,6 @@ public class PresetsDropdownMenuWidget extends DropdownMenuWidget {
 
     public void updateNames(Collection<String> names) {
         Iterator<String> it = names.iterator();
-        this.forEachEntry(btn -> btn.setMessage(Text.of("\"" + it.next() + "\"")));
+        this.forEachEntry(btn -> btn.setMessage(net.minecraft.text.Text.of("\"" + it.next() + "\"")));
     }
 }

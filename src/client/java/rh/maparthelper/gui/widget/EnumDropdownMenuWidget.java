@@ -4,16 +4,15 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 
 import java.util.function.Consumer;
 
 public class EnumDropdownMenuWidget extends DropdownMenuWidget {
-    private final Text fieldName;
+    private final net.minecraft.text.Text fieldName;
     private boolean showTooltips = true;
 
-    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption) {
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, net.minecraft.text.Text fieldName, net.minecraft.text.Text initOption) {
         super(parent, x, y, width, height, menuWidth, -1, fieldName.copy().append(initOption));
         this.fieldName = fieldName;
     }
@@ -23,7 +22,7 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     }
 
     public void addEntry(Consumer<Enum<?>> action, Enum<?> object) {
-        Text objectName = Text.translatable("maparthelper.gui.option." + object.name());
+        net.minecraft.text.Text objectName = net.minecraft.text.Text.translatable("maparthelper.gui.option." + object.name());
         ButtonWidget widget = ButtonWidget.builder(
                 objectName,
                         btn -> {
@@ -34,7 +33,7 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
                 .size(menuWidth - 4, 15)
                 .build();
         if (showTooltips) {
-            Text tooltip = MutableText.of(new TranslatableTextContent("maparthelper.gui.option." + object.name() + "._TOOLTIP", "", TranslatableTextContent.EMPTY_ARGUMENTS));
+            net.minecraft.text.Text tooltip = MutableText.of(new TranslatableTextContent("maparthelper.gui.option." + object.name() + "._TOOLTIP", "", TranslatableTextContent.EMPTY_ARGUMENTS));
             widget.setTooltip(Tooltip.of(tooltip));
         }
         super.addEntry(widget);

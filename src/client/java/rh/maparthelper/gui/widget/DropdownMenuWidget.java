@@ -4,11 +4,10 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.*;
-import net.minecraft.text.Text;
 
 import java.util.function.Consumer;
 
-public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
+public class DropdownMenuWidget extends ButtonWidget.Text implements LayoutWidget {
     public static DropdownMenuWidget expandedOne;
 
     private final Screen parent;
@@ -23,7 +22,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
 
     private boolean needRelayout = false;
 
-    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, int columns, Text message) {
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, int columns, net.minecraft.text.Text message) {
         super(x, y, width, height, message, btn -> {}, DEFAULT_NARRATION_SUPPLIER);
         expandedOne = null;
         this.parent = parent;
@@ -42,7 +41,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         this.menuAdder = this.menu.grid.createAdder(columns);
     }
 
-    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text message) {
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, net.minecraft.text.Text message) {
         this(parent, x, y, width, height, menuWidth, maxMenuHeight, 1, message);
     }
 
@@ -145,7 +144,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         if (needRelayout) {
             menu.setHeight(maxMenuHeight);
             if (getBottom() + menu.getHeight() > parent.height) {
@@ -176,7 +175,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
             this.needRelayout = false;
         }
 
-        super.renderWidget(context, mouseX, mouseY, deltaTicks);
+        super.drawIcon(context, mouseX, mouseY, deltaTicks);
     }
 
     public void renderMenu(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
