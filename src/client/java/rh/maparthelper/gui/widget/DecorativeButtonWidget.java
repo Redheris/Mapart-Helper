@@ -2,16 +2,13 @@ package rh.maparthelper.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.input.AbstractInput;
 import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
 
 public class DecorativeButtonWidget extends PressableWidget {
     private final PressAction onPress;
@@ -35,12 +32,6 @@ public class DecorativeButtonWidget extends PressableWidget {
 
     @Override
     protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-//        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-//        int i = ColorHelper.withAlpha(this.alpha, this.active ? Colors.WHITE : Colors.LIGHT_GRAY);
-////        context
-//
-//        this.drawMessage(context, minecraftClient.textRenderer, i);
-
         if (texture != null) {
             context.drawTexture(
                     RenderPipelines.GUI_TEXTURED,
