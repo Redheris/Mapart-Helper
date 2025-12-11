@@ -1,6 +1,7 @@
 package rh.maparthelper.gui;
 
 import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.AutoConfigClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
@@ -244,7 +245,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         this.addDrawableChild(
                 DecorativeButtonWidget.builder(
                         SETTINGS_TEXTURE, btn -> MinecraftClient.getInstance().setScreen(
-                                AutoConfig.getConfigScreen(MapartHelperConfig.class, this).get()
+                                AutoConfigClient.getConfigScreen(MapartHelperConfig.class, this).get()
                         )
                 ).dimensions(2, 4, 14, 14).build()
         );
