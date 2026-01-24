@@ -55,7 +55,8 @@
   "maparthelper.gui.option.SIERRA_LITE": "Sierra Lite",
   "maparthelper.gui.option.SIERRA_2ROW": "Sierra Two-row",
   "maparthelper.gui.option.NO_AUX": "Only top row",
-  "maparthelper.gui.option.NEEDED": "Important",
+  "maparthelper.gui.option.IMPORTANT": "Important",
+  "maparthelper.gui.option.ALL": "All (optimized)",
 
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
   "maparthelper.gui.import_tooltip": "Import an image to create a mapart",

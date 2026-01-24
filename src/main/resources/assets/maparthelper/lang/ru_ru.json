@@ -55,7 +55,8 @@
   "maparthelper.gui.option.SIERRA_LITE": "Sierra Lite",
   "maparthelper.gui.option.SIERRA_2ROW": "Sierra Two-row",
   "maparthelper.gui.option.NO_AUX": "Верхний ряд",
-  "maparthelper.gui.option.NEEDED": "Важные",
+  "maparthelper.gui.option.IMPORTANT": "Важные",
+  "maparthelper.gui.option.ALL": "Все",
 
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
   "maparthelper.gui.import_tooltip": "Выбрать изображение для создания мапарта",
