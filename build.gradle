@@ -149,7 +149,7 @@ publishMods {
 			style {
 				look = "MODERN"
 				thumbnailUrl = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
-				link = "BUTTON"
+//				link = "BUTTON"
 				color = "#7419CA"
 			}
 		}

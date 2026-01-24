@@ -3,6 +3,7 @@ package rh.maparthelper.conversion.schematic;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -33,7 +34,10 @@ public class MapartToNBT {
     );
 
     private static void saveNBT(boolean asSingleFile, ZipOutputStream zipOut, File zipFile) {
-        assert CurrentConversionSettings.guiMapartImage.getImage() != null;
+        NativeImage mapartImage = CurrentConversionSettings.guiMapartImage.getImage();
+        int mapsWidth = CurrentConversionSettings.getMapartWidth();
+        int mapsHeight = CurrentConversionSettings.getMapartHeight();
+        assert mapartImage != null;
 
         try {
             if (!Files.exists(SCHEMATICS)) {
@@ -45,7 +49,7 @@ public class MapartToNBT {
 
         int[][] maps;
         if (asSingleFile) {
-            maps = new int[][]{CurrentConversionSettings.guiMapartImage.getImage().copyPixelsArgb()};
+            maps = new int[][]{mapartImage.copyPixelsArgb()};
         } else {
             maps = NativeImageUtils.divideMapartByMaps(CurrentConversionSettings.mapart);
         }
@@ -56,10 +60,10 @@ public class MapartToNBT {
 
             NbtCompound mapartNbt;
             if (asSingleFile)
-                mapartNbt = NbtSchematicUtils.createMapartNbt();
+                mapartNbt = new MapartSchematicBuilder(maps[0], mapsWidth, mapsHeight).build();
             else {
-                mapartNbt = NbtSchematicUtils.createMapartNbt(maps[i], 1, 1);
-                filename += " (" + (i % CurrentConversionSettings.getMapartWidth()) + "_" + (i / CurrentConversionSettings.getMapartWidth()) + ")";
+                mapartNbt = new MapartSchematicBuilder(maps[i], 1, 1).build();
+                filename += " (" + (i % mapsWidth) + "_" + (i / mapsWidth) + ")";
             }
 
             String writeFilename = Utils.makeUniqueFilename(SCHEMATICS, filename, "nbt");

@@ -1,3 +1,3 @@
 ### Changes and new features
 
-- Added an image import button (kvxd)
+- Implemented option `ALL` for auxiliary blocks

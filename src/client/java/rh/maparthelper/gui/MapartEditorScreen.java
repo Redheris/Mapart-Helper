@@ -36,8 +36,8 @@ import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
+import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
-import rh.maparthelper.conversion.schematic.NbtSchematicUtils;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
 import rh.maparthelper.util.InventoryItemsCounter;
@@ -143,7 +143,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         amountText.setTooltip(Tooltip.of(amountText.getMessage()));
         amountText.setTooltipDelay(Duration.ofMillis(100));
 
-        if (NbtSchematicUtils.needsAuxBlock(block)) {
+        if (MapartSchematicBuilder.needsAuxBlock(block)) {
             auxBlockCount += color.amount();
         }
     }
@@ -399,7 +399,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 return;
             Identifier id = Identifier.of(s);
             Block newBlock = Registries.BLOCK.get(id);
-            if (newBlock != Blocks.AIR && !NbtSchematicUtils.needsAuxBlock(newBlock)) {
+            if (newBlock != Blocks.AIR && !MapartSchematicBuilder.needsAuxBlock(newBlock)) {
                 MapartHelper.conversionSettings.auxBlock = newBlock;
                 auxBlockPreview.setBlock(newBlock);
                 updateMaterialList();
