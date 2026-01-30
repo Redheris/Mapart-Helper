@@ -14,6 +14,7 @@ import net.minecraft.client.gui.widget.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -34,12 +35,14 @@ import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
+import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
+import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.util.InventoryItemsCounter;
 import rh.maparthelper.util.RenderUtils;
 
@@ -61,6 +64,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ButtonWidget saveNBT;
     private ButtonWidget saveSplitNBT;
     private ButtonWidget saveZipNBT;
+    private ButtonWidget getMapItemsButton;
     private ButtonWidget showInWorldButton;
     private ButtonWidget resetExcludedColors;
 
@@ -764,6 +768,8 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     private DropdownMenuWidget createSaveMapartDropdown() {
+        boolean isIntegratedServer = MinecraftClient.getInstance().isIntegratedServerRunning();
+
         ButtonWidget saveImage = ButtonWidget.builder(
                 Text.translatable("maparthelper.gui.savePNG"),
                 (btn) -> {
@@ -787,12 +793,27 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> MapartToNBT.saveNBTAsZip()
         ).size(156, 20).build();
 
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if (isIntegratedServer && mc.getServer() != null && mc.player != null) {
+            ServerPlayerEntity serverPlayer = mc.getServer().getPlayerManager().getPlayer(mc.player.getUuid());
+            getMapItemsButton = ButtonWidget.builder(
+                    Text.translatable("maparthelper.gui.save_map_items").formatted(Formatting.GOLD),
+                    btn -> {
+                        int[][] maps = NativeImageUtils.divideMapartByMaps(CurrentConversionSettings.mapart);
+                        int width = CurrentConversionSettings.getMapartWidth();
+                        MapCreator.getMapsForMapart(maps, width, CurrentConversionSettings.mapart.mapartName, mc.getServer().getOverworld(), serverPlayer);
+                    }
+            ).size(156, 20).build();
+        }
+
         DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Text.literal("\uD83D\uDDAB"));
         saveMapart.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.save_mapart_as")));
         saveMapart.addEntry(saveImage);
         saveMapart.addEntry(saveNBT);
         saveMapart.addEntry(saveSplitNBT);
         saveMapart.addEntry(saveZipNBT);
+        if (isIntegratedServer)
+            saveMapart.addEntry(getMapItemsButton);
 
         return saveMapart;
     }
@@ -802,17 +823,26 @@ public class MapartEditorScreen extends ScreenAdapted {
         saveNBT.active = active;
         saveSplitNBT.active = active;
         saveZipNBT.active = active;
+        if (getMapItemsButton != null)
+            getMapItemsButton.active = active;
         showInWorldButton.active = active;
         if (active) {
             saveNBT.setTooltip(null);
             saveSplitNBT.setTooltip(null);
             saveZipNBT.setTooltip(null);
+            if (getMapItemsButton != null) {
+                getMapItemsButton.setTooltip(Tooltip.of(
+                        Text.translatable("maparthelper.gui.singleplayer_only").formatted(Formatting.GOLD)
+                ));
+            }
             showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
         } else {
             Tooltip disabled = Tooltip.of(Text.translatable("maparthelper.gui.enableColorAdaptation"));
             saveNBT.setTooltip(disabled);
             saveSplitNBT.setTooltip(disabled);
             saveZipNBT.setTooltip(disabled);
+            if (getMapItemsButton != null)
+                getMapItemsButton.setTooltip(disabled);
             showInWorldButton.setTooltip(disabled);
         }
     }
