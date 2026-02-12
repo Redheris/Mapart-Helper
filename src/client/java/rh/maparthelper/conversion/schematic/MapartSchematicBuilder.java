@@ -148,7 +148,8 @@ public class MapartSchematicBuilder {
     }
 
     public static boolean needsAuxBlock(Block block) {
-        if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX) return false;
+        if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX || block.getDefaultState().isAir())
+            return false;
         boolean canPlaceAtAir = block.getDefaultState().canPlaceAt(DummyWorldView.getInstance(), BlockPos.ORIGIN);
         boolean hasNoCollision = block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
