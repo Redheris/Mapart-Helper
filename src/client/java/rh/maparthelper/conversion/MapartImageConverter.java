@@ -202,7 +202,7 @@ public class MapartImageConverter {
                     PaletteColors.clearColorCache();
                     mapart.getColorsCounter().clear();
                     if (!showOriginalImage) {
-                        if (PaletteConfigManager.presetsConfig.getCurrentPresetColors().isEmpty())
+                        if (!PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
                             bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                         else
                             convertToBlocksPalette(bufferedImage, bgColor, MapartHelper.conversionSettings.use3D(), mapart.getColorsCounter());

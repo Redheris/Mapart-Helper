@@ -48,7 +48,8 @@ public class MapartSchematicBuilder {
     }
 
     public NbtCompound build() {
-        heightsZX = staircaseStyle.getStaircase(mapColors);
+        if (staircaseStyle != StaircaseStyles.FLAT_2D)
+            heightsZX = staircaseStyle.getStaircase(mapColors);
         for (int z = 0; z < zSize; z++) {
             for (int x = 0; x < xSize; x++) {
                 int y = staircaseStyle == StaircaseStyles.FLAT_2D ? 0 : heightsZX.get(z).get(x);
@@ -147,7 +148,8 @@ public class MapartSchematicBuilder {
     }
 
     public static boolean needsAuxBlock(Block block) {
-        if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX) return false;
+        if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX || block.getDefaultState().isAir())
+            return false;
         boolean canPlaceAtAir = block.getDefaultState().canPlaceAt(DummyWorldView.getInstance(), BlockPos.ORIGIN);
         boolean hasNoCollision = block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
