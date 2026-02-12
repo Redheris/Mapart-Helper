@@ -42,6 +42,11 @@ public class PalettePresetsConfig {
         return getPresetColors(currentPresetFile);
     }
 
+    public boolean shouldConvertWithCurrentPreset() {
+        Set<MapColor> currentColors = getCurrentPresetColors();
+        return !currentColors.isEmpty() && !PaletteColors.excludingColors.containsAll(currentColors);
+    }
+
     public Block getPresetBlockOfMapColor(String preset, MapColor color) {
         return presets.get(preset).getBlockOfMapColor(color);
     }

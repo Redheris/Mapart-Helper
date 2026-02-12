@@ -79,13 +79,13 @@ public class Valley3DStaircase implements IMapartStaircase {
                 }
 
                 // Adjustment of boundary blocks
-                if (cur != LOW && row < staircase.size() - 1) {
+                if (cur != LOW && row < staircase.size() - 1 && colors[row - 2][col] != 0) {
                     if (cur == HIGH) {
                         staircase.get(row).set(col,
                                 Math.max(staircase.get(row).get(col), staircase.get(row - 1).get(col) + 1)
                         );
                     }
-                    while (next == 1) {
+                    while (next == 1 && colors[row - 1][col] != 0) {
                         row++;
                         staircase.get(row).set(col, staircase.get(row - 1).get(col));
                         next = brights[row][col];

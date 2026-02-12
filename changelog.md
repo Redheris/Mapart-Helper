@@ -1,5 +1,11 @@
-### Changes and new features
+0.11.2 was released with some critical issues and a few unpleasant ones. This patch should fix the detected problems. 
+I apologize for not finding them earlier
 
-- Implemented option `ALL` for auxiliary blocks
-- Implemented singleplayer-only feature to get maps of the mapart without
-  building them in the world
+### Fixes and minor changes
+
+- Improved Waves staircasing style for images with transparency
+- Fixed 2D staircasing style not working entirely;
+- Fixed Valley staircasing style for images with transparency;
+- Fixed image reset if all colors from the preset were excluded;
+- Fixed an exception when sending a message about saving NBT;
+- Fixed a warning about exception in logs if the game was closed without opening the Mapart Editor screen;
