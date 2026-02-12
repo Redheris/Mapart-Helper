@@ -48,7 +48,8 @@ public class MapartSchematicBuilder {
     }
 
     public NbtCompound build() {
-        heightsZX = staircaseStyle.getStaircase(mapColors);
+        if (staircaseStyle != StaircaseStyles.FLAT_2D)
+            heightsZX = staircaseStyle.getStaircase(mapColors);
         for (int z = 0; z < zSize; z++) {
             for (int x = 0; x < xSize; x++) {
                 int y = staircaseStyle == StaircaseStyles.FLAT_2D ? 0 : heightsZX.get(z).get(x);
