@@ -107,7 +107,7 @@ public class MapartToNBT {
                 message = Text.translatable("maparthelper.nbt_files_saved", maps.length, mapartName, openFile);
             else
                 message = Text.translatable("maparthelper.nbt_zip_saved", maps.length, mapartName, openFile);
-            player.sendMessage(message.formatted(Formatting.GREEN), false);
+            sendMessageSafe(player, message.formatted(Formatting.GREEN));
         }
         MapartHelper.LOGGER.info("{} NBT file(s) for \"{}\" successfully saved", maps.length, mapartName);
     }
@@ -133,5 +133,9 @@ public class MapartToNBT {
                 MapartHelper.LOGGER.error("An error occurred during saving zip", e);
             }
         });
+    }
+
+    private static void sendMessageSafe(PlayerEntity player, Text message) {
+        MinecraftClient.getInstance().execute(() -> player.sendMessage(message, false));
     }
 }
