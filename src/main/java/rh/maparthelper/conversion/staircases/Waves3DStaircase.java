@@ -46,7 +46,7 @@ public class Waves3DStaircase implements IMapartStaircase {
             int waveNumber = 0;
             for (int z = 0; z < height; z++) {
                 if (z > 0 && colors[z - 1][x] == 0) continue;
-                if (z > 2 && colors[z - 2][x] == 0) waveNumber++;
+                if (z > 1 && colors[z - 2][x] == 0) waveNumber++;
                 staircase.get(z).set(x, staircase.get(z).get(x) - negativeHeights.get(x).get(waveNumber));
             }
         }
