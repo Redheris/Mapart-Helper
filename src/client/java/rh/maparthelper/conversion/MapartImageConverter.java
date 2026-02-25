@@ -11,9 +11,9 @@ import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
-import rh.maparthelper.conversion.mapart.ColorsCounter;
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
-import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.ColorsCounter;
+import rh.maparthelper.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 import rh.maparthelper.gui.MapartEditorScreen;
 
 import javax.imageio.ImageIO;

@@ -5,7 +5,7 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ConvertedMapartImage;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;

@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.mapart;
+package rh.maparthelper.mapart;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.texture.NativeImage;

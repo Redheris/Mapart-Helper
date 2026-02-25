@@ -4,7 +4,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ConvertedMapartImage;
 
 public class CurrentConversionSettings {
     // GUI image

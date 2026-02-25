@@ -2,8 +2,8 @@ package rh.maparthelper.conversion;
 
 import net.minecraft.block.MapColor;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
-import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 
 import java.nio.file.Path;
 import java.util.Set;

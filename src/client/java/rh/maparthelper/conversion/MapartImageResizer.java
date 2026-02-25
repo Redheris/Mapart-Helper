@@ -1,7 +1,7 @@
 package rh.maparthelper.conversion;
 
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
-import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

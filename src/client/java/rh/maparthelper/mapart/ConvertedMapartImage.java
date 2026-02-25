@@ -1,4 +1,4 @@
-package rh.maparthelper.conversion.mapart;
+package rh.maparthelper.mapart;
 
 import net.minecraft.block.MapColor;
 import net.minecraft.client.texture.NativeImageBackedTexture;
