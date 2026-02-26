@@ -41,7 +41,9 @@ import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
-import rh.maparthelper.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ColorsCounter;
+import rh.maparthelper.mapart.MapartSaver;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.util.InventoryItemsCounter;
 import rh.maparthelper.util.RenderUtils;
@@ -53,7 +55,7 @@ import java.util.*;
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier SETTINGS_TEXTURE = Identifier.of(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
-    protected final ConvertedMapartImage mapart = CurrentConversionSettings.mapart;
+    protected final ProcessingMapartImage mapart = CurrentConversionSettings.mapart;
 
     private DirectionalLayoutWidget settingsLeft;
     private DirectionalLayoutWidget settingsRight;
@@ -100,7 +102,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
 
-        ConvertedMapartImage.MapColorCount[] colorsCounter = mapart.getColorCounts(materialsAscendingOrder);
+        ColorsCounter colorsCounter = mapart.getColorsCounter();
+        ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
 
         this.auxBlockCount = mapart.getWidth() * 128;
         BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock);
@@ -112,9 +115,9 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         boolean hasAuxBlockInColors = false;
         if (displayRemainingAmount)
-            hasAuxBlockInColors = calculateRemainingCounts(colorsCounter);
+            hasAuxBlockInColors = calculateRemainingCounts(colorCounts);
 
-        for (ConvertedMapartImage.MapColorCount colorCount : colorsCounter) {
+        for (ColorsCounter.MapColorCount colorCount : colorCounts) {
             addBlockToMaterialList(materialListAdder, palette, colorCount);
         }
 
@@ -132,7 +135,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         this.addDrawableChild(materialList);
     }
 
-    private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, ConvertedMapartImage.MapColorCount color) {
+    private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, ColorsCounter.MapColorCount color) {
         MapColor mapColor = MapColor.get(color.id());
         Block block = palette.getBlockOfMapColor(mapColor);
         if (block == null) return;
@@ -153,7 +156,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     /// @return Whether the color-blocks list contains the same block as the auxiliary block.
-    private boolean calculateRemainingCounts(ConvertedMapartImage.MapColorCount[] colors) {
+    private boolean calculateRemainingCounts(ColorsCounter.MapColorCount[] colors) {
         PlayerEntity player = MinecraftClient.getInstance().player;
         if (player == null) return false;
         boolean hasAuxBlock = false;
@@ -181,10 +184,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 auxBlockCount += Math.min(0, remaining);
                 hasAuxBlock = true;
             }
-            colors[i] = new ConvertedMapartImage.MapColorCount(colors[i].id(), Math.max(0, remaining));
+            colors[i] = new ColorsCounter.MapColorCount(colors[i].id(), Math.max(0, remaining));
         }
 
-        Comparator<ConvertedMapartImage.MapColorCount> cmp = Comparator.comparingInt(ConvertedMapartImage.MapColorCount::amount);
+        Comparator<ColorsCounter.MapColorCount> cmp = Comparator.comparingInt(ColorsCounter.MapColorCount::amount);
         Arrays.sort(colors, materialsAscendingOrder ? cmp : cmp.reversed());
         return hasAuxBlock;
     }
@@ -774,7 +777,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Text.translatable("maparthelper.gui.savePNG"),
                 (btn) -> {
                     PlayerEntity player = client != null ? client.player : null;
-                    mapart.saveMapartImage(player);
+                    MapartSaver.saveMapartImage(mapart.mapartName, CurrentConversionSettings.guiMapartImage, player);
                 }
         ).size(156, 20).build();
 

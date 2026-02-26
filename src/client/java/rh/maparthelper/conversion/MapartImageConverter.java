@@ -11,10 +11,9 @@ import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
-import rh.maparthelper.mapart.ColorsCounter;
-import rh.maparthelper.mapart.ConvertedMapartImage;
-import rh.maparthelper.mapart.ProcessingMapartImage;
 import rh.maparthelper.gui.MapartEditorScreen;
+import rh.maparthelper.mapart.MapartImage;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -35,21 +34,21 @@ public class MapartImageConverter {
     );
     private static Future<?> currentConvertingFuture;
 
-    public static void readAndUpdateMapartImage(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
-        FutureTask<Void> future = getVoidFutureTask(updatingMapart, processingMapart, path, imageChangeResult);
+    public static void readAndUpdateMapartImage(ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
+        FutureTask<Void> future = getVoidFutureTask(processingMapart, path, imageChangeResult);
 
         if (currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
         currentConvertingFuture = convertingExecutor.submit(future);
     }
 
-    private static @NotNull FutureTask<Void> getVoidFutureTask(ConvertedMapartImage updatingMapart, ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
+    private static @NotNull FutureTask<Void> getVoidFutureTask(ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
         FutureTask<Void> future;
         boolean logExecutionTime = MapartHelper.commonConfig.mapartEditor.logConversionTime;
-        if (!updatingMapart.isReset() && path.equals(processingMapart.getImagePath()))
-            future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, null, logExecutionTime, imageChangeResult), null);
+        if (!processingMapart.isReset() && path.equals(processingMapart.getImagePath()))
+            future = new FutureTask<>(new ConvertImageFileRunnable(processingMapart, null, logExecutionTime, imageChangeResult), null);
         else {
-            future = new FutureTask<>(new ConvertImageFileRunnable(updatingMapart, processingMapart, path, logExecutionTime, imageChangeResult), null);
+            future = new FutureTask<>(new ConvertImageFileRunnable(processingMapart, path, logExecutionTime, imageChangeResult), null);
         }
         return future;
     }
@@ -74,10 +73,13 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    private static void convertToBlocksPalette(BufferedImage image, MapColorEntry bgColor, boolean use3D, ColorsCounter colorsCounter) {
-        int width = image.getWidth();
-        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        double progressStep = 1.0 / pixels.length;
+    private static BufferedImage convertToBlocksPalette(BufferedImage image, MapColorEntry bgColor, boolean use3D, MapartImage colorsCounter) {
+        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        int width = converted.getWidth();
+        int[] originalPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        int[] resultPixels = ((DataBufferInt) converted.getRaster().getDataBuffer()).getData();
+        double progressStep = 1.0 / originalPixels.length;
 
         int[] errorsArray = new int[0];
         DitheringAlgorithms ditherAlg = MapartHelper.conversionSettings.ditheringAlgorithm;
@@ -85,14 +87,14 @@ public class MapartImageConverter {
         if (useDithering)
             errorsArray = new int[ditherAlg.rowsNumber * width * 3];
 
-        for (int y = 0; y < image.getHeight(); y++) {
+        for (int y = 0; y < converted.getHeight(); y++) {
             for (int x = 0; x < width; x++) {
                 if (Thread.currentThread().isInterrupted()) {
                     PaletteColors.clearColorCache();
-                    colorsCounter.clear();
-                    return;
+                    colorsCounter.clearColorCounters();
+                    return null;
                 }
-                int argb = pixels[x + y * width];
+                int argb = originalPixels[x + y * width];
                 if (argb == 0 && bgColor == MapColorEntry.CLEAR) {
                     continue;
                 }
@@ -111,7 +113,7 @@ public class MapartImageConverter {
                 }
                 if (useDithering && color != MapColorEntry.CLEAR)
                     ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
-                if (y > 0 && pixels[x + (y - 1) * width] == 0)
+                if (y > 0 && originalPixels[x + (y - 1) * width] == 0)
                     newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
                 else {
                     if (use3D)
@@ -119,9 +121,9 @@ public class MapartImageConverter {
                     else
                         newArgb = color.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
                 }
-                pixels[x + y * width] = newArgb;
+                resultPixels[x + y * width] = newArgb;
                 if (color != MapColorEntry.CLEAR) {
-                    colorsCounter.increment(color.mapColor().id);
+                    colorsCounter.getColorsCounter().increment(color.mapColor().id);
                 }
                 conversionProgress.addAndGet(progressStep);
             }
@@ -135,6 +137,7 @@ public class MapartImageConverter {
 
         conversionProgress.set(1.0);
         PaletteColors.clearColorCache();
+        return converted;
     }
 
     private static BufferedImage cropAndScaleToMapSize(ProcessingMapartImage mapart, boolean rescale) {
@@ -157,14 +160,12 @@ public class MapartImageConverter {
     }
 
     private static class ConvertImageFileRunnable implements Runnable {
-        private final ConvertedMapartImage updatingMapart;
         private final ProcessingMapartImage mapart;
         private final Path newImagePath;
         private final boolean logExecutionTime;
         private final ImageChangeResult imageChangeResult;
 
-        public ConvertImageFileRunnable(ConvertedMapartImage updatingMapart, ProcessingMapartImage mapart, Path path, boolean logExecutionTime, ImageChangeResult imageChangeResult) {
-            this.updatingMapart = updatingMapart;
+        public ConvertImageFileRunnable(ProcessingMapartImage mapart, Path path, boolean logExecutionTime, ImageChangeResult imageChangeResult) {
             this.mapart = mapart;
             this.newImagePath = path;
             this.logExecutionTime = logExecutionTime;
@@ -173,79 +174,80 @@ public class MapartImageConverter {
 
         @Override
         public void run() {
-            try {
-                long startTime = System.currentTimeMillis();
-                conversionProgress = new AtomicDouble(0.0);
+            synchronized (CurrentConversionSettings.mapart) {
+                try {
+                    long startTime = System.currentTimeMillis();
+                    conversionProgress = new AtomicDouble(0.0);
 
-                boolean showOriginalImage = MapartHelper.conversionSettings.showOriginalImage;
-                MapColorEntry bgColor = MapartHelper.conversionSettings.backgroundColor;
+                    boolean showOriginalImage = MapartHelper.conversionSettings.showOriginalImage;
+                    MapColorEntry bgColor = MapartHelper.conversionSettings.backgroundColor;
 
-                if (newImagePath != null) {
-                    mapart.setImagePath(null);
-                    mapart.setOriginal(ImageIO.read(newImagePath.toFile()));
-                    mapart.setImagePath(newImagePath);
-                    mapart.autoCropOriginalImage();
-                }
-                if (Thread.currentThread().isInterrupted()) return;
-
-                boolean needReconvertingColors = imageChangeResult != ImageChangeResult.SIMPLE
-                        && (imageChangeResult == ImageChangeResult.NEED_RESCALE || bgColor == MapColorEntry.CLEAR && !showOriginalImage);
-
-                BufferedImage bufferedImage = cropAndScaleToMapSize(mapart, needReconvertingColors);
-                if (Thread.currentThread().isInterrupted()) return;
-
-                if (imageChangeResult != ImageChangeResult.SIMPLE) {
-                    if (needReconvertingColors)
-                        bufferedImage = preprocessImage(bufferedImage);
-                    if (Thread.currentThread().isInterrupted()) return;
-
-                    PaletteColors.clearColorCache();
-                    mapart.getColorsCounter().clear();
-                    if (!showOriginalImage) {
-                        if (!PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
-                            bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                        else
-                            convertToBlocksPalette(bufferedImage, bgColor, MapartHelper.conversionSettings.use3D(), mapart.getColorsCounter());
-                    }
-                    if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
-                        mapart.setScaledImage(bufferedImage.getSubimage(
-                                mapart.getInsertionX(), mapart.getInsertionY(),
-                                mapart.getScaledImage().getWidth(), mapart.getScaledImage().getHeight())
-                        );
+                    if (newImagePath != null) {
+                        mapart.setImagePath(null);
+                        mapart.setOriginal(ImageIO.read(newImagePath.toFile()));
+                        mapart.setImagePath(newImagePath);
+                        mapart.autoCropOriginalImage();
                     }
                     if (Thread.currentThread().isInterrupted()) return;
-                }
 
-                mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(
-                        bufferedImage,
-                        bgColor,
-                        CurrentConversionSettings.doShowTransparent)
-                );
-                if (Thread.currentThread().isInterrupted()) return;
+                    boolean needReconvertingColors = imageChangeResult != ImageChangeResult.SIMPLE
+                            && (imageChangeResult == ImageChangeResult.NEED_RESCALE || bgColor == MapColorEntry.CLEAR && !showOriginalImage);
 
-                ConvertedMapartImage result = mapart.release(updatingMapart);
-                MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(result.getNativeImage()));
+                    BufferedImage bufferedImage = cropAndScaleToMapSize(mapart, needReconvertingColors);
+                    if (Thread.currentThread().isInterrupted()) return;
 
-                MapartImageUpdater.scale = 0;
-                MapartImageUpdater.moveDx = 0;
-                MapartImageUpdater.moveDy = 0;
+                    if (imageChangeResult != ImageChangeResult.SIMPLE) {
+                        if (needReconvertingColors)
+                            bufferedImage = preprocessImage(bufferedImage);
+                        if (Thread.currentThread().isInterrupted()) return;
 
-                if (logExecutionTime) {
-                    double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
-                    MapartHelper.LOGGER.info("Image preprocessing and conversion took {} seconds", timeLeft);
-                }
-
-            } catch (Exception e) {
-                CurrentConversionSettings.resetMapart();
-                MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
-                throw new RuntimeException(e);
-            } finally {
-                MinecraftClient.getInstance().execute(() -> {
-                    if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen) {
-                        editorScreen.updateMaterialList();
-                        editorScreen.updateMapartOutputButtons();
+                        PaletteColors.clearColorCache();
+                        mapart.clearColorCounters();
+                        if (!showOriginalImage) {
+                            if (!PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
+                                bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                            else
+                                bufferedImage = convertToBlocksPalette(bufferedImage, bgColor, MapartHelper.conversionSettings.use3D(), mapart);
+                        }
+                        if (bufferedImage == null) return;
+                        if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
+                            mapart.setScaledImage(bufferedImage.getSubimage(
+                                    mapart.getInsertionX(), mapart.getInsertionY(),
+                                    mapart.getScaledImage().getWidth(), mapart.getScaledImage().getHeight())
+                            );
+                        }
+                        if (Thread.currentThread().isInterrupted()) return;
                     }
-                });
+
+                    mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(
+                            bufferedImage,
+                            bgColor,
+                            CurrentConversionSettings.doShowTransparent)
+                    );
+                    if (Thread.currentThread().isInterrupted()) return;
+                    MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage()));
+
+                    MapartImageUpdater.scale = 0;
+                    MapartImageUpdater.moveDx = 0;
+                    MapartImageUpdater.moveDy = 0;
+
+                    if (logExecutionTime) {
+                        double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
+                        MapartHelper.LOGGER.info("Image preprocessing and conversion took {} seconds", timeLeft);
+                    }
+
+                } catch (Exception e) {
+                    CurrentConversionSettings.resetMapart();
+                    MapartHelper.LOGGER.error("Error occurred while reading and converting an image: ", e);
+                    throw new RuntimeException(e);
+                } finally {
+                    MinecraftClient.getInstance().execute(() -> {
+                        if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen) {
+                            editorScreen.updateMaterialList();
+                            editorScreen.updateMapartOutputButtons();
+                        }
+                    });
+                }
             }
         }
     }

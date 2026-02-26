@@ -1,17 +1,16 @@
 package rh.maparthelper.mapart;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.texture.NativeImage;
 
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
 public abstract class MapartImage {
-    protected final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
-    protected ColorsCounter colorsCounter = new ColorsCounter();
-    protected NativeImage nativeImage;
-    protected BufferedImage original;
     protected Path imagePath;
+    protected BufferedImage original;
+    protected NativeImage nativeImage;
+//    protected MapSegment[] mapSegments;
+    protected ColorsCounter colorsCounter = new ColorsCounter();
 
     public String mapartName = "New mapart";
     protected int width = 1;
@@ -19,34 +18,23 @@ public abstract class MapartImage {
 
     protected final CroppingFrame croppingFrame = new CroppingFrame();
     protected BufferedImage scaledImage;
-    protected double scale = 1; // How much the image scaled
     protected int insertionX = 0;
     protected int insertionY = 0;
 
-    public MapartImage() {
-
-    }
-
-    public MapartImage(MapartImage mapart) {
-        this.colorsCounter = new ColorsCounter(mapart.colorsCounter);
-        this.nativeImage = mapart.nativeImage;
-        this.original = mapart.original;
-        this.imagePath = mapart.imagePath;
-        this.mapartName = mapart.mapartName;
-        this.width = mapart.width;
-        this.height = mapart.height;
-        this.insertionX = mapart.insertionX;
-        this.insertionY = mapart.insertionY;
-        this.scaledImage = mapart.scaledImage;
-        this.scale = mapart.scale;
-
-        this.croppingFrame.x = mapart.croppingFrame.x;
-        this.croppingFrame.y = mapart.croppingFrame.y;
-        this.croppingFrame.width = mapart.croppingFrame.width;
-        this.croppingFrame.height = mapart.croppingFrame.height;
+    public void clearColorCounters() {
+//        if (mapSegments == null) return;
+//        for (MapSegment mapSegment : mapSegments) {
+//            mapSegment.getColorsCounter().clear();
+//        }
+        colorsCounter.clear();
     }
 
     public ColorsCounter getColorsCounter() {
+//        if (mapSegments == null) return new ColorsCounter();
+//        ColorsCounter[] counters = Arrays.stream(mapSegments)
+//                .map(MapSegment::getColorsCounter)
+//                .toArray(ColorsCounter[]::new);
+//        return ColorsCounter.sum(counters);
         return colorsCounter;
     }
 

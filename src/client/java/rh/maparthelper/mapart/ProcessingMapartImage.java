@@ -7,13 +7,19 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
 public class ProcessingMapartImage extends MapartImage {
+    private boolean isReset = false;
 
-    public ProcessingMapartImage(MapartImage mapart) {
-        super(mapart);
+    public boolean isReset() {
+        return isReset;
     }
 
-    public ConvertedMapartImage release(ConvertedMapartImage mapart) {
-        return mapart.update(this);
+    public void setReset(boolean reset) {
+        isReset = reset;
+    }
+
+    public void setMapartSize(int width, int height) {
+        this.width = width;
+        this.height = height;
     }
 
     public void autoCropOriginalImage() {
@@ -113,16 +119,14 @@ public class ProcessingMapartImage extends MapartImage {
         if (imageWidth < mapartWidth) {
             croppingFrame.setX(0);
             insertionX = (mapartWidth - imageWidth) / 2;
-        }
-        else {
+        } else {
             insertionX = 0;
             croppingFrame.setX((original.getWidth() - croppingFrame.getWidth()) / 2);
         }
         if (imageHeight < mapartHeight) {
             croppingFrame.setY(0);
             insertionY = (mapartHeight - imageHeight) / 2;
-        }
-        else {
+        } else {
             insertionY = 0;
             croppingFrame.setY((original.getHeight() - croppingFrame.getHeight()) / 2);
         }
@@ -172,32 +176,31 @@ public class ProcessingMapartImage extends MapartImage {
     public ImageChangeResult moveCroppingFrame(int dx, int dy, int type) {
         if (original == null) return ImageChangeResult.SIMPLE;
 
-        ImageChangeResult imageChangeResult = ImageChangeResult.SIMPLE;
+        ImageChangeResult imageChangeResult = ImageChangeResult.NEED_RESCALE;
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
         int mapartHeight = height * 128;
 
         if (dx != 0) {
-            if (scaledImage.getWidth() < mapartWidth)
+            if (scaledImage.getWidth() < mapartWidth) {
                 insertionX = Math.clamp(insertionX - (long) dx * type, 0, mapartWidth - scaledImage.getWidth());
-            else {
+                imageChangeResult = ImageChangeResult.SIMPLE;
+            } else {
                 insertionX = 0;
                 int oldCropX = croppingFrame.getX();
                 croppingFrame.setX(Math.clamp(oldCropX - dx, 0, imageWidth - croppingFrame.getWidth()));
-                if (croppingFrame.getX() != oldCropX)
-                    imageChangeResult = ImageChangeResult.NEED_RESCALE;
             }
         }
-
         if (dy != 0) {
             if (scaledImage.getHeight() < mapartHeight) {
                 boolean wasTop = insertionY == 0;
                 insertionY = Math.clamp(insertionY - (long) dy * type, 0, mapartHeight - scaledImage.getHeight());
                 if (wasTop != (insertionY == 0))
                     imageChangeResult = ImageChangeResult.TOP_LINE_CHANGED;
-            }
-            else {
+                else
+                    imageChangeResult = ImageChangeResult.SIMPLE;
+            } else {
                 insertionY = 0;
                 int oldCropY = croppingFrame.getY();
                 croppingFrame.setY(Math.clamp(oldCropY - dy, 0, imageHeight - croppingFrame.getHeight()));
@@ -222,10 +225,6 @@ public class ProcessingMapartImage extends MapartImage {
 
     public void setScaledImage(BufferedImage scaledImage) {
         this.scaledImage = scaledImage;
-    }
-
-    public void setScale(double scale) {
-        this.scale = scale;
     }
 
     public void setWidth(int width) {

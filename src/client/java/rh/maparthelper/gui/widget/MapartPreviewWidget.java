@@ -18,7 +18,7 @@ import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.MapartImageUpdater;
-import rh.maparthelper.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
 import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.scheduler.DelayedRepeater;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 import static rh.maparthelper.gui.sprites.ManualCroppingSprites.*;
 
 public class MapartPreviewWidget extends ClickableWidget {
-    private final ConvertedMapartImage mapart;
+    private final ProcessingMapartImage mapart;
     private final int maxWidth;
     private final int maxHeight;
 
@@ -40,7 +40,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     private ManualCroppingAction hoveredAction = null;
     private MapColor highlightingColor = MapColor.CLEAR;
 
-    public MapartPreviewWidget(ConvertedMapartImage mapart, int x, int y, int maxX, int maxY) {
+    public MapartPreviewWidget(ProcessingMapartImage mapart, int x, int y, int maxX, int maxY) {
         super(x, y, mapart.getWidth(), mapart.getHeight(), Text.empty());
         this.maxWidth = maxX - 16 - x;
         this.maxHeight = maxY - y;
@@ -194,6 +194,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         return false;
     }
 
+    // TODO: replace mouseDragged with mouseMoved
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
@@ -201,7 +202,11 @@ public class MapartPreviewWidget extends ClickableWidget {
         if (mouseX < getImageX() || CurrentConversionSettings.doShowManualCroppingButtons && isMouseOverActionsArea(mouseX, mouseY))
             return false;
         setHoveredAction(null);
-        MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, deltaX, deltaY, true);
+        double scaleX = (double) mapart.getCroppingFrame().getWidth() / width;
+        double scaleY = (double) mapart.getCroppingFrame().getHeight() / height;
+        double imageDeltaX = deltaX * scaleX;
+        double imageDeltaY = deltaY * scaleY;
+        MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, imageDeltaX, imageDeltaY, true);
         return true;
     }
 
@@ -476,19 +481,19 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         final Identifier normal;
         final Identifier highlighted;
-        final Consumer<ConvertedMapartImage> action;
+        final Consumer<ProcessingMapartImage> action;
 
-        ManualCroppingAction(Identifier normal, Identifier highlighted, Consumer<ConvertedMapartImage> action) {
+        ManualCroppingAction(Identifier normal, Identifier highlighted, Consumer<ProcessingMapartImage> action) {
             this.normal = normal;
             this.highlighted = highlighted;
             this.action = action;
         }
 
-        void perform(ConvertedMapartImage mapart) {
+        void perform(ProcessingMapartImage mapart) {
             action.accept(mapart);
         }
 
-        static void move(ConvertedMapartImage mapart, int dx, int dy) {
+        static void move(ProcessingMapartImage mapart, int dx, int dy) {
             MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, dx, dy, false);
         }
     }

@@ -1,6 +1,5 @@
 package rh.maparthelper.conversion;
 
-import rh.maparthelper.mapart.ConvertedMapartImage;
 import rh.maparthelper.mapart.ProcessingMapartImage;
 
 import java.awt.*;
@@ -11,7 +10,7 @@ public class MapartImageResizer {
         BufferedImage image = mapart.getOriginal();
         int imageW = image.getWidth();
         int imageH = image.getHeight();
-        ConvertedMapartImage.CroppingFrame frame = mapart.getCroppingFrame();
+        ProcessingMapartImage.CroppingFrame frame = mapart.getCroppingFrame();
 
         int visibleW = frame.getWidth();
         int visibleH = frame.getHeight();
@@ -24,7 +23,6 @@ public class MapartImageResizer {
 
         if (mapartScaledW > 1 && mapartScaledH > 1) {
             mapart.setScaledImage(scaleImage(image, mapartScaledW, mapartScaledH));
-            mapart.setScale(Math.min((double) mapartScaledW / visibleW, (double) mapartScaledH / visibleH));
         }
 
         return placeOnMapartCanvas(mapart, mapartW, mapartH);

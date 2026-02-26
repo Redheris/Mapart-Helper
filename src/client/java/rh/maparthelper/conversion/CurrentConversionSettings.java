@@ -4,11 +4,11 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.ProcessingMapartImage;
 
 public class CurrentConversionSettings {
     // GUI image
-    public final static ConvertedMapartImage mapart = new ConvertedMapartImage();
+    public final static ProcessingMapartImage mapart = new ProcessingMapartImage();
     public static NativeImageBackedTexture guiMapartImage;
     public final static Identifier guiMapartId = Identifier.of(MapartHelper.MOD_ID, "mapart_gui_texture");
 
@@ -25,7 +25,7 @@ public class CurrentConversionSettings {
     public static void resetMapart() {
         PaletteColors.clearExcludingColors();
         guiMapartImage = null;
-        mapart.reset();
+//        mapart.reset();
     }
 
     public static int getMapartWidth() {
