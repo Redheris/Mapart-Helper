@@ -42,8 +42,8 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
 import rh.maparthelper.mapart.ColorsCounter;
-import rh.maparthelper.mapart.MapartSaver;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.mapart.MapartSaver;
 import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.util.InventoryItemsCounter;
 import rh.maparthelper.util.RenderUtils;
@@ -802,9 +802,10 @@ public class MapartEditorScreen extends ScreenAdapted {
             getMapItemsButton = ButtonWidget.builder(
                     Text.translatable("maparthelper.gui.save_map_items").formatted(Formatting.GOLD),
                     btn -> {
-                        int[][] maps = NativeImageUtils.divideMapartByMaps(CurrentConversionSettings.mapart);
-                        int width = CurrentConversionSettings.getMapartWidth();
-                        MapCreator.getMapsForMapart(maps, width, CurrentConversionSettings.mapart.mapartName, mc.getServer().getOverworld(), serverPlayer);
+                        int[][] maps = NativeImageUtils.divideImageByMaps(
+                                mapart.getWidth(), mapart.getHeight(), mapart.getNativeImage()
+                        );
+                        MapCreator.getMapsForMapart(maps, mapart.getWidth(), mapart.mapartName, mc.getServer().getOverworld(), serverPlayer);
                     }
             ).size(156, 20).build();
         }

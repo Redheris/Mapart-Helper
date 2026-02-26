@@ -1,14 +1,6 @@
 package rh.maparthelper.mapart;
 
-import net.minecraft.client.texture.NativeImage;
-
-import java.awt.image.BufferedImage;
-import java.nio.file.Path;
-
 public abstract class AbstractMapart {
-    protected Path imagePath;
-    protected BufferedImage original;
-    protected NativeImage nativeImage;
 //    protected MapSegment[] mapSegments;
     protected ColorsCounter colorsCounter = new ColorsCounter();
 
@@ -17,7 +9,6 @@ public abstract class AbstractMapart {
     protected int height = 1;
 
     protected final CroppingFrame croppingFrame = new CroppingFrame();
-    protected BufferedImage scaledImage;
     protected int insertionX = 0;
     protected int insertionY = 0;
 
@@ -38,24 +29,12 @@ public abstract class AbstractMapart {
         return colorsCounter;
     }
 
-    public NativeImage getNativeImage() {
-        return nativeImage;
-    }
+    public abstract int getOriginalWidth();
 
-    public BufferedImage getOriginal() {
-        return original;
-    }
-
-    public Path getImagePath() {
-        return imagePath;
-    }
+    public abstract int getOriginalHeight();
 
     public CroppingFrame getCroppingFrame() {
         return croppingFrame;
-    }
-
-    public BufferedImage getScaledImage() {
-        return scaledImage;
     }
 
     public int getWidth() {
@@ -86,7 +65,7 @@ public abstract class AbstractMapart {
         }
 
         protected void setX(int x) {
-            if (x < 0 || x > original.getWidth()) return;
+            if (x < 0 || x > getOriginalWidth()) return;
             this.x = x;
         }
 
@@ -95,7 +74,7 @@ public abstract class AbstractMapart {
         }
 
         protected void setY(int y) {
-            if (y < 0 || y > original.getHeight()) return;
+            if (y < 0 || y > getOriginalHeight()) return;
             this.y = y;
         }
 

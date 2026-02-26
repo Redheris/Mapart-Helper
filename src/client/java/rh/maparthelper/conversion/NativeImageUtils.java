@@ -5,7 +5,6 @@ import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.mapart.AbstractMapart;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -22,14 +21,12 @@ public class NativeImageUtils {
         CurrentConversionSettings.guiMapartImage = backedTexture;
     }
 
-    public static int[][] divideMapartByMaps(AbstractMapart mapart) {
+    public static int[][] divideImageByMaps(int width, int height, NativeImage image) {
         if (CurrentConversionSettings.guiMapartImage == null || CurrentConversionSettings.guiMapartImage.getImage() == null)
             return null;
-        int width = mapart.getWidth();
-        int height = mapart.getHeight();
         int imageWidth = width * 128;
 
-        int[] pixels = mapart.getNativeImage().copyPixelsArgb();
+        int[] pixels = image.copyPixelsArgb();
         int[][] maps = new int[width * height][];
         for (int i = 0; i < maps.length; i++) {
             maps[i] = new int[16384];

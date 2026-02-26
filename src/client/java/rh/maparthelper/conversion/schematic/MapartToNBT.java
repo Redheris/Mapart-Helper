@@ -17,7 +17,10 @@ import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.util.Utils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
@@ -51,7 +54,9 @@ public class MapartToNBT {
         if (asSingleFile) {
             maps = new int[][]{mapartImage.copyPixelsArgb()};
         } else {
-            maps = NativeImageUtils.divideMapartByMaps(CurrentConversionSettings.mapart);
+            maps = NativeImageUtils.divideImageByMaps(
+                    CurrentConversionSettings.getMapartWidth(), CurrentConversionSettings.getMapartHeight(), mapartImage
+            );
         }
         assert maps != null;
 

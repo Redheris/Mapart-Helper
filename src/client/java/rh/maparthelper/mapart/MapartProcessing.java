@@ -7,6 +7,11 @@ import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
 public class MapartProcessing extends AbstractMapart {
+    private Path imagePath;
+    private BufferedImage original;
+    private NativeImage nativeImage;
+    private BufferedImage scaledImage;
+
     private boolean isReset = false;
 
     public boolean isReset() {
@@ -15,6 +20,32 @@ public class MapartProcessing extends AbstractMapart {
 
     public void setReset(boolean reset) {
         isReset = reset;
+    }
+
+    public NativeImage getNativeImage() {
+        return nativeImage;
+    }
+
+    public BufferedImage getOriginal() {
+        return original;
+    }
+
+    @Override
+    public int getOriginalWidth() {
+        return original.getWidth();
+    }
+
+    @Override
+    public int getOriginalHeight() {
+        return original.getHeight();
+    }
+
+    public Path getImagePath() {
+        return imagePath;
+    }
+
+    public BufferedImage getScaledImage() {
+        return scaledImage;
     }
 
     public void setMapartSize(int width, int height) {
