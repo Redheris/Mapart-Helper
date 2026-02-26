@@ -5,7 +5,7 @@ import net.minecraft.client.texture.NativeImage;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
-public abstract class MapartImage {
+public abstract class AbstractMapart {
     protected Path imagePath;
     protected BufferedImage original;
     protected NativeImage nativeImage;

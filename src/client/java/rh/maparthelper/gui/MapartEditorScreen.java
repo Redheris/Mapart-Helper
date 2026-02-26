@@ -43,7 +43,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.widget.*;
 import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartSaver;
-import rh.maparthelper.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.util.InventoryItemsCounter;
 import rh.maparthelper.util.RenderUtils;
@@ -55,7 +55,7 @@ import java.util.*;
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier SETTINGS_TEXTURE = Identifier.of(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
-    protected final ProcessingMapartImage mapart = CurrentConversionSettings.mapart;
+    protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
 
     private DirectionalLayoutWidget settingsLeft;
     private DirectionalLayoutWidget settingsRight;

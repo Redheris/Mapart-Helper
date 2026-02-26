@@ -12,8 +12,8 @@ import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.gui.MapartEditorScreen;
-import rh.maparthelper.mapart.MapartImage;
-import rh.maparthelper.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.AbstractMapart;
+import rh.maparthelper.mapart.MapartProcessing;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,7 +34,7 @@ public class MapartImageConverter {
     );
     private static Future<?> currentConvertingFuture;
 
-    public static void readAndUpdateMapartImage(ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
+    public static void readAndUpdateMapartImage(MapartProcessing processingMapart, Path path, ImageChangeResult imageChangeResult) {
         FutureTask<Void> future = getVoidFutureTask(processingMapart, path, imageChangeResult);
 
         if (currentConvertingFuture != null)
@@ -42,7 +42,7 @@ public class MapartImageConverter {
         currentConvertingFuture = convertingExecutor.submit(future);
     }
 
-    private static @NotNull FutureTask<Void> getVoidFutureTask(ProcessingMapartImage processingMapart, Path path, ImageChangeResult imageChangeResult) {
+    private static @NotNull FutureTask<Void> getVoidFutureTask(MapartProcessing processingMapart, Path path, ImageChangeResult imageChangeResult) {
         FutureTask<Void> future;
         boolean logExecutionTime = MapartHelper.commonConfig.mapartEditor.logConversionTime;
         if (!processingMapart.isReset() && path.equals(processingMapart.getImagePath()))
@@ -73,7 +73,7 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    private static BufferedImage convertToBlocksPalette(BufferedImage image, MapColorEntry bgColor, boolean use3D, MapartImage colorsCounter) {
+    private static BufferedImage convertToBlocksPalette(BufferedImage image, MapColorEntry bgColor, boolean use3D, AbstractMapart colorsCounter) {
         BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = converted.getWidth();
@@ -140,7 +140,7 @@ public class MapartImageConverter {
         return converted;
     }
 
-    private static BufferedImage cropAndScaleToMapSize(ProcessingMapartImage mapart, boolean rescale) {
+    private static BufferedImage cropAndScaleToMapSize(MapartProcessing mapart, boolean rescale) {
         int mapartWidth = mapart.getWidth() * 128;
         int mapartHeight = mapart.getHeight() * 128;
         if (!rescale) {
@@ -160,12 +160,12 @@ public class MapartImageConverter {
     }
 
     private static class ConvertImageFileRunnable implements Runnable {
-        private final ProcessingMapartImage mapart;
+        private final MapartProcessing mapart;
         private final Path newImagePath;
         private final boolean logExecutionTime;
         private final ImageChangeResult imageChangeResult;
 
-        public ConvertImageFileRunnable(ProcessingMapartImage mapart, Path path, boolean logExecutionTime, ImageChangeResult imageChangeResult) {
+        public ConvertImageFileRunnable(MapartProcessing mapart, Path path, boolean logExecutionTime, ImageChangeResult imageChangeResult) {
             this.mapart = mapart;
             this.newImagePath = path;
             this.logExecutionTime = logExecutionTime;

@@ -6,7 +6,7 @@ import rh.maparthelper.conversion.ImageChangeResult;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
-public class ProcessingMapartImage extends MapartImage {
+public class MapartProcessing extends AbstractMapart {
     private boolean isReset = false;
 
     public boolean isReset() {

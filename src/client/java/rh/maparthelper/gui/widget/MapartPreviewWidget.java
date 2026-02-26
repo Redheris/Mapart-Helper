@@ -18,7 +18,7 @@ import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.MapartImageUpdater;
-import rh.maparthelper.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
 import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.scheduler.DelayedRepeater;
@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 import static rh.maparthelper.gui.sprites.ManualCroppingSprites.*;
 
 public class MapartPreviewWidget extends ClickableWidget {
-    private final ProcessingMapartImage mapart;
+    private final MapartProcessing mapart;
     private final int maxWidth;
     private final int maxHeight;
 
@@ -40,7 +40,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     private ManualCroppingAction hoveredAction = null;
     private MapColor highlightingColor = MapColor.CLEAR;
 
-    public MapartPreviewWidget(ProcessingMapartImage mapart, int x, int y, int maxX, int maxY) {
+    public MapartPreviewWidget(MapartProcessing mapart, int x, int y, int maxX, int maxY) {
         super(x, y, mapart.getWidth(), mapart.getHeight(), Text.empty());
         this.maxWidth = maxX - 16 - x;
         this.maxHeight = maxY - y;
@@ -481,19 +481,19 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         final Identifier normal;
         final Identifier highlighted;
-        final Consumer<ProcessingMapartImage> action;
+        final Consumer<MapartProcessing> action;
 
-        ManualCroppingAction(Identifier normal, Identifier highlighted, Consumer<ProcessingMapartImage> action) {
+        ManualCroppingAction(Identifier normal, Identifier highlighted, Consumer<MapartProcessing> action) {
             this.normal = normal;
             this.highlighted = highlighted;
             this.action = action;
         }
 
-        void perform(ProcessingMapartImage mapart) {
+        void perform(MapartProcessing mapart) {
             action.accept(mapart);
         }
 
-        static void move(ProcessingMapartImage mapart, int dx, int dy) {
+        static void move(MapartProcessing mapart, int dx, int dy) {
             MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, dx, dy, false);
         }
     }

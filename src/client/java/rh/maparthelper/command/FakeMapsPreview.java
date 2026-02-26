@@ -18,11 +18,11 @@ import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.MapartProcessing;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {
-    public static boolean createFakeFramesFromMapart(ProcessingMapartImage mapart, ClientPlayerEntity player) {
+    public static boolean createFakeFramesFromMapart(MapartProcessing mapart, ClientPlayerEntity player) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return false;
         removeFakeItemFrames(player.clientWorld);
