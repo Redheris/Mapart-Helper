@@ -102,7 +102,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
 
-        ColorsCounter colorsCounter = mapart.getColorsCounter();
+        ColorsCounter colorsCounter = mapart.getTotalColorsCounter();
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
 
         this.auxBlockCount = mapart.getWidth() * 128;

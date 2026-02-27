@@ -1,32 +1,45 @@
 package rh.maparthelper.mapart;
 
-public abstract class AbstractMapart {
-//    protected MapSegment[] mapSegments;
-    protected ColorsCounter colorsCounter = new ColorsCounter();
+import java.util.Arrays;
 
-    public String mapartName = "New mapart";
-    protected int width = 1;
-    protected int height = 1;
+public abstract class AbstractMapart {
+    protected MapSegment[] mapSegments;
+
+    public String mapartName;
+    protected int width;
+    protected int height;
 
     protected final CroppingFrame croppingFrame = new CroppingFrame();
     protected int insertionX = 0;
     protected int insertionY = 0;
 
-    public void clearColorCounters() {
-//        if (mapSegments == null) return;
-//        for (MapSegment mapSegment : mapSegments) {
-//            mapSegment.getColorsCounter().clear();
-//        }
-        colorsCounter.clear();
+    public AbstractMapart() {
+        width = 1;
+        height = 1;
+        mapSegments = new MapSegment[]{new MapSegment(0, 0)};
     }
 
-    public ColorsCounter getColorsCounter() {
-//        if (mapSegments == null) return new ColorsCounter();
-//        ColorsCounter[] counters = Arrays.stream(mapSegments)
-//                .map(MapSegment::getColorsCounter)
-//                .toArray(ColorsCounter[]::new);
-//        return ColorsCounter.sum(counters);
-        return colorsCounter;
+    public void clearColorCounters() {
+        if (mapSegments == null) return;
+        for (MapSegment mapSegment : mapSegments) {
+            mapSegment.getColorsCounter().clear();
+        }
+    }
+
+    public ColorsCounter getTotalColorsCounter() {
+        if (mapSegments == null) return new ColorsCounter();
+        ColorsCounter[] counters = Arrays.stream(mapSegments)
+                .map(MapSegment::getColorsCounter)
+                .toArray(ColorsCounter[]::new);
+        return ColorsCounter.sum(counters);
+    }
+
+    public ColorsCounter getColorsCounterFor(int mapX, int mapY) {
+        return mapSegments[getSegmentId(mapX, mapY)].getColorsCounter();
+    }
+
+    public int getSegmentId(int mapX, int mapY) {
+        return mapY * width + mapX;
     }
 
     public abstract int getOriginalWidth();

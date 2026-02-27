@@ -13,6 +13,7 @@ import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.gui.MapartEditorScreen;
 import rh.maparthelper.mapart.AbstractMapart;
+import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
 
 import javax.imageio.ImageIO;
@@ -73,7 +74,7 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    private static BufferedImage convertToBlocksPalette(BufferedImage image, MapColorEntry bgColor, boolean use3D, AbstractMapart colorsCounter) {
+    private static BufferedImage convertToBlocksPalette(AbstractMapart mapart, BufferedImage image, MapColorEntry bgColor, boolean use3D) {
         BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = converted.getWidth();
@@ -89,9 +90,10 @@ public class MapartImageConverter {
 
         for (int y = 0; y < converted.getHeight(); y++) {
             for (int x = 0; x < width; x++) {
+                ColorsCounter colorsCounter = mapart.getColorsCounterFor(x / 128, y / 128);
                 if (Thread.currentThread().isInterrupted()) {
                     PaletteColors.clearColorCache();
-                    colorsCounter.clearColorCounters();
+                    mapart.clearColorCounters();
                     return null;
                 }
                 int argb = originalPixels[x + y * width];
@@ -123,7 +125,7 @@ public class MapartImageConverter {
                 }
                 resultPixels[x + y * width] = newArgb;
                 if (color != MapColorEntry.CLEAR) {
-                    colorsCounter.getColorsCounter().increment(color.mapColor().id);
+                    colorsCounter.increment(color.mapColor().id);
                 }
                 conversionProgress.addAndGet(progressStep);
             }
@@ -207,7 +209,7 @@ public class MapartImageConverter {
                             if (!PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
                                 bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                             else
-                                bufferedImage = convertToBlocksPalette(bufferedImage, bgColor, MapartHelper.conversionSettings.use3D(), mapart);
+                                bufferedImage = convertToBlocksPalette(mapart, bufferedImage, bgColor, MapartHelper.conversionSettings.use3D());
                         }
                         if (bufferedImage == null) return;
                         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {

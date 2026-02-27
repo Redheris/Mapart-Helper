@@ -51,6 +51,7 @@ public class MapartProcessing extends AbstractMapart {
     public void setMapartSize(int width, int height) {
         this.width = width;
         this.height = height;
+        this.mapSegments = MapSegment.initSegmentsForSize(width, height);
     }
 
     public void autoCropOriginalImage() {
