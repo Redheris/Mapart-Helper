@@ -3,8 +3,6 @@ package rh.maparthelper.gui.widget;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -14,15 +12,16 @@ import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import java.util.function.Consumer;
 
-public class MapColorsPaletteWidget extends ClickableWidget {
+public class MapColorsPaletteGridBuilder {
     private final GridWidget grid = new GridWidget();
     private final Consumer<MapColorEntry> colorSetter;
 
-    public MapColorsPaletteWidget(int x, int y, int width, int entryHeight, int entriesPerRow, Consumer<MapColorEntry> colorSetter) {
-        super(x, y, width, 0, Text.empty());
-        int entryWidth = (width - 10) / entriesPerRow;
-        this.height = (int) Math.ceil((double) MapColors.values().length / entriesPerRow) * (entryHeight + 2);
+    public MapColorsPaletteGridBuilder(Consumer<MapColorEntry> colorSetter) {
         this.colorSetter = colorSetter;
+    }
+
+    public GridWidget build(int width, int entryHeight, int entriesPerRow) {
+        int entryWidth = (width - 10) / entriesPerRow;
 
         grid.getMainPositioner().margin(1);
         GridWidget.Adder adder = grid.createAdder(entriesPerRow);
@@ -31,19 +30,8 @@ public class MapColorsPaletteWidget extends ClickableWidget {
             adder.add(new MapColorSelector(0, 0, entryWidth, entryHeight, color.color));
         }
         grid.refreshPositions();
-    }
 
-    @Override
-    public void forEachChild(Consumer<ClickableWidget> consumer) {
-        grid.forEachChild(consumer);
-    }
-
-    @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-    }
-
-    @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+        return grid;
     }
 
     private class MapColorSelector extends MapColorWidget {

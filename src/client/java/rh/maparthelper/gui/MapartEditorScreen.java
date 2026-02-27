@@ -364,8 +364,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         DropdownMenuWidget colorPicker = new MapColorPickerWidget(this, 0, 0, 20, 20, baseElementWidth, 180, 4,
                 () -> MapartHelper.conversionSettings.getBackgroundColor()
         );
-        new MapColorsPaletteWidget(
-                0, 2, baseElementWidth - 4, 20, 4,
+        new MapColorsPaletteGridBuilder(
                 c -> {
                     MapColorEntry current = MapartHelper.conversionSettings.getBackgroundColor();
                     if (current.mapColor() != c.mapColor() || current.brightness() != c.brightness()) {
@@ -374,7 +373,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                         MapartImageUpdater.updateMapart(mapart);
                     }
                 }
-        ).forEachChild(colorPicker::addEntry);
+        ).build(baseElementWidth - 4, 20, 4).forEachChild(colorPicker::addEntry);
 
         bgAdder.add(new TextWidget(Text.translatable("maparthelper.gui.backgroundColor"), textRenderer));
         bgAdder.add(colorPicker);
