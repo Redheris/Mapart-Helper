@@ -3,17 +3,14 @@ package rh.maparthelper.command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.block.MapColor;
+import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.map.MapState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import rh.maparthelper.config.palette.PaletteConfigManager;
+import net.minecraft.util.Colors;
+import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.util.MapUtils;
-
-import java.util.Set;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -41,35 +38,27 @@ public class ServerCommands {
                                 ServerPlayerEntity player = ctx.getSource().getPlayer();
                                 assert player != null;
 
-                                ItemStack itemStack = player.getMainHandStack();
-                                if (!(itemStack.getItem() instanceof FilledMapItem))
-                                    itemStack = player.getOffHandStack();
-                                if (!(itemStack.getItem() instanceof FilledMapItem)) {
-                                    player.sendMessage(
-                                            Text.translatable("maparthelper.is_holding_filled_map").formatted(Formatting.RED),
-                                            true
-                                    );
-                                    return 0;
-                                }
-
-                                MapState mapState = FilledMapItem.getMapState(itemStack, player.getWorld());
-                                assert mapState != null;
-                                for (int i = 0; i < 128; i++) {
-                                    for (int j = 0; j < 128; j++) {
-                                        mapState.setColor(i, j, MapColor.CLEAR.getRenderColorByte(MapColor.Brightness.NORMAL));
-                                    }
-                                }
-
-                                Set<MapColor> paletteColors = PaletteConfigManager.presetsConfig.getCurrentPresetColors();
-                                var it = paletteColors.iterator();
-                                for (int x = 0; x < paletteColors.size(); x++) {
-                                    MapColor color = it.next();
+                                byte[] colors = new byte[16384];
+                                for (int id = 1; id < 64; id++) {
+                                    MapColor color = MapColor.get(id);
+                                    if (color == MapColor.CLEAR) break;
                                     for (int i = 0; i < 2; i++) {
-                                        mapState.setColor(x * 2 + i, 0, color.getRenderColorByte(MapColor.Brightness.HIGH));
-                                        mapState.setColor(x * 2 + i, 1, color.getRenderColorByte(MapColor.Brightness.NORMAL));
-                                        mapState.setColor(x * 2 + i, 2, color.getRenderColorByte(MapColor.Brightness.LOW));
+                                        int idx = (id - 1) * 2 + i;
+                                        colors[idx] = color.getRenderColorByte(MapColor.Brightness.HIGH);
+                                        colors[idx + 128] = color.getRenderColorByte(MapColor.Brightness.NORMAL);
+                                        colors[idx + 256] = color.getRenderColorByte(MapColor.Brightness.LOW);
+                                        colors[idx + 384] = color.getRenderColorByte(MapColor.Brightness.LOWEST);
                                     }
                                 }
+
+                                MapIdComponent mapId;
+                                mapId = MapCreator.createMap(colors, player.getWorld());
+
+                                ItemStack itemStack = MapCreator.getMapItemStack(
+                                        mapId,
+                                        Text.literal("Palette").withColor(Colors.YELLOW)
+                                );
+                                player.giveItemStack(itemStack);
 
                                 return 1;
                             }))
