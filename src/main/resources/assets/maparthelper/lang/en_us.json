@@ -105,6 +105,10 @@
   "maparthelper.gui.background_color_clear": "None",
   "maparthelper.gui.color_without_block": "This color is not in the current preset",
   "maparthelper.gui.singleplayer_only": "Singleplayer only",
+  "maparthelper.gui.countMode.perBlock": "Count mode: Per map",
+  "maparthelper.gui.countMode.perBlock_tooltip": "Maximum count if you build a whole mapart at once",
+  "maparthelper.gui.countMode.full": "Count mode: Full",
+  "maparthelper.gui.countMode.full_tooltip": "Minimum count if you build a mapart per one map",
 
   "maparthelper.gui.preset": "Preset",
   "maparthelper.gui.presets.choose_preset": "Choose preset",

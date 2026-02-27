@@ -16,19 +16,23 @@ public class ConversionConfiguration implements ConfigData {
     public Block auxBlock = Blocks.NETHERRACK;
     public DitheringAlgorithms ditheringAlgorithm = DitheringAlgorithms.NONE;
     private MapColorEntry backgroundColor = MapColorEntry.CLEAR;
-    
+    public MaterialsCountModes materialsCountMode = MaterialsCountModes.PER_MAP;
+
     public transient boolean useLAB = false;
     public transient boolean showOriginalImage = false;
 
     public boolean use3D() {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
     }
+
     public boolean useDithering() {
         return this.ditheringAlgorithm != DitheringAlgorithms.NONE;
     }
+
     public int getBackgroundRenderColor() {
         return use3D() ? backgroundColor.getRenderColor() : backgroundColor.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
     }
+
     public MapColorEntry getBackgroundColor() {
         return backgroundColor;
     }

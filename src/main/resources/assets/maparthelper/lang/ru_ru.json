@@ -105,6 +105,10 @@
   "maparthelper.gui.background_color_clear": "Без",
   "maparthelper.gui.color_without_block": "Этого цвета нет в текущем пресете",
   "maparthelper.gui.singleplayer_only": "Только в одиночной игре",
+  "maparthelper.gui.countMode.perBlock": "Режим: По картам",
+  "maparthelper.gui.countMode.perBlock_tooltip": "Максимальное количество, если строить мапарт сразу целиком",
+  "maparthelper.gui.countMode.full": "Режим: Полный",
+  "maparthelper.gui.countMode.full_tooltip": "Минимальное количество, если строить мапарт по одной карте",
 
   "maparthelper.gui.preset": "Пресет:",
   "maparthelper.gui.presets.choose_preset": "Выбрать пресет",

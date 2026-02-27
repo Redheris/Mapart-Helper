@@ -28,6 +28,7 @@ import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
+import rh.maparthelper.config.MaterialsCountModes;
 import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
@@ -102,7 +103,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
 
-        ColorsCounter colorsCounter = mapart.getTotalColorsCounter();
+        ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionSettings.materialsCountMode);
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
 
         this.auxBlockCount = mapart.getWidth() * 128;
@@ -502,23 +503,36 @@ public class MapartEditorScreen extends ScreenAdapted {
         materialListSettings.add(resetExcludedColors);
         settingsRight.add(materialListSettings);
 
-        if (MinecraftClient.getInstance().player != null) {
-            Text remaining = Text.translatable("maparthelper.gui.amount_remaining").formatted(Formatting.GOLD);
-            Text description = Text.translatable("maparthelper.gui.amount_remaining_description");
-            Text total = Text.translatable("maparthelper.gui.amount_total");
-            ButtonWidget amountDisplayMode = ButtonWidget
-                    .builder(displayRemainingAmount ? remaining : total,
-                            btn -> {
-                                displayRemainingAmount = !displayRemainingAmount;
-                                btn.setMessage(displayRemainingAmount ? remaining : total);
-                                btn.setTooltip(displayRemainingAmount ? Tooltip.of(description) : null);
-                                updateMaterialList();
-                            })
-                    .size(baseElementWidth, 14)
-                    .build();
-            amountDisplayMode.setTooltip(displayRemainingAmount ? Tooltip.of(description) : null);
-            settingsRight.add(amountDisplayMode);
-        }
+        Text perMapCountMode = Text.translatable("maparthelper.gui.countMode.perBlock");
+        Text fullCountMode = Text.translatable("maparthelper.gui.countMode.full");
+        ButtonWidget materialsCountMode = ButtonWidget
+                .builder(MapartHelper.conversionSettings.materialsCountMode == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode,
+                        btn -> {
+                            MapartHelper.conversionSettings.materialsCountMode = MaterialsCountModes.nextMode(MapartHelper.conversionSettings.materialsCountMode);
+                            btn.setMessage(MapartHelper.conversionSettings.materialsCountMode == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode);
+                            btn.setTooltip(Tooltip.of(MapartHelper.conversionSettings.materialsCountMode.getDescription()));
+                            updateMaterialList();
+                        })
+                .size(baseElementWidth, 14)
+                .build();
+        materialsCountMode.setTooltip(Tooltip.of(MapartHelper.conversionSettings.materialsCountMode.getDescription()));
+        settingsRight.add(materialsCountMode);
+
+        Text remaining = Text.translatable("maparthelper.gui.amount_remaining").formatted(Formatting.GOLD);
+        Text description = Text.translatable("maparthelper.gui.amount_remaining_description");
+        Text total = Text.translatable("maparthelper.gui.amount_total");
+        ButtonWidget amountDisplayMode = ButtonWidget
+                .builder(displayRemainingAmount ? remaining : total,
+                        btn -> {
+                            displayRemainingAmount = !displayRemainingAmount;
+                            btn.setMessage(displayRemainingAmount ? remaining : total);
+                            btn.setTooltip(displayRemainingAmount ? Tooltip.of(description) : null);
+                            updateMaterialList();
+                        })
+                .size(baseElementWidth, 14)
+                .build();
+        amountDisplayMode.setTooltip(displayRemainingAmount ? Tooltip.of(description) : null);
+        settingsRight.add(amountDisplayMode, settingsRightPositioner.copy().marginTop(2));
 
         settingsRight.refreshPositions();
         settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);

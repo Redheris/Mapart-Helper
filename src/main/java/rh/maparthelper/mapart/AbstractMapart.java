@@ -1,5 +1,7 @@
 package rh.maparthelper.mapart;
 
+import rh.maparthelper.config.MaterialsCountModes;
+
 import java.util.Arrays;
 
 public abstract class AbstractMapart {
@@ -14,6 +16,7 @@ public abstract class AbstractMapart {
     protected int insertionY = 0;
 
     public AbstractMapart() {
+        mapartName = "New mapart";
         width = 1;
         height = 1;
         mapSegments = new MapSegment[]{new MapSegment(0, 0)};
@@ -26,12 +29,14 @@ public abstract class AbstractMapart {
         }
     }
 
-    public ColorsCounter getTotalColorsCounter() {
+    public ColorsCounter getTotalColorsCounter(MaterialsCountModes countMode) {
         if (mapSegments == null) return new ColorsCounter();
         ColorsCounter[] counters = Arrays.stream(mapSegments)
                 .map(MapSegment::getColorsCounter)
                 .toArray(ColorsCounter[]::new);
-        return ColorsCounter.sum(counters);
+        if (countMode == MaterialsCountModes.FULL)
+            return ColorsCounter.sum(counters);
+        return ColorsCounter.intersect(counters);
     }
 
     public ColorsCounter getColorsCounterFor(int mapX, int mapY) {
