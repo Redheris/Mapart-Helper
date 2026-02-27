@@ -362,14 +362,14 @@ public class MapartEditorScreen extends ScreenAdapted {
         bgColor.getMainPositioner().alignVerticalCenter();
         GridWidget.Adder bgAdder = bgColor.createAdder(2);
         DropdownMenuWidget colorPicker = new MapColorPickerWidget(this, 0, 0, 20, 20, baseElementWidth, 180, 4,
-                () -> MapartHelper.conversionSettings.backgroundColor
+                () -> MapartHelper.conversionSettings.getBackgroundColor()
         );
         new MapColorsPaletteWidget(
                 0, 2, baseElementWidth - 4, 20, 4,
                 c -> {
-                    MapColorEntry current = MapartHelper.conversionSettings.backgroundColor;
+                    MapColorEntry current = MapartHelper.conversionSettings.getBackgroundColor();
                     if (current.mapColor() != c.mapColor() || current.brightness() != c.brightness()) {
-                        MapartHelper.conversionSettings.backgroundColor = c;
+                        MapartHelper.conversionSettings.setBackgroundColor(c);
                         AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                         MapartImageUpdater.updateMapart(mapart);
                     }
@@ -458,9 +458,9 @@ public class MapartEditorScreen extends ScreenAdapted {
                     PaletteColors.clearExcludingColors();
                     updateResetExcludedColorsButton(false);
                     PaletteConfigManager.changeCurrentPreset(s);
-                    MapColor oldBgColor = MapartHelper.conversionSettings.backgroundColor.mapColor();
+                    MapColor oldBgColor = MapartHelper.conversionSettings.getBackgroundColor().mapColor();
                     if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
-                        MapartHelper.conversionSettings.backgroundColor = MapColorEntry.CLEAR;
+                        MapartHelper.conversionSettings.setBackgroundColor(MapColorEntry.CLEAR);
                     }
                     MapartImageUpdater.updateMapart(mapart);
                 },

@@ -4,7 +4,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.TextureManager;
-import rh.maparthelper.colors.MapColorEntry;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -43,7 +42,7 @@ public class NativeImageUtils {
         return maps;
     }
 
-    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image, MapColorEntry bgColor, boolean useTransparent) {
+    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image, int bgColor, boolean useTranslucent) {
         int width = image.getWidth();
         int height = image.getHeight();
 
@@ -54,21 +53,31 @@ public class NativeImageUtils {
             for (int x = 0; x < width; x++) {
                 int argb = pixels[x + y * width];
 
-                if (useTransparent ? argb == 0 : ((argb >> 24) & 0xFF) < 80) {
-                    nativeImage.setColorArgb(x, y, bgColor.getRenderColor());
-                } else {
-                    nativeImage.setColorArgb(x, y, useTransparent ? argb : argb | 0xFF000000);
-                }
-
-                if (useTransparent) {
+                if (useTranslucent) {
                     if (argb == 0) continue;
                     nativeImage.setColorArgb(x, y, argb);
                 } else {
                     if (((argb >> 24) & 0xFF) < 80)
-                        nativeImage.setColorArgb(x, y, bgColor.getRenderColor());
+                        nativeImage.setColorArgb(x, y, bgColor);
                     else
                         nativeImage.setColorArgb(x, y, argb | 0xFF000000);
                 }
+            }
+        }
+
+        return nativeImage;
+    }
+
+    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        NativeImage nativeImage = new NativeImage(width, height, false);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                nativeImage.setColorArgb(x, y, pixels[x + y * width]);
             }
         }
 

@@ -74,7 +74,8 @@ public class MapartImageConverter {
     /**
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
-    private static BufferedImage convertToBlocksPalette(AbstractMapart mapart, BufferedImage image, MapColorEntry bgColor, boolean use3D) {
+    private static BufferedImage convertToBlocksPalette(AbstractMapart mapart, BufferedImage image,
+                                                        int bgColor, int bgMapColorId, boolean use3D) {
         BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = converted.getWidth();
@@ -97,7 +98,9 @@ public class MapartImageConverter {
                     return null;
                 }
                 int argb = originalPixels[x + y * width];
-                if (argb == 0 && bgColor == MapColorEntry.CLEAR) {
+                if (argb == 0 && bgColor != 0) {
+                    resultPixels[x + y * width] = bgColor;
+                    colorsCounter.increment(bgMapColorId);
                     continue;
                 }
                 if (useDithering) {
@@ -111,22 +114,21 @@ public class MapartImageConverter {
                 int newArgb;
                 MapColorEntry color = PaletteColors.getClosestColor(argb, use3D, useDithering);
                 if (color == MapColorEntry.CLEAR) {
-                    color = bgColor;
-                }
-                if (useDithering && color != MapColorEntry.CLEAR)
-                    ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
-                if (y > 0 && originalPixels[x + (y - 1) * width] == 0)
-                    newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
-                else {
-                    if (use3D)
-                        newArgb = color.getRenderColor();
-                    else
-                        newArgb = color.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
-                }
-                resultPixels[x + y * width] = newArgb;
-                if (color != MapColorEntry.CLEAR) {
+                    newArgb = bgColor;
+                } else {
+                    if (useDithering)
+                        ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
+                    if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
+                        newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
+                    else {
+                        if (use3D)
+                            newArgb = color.getRenderColor();
+                        else
+                            newArgb = color.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
+                    }
                     colorsCounter.increment(color.mapColor().id);
                 }
+                resultPixels[x + y * width] = newArgb;
                 conversionProgress.addAndGet(progressStep);
             }
             if (useDithering) {
@@ -182,7 +184,8 @@ public class MapartImageConverter {
                     conversionProgress = new AtomicDouble(0.0);
 
                     boolean showOriginalImage = MapartHelper.conversionSettings.showOriginalImage;
-                    MapColorEntry bgColor = MapartHelper.conversionSettings.backgroundColor;
+                    int bgColor = MapartHelper.conversionSettings.getBackgroundRenderColor();
+                    int bgMapColorId = MapartHelper.conversionSettings.getBackgroundColor().mapColor().id;
 
                     if (newImagePath != null) {
                         mapart.setImagePath(null);
@@ -193,7 +196,7 @@ public class MapartImageConverter {
                     if (Thread.currentThread().isInterrupted()) return;
 
                     boolean needReconvertingColors = imageChangeResult != ImageChangeResult.SIMPLE
-                            && (imageChangeResult == ImageChangeResult.NEED_RESCALE || bgColor == MapColorEntry.CLEAR && !showOriginalImage);
+                            && (imageChangeResult == ImageChangeResult.NEED_RESCALE || bgColor == 0 && !showOriginalImage);
 
                     BufferedImage bufferedImage = cropAndScaleToMapSize(mapart, needReconvertingColors);
                     if (Thread.currentThread().isInterrupted()) return;
@@ -209,7 +212,7 @@ public class MapartImageConverter {
                             if (!PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
                                 bufferedImage = new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                             else
-                                bufferedImage = convertToBlocksPalette(mapart, bufferedImage, bgColor, MapartHelper.conversionSettings.use3D());
+                                bufferedImage = convertToBlocksPalette(mapart, bufferedImage, bgColor, bgMapColorId, MapartHelper.conversionSettings.use3D());
                         }
                         if (bufferedImage == null) return;
                         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
@@ -220,12 +223,15 @@ public class MapartImageConverter {
                         }
                         if (Thread.currentThread().isInterrupted()) return;
                     }
-
-                    mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(
-                            bufferedImage,
-                            bgColor,
-                            CurrentConversionSettings.doShowTransparent)
-                    );
+                    if (showOriginalImage || imageChangeResult == ImageChangeResult.SIMPLE) {
+                        mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(
+                                bufferedImage,
+                                bgColor,
+                                CurrentConversionSettings.doShowTranslucent
+                        ));
+                    } else {
+                        mapart.setNativeImage(NativeImageUtils.convertBufferedImageToNativeImage(bufferedImage));
+                    }
                     if (Thread.currentThread().isInterrupted()) return;
                     MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage()));
 

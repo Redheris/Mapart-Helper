@@ -4,6 +4,7 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
@@ -14,7 +15,7 @@ public class ConversionConfiguration implements ConfigData {
     public UseAuxBlocks useAuxBlocks = UseAuxBlocks.IMPORTANT;
     public Block auxBlock = Blocks.NETHERRACK;
     public DitheringAlgorithms ditheringAlgorithm = DitheringAlgorithms.NONE;
-    public MapColorEntry backgroundColor = MapColorEntry.CLEAR;
+    private MapColorEntry backgroundColor = MapColorEntry.CLEAR;
     
     public transient boolean useLAB = false;
     public transient boolean showOriginalImage = false;
@@ -24,5 +25,15 @@ public class ConversionConfiguration implements ConfigData {
     }
     public boolean useDithering() {
         return this.ditheringAlgorithm != DitheringAlgorithms.NONE;
+    }
+    public int getBackgroundRenderColor() {
+        return use3D() ? backgroundColor.getRenderColor() : backgroundColor.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
+    }
+    public MapColorEntry getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(MapColorEntry backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 }
