@@ -82,7 +82,9 @@ public class FakeMapsPreview {
             case SOUTH -> LEFT = Direction.EAST;
             case WEST -> LEFT = Direction.SOUTH;
         }
-        pos.move(LEFT, (int)(width / 2.0));
+        double localOffset = player.getPos().getComponentAlongAxis(LEFT.getAxis()) - pos.getComponentAlongAxis(LEFT.getAxis());
+        double leftOffset = width % 2 == 1 || localOffset < 0.5 ? 0 : -1;
+        pos.move(LEFT, (int) (width / 2.0 + leftOffset));
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -99,7 +101,8 @@ public class FakeMapsPreview {
                 posX -= direction.getOffsetX() * 0.03;
                 posZ -= direction.getOffsetZ() * 0.03;
 
-                itemFrame.setPos(posX, pos.getY() - 0.5, posZ);
+                double yOffset = height == 2 ? 0.5 : -0.5;
+                itemFrame.setPos(posX, pos.getY() + yOffset, posZ);
                 player.clientWorld.addEntity(itemFrame);
                 pos.move(LEFT.getOpposite());
             }
