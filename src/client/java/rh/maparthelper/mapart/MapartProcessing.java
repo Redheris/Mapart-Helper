@@ -12,7 +12,7 @@ public class MapartProcessing extends AbstractMapart {
     private NativeImage nativeImage;
     private BufferedImage scaledImage;
 
-    private boolean isReset = false;
+    private boolean isReset = true;
 
     public boolean isReset() {
         return isReset;
