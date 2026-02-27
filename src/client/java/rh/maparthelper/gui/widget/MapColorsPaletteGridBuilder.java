@@ -6,6 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
@@ -45,6 +46,7 @@ public class MapColorsPaletteGridBuilder {
         @Override
         protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
+            onlyNormalBrightness = !MapartHelper.conversionSettings.use3D();
             if (color != MapColor.CLEAR && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 setAlpha(0.2f);
                 if (this.isMouseOver(mouseX, mouseY) && context.scissorContains(mouseX, mouseY)) {
@@ -65,8 +67,8 @@ public class MapColorsPaletteGridBuilder {
             if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 return false;
             }
-            if (color == MapColor.WATER_BLUE) {
-                colorSetter.accept(new MapColorEntry(MapColor.WATER_BLUE, MapColor.Brightness.NORMAL, new int[3]));
+            if (onlyNormalBrightness || color == MapColor.WATER_BLUE) {
+                colorSetter.accept(new MapColorEntry(color, MapColor.Brightness.NORMAL, new int[3]));
                 return true;
             }
             int brightnessId = (int) Math.min((mouseX - this.getX()) / segWidth, 2);
