@@ -40,7 +40,9 @@ public abstract class AbstractMapart {
     }
 
     public ColorsCounter getColorsCounterFor(int mapX, int mapY) {
-        return mapSegments[getSegmentId(mapX, mapY)].getColorsCounter();
+        int id = getSegmentId(mapX, mapY);
+        if (id >= mapSegments.length) return null;
+        return mapSegments[id].getColorsCounter();
     }
 
     public int getSegmentId(int mapX, int mapY) {

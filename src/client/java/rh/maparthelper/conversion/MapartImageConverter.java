@@ -92,7 +92,7 @@ public class MapartImageConverter {
         for (int y = 0; y < converted.getHeight(); y++) {
             for (int x = 0; x < width; x++) {
                 ColorsCounter colorsCounter = mapart.getColorsCounterFor(x / 128, y / 128);
-                if (Thread.currentThread().isInterrupted()) {
+                if (colorsCounter == null || Thread.currentThread().isInterrupted()) {
                     PaletteColors.clearColorCache();
                     mapart.clearColorCounters();
                     return null;
