@@ -245,6 +245,7 @@ public class MapartImageConverter {
                     if (processingImage == null || Thread.currentThread().isInterrupted()) return;
 
                     if (imageChangeResult != ImageChangeResult.SIMPLE && CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
+                        assert mapart.getScaledImage() != null;
                         mapart.setScaledImage(processingImage.getSubimage(
                                 mapart.getInsertionX(), mapart.getInsertionY(),
                                 mapart.getScaledImage().getWidth(), mapart.getScaledImage().getHeight())

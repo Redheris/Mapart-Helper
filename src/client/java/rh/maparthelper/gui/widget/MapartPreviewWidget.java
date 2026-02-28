@@ -198,6 +198,8 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (mapart.isReset() || mapart.getScaledImage() == null)
+            return false;
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
             return false;
         if (hoveredAction != null)

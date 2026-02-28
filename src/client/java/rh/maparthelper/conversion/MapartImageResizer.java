@@ -8,6 +8,8 @@ import java.awt.image.BufferedImage;
 public class MapartImageResizer {
     public static BufferedImage adjustToMapartSize(MapartProcessing mapart) {
         BufferedImage image = mapart.getOriginal();
+        if (image == null) return null;
+
         int imageW = image.getWidth();
         int imageH = image.getHeight();
         MapartProcessing.CroppingFrame frame = mapart.getCroppingFrame();

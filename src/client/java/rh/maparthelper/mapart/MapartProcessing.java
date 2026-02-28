@@ -1,15 +1,21 @@
 package rh.maparthelper.mapart;
 
 import net.minecraft.client.texture.NativeImage;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.conversion.ImageChangeResult;
 
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 
 public class MapartProcessing extends AbstractMapart {
+    @Nullable
     private Path imagePath;
+    @Nullable
     private BufferedImage original;
+    @Nullable
     private NativeImage nativeImage;
+    @Nullable
     private BufferedImage scaledImage;
 
     private boolean isReset = true;
@@ -22,28 +28,32 @@ public class MapartProcessing extends AbstractMapart {
         isReset = reset;
     }
 
+    @Nullable
     public NativeImage getNativeImage() {
         return nativeImage;
     }
 
+    @Nullable
     public BufferedImage getOriginal() {
         return original;
     }
 
     @Override
     public int getOriginalWidth() {
-        return original.getWidth();
+        return original == null ? 1 : original.getWidth();
     }
 
     @Override
     public int getOriginalHeight() {
-        return original.getHeight();
+        return original == null ? 1 : original.getHeight();
     }
 
+    @Nullable
     public Path getImagePath() {
         return imagePath;
     }
 
+    @Nullable
     public BufferedImage getScaledImage() {
         return scaledImage;
     }
@@ -55,6 +65,8 @@ public class MapartProcessing extends AbstractMapart {
     }
 
     public void autoCropOriginalImage() {
+        if (original == null) return;
+
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         double mapartAspect = (double) width / height;
@@ -83,6 +95,8 @@ public class MapartProcessing extends AbstractMapart {
     }
 
     private int fittingAxis() {
+        if (original == null) return 0;
+
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -118,6 +132,8 @@ public class MapartProcessing extends AbstractMapart {
     }
 
     private void fitByWidth() {
+        if (original == null) return;
+
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -131,6 +147,8 @@ public class MapartProcessing extends AbstractMapart {
     }
 
     private void fitByHeight() {
+        if (original == null) return;
+
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -144,6 +162,8 @@ public class MapartProcessing extends AbstractMapart {
     }
 
     public void centerImage() {
+        if (original == null || scaledImage == null) return;
+
         int imageWidth = scaledImage.getWidth();
         int imageHeight = scaledImage.getHeight();
         int mapartWidth = width * 128;
@@ -169,6 +189,8 @@ public class MapartProcessing extends AbstractMapart {
     }
 
     public void scaleToPoint(double pointX, double pointY, double scale) {
+        if (original == null) return;
+
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         double mapartAspect = (double) width / height;
@@ -207,6 +229,7 @@ public class MapartProcessing extends AbstractMapart {
 
     public ImageChangeResult moveCroppingFrame(int dx, int dy, int type) {
         if (original == null) return ImageChangeResult.SIMPLE;
+        assert scaledImage != null;
 
         ImageChangeResult imageChangeResult = ImageChangeResult.SIMPLE;
         int imageWidth = original.getWidth();
@@ -241,19 +264,19 @@ public class MapartProcessing extends AbstractMapart {
         return imageChangeResult;
     }
 
-    public void setNativeImage(NativeImage nativeImage) {
+    public void setNativeImage(@NotNull NativeImage nativeImage) {
         this.nativeImage = nativeImage;
     }
 
-    public void setImagePath(Path imagePath) {
+    public void setImagePath(@NotNull Path imagePath) {
         this.imagePath = imagePath;
     }
 
-    public void setOriginal(BufferedImage image) {
+    public void setOriginal(@NotNull BufferedImage image) {
         this.original = image;
     }
 
-    public void setScaledImage(BufferedImage scaledImage) {
+    public void setScaledImage(@NotNull BufferedImage scaledImage) {
         this.scaledImage = scaledImage;
     }
 
