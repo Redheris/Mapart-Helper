@@ -36,6 +36,8 @@ public class MapartPreviewWidget extends ClickableWidget {
 
     private final DelayedRepeater repeater = new DelayedRepeater();
 
+    private double offsetXCumulative = 0;
+    private double offsetYCumulative = 0;
     private boolean scaleToCursor = true;
     private ManualCroppingAction hoveredAction = null;
     private MapColor highlightingColor = MapColor.CLEAR;
@@ -194,20 +196,46 @@ public class MapartPreviewWidget extends ClickableWidget {
         return false;
     }
 
-    // TODO: replace mouseDragged with mouseMoved
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
             return false;
-        if (mouseX < getImageX() || CurrentConversionSettings.doShowManualCroppingButtons && isMouseOverActionsArea(mouseX, mouseY))
+        if (hoveredAction != null)
             return false;
-        setHoveredAction(null);
-        double scaleX = (double) mapart.getCroppingFrame().getWidth() / width;
-        double scaleY = (double) mapart.getCroppingFrame().getHeight() / height;
-        double imageDeltaX = deltaX * scaleX;
-        double imageDeltaY = deltaY * scaleY;
-        MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, imageDeltaX, imageDeltaY, true);
+
+        int mapartWidth = mapart.getWidth() * 128;
+        int mapartHeight = mapart.getHeight() * 128;
+
+        double scaleX;
+        double scaleY;
+        if (mapart.getScaledImage().getWidth() < mapartWidth)
+            scaleX = (double) mapartWidth / width;
+        else
+            scaleX = (double) mapart.getCroppingFrame().getWidth() / width;
+        if (mapart.getScaledImage().getHeight() < mapartHeight)
+            scaleY = (double) mapartHeight / height;
+        else
+            scaleY = (double) mapart.getCroppingFrame().getHeight() / height;
+
+        offsetXCumulative += deltaX * scaleX;
+        offsetYCumulative += deltaY * scaleY;
+
+        int imageDeltaX = (int) offsetXCumulative;
+        int imageDeltaY = (int) offsetYCumulative;
+
+        if (imageDeltaX != 0 || imageDeltaY != 0) {
+            MapartImageUpdater.moveCroppingFrameOrMapartImage(mapart, imageDeltaX, imageDeltaY, true);
+            offsetXCumulative -= imageDeltaX;
+            offsetYCumulative -= imageDeltaY;
+        }
         return true;
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        offsetXCumulative = 0;
+        offsetYCumulative = 0;
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override

@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.util.Set;
 
 public class MapartImageUpdater {
-    static double moveDx = 0;
-    static double moveDy = 0;
     static double scale = 0;
 
     public static void readAndUpdateMapartImage(MapartProcessing mapart, Path path) {
@@ -52,14 +50,13 @@ public class MapartImageUpdater {
         MapartImageConverter.readAndUpdateMapartImage(mapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 
-    // TODO: replace delta-changes with set-changes
-    public static void moveCroppingFrameOrMapartImage(MapartProcessing mapart, double dx, double dy, boolean withMouse) {
+    public static void moveCroppingFrameOrMapartImage(MapartProcessing mapart, int dx, int dy, boolean withMouse) {
         if (mapart.isReset()) return;
-        moveDx += dx;
-        moveDy += dy;
         int type = withMouse ? -1 : 1;
-        ImageChangeResult imageChangeResult = mapart.moveCroppingFrame((int) moveDx, (int) moveDy, type);
-        MapartImageConverter.readAndUpdateMapartImage(mapart, mapart.getImagePath(), imageChangeResult);
+        if (dx != 0 || dy != 0) {
+            ImageChangeResult imageChangeResult = mapart.moveCroppingFrame(dx, dy, type);
+            MapartImageConverter.readAndUpdateMapartImage(mapart, mapart.getImagePath(), imageChangeResult);
+        }
     }
 
     public static void centerCroppingFrameAndMapartImage(MapartProcessing mapart) {

@@ -236,8 +236,6 @@ public class MapartImageConverter {
                     MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage()));
 
                     MapartImageUpdater.scale = 0;
-                    MapartImageUpdater.moveDx = 0;
-                    MapartImageUpdater.moveDy = 0;
 
                     if (logExecutionTime) {
                         double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
