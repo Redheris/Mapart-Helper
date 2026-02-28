@@ -208,7 +208,7 @@ public class MapartProcessing extends AbstractMapart {
     public ImageChangeResult moveCroppingFrame(int dx, int dy, int type) {
         if (original == null) return ImageChangeResult.SIMPLE;
 
-        ImageChangeResult imageChangeResult = ImageChangeResult.NEED_RESCALE;
+        ImageChangeResult imageChangeResult = ImageChangeResult.SIMPLE;
         int imageWidth = original.getWidth();
         int imageHeight = original.getHeight();
         int mapartWidth = width * 128;
@@ -217,27 +217,25 @@ public class MapartProcessing extends AbstractMapart {
         if (dx != 0) {
             if (scaledImage.getWidth() < mapartWidth) {
                 insertionX = Math.clamp(insertionX - (long) dx * type, 0, mapartWidth - scaledImage.getWidth());
-                imageChangeResult = ImageChangeResult.SIMPLE;
             } else {
                 insertionX = 0;
                 int oldCropX = croppingFrame.getX();
                 croppingFrame.setX(Math.clamp(oldCropX - dx, 0, imageWidth - croppingFrame.getWidth()));
+                imageChangeResult = ImageChangeResult.NEED_FULL_UPDATE;
             }
         }
         if (dy != 0) {
             if (scaledImage.getHeight() < mapartHeight) {
                 boolean wasTop = insertionY == 0;
                 insertionY = Math.clamp(insertionY - (long) dy * type, 0, mapartHeight - scaledImage.getHeight());
-                if (wasTop != (insertionY == 0))
-                    imageChangeResult = ImageChangeResult.TOP_LINE_CHANGED;
-                else
-                    imageChangeResult = ImageChangeResult.SIMPLE;
+                if (imageChangeResult == ImageChangeResult.SIMPLE && wasTop != (insertionY == 0))
+                    imageChangeResult = ImageChangeResult.ONLY_TOP_LINE;
             } else {
                 insertionY = 0;
                 int oldCropY = croppingFrame.getY();
                 croppingFrame.setY(Math.clamp(oldCropY - dy, 0, imageHeight - croppingFrame.getHeight()));
                 if (croppingFrame.getY() != oldCropY)
-                    imageChangeResult = ImageChangeResult.NEED_RESCALE;
+                    imageChangeResult = ImageChangeResult.NEED_FULL_UPDATE;
             }
         }
         return imageChangeResult;

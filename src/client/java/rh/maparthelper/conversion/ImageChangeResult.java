@@ -1,7 +1,13 @@
 package rh.maparthelper.conversion;
 
 public enum ImageChangeResult {
-    SIMPLE,
-    NEED_RESCALE,
-    TOP_LINE_CHANGED
+    NEED_FULL_UPDATE(10),
+    ONLY_TOP_LINE(5),
+    SIMPLE(0);
+
+    public final int priority;
+
+    ImageChangeResult(int priority) {
+        this.priority = priority;
+    }
 }
