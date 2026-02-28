@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.util.Set;
 
 public class MapartImageUpdater {
-    static double scale = 0;
-
     public static void readAndUpdateMapartImage(MapartProcessing mapart, Path path) {
         MapartImageConverter.readAndUpdateMapartImage(mapart, path, ImageChangeResult.NEED_RESCALE);
         mapart.setReset(false);
@@ -38,15 +36,13 @@ public class MapartImageUpdater {
 
     public static void scaleToPoint(MapartProcessing mapart, double pointX, double pointY, double scale) {
         if (mapart.isReset()) return;
-        MapartImageUpdater.scale += scale;
-        mapart.scaleToPoint(pointX, pointY, MapartImageUpdater.scale);
+        mapart.scaleToPoint(pointX, pointY, scale);
         MapartImageConverter.readAndUpdateMapartImage(mapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 
     public static void scaleToCenter(MapartProcessing mapart, double scale) {
         if (mapart.isReset()) return;
-        MapartImageUpdater.scale += scale;
-        mapart.scaleToCenter(MapartImageUpdater.scale);
+        mapart.scaleToCenter(scale);
         MapartImageConverter.readAndUpdateMapartImage(mapart, mapart.getImagePath(), ImageChangeResult.NEED_RESCALE);
     }
 

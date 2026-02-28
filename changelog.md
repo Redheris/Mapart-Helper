@@ -1,6 +1,7 @@
 ## Changes and new features
 
-- Add per-map option for materials counting
+- Added per-map option for materials counting;
+- Moving an image with mouse in manual cropping became accurate;
 
 ### Fixes and minor changes
 

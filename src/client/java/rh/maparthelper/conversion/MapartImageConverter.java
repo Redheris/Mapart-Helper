@@ -235,8 +235,6 @@ public class MapartImageConverter {
                     if (Thread.currentThread().isInterrupted()) return;
                     MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage()));
 
-                    MapartImageUpdater.scale = 0;
-
                     if (logExecutionTime) {
                         double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
                         MapartHelper.LOGGER.info("Image preprocessing and conversion took {} seconds", timeLeft);
