@@ -68,11 +68,11 @@ public class MapColorsPaletteGridBuilder {
                 return false;
             }
             if (onlyNormalBrightness || color == MapColor.WATER_BLUE) {
-                colorSetter.accept(new MapColorEntry(color, MapColor.Brightness.NORMAL, new int[3]));
+                colorSetter.accept(new MapColorEntry(color, MapColor.Brightness.NORMAL));
                 return true;
             }
             int brightnessId = (int) Math.min((mouseX - this.getX()) / segWidth, 2);
-            colorSetter.accept(new MapColorEntry(color, MapColor.Brightness.validateAndGet(brightnessId), new int[3]));
+            colorSetter.accept(new MapColorEntry(color, MapColor.Brightness.validateAndGet(brightnessId)));
             return true;
         }
     }

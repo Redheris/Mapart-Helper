@@ -20,15 +20,13 @@ public class PaletteColors {
         return argbMapColors.get(argb);
     }
 
-    private static MapColorEntry getClosestColor3D(int argb, boolean useDithering) {
+    private static MapColorEntry getClosestColor3D(int argb) {
         MapColor closestColor = MapColor.CLEAR;
-        MapColor.Brightness closeBrightness = MapColor.Brightness.NORMAL;
+        MapColor.Brightness closestBrightness = MapColor.Brightness.NORMAL;
         double minDist = Integer.MAX_VALUE;
 
-        int[] rgbOriginal = new int[0];
+        int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
-        if (useDithering)
-            rgbOriginal = ColorUtils.getRGB(argb);
 
         for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             if (excludingColors.contains(color)) continue;
@@ -36,73 +34,57 @@ public class PaletteColors {
                 MapColor.Brightness brightness;
                 brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.NORMAL : MapColor.Brightness.validateAndGet(brightId);
                 int current = color.getRenderColor(brightness);
-                if (current == argb) return new MapColorEntry(color, brightness, new int[]{0, 0, 0});
+                if (current == argb) return new MapColorEntry(color, brightness);
 
-                double dist = ColorUtils.colorDistance(argb, current, MapartHelper.conversionSettings.useLAB);
+                double dist = ColorUtils.colorDistance(argb, current, MapartHelper.conversionSettings.useLAB());
                 if (dist < minDist) {
                     minDist = dist;
                     closestColor = color;
-                    closeBrightness = brightness;
-                    if (useDithering)
-                        rgbClosest = ColorUtils.getRGB(current);
+                    closestBrightness = brightness;
+                    rgbClosest = ColorUtils.getRGB(current);
                 }
 
                 if (color == MapColor.WATER_BLUE) break;
             }
         }
 
-        if (useDithering) {
-            int[] distError = new int[]{
-                    rgbOriginal[0] - rgbClosest[0],
-                    rgbOriginal[1] - rgbClosest[1],
-                    rgbOriginal[2] - rgbClosest[2]
-            };
-            return new MapColorEntry(closestColor, closeBrightness, distError);
-        }
-
-        return new MapColorEntry(closestColor, closeBrightness);
+        int errorRed = rgbOriginal[0] - rgbClosest[0];
+        int errorGreen = rgbOriginal[1] - rgbClosest[1];
+        int errorBlue = rgbOriginal[2] - rgbClosest[2];
+        return new MapColorEntry(closestColor, closestBrightness, errorRed, errorGreen, errorBlue);
     }
 
-    private static MapColorEntry getClosestColor2D(int argb, boolean useDithering) {
-        MapColor closest = MapColor.CLEAR;
+    private static MapColorEntry getClosestColor2D(int argb) {
+        MapColor closestColor = MapColor.CLEAR;
         double minDist = Integer.MAX_VALUE;
 
-        int[] rgbOriginal = new int[0];
+        int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
-        if (useDithering)
-            rgbOriginal = ColorUtils.getRGB(argb);
 
         for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             if (excludingColors.contains(color)) continue;
             int current = color.getRenderColor(MapColor.Brightness.NORMAL);
-            if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL, new int[]{0, 0, 0});
+            if (current == argb) return new MapColorEntry(color, MapColor.Brightness.NORMAL);
 
-            double dist = ColorUtils.colorDistance(argb, current, MapartHelper.conversionSettings.useLAB);
+            double dist = ColorUtils.colorDistance(argb, current, MapartHelper.conversionSettings.useLAB());
             if (dist < minDist) {
                 minDist = dist;
-                closest = color;
-                if (useDithering)
-                    rgbClosest = ColorUtils.getRGB(current);
+                closestColor = color;
+                rgbClosest = ColorUtils.getRGB(current);
             }
         }
 
-        if (useDithering) {
-            int[] distError = new int[]{
-                    rgbOriginal[0] - rgbClosest[0],
-                    rgbOriginal[1] - rgbClosest[1],
-                    rgbOriginal[2] - rgbClosest[2]
-            };
-            return new MapColorEntry(closest, MapColor.Brightness.NORMAL, distError);
-        }
-
-        return new MapColorEntry(closest, MapColor.Brightness.NORMAL);
+        int errorRed = rgbOriginal[0] - rgbClosest[0];
+        int errorGreen = rgbOriginal[1] - rgbClosest[1];
+        int errorBlue = rgbOriginal[2] - rgbClosest[2];
+        return new MapColorEntry(closestColor, MapColor.Brightness.NORMAL, errorRed, errorGreen, errorBlue);
     }
 
-    public static MapColorEntry getClosestColor(int argb, boolean use3D, boolean useDithering) {
+    public static MapColorEntry getClosestColor(int argb, boolean use3D) {
         if (((argb >> 24) & 0xFF) < 80) return MapColorEntry.CLEAR;
         if (use3D)
-            return cachedClosestColors.computeIfAbsent(argb, c -> PaletteColors.getClosestColor3D(c, useDithering));
-        return cachedClosestColors.computeIfAbsent(argb, c -> PaletteColors.getClosestColor2D(c, useDithering));
+            return cachedClosestColors.computeIfAbsent(argb, PaletteColors::getClosestColor3D);
+        return cachedClosestColors.computeIfAbsent(argb, PaletteColors::getClosestColor2D);
     }
 
     public static int excludingColorsAmount() {

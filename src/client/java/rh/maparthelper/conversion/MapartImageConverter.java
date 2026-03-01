@@ -121,12 +121,12 @@ public class MapartImageConverter {
                     argb = ColorUtils.getARGB(argb0);
                 }
                 int newArgb;
-                MapColorEntry color = PaletteColors.getClosestColor(argb, use3D, useDithering);
+                MapColorEntry color = PaletteColors.getClosestColor(argb, use3D);
                 if (color == MapColorEntry.CLEAR) {
                     newArgb = bgColor;
                 } else {
                     if (useDithering)
-                        ditherAlg.spreadDiffusionError(errorsArray, width, x, color.distError());
+                        ditherAlg.spreadDiffusionError(errorsArray, width, x, color.errorRed(), color.errorGreen(), color.errorBlue());
                     if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
                         newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
                     else {

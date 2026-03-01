@@ -111,7 +111,7 @@ public enum DitheringAlgorithms {
      * (1/16)<br>
      * --X 7<br>
      * 3 5 1<br>
-     * Then weights will be {7, 3F, 5, 1} (/16 will apply as sum of the weights) and two other arrays will be coordinate offsets with X at (0,0)
+     * Then weights will be {7, 3, 5, 1} (/16 will apply as sum of the weights) and two other arrays will be coordinate offsets with X at (0,0)
      * @param weights Array of algorithm's weights for diffusion error propagation
      * @param offsetX Array of horizontal (x) coordinate offsets
      * @param offsetY Array of vertical (y) coordinate offsets
@@ -132,16 +132,18 @@ public enum DitheringAlgorithms {
      * @param errorsArray Array of the stored errors with 3*width size for storing as int[]{r1,g1,b1, r2,b2,g2, ...}
      * @param width Width of the image
      * @param x X coordinate of the pixel
-     * @param errorRGB Value of the distance error as int[]{r, g, b}
+     * @param errorRed Value of the distance error for Red
+     * @param errorGreen Value of the distance error for Green
+     * @param errorBlue Value of the distance error for Blue
      */
-    public void spreadDiffusionError(int[] errorsArray, int width, int x, int[] errorRGB) {
+    public void spreadDiffusionError(int[] errorsArray, int width, int x, int errorRed, int errorGreen, int errorBlue) {
         for (int i = 0; i < kernel.length; i++) {
             int nx = x + offsetX[i];
             int ny = offsetY[i];
             putError(errorsArray, width, nx, ny,
-                    errorRGB[0] * kernel[i],
-                    errorRGB[1] * kernel[i],
-                    errorRGB[2] * kernel[i]
+                    errorRed * kernel[i],
+                    errorGreen * kernel[i],
+                    errorBlue * kernel[i]
             );
         }
     }

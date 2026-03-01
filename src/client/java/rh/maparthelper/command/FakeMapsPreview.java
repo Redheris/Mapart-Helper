@@ -45,9 +45,8 @@ public class FakeMapsPreview {
         MapState mapState = MapState.of((byte) 1, false, null);
         mapState.colors = new byte[map.length];
         boolean use3D = MapartHelper.conversionSettings.use3D();
-        boolean useDithering = MapartHelper.conversionSettings.useDithering();
         for (int i = 0; i < map.length; i++) {
-            MapColorEntry color = PaletteColors.getClosestColor(map[i], use3D, useDithering);
+            MapColorEntry color = PaletteColors.getClosestColor(map[i], use3D);
             mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());
         }
 

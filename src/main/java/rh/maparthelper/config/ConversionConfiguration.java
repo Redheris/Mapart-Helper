@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
@@ -18,15 +19,15 @@ public class ConversionConfiguration implements ConfigData {
     private MapColorEntry backgroundColor = MapColorEntry.CLEAR;
     public MaterialsCountModes materialsCountMode = MaterialsCountModes.PER_MAP;
 
-    public transient boolean useLAB = false;
+    private transient boolean useLAB = false;
     public transient boolean showOriginalImage = false;
 
     public boolean use3D() {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
     }
 
-    public boolean useDithering() {
-        return this.ditheringAlgorithm != DitheringAlgorithms.NONE;
+    public boolean useLAB() {
+        return useLAB;
     }
 
     public int getBackgroundRenderColor() {
@@ -39,5 +40,10 @@ public class ConversionConfiguration implements ConfigData {
 
     public void setBackgroundColor(MapColorEntry backgroundColor) {
         this.backgroundColor = backgroundColor;
+    }
+
+    public void toggleLAB() {
+        this.useLAB = !useLAB;
+        PaletteColors.clearColorCache();
     }
 }

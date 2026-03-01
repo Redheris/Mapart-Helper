@@ -342,10 +342,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         Text isOn = Text.translatable("maparthelper.gui.isOn");
         Text isOff = Text.translatable("maparthelper.gui.isOff");
         ButtonWidget useLAB = ButtonWidget.builder(
-                Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB ? isOn : isOff),
+                Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB() ? isOn : isOff),
                 (btn) -> {
-                    MapartHelper.conversionSettings.useLAB = !MapartHelper.conversionSettings.useLAB;
-                    btn.setMessage(Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB ? isOn : isOff));
+                    MapartHelper.conversionSettings.toggleLAB();
+                    btn.setMessage(Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB() ? isOn : isOff));
                     MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(80, 20).build();
