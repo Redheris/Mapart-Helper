@@ -24,6 +24,7 @@ public class CurrentConversionSettings {
 
     public static void resetMapart() {
         PaletteColors.clearExcludingColors();
+        PaletteColors.clearColorCache();
         guiMapartImage = null;
         mapart.setReset(true);
     }

@@ -62,7 +62,7 @@ public class MapartImageConverter {
     }
 
     public static boolean isConverting() {
-        return currentConvertingFuture != null && !currentConvertingFuture.isDone();
+        return currentRunnable != null && currentRunnable.isUpdating();
     }
 
     public static double getConversionProgress() {
@@ -102,7 +102,6 @@ public class MapartImageConverter {
             for (int x = 0; x < width; x++) {
                 ColorsCounter colorsCounter = mapart.getColorsCounterFor(x / 128, y / 128);
                 if (colorsCounter == null || Thread.currentThread().isInterrupted()) {
-                    PaletteColors.clearColorCache();
                     mapart.clearColorCounters();
                     return null;
                 }
@@ -154,7 +153,6 @@ public class MapartImageConverter {
         }
 
         conversionProgress.set(1.0);
-        PaletteColors.clearColorCache();
         return converted;
     }
 
@@ -198,6 +196,9 @@ public class MapartImageConverter {
         private final int bgColor = MapartHelper.conversionSettings.getBackgroundRenderColor();
         private final int bgMapColorId = MapartHelper.conversionSettings.getBackgroundColor().mapColor().id;
         private final boolean use3D = MapartHelper.conversionSettings.use3D();
+        private final int colorsCacheLiveTimeMs = MapartHelper.commonConfig.mapartEditor.colorsCacheLiveTimeMs;
+
+        private boolean isUpdating = true;
 
         public UpdateMapartRunnable(MapartProcessing mapart, Path path, boolean logExecutionTime, ImageChangeResult imageChangeResult) {
             this.mapart = mapart;
@@ -207,6 +208,10 @@ public class MapartImageConverter {
                 this.imageChangeResult = ImageChangeResult.SIMPLE;
             else
                 this.imageChangeResult = imageChangeResult;
+        }
+
+        public boolean isUpdating() {
+            return isUpdating;
         }
 
         @Override
@@ -231,7 +236,6 @@ public class MapartImageConverter {
                         processingImage = preprocessImage(processingImage);
                         if (Thread.currentThread().isInterrupted()) return;
 
-                        PaletteColors.clearColorCache();
                         mapart.clearColorCounters();
                         if (!showOriginalImage) {
                             if (PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
@@ -264,7 +268,10 @@ public class MapartImageConverter {
                     }
                     if (Thread.currentThread().isInterrupted()) return;
 
-                    MinecraftClient.getInstance().execute(() -> NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage()));
+                    MinecraftClient.getInstance().execute(() -> {
+                        NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage());
+                        isUpdating = false;
+                    });
 
                     if (logExecutionTime) {
                         double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
@@ -284,6 +291,12 @@ public class MapartImageConverter {
                             editorScreen.updateMapartOutputButtons();
                         }
                     });
+                }
+                try {
+                    Thread.sleep(colorsCacheLiveTimeMs);
+                    PaletteColors.clearColorCache();
+                } catch (InterruptedException ignored) {
+
                 }
             }
         }

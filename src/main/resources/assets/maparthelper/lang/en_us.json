@@ -136,6 +136,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showUseLABTooltip": "Show tooltip for LAB toggle",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Show tooltips for staircase styles",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showImageImportButton": "Show image import button",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.colorsCacheLiveTimeMs": "Cached closest colors cache lifetime (in ms)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.colorsCacheLiveTimeMs.@Tooltip": "Cache is used to speed up color adaptation. \nIts lifetime should allow reuse across multiple updating processes. \n§cDo not set the value too high to avoid wasting memory",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Include in palette:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Which blocks will be used when generating the global palette",

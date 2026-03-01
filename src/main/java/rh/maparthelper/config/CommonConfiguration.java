@@ -28,6 +28,8 @@ public class CommonConfiguration implements ConfigData {
         public boolean showUseLABTooltip = true;
         public boolean showStaircaseTooltips = true;
         public boolean showImageImportButton = true;
+        @ConfigEntry.Gui.Tooltip
+        public int colorsCacheLiveTimeMs = 5000;
     }
 
     public static class UseInBlockPalette {
