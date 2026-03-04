@@ -127,6 +127,7 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "Used for /mart save selection and /mart beams",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor": "Selection color",
   "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Fake item frames display duration (in ticks)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.createDirsForSchematic": "Create subdirectories for schematic files",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor": "Mapart editor settings:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.logConversionTime": "Log art conversion duration",

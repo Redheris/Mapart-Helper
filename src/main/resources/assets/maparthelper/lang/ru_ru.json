@@ -127,6 +127,7 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor.@Tooltip": "Для /mart save selection и /mart beams",
   "text.autoconfig.mapart-helper.option.commonConfiguration.selectionColor": "Цвет при выделении мапарта",
   "text.autoconfig.mapart-helper.option.commonConfiguration.fakeItemFramesLiveTime": "Длительность показа фейковых рамок (в тиках)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.createDirsForSchematic": "Создавать подпапки для файлов схематики",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor": "Настройки редактора мапартов:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.logConversionTime": "Выводить длительность обработки арта в логи",

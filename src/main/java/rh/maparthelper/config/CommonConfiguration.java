@@ -11,6 +11,7 @@ public class CommonConfiguration implements ConfigData {
     @ConfigEntry.ColorPicker
     public int selectionColor = 0x9900ff;
     public int fakeItemFramesLiveTime = 100;
+    public boolean createDirsForSchematic = true;
 
     @ConfigEntry.Gui.CollapsibleObject()
     public MapartEditorSettings mapartEditor = new MapartEditorSettings();
