@@ -26,7 +26,6 @@ import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
-import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.MaterialsCountModes;
 import rh.maparthelper.config.UseAuxBlocks;
@@ -37,7 +36,7 @@ import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.NativeImageUtils;
-import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.conversion.dithering.ColorConverters;
 import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
@@ -307,15 +306,12 @@ public class MapartEditorScreen extends ScreenAdapted {
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.translatable("maparthelper.gui.staircaseStyle"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.staircaseStyle.name())
+                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getStaircaseStyle().name())
         );
         staircaseStyle.toggleTooltips(MapartHelper.commonConfig.mapartEditor.showStaircaseTooltips);
         staircaseStyle.addEntries(
                 e -> {
-                    ConversionConfiguration config = MapartHelper.conversionSettings;
-                    boolean was3D = config.use3D();
-                    config.staircaseStyle = (StaircaseStyles) e;
-                    if (config.use3D() != was3D)
+                    if (MapartHelper.conversionSettings.setStaircaseStyle((StaircaseStyles) e))
                         MapartImageUpdater.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
@@ -323,21 +319,21 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
         adder.add(staircaseStyle);
 
-        EnumDropdownMenuWidget ditheringAlg = new EnumDropdownMenuWidget(
+        EnumDropdownMenuWidget colorConverter = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.translatable("maparthelper.gui.ditheringAlg"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.ditheringAlgorithm.name())
+                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.colorConverter.name())
         );
-        ditheringAlg.setLeftScroll(true);
-        ditheringAlg.addEntries(
+        colorConverter.setLeftScroll(true);
+        colorConverter.addEntries(
                 e -> {
-                    MapartHelper.conversionSettings.ditheringAlgorithm = (DitheringAlgorithms) e;
+                    MapartHelper.conversionSettings.colorConverter = (ColorConverters) e;
                     MapartImageUpdater.updateMapart(mapart);
                     AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
-                DitheringAlgorithms.values()
+                ColorConverters.values()
         );
-        adder.add(ditheringAlg);
+        adder.add(colorConverter);
 
         Text isOn = Text.translatable("maparthelper.gui.isOn");
         Text isOff = Text.translatable("maparthelper.gui.isOff");

@@ -32,7 +32,7 @@ public class MapartSchematicBuilder {
     private final boolean[] prevRowSupportBlock;
     private List<List<Integer>> heightsZX;
 
-    private final StaircaseStyles staircaseStyle = MapartHelper.conversionSettings.staircaseStyle;
+    private final StaircaseStyles staircaseStyle = MapartHelper.conversionSettings.getStaircaseStyle();
     private final UseAuxBlocks useAuxBlocks = MapartHelper.conversionSettings.useAuxBlocks;
     private final Block auxBlock = MapartHelper.conversionSettings.auxBlock;
 

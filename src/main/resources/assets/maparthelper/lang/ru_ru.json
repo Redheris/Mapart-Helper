@@ -45,7 +45,7 @@
   "maparthelper.gui.option.VALLEY_3D._TOOLTIP": "Основной стиль 3D ступенчатости для строительства в выживании",
   "maparthelper.gui.option.WAVES_3D": "Волны",
   "maparthelper.gui.option.WAVES_3D._TOOLTIP": "Стиль механики 3D, очень §cнеоптимизированный §fдля строительства в выживании",
-  "maparthelper.gui.option.NONE": "Нет",
+  "maparthelper.gui.option.SIMPLE": "Нет",
   "maparthelper.gui.option.FLOYD_STEINBERG": "Floyd-Steinberg",
   "maparthelper.gui.option.ATKINSON": "Atkinson",
   "maparthelper.gui.option.JJN": "JJN",

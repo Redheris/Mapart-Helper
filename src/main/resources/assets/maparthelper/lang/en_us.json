@@ -45,7 +45,7 @@
   "maparthelper.gui.option.VALLEY_3D._TOOLTIP": "Basic 3D style for building in survival",
   "maparthelper.gui.option.WAVES_3D": "Waves",
   "maparthelper.gui.option.WAVES_3D._TOOLTIP": "3D mechanic style, very §cunoptimized §ffor building in survival",
-  "maparthelper.gui.option.NONE": "None",
+  "maparthelper.gui.option.SIMPLE": "None",
   "maparthelper.gui.option.FLOYD_STEINBERG": "Floyd-Steinberg",
   "maparthelper.gui.option.ATKINSON": "Atkinson",
   "maparthelper.gui.option.JJN": "JJN",

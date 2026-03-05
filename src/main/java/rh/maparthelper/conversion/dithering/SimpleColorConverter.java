@@ -1,0 +1,64 @@
+package rh.maparthelper.conversion.dithering;
+
+import net.minecraft.block.MapColor;
+import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.mapart.ColorsCounter;
+
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+
+public class SimpleColorConverter extends ColorConverter {
+    public SimpleColorConverter(ConversionContext context) {
+        super(context);
+    }
+
+    @Override
+    public BufferedImage convertColors() {
+        BufferedImage convertedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+        int width = convertedImage.getWidth();
+        int[] originalPixels = ((DataBufferInt) original.getRaster().getDataBuffer()).getData();
+        int[] resultPixels = ((DataBufferInt) convertedImage.getRaster().getDataBuffer()).getData();
+        double progressStep = 1.0 / originalPixels.length;
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < convertedImage.getHeight(); y++) {
+                ColorsCounter colorsCounter = mapart.getColorsCounterFor(x / 128, y / 128);
+                if (colorsCounter == null || Thread.currentThread().isInterrupted()) {
+                    mapart.clearColorCounters();
+                    return null;
+                }
+                int argb = originalPixels[x + y * width];
+                if (argb == 0 && backgroundColor != 0) {
+                    resultPixels[x + y * width] = backgroundColor;
+                    colorsCounter.increment(backgroundMapColorId);
+                    continue;
+                }
+                int newArgb;
+                MapColorEntry mapColor = PaletteColors.getClosestColor(argb, use3D);
+                if (mapColor == MapColorEntry.CLEAR) {
+                    newArgb = backgroundColor;
+                } else {
+                    if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
+                        newArgb = mapColor.mapColor().getRenderColor(MapColor.Brightness.HIGH);
+                    else {
+                        if (use3D)
+                            newArgb = mapColor.getRenderColor();
+                        else
+                            newArgb = mapColor.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
+                    }
+                    colorsCounter.increment(mapColor.mapColor().id);
+                }
+                if (y == mapart.getInsertionY() && x >= mapart.getInsertionX()) {
+                    topLineBright[x - mapart.getInsertionX()] = newArgb;
+                    topLineCorrect[x - mapart.getInsertionX()] = mapColor.getRenderColor();
+                }
+                resultPixels[x + y * width] = newArgb;
+                progress.addAndGet(progressStep);
+            }
+        }
+
+        return convertedImage;
+    }
+}

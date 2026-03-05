@@ -7,15 +7,15 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.conversion.dithering.ColorConverters;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
 @Config(name = "conversion-settings")
 public class ConversionConfiguration implements ConfigData {
-    public StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
+    private StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
     public UseAuxBlocks useAuxBlocks = UseAuxBlocks.IMPORTANT;
     public Block auxBlock = Blocks.NETHERRACK;
-    public DitheringAlgorithms ditheringAlgorithm = DitheringAlgorithms.NONE;
+    public ColorConverters colorConverter = ColorConverters.SIMPLE;
     private MapColorEntry backgroundColor = MapColorEntry.CLEAR;
     public MaterialsCountModes materialsCountMode = MaterialsCountModes.PER_MAP;
 
@@ -45,5 +45,20 @@ public class ConversionConfiguration implements ConfigData {
     public void toggleLAB() {
         this.useLAB = !useLAB;
         PaletteColors.clearColorCache();
+    }
+
+    public StaircaseStyles getStaircaseStyle() {
+        return staircaseStyle;
+    }
+
+    /// @return whether use3D value is changed
+    public boolean setStaircaseStyle(StaircaseStyles staircaseStyle) {
+        boolean was3D = use3D();
+        this.staircaseStyle = staircaseStyle;
+        if(was3D != use3D()) {
+            PaletteColors.clearColorCache();
+            return true;
+        }
+        return false;
     }
 }

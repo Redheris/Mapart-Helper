@@ -2,19 +2,16 @@ package rh.maparthelper.conversion;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.ColorUtils;
-import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.conversion.dithering.DitheringAlgorithms;
+import rh.maparthelper.conversion.dithering.ColorConverter;
 import rh.maparthelper.gui.MapartEditorScreen;
 import rh.maparthelper.mapart.AbstractMapart;
-import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
 
 import javax.imageio.ImageIO;
@@ -22,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -82,78 +78,19 @@ public class MapartImageConverter {
      **/
     private static BufferedImage convertToBlocksPalette(AbstractMapart mapart, BufferedImage image,
                                                         int bgColor, int bgMapColorId, boolean use3D) {
-        BufferedImage converted = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
-
-        int width = converted.getWidth();
-        int[] originalPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-        int[] resultPixels = ((DataBufferInt) converted.getRaster().getDataBuffer()).getData();
-        double progressStep = 1.0 / originalPixels.length;
-
-        topLineCorrect = new int[width];
-        topLineBright = new int[width];
-
-        int[] errorsArray = new int[0];
-        DitheringAlgorithms ditherAlg = MapartHelper.conversionSettings.ditheringAlgorithm;
-        boolean useDithering = ditherAlg != DitheringAlgorithms.NONE;
-        if (useDithering)
-            errorsArray = new int[ditherAlg.rowsNumber * width * 3];
-
-        for (int y = 0; y < converted.getHeight(); y++) {
-            for (int x = 0; x < width; x++) {
-                ColorsCounter colorsCounter = mapart.getColorsCounterFor(x / 128, y / 128);
-                if (colorsCounter == null || Thread.currentThread().isInterrupted()) {
-                    mapart.clearColorCounters();
-                    return null;
-                }
-                int argb = originalPixels[x + y * width];
-                if (argb == 0 && bgColor != 0) {
-                    resultPixels[x + y * width] = bgColor;
-                    colorsCounter.increment(bgMapColorId);
-                    continue;
-                }
-                if (useDithering) {
-                    int ind = x * 3;
-                    int[] argb0 = ColorUtils.getARGB(argb);
-                    argb0[1] = Math.clamp(argb0[1] + errorsArray[ind], 0, 255);
-                    argb0[2] = Math.clamp(argb0[2] + errorsArray[ind + 1], 0, 255);
-                    argb0[3] = Math.clamp(argb0[3] + errorsArray[ind + 2], 0, 255);
-                    argb = ColorUtils.getARGB(argb0);
-                }
-                int newArgb;
-                MapColorEntry color = PaletteColors.getClosestColor(argb, use3D);
-                if (color == MapColorEntry.CLEAR) {
-                    newArgb = bgColor;
-                } else {
-                    if (useDithering)
-                        ditherAlg.spreadDiffusionError(errorsArray, width, x, color.errorRed(), color.errorGreen(), color.errorBlue());
-                    if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
-                        newArgb = color.mapColor().getRenderColor(MapColor.Brightness.HIGH);
-                    else {
-                        if (use3D)
-                            newArgb = color.getRenderColor();
-                        else
-                            newArgb = color.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
-                    }
-                    colorsCounter.increment(color.mapColor().id);
-                }
-                if (y == mapart.getInsertionY() && x >= mapart.getInsertionX()) {
-                    topLineBright[x - mapart.getInsertionX()] = newArgb;
-                    topLineCorrect[x - mapart.getInsertionX()] = color.getRenderColor();
-                }
-                resultPixels[x + y * width] = newArgb;
-                conversionProgress.addAndGet(progressStep);
-            }
-
-            if (useDithering) {
-                for (int row = 1; row < ditherAlg.rowsNumber; row++) {
-                    System.arraycopy(errorsArray, row * width * 3, errorsArray, (row - 1) * width * 3, width * 3);
-                }
-                Arrays.fill(errorsArray, (ditherAlg.rowsNumber - 1) * width * 3, ditherAlg.rowsNumber * width * 3, 0);
-            }
-        }
-
-        conversionProgress.set(1.0);
-        return converted;
+        topLineBright = new int[image.getWidth()];
+        topLineCorrect = new int[image.getWidth()];
+        ColorConverter colorConverter = MapartHelper.conversionSettings.colorConverter.createColorConverter(
+                mapart,
+                image,
+                use3D,
+                bgColor,
+                bgMapColorId,
+                topLineBright,
+                topLineCorrect,
+                conversionProgress
+        );
+        return colorConverter.convertColors();
     }
 
     private static void swapTopLine(AbstractMapart mapart, BufferedImage image) {
@@ -204,7 +141,7 @@ public class MapartImageConverter {
             this.mapart = mapart;
             this.newImagePath = path;
             this.logExecutionTime = logExecutionTime;
-            if (imageChangeResult == ImageChangeResult.ONLY_TOP_LINE && (showOriginalImage || bgMapColorId != 0))
+            if (imageChangeResult == ImageChangeResult.ONLY_TOP_LINE && (showOriginalImage || bgColor != 0))
                 this.imageChangeResult = ImageChangeResult.SIMPLE;
             else
                 this.imageChangeResult = imageChangeResult;
@@ -271,6 +208,7 @@ public class MapartImageConverter {
                     MinecraftClient.getInstance().execute(() -> {
                         NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage());
                         isUpdating = false;
+                        conversionProgress.set(1.0);
                     });
 
                     if (logExecutionTime) {
