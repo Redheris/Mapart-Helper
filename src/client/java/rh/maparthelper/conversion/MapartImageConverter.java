@@ -160,6 +160,7 @@ public class MapartImageConverter {
 
                     if (newImagePath != null) {
                         BufferedImage original = ImageIO.read(newImagePath.toFile());
+                        if (original == null) throw new IllegalArgumentException();
                         mapart.setOriginal(original);
                         mapart.setImagePath(newImagePath);
                         mapart.autoCropOriginalImage();
@@ -215,7 +216,7 @@ public class MapartImageConverter {
                         double timeLeft = (System.currentTimeMillis() - startTime) / 1000.0;
                         MapartHelper.LOGGER.info("Image preprocessing and conversion took {} seconds", timeLeft);
                     }
-                } catch (IOException e) {
+                } catch (IOException | IllegalArgumentException e) {
                     CurrentConversionSettings.resetMapart();
                     MapartHelper.LOGGER.error("Can't read image file \"{}\". Check path and file's extension. ", newImagePath, e);
                 } catch (Exception e) {
