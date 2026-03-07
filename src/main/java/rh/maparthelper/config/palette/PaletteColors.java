@@ -92,11 +92,13 @@ public class PaletteColors {
     }
 
     public static boolean addExcludingColors(Set<MapColor> excludingColors) {
+        clearColorCache();
         return PaletteColors.excludingColors.addAll(excludingColors);
     }
 
     public static void clearExcludingColors() {
         excludingColors.clear();
+        clearColorCache();
     }
 
     public static void clearColorCache() {
