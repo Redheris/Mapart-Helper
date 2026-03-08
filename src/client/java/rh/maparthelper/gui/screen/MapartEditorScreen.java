@@ -1,4 +1,4 @@
-package rh.maparthelper.gui;
+package rh.maparthelper.gui.screen;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;

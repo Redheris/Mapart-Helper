@@ -10,7 +10,7 @@ import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.dithering.ColorConverter;
-import rh.maparthelper.gui.MapartEditorScreen;
+import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.mapart.AbstractMapart;
 import rh.maparthelper.mapart.MapartProcessing;
 

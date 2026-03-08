@@ -1,4 +1,4 @@
-package rh.maparthelper.gui;
+package rh.maparthelper.gui.screen;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;

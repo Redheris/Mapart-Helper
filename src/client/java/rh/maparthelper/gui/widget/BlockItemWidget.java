@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import rh.maparthelper.gui.PresetsEditorScreen;
+import rh.maparthelper.gui.screen.PresetsEditorScreen;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;

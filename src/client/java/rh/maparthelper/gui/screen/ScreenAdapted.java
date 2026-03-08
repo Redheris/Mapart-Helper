@@ -1,4 +1,4 @@
-package rh.maparthelper.gui;
+package rh.maparthelper.gui.screen;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
