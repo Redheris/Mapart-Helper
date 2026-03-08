@@ -5,14 +5,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
@@ -31,7 +29,6 @@ import rh.maparthelper.config.MaterialsCountModes;
 import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
@@ -40,18 +37,16 @@ import rh.maparthelper.conversion.dithering.ColorConverters;
 import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
+import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.*;
-import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.mapart.MapartSaver;
 import rh.maparthelper.server.MapCreator;
-import rh.maparthelper.util.InventoryItemsCounter;
-import rh.maparthelper.util.RenderUtils;
 
 import javax.imageio.ImageIO;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.*;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
@@ -60,7 +55,6 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     private DirectionalLayoutWidget settingsLeft;
     private DirectionalLayoutWidget settingsRight;
-    private ScrollableGridWidget materialList;
     private MapartPreviewWidget mapartPreview;
     private final int baseElementWidth = 165;
 
@@ -71,154 +65,23 @@ public class MapartEditorScreen extends ScreenAdapted {
     private ButtonWidget showInWorldButton;
     private ButtonWidget resetExcludedColors;
 
-    private int auxBlockCount = 0;
-    private static boolean materialsAscendingOrder = false;
-    private static boolean displayRemainingAmount = false;
-    private final InventoryItemsCounter inventoryItemsCounter = new InventoryItemsCounter();
+    private final MaterialListPanel materialList = new MaterialListPanel(this, mapart, 0, 0, 0, 0);
 
     public MapartEditorScreen() {
         super(Text.translatable("maparthelper.gui.mapart_editor_screen"));
-        if (MinecraftClient.getInstance().player != null) {
-            inventoryItemsCounter.count(MinecraftClient.getInstance().player.getInventory());
-        }
+    }
+
+    public void setHighlightingColor(MapColor color) {
+        mapartPreview.setHighlightingColor(color);
     }
 
     public void updateMaterialList() {
-        MaterialListBlockWidget.fixedHighlight = null;
-        MaterialListBlockWidget.selectedForExcluding.clear();
-        this.remove(materialList);
-
-        if (!CurrentConversionSettings.isMapartConverted()) return;
-
-        int listTop = settingsRight.getY() + settingsRight.getHeight();
-        materialList = new ScrollableGridWidget(
-                null,
-                settingsRight.getX() - 6, listTop,
-                width - settingsRight.getX() - 5, height - listTop, 6
-        );
-        materialList.setLeftScroll(true);
-        materialList.grid.setColumnSpacing(0);
-        materialList.grid.getMainPositioner().alignVerticalCenter();
-
-        GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
-        PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
-
-        ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionSettings.materialsCountMode);
-        ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
-
-        this.auxBlockCount = mapart.getWidth() * 128;
-        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock);
-        auxBlockItemWidget.insertToTooltip(1, Text.translatable("maparthelper.aux_block").formatted(Formatting.GRAY));
-
-        TextWidget auxAmountText = new TextWidget(Text.empty(), textRenderer);
-        materialListAdder.add(auxBlockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
-        materialListAdder.add(auxAmountText);
-
-        boolean hasAuxBlockInColors = false;
-        if (displayRemainingAmount)
-            hasAuxBlockInColors = calculateRemainingCounts(colorCounts);
-
-        for (ColorsCounter.MapColorCount colorCount : colorCounts) {
-            addBlockToMaterialList(materialListAdder, palette, colorCount);
-        }
-
-        if (displayRemainingAmount && !hasAuxBlockInColors)
-            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionSettings.auxBlock.asItem(), 0);
-
-        MutableText amountText = Text.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
-        if (auxBlockCount <= 0)
-            amountText = amountText.formatted(Formatting.GREEN);
-        auxAmountText.setWidth(textRenderer.getWidth(amountText));
-        auxAmountText.setMessage(amountText);
-        auxAmountText.setTooltip(Tooltip.of(amountText));
-
-        materialList.refreshPositions();
-        this.addDrawableChild(materialList);
-    }
-
-    private void addBlockToMaterialList(GridWidget.Adder adder, PalettePresetsConfig palette, ColorsCounter.MapColorCount color) {
-        MapColor mapColor = MapColor.get(color.id());
-        Block block = palette.getBlockOfMapColor(mapColor);
-        if (block == null) return;
-
-        MaterialListBlockWidget blockItemWidget = new MaterialListBlockWidget(0, 0, 24, block, mapColor);
-        adder.add(blockItemWidget, materialList.grid.copyPositioner().marginLeft(6));
-        MutableText text = Text.literal(getAmountString(color.amount(), block.asItem().getMaxCount()));
-        if (color.amount() == 0)
-            text = text.formatted(Formatting.GREEN);
-        TextWidget amountText = new TextWidget(text, textRenderer);
-        adder.add(amountText);
-        amountText.setTooltip(Tooltip.of(amountText.getMessage()));
-        amountText.setTooltipDelay(Duration.ofMillis(100));
-
-        if (MapartSchematicBuilder.needsAuxBlock(block)) {
-            auxBlockCount += color.amount();
-        }
-    }
-
-    /// @return Whether the color-blocks list contains the same block as the auxiliary block.
-    private boolean calculateRemainingCounts(ColorsCounter.MapColorCount[] colors) {
-        PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player == null) return false;
-        boolean hasAuxBlock = false;
-
-        PalettePresetsConfig paletteConfig = PaletteConfigManager.presetsConfig;
-
-        List<Item> countingBlocks = Arrays.stream(colors)
-                .map(c -> {
-                    Block block = paletteConfig.getBlockOfMapColor(MapColor.get(c.id()));
-                    if (block instanceof FluidBlock)
-                        return Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem();
-                    return block.asItem();
-                })
-                .toList();
-
-        Item auxBlockItem = MapartHelper.conversionSettings.auxBlock.asItem();
-        Map<Item, Integer> inventory = inventoryItemsCounter.getCounts();
-
-        for (int i = 0; i < colors.length; i++) {
-            Item item = countingBlocks.get(i);
-
-            int have = inventory.getOrDefault(item, 0);
-            int remaining = colors[i].amount() - have;
-            if (item == auxBlockItem) {
-                auxBlockCount += Math.min(0, remaining);
-                hasAuxBlock = true;
-            }
-            colors[i] = new ColorsCounter.MapColorCount(colors[i].id(), Math.max(0, remaining));
-        }
-
-        Comparator<ColorsCounter.MapColorCount> cmp = Comparator.comparingInt(ColorsCounter.MapColorCount::amount);
-        Arrays.sort(colors, materialsAscendingOrder ? cmp : cmp.reversed());
-        return hasAuxBlock;
-    }
-
-    private String getAmountString(int amount, int stackSize) {
-        StringBuilder text = new StringBuilder();
-        int shBoxSize = 27 * stackSize;
-        int shBoxes = amount / shBoxSize;
-        int stacks = amount % shBoxSize / stackSize;
-        int items = amount % shBoxSize % stackSize;
-        boolean counted = shBoxes > 0 || stacks > 0;
-
-        if (shBoxes > 0)
-            text.append(shBoxes).append("§3").append(Text.translatable("maparthelper.gui.shulker_box_abbr").getString()).append("§r");
-        if (stacks > 0) {
-            text.append(shBoxes > 0 ? " + " : "").append(stacks);
-            if (stackSize > 1) text.append("§3x").append(stackSize).append("§r");
-        }
-        if (counted) {
-            text.insert(0, " = ");
-            if (items > 0) text.append(" + ").append(items);
-        }
-
-        return text.insert(0, "" + amount).toString();
+        materialList.updateMaterialList(this::addDrawableChild, this::remove);
     }
 
     @Override
     protected void init() {
         super.init();
-        if (MinecraftClient.getInstance().player == null) displayRemainingAmount = false;
 
         settingsLeft = DirectionalLayoutWidget.vertical();
         settingsLeft.setPosition(5, 20);
@@ -478,10 +341,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         DirectionalLayoutWidget materialListSettings = DirectionalLayoutWidget.horizontal().spacing(2);
         materialListSettings.getMainPositioner().alignBottom();
         materialListSettings.add(DecorativeButtonWidget.builder(
-                Text.of(materialsAscendingOrder ? "▲" : "▼"),
+                Text.of(materialList.isMaterialsAscendingOrder() ? "▲" : "▼"),
                 btn -> {
-                    materialsAscendingOrder = !materialsAscendingOrder;
-                    btn.setMessage(Text.of(materialsAscendingOrder ? "▲" : "▼"));
+                    materialList.toggleMaterialsAscendingOrder();
+                    btn.setMessage(Text.of(materialList.isMaterialsAscendingOrder() ? "▲" : "▼"));
                     updateMaterialList();
                 }
         ).size(10, 10).build());
@@ -519,16 +382,16 @@ public class MapartEditorScreen extends ScreenAdapted {
         Text description = Text.translatable("maparthelper.gui.amount_remaining_description");
         Text total = Text.translatable("maparthelper.gui.amount_total");
         ButtonWidget amountDisplayMode = ButtonWidget
-                .builder(displayRemainingAmount ? remaining : total,
+                .builder(materialList.isDisplayRemainingAmount() ? remaining : total,
                         btn -> {
-                            displayRemainingAmount = !displayRemainingAmount;
-                            btn.setMessage(displayRemainingAmount ? remaining : total);
-                            btn.setTooltip(displayRemainingAmount ? Tooltip.of(description) : null);
+                            materialList.toggleDisplayRemainingAmount();
+                            btn.setMessage(materialList.isDisplayRemainingAmount() ? remaining : total);
+                            btn.setTooltip(materialList.isDisplayRemainingAmount() ? Tooltip.of(description) : null);
                             updateMaterialList();
                         })
                 .size(baseElementWidth, 14)
                 .build();
-        amountDisplayMode.setTooltip(displayRemainingAmount ? Tooltip.of(description) : null);
+        amountDisplayMode.setTooltip(materialList.isDisplayRemainingAmount() ? Tooltip.of(description) : null);
         settingsRight.add(amountDisplayMode, settingsRightPositioner.copy().marginTop(2));
 
         settingsRight.refreshPositions();
@@ -539,6 +402,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         resetExcludedColors.setX(width - 5 - resetExcludedColors.getWidth());
 
         updateMaterialList();
+        materialList.setPosition(settingsRight.getX(), settingsRight.getY() + settingsRight.getHeight());
+        materialList.setSize(settingsRight.getWidth(), height - settingsRight.getHeight());
 
         // =========== Mapart preview area ===========
 
@@ -615,10 +480,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
         super.render(context, mouseX, mouseY, delta);
 
-        if (!MaterialListBlockWidget.hoveringAny) {
-            MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
+        if (!MaterialListPanel.MaterialListBlockWidget.isHoveringAny()) {
+            MaterialListPanel.MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
         }
-        MaterialListBlockWidget.hoveringAny = false;
+        MaterialListPanel.MaterialListBlockWidget.resetHovering();
     }
 
     @Override
@@ -861,7 +726,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
     }
 
-    private void updateResetExcludedColorsButton(boolean active) {
+    public void updateResetExcludedColorsButton(boolean active) {
         if (active) {
             MutableText excludedAmount = Text.translatable("maparthelper.gui.excluded_colors_amount", PaletteColors.excludingColorsAmount());
             MutableText revertExcluding = Text.translatable("maparthelper.gui.revert_excluding_colors");
@@ -875,91 +740,6 @@ public class MapartEditorScreen extends ScreenAdapted {
             resetExcludedColors.setMessage(Text.literal("⟲").formatted(Formatting.BOLD, Formatting.WHITE));
             resetExcludedColors.setTooltip(null);
             resetExcludedColors.active = false;
-        }
-    }
-
-    private class MaterialListBlockWidget extends BlockItemWidget {
-        static final Set<MapColor> selectedForExcluding = new HashSet<>();
-        static MaterialListBlockWidget fixedHighlight;
-        static boolean hoveringAny = false;
-        private final MapColor mapColor;
-        private boolean confirmRemoving = false;
-
-        public MaterialListBlockWidget(int x, int y, int squareSize, Block block, MapColor mapColor) {
-            super(x, y, squareSize, block);
-            this.mapColor = mapColor;
-            this.tooltip = new ArrayList<>(List.of(
-                    block.getName().asOrderedText(),
-                    Text.translatable("maparthelper.gui.LMB_to_highlight").formatted(Formatting.GRAY).asOrderedText(),
-                    Text.translatable("maparthelper.gui.RMB_to_remove").formatted(Formatting.GRAY).asOrderedText()
-            ));
-            if (client != null && client.options.advancedItemTooltips)
-                this.tooltip.add(Text.literal(Registries.BLOCK.getId(block).toString()).formatted(Formatting.DARK_GRAY).asOrderedText());
-        }
-
-        @Override
-        protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-            super.renderWidget(context, mouseX, mouseY, deltaTicks);
-            if (fixedHighlight == this) {
-                context.createNewRootLayer();
-                context.drawBorder(getX(), getY(), this.width, this.height, MapartHelper.commonConfig.mapartEditor.previewHighlightingColor);
-            } else if (MapartHelper.commonConfig.mapartEditor.previewHighlightOnHover
-                    && context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-                mapartPreview.setHighlightingColor(mapColor);
-                hoveringAny = true;
-            }
-            if (confirmRemoving) {
-                RenderUtils.renderItemStack(
-                        context,
-                        Blocks.BARRIER.asItem().getDefaultStack(),
-                        "RemoveColor",
-                        getX(), getY(),
-                        width, height
-                );
-            }
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button == 0) {
-                if (confirmRemoving) {
-                    MapartImageUpdater.excludeColorsFromMapart(mapart, selectedForExcluding);
-                    updateResetExcludedColorsButton(true);
-                    selectedForExcluding.clear();
-                    return true;
-                }
-                if (fixedHighlight == this) {
-                    fixedHighlight = null;
-                } else {
-                    fixedHighlight = this;
-                    mapartPreview.setHighlightingColor(mapColor);
-                }
-                return true;
-            }
-            if (button == 1) {
-                if (fixedHighlight == this) {
-                    fixedHighlight = null;
-                }
-                if (!confirmRemoving) {
-                    confirmRemoving = true;
-                    selectedForExcluding.add(mapColor);
-                    tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_confirm").formatted(Formatting.RED).asOrderedText());
-                    tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_cancel").formatted(Formatting.RED).asOrderedText());
-                } else {
-                    confirmRemoving = false;
-                    selectedForExcluding.remove(mapColor);
-                    tooltip.set(1, Text.translatable("maparthelper.gui.LMB_to_highlight").formatted(Formatting.GRAY).asOrderedText());
-                    tooltip.set(2, Text.translatable("maparthelper.gui.RMB_to_remove").formatted(Formatting.GRAY).asOrderedText());
-                }
-            }
-            return true;
-        }
-
-        public static void setDefaultHighlight(MapartPreviewWidget mapartPreview) {
-            if (fixedHighlight == null)
-                mapartPreview.setHighlightingColor(MapColor.CLEAR);
-            else
-                mapartPreview.setHighlightingColor(fixedHighlight.mapColor);
         }
     }
 
