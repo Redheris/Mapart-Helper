@@ -20,7 +20,6 @@ import java.util.Optional;
  */
 public abstract class ScreenAdapted extends Screen {
     private final List<Drawable> drawables = new ArrayList<>();
-    TextFieldWidget selectedTextWidget;
 
     protected ScreenAdapted(Text title) {
         super(title);
@@ -58,12 +57,6 @@ public abstract class ScreenAdapted extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (selectedTextWidget != null) {
-            selectedTextWidget.setSelectionStart(0);
-            selectedTextWidget.setSelectionEnd(0);
-            selectedTextWidget = null;
-        }
-
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         if (dropdownMenu != null) {
             if (dropdownMenu.isMouseOverMenu(mouseX, mouseY) || dropdownMenu.isMouseOver(mouseX, mouseY)) {
@@ -83,23 +76,7 @@ public abstract class ScreenAdapted extends Screen {
         if (element instanceof ScrollableGridWidget layout) {
             Optional<Widget> optional2 = layout.hoveredElement(mouseX, mouseY);
             if (optional2.isEmpty()) return false;
-            element = (Element) optional2.get();
-        }
-
-        if (element instanceof TextFieldWidget textField) {
-            if (element.isFocused()) {
-                return element.mouseClicked(mouseX, mouseY, button);
-            }
-
-            selectedTextWidget = textField;
-            this.setFocused(textField);
-            if (button == 0) {
-                textField.setSelectionStart(0);
-                textField.setSelectionEnd(textField.getText().length());
-            } else if (button == 1) {
-                textField.setText("");
-            }
-            return true;
+            return element.mouseClicked(mouseX, mouseY, button);
         }
 
         return super.mouseClicked(mouseX, mouseY, button);

@@ -4,7 +4,6 @@ import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -18,6 +17,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.FakeMapsPreview;
@@ -31,11 +31,13 @@ import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.conversion.dithering.ColorConverters;
-import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
+import rh.maparthelper.gui.input.TextFieldPredicates;
+import rh.maparthelper.gui.input.TextFieldValidators;
 import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.*;
+import rh.maparthelper.gui.widget.input.AdjTextFieldWidget;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.mapart.MapartSaver;
 import rh.maparthelper.server.MapCreator;
@@ -84,20 +86,13 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.setPosition(5, 20);
         Positioner settingsLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
 
-        TextFieldWidget mapartName = createTextInputFieldWidget(baseElementWidth, mapart.mapartName, -1);
-        mapartName.setChangedListener(value -> {
-            mapartName.setEditableColor(Colors.WHITE);
-            if (value.isEmpty()) {
-                mapartName.setSuggestion(Text.translatable("maparthelper.gui.mapart_name_field").getString());
-                return;
-            }
-            mapartName.setSuggestion(null);
-            if (value.matches(".*[<>:\"/|?*\\\\].*")) {
-                mapartName.setEditableColor(Colors.LIGHT_RED);
-                return;
-            }
-            mapart.mapartName = value;
-        });
+        AdjTextFieldWidget mapartName = new AdjTextFieldWidget(
+                textRenderer, baseElementWidth, 20, mapart.mapartName, "Mapart name"
+        );
+        mapartName.setPlaceholder(Text.translatable("maparthelper.gui.mapart_name_field").withColor(Colors.GRAY));
+        mapartName.setValueValidator(s -> !s.isBlank());
+        mapartName.setTextPredicate(TextFieldPredicates.validPathName());
+        mapartName.setValueConsumer(newValue -> mapart.mapartName = newValue);
         settingsLeft.add(new TextWidget(Text.translatable("maparthelper.gui.mapart_name_field"), textRenderer));
         settingsLeft.add(mapartName, settingsLeftPositioner.copy().marginTop(0));
 
@@ -245,37 +240,11 @@ public class MapartEditorScreen extends ScreenAdapted {
         if (currentAuxBlock.contains("minecraft:"))
             currentAuxBlock = currentAuxBlock.substring(10);
         BlockItemWidget auxBlockPreview = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock, false);
-        TextFieldWidget auxBlockIdField = createTextInputFieldWidget(
-                baseElementWidth - auxBlockPreview.getWidth() - 5,
-                currentAuxBlock,
-                -1
-        );
-        auxBlockIdField.setChangedListener(s -> {
-            auxBlockIdField.setEditableColor(Colors.WHITE);
-            int delimiterInd = s.indexOf(':');
-            if (delimiterInd != -1 && !Identifier.isNamespaceValid(s.substring(0, delimiterInd))
-                    || !Identifier.isPathValid(s.substring(delimiterInd + 1))
-            ) {
-                auxBlockIdField.setEditableColor(Colors.LIGHT_RED);
-                return;
-            }
-            if (s.equals(Registries.BLOCK.getId(MapartHelper.conversionSettings.auxBlock).toString()))
-                return;
-            Identifier id = Identifier.of(s);
-            Block newBlock = Registries.BLOCK.get(id);
-            if (newBlock != Blocks.AIR && !MapartSchematicBuilder.needsAuxBlock(newBlock)) {
-                MapartHelper.conversionSettings.auxBlock = newBlock;
-                auxBlockPreview.setBlock(newBlock);
-                updateMaterialList();
-                AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
-            } else {
-                auxBlockIdField.setEditableColor(Colors.LIGHT_RED);
-            }
-        });
+
         GridWidget auxBlock = new GridWidget().setSpacing(5);
         auxBlock.getMainPositioner().alignVerticalCenter();
         GridWidget.Adder auxAdder = auxBlock.createAdder(2);
-        auxAdder.add(auxBlockIdField);
+        auxAdder.add(createAuxBlockFieldWidget(auxBlockPreview, currentAuxBlock));
         auxAdder.add(auxBlockPreview);
         adder.add(auxBlock);
 
@@ -473,6 +442,23 @@ public class MapartEditorScreen extends ScreenAdapted {
         updateMapartOutputButtons();
     }
 
+    private @NotNull AdjTextFieldWidget createAuxBlockFieldWidget(BlockItemWidget auxBlockPreview, String currentAuxBlock) {
+        AdjTextFieldWidget auxBlockId = new AdjTextFieldWidget(
+                textRenderer, baseElementWidth - auxBlockPreview.getWidth() - 5, 20,
+                currentAuxBlock, "Auxiliary block identifier"
+        );
+        auxBlockId.setValueValidator(TextFieldValidators.auxBlockIdentifier());
+        auxBlockId.setValueConsumer(idStr -> {
+            Identifier id = Identifier.of(idStr);
+            Block block = Registries.BLOCK.get(id);
+            MapartHelper.conversionSettings.auxBlock = block;
+            auxBlockPreview.setBlock(block);
+            updateMaterialList();
+            AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
+        });
+        return auxBlockId;
+    }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
@@ -508,67 +494,36 @@ public class MapartEditorScreen extends ScreenAdapted {
         readImage(paths.getFirst());
     }
 
-
-    private TextFieldWidget createTextInputFieldWidget(int width, String initialValue, int maxLength) {
-        TextFieldWidget textInputField = new TextFieldWidget(textRenderer,
-                width, 20,
-                Text.empty()
-        );
-        if (maxLength != -1)
-            textInputField.setMaxLength(maxLength);
-        textInputField.setText(initialValue);
-        return textInputField;
-    }
-
     private GridWidget createSizeSettingsGrid() {
         GridWidget size = new GridWidget().setSpacing(10).setRowSpacing(1);
         GridWidget.Adder adder = size.createAdder(2);
 
-        TextFieldWidget widthInput = createTextInputFieldWidget(
-                30, "" + mapart.getWidth(), 3
+        AdjTextFieldWidget widthInput = new AdjTextFieldWidget(
+                textRenderer, 30, 20, "" + mapart.getWidth(), "Width"
         );
-        widthInput.setChangedListener(value -> {
-            widthInput.setEditableColor(Colors.WHITE);
-            if (value.isEmpty()) {
-                widthInput.setSuggestion("x");
-                return;
-            }
-            widthInput.setSuggestion(null);
-            try {
-                int newWidth = Integer.parseInt(value);
-                if (newWidth <= 0) {
-                    widthInput.setEditableColor(Colors.LIGHT_RED);
-                } else if (newWidth != mapart.getWidth()) {
-                    CurrentConversionSettings.guiMapartImage = null;
-                    MapartImageUpdater.resizeMapartImage(mapart, newWidth, mapart.getHeight());
-                }
-            } catch (NumberFormatException e) {
-                widthInput.setEditableColor(Colors.LIGHT_RED);
+        widthInput.setPlaceholder(Text.literal("x").withColor(Colors.GRAY));
+        widthInput.setTextPredicate(TextFieldPredicates.positiveInt());
+        widthInput.setValueConsumer(s -> {
+            int value = Integer.parseInt(s);
+            if (value != mapart.getWidth()) {
+                CurrentConversionSettings.guiMapartImage = null;
+                MapartImageUpdater.resizeMapartImage(mapart, value, mapart.getHeight());
             }
         });
 
-        TextFieldWidget heightInput = createTextInputFieldWidget(
-                30, "" + mapart.getHeight(), 3
+        AdjTextFieldWidget heightInput = new AdjTextFieldWidget(
+                textRenderer, 30, 20, "" + mapart.getHeight(), "Height"
         );
-        heightInput.setChangedListener(value -> {
-            heightInput.setEditableColor(Colors.WHITE);
-            if (value.isEmpty()) {
-                heightInput.setSuggestion("y");
-                return;
-            }
-            heightInput.setSuggestion(null);
-            try {
-                int newHeight = Integer.parseInt(value);
-                if (newHeight <= 0) {
-                    heightInput.setEditableColor(Colors.LIGHT_RED);
-                } else if (newHeight != mapart.getHeight()) {
-                    CurrentConversionSettings.guiMapartImage = null;
-                    MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), newHeight);
-                }
-            } catch (NumberFormatException e) {
-                heightInput.setEditableColor(Colors.LIGHT_RED);
+        heightInput.setPlaceholder(Text.literal("y").withColor(Colors.GRAY));
+        heightInput.setTextPredicate(TextFieldPredicates.positiveInt());
+        heightInput.setValueConsumer(s -> {
+            int value = Integer.parseInt(s);
+            if (value != mapart.getHeight()) {
+                CurrentConversionSettings.guiMapartImage = null;
+                MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), value);
             }
         });
+
         adder.add(new TextWidget(Text.translatable("maparthelper.gui.mapart_size_label"), textRenderer), 2);
         adder.add(widthInput);
         adder.add(heightInput);

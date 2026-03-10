@@ -82,7 +82,7 @@ public class MapartSchematicBuilder {
     }
 
     private void addAuxBlocksForColor(Block colorBlock, int colorX, int colorY, int colorZ) {
-        boolean needsSupport = needsAuxBlock(colorBlock);
+        boolean needsSupport = shouldPlaceAuxBlock(colorBlock);
         if (colorY > 0 && needsSupport)
             addBlock(auxBlock, colorX, colorY - 1, colorZ);
 
@@ -147,9 +147,12 @@ public class MapartSchematicBuilder {
         NbtHelper.putDataVersion(nbt);
     }
 
-    public static boolean needsAuxBlock(Block block) {
+    public static boolean shouldPlaceAuxBlock(Block block) {
         if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX || block.getDefaultState().isAir())
             return false;
+        return needsAuxBlock(block);
+    }
+    public static boolean needsAuxBlock(Block block) {
         boolean canPlaceAtAir = block.getDefaultState().canPlaceAt(DummyWorldView.getInstance(), BlockPos.ORIGIN);
         boolean hasNoCollision = block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;

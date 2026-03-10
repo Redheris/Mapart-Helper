@@ -155,7 +155,7 @@ public class MaterialListPanel extends WrapperWidget {
         amountText.setTooltip(Tooltip.of(amountText.getMessage()));
         amountText.setTooltipDelay(Duration.ofMillis(100));
 
-        if (MapartSchematicBuilder.needsAuxBlock(block)) {
+        if (MapartSchematicBuilder.shouldPlaceAuxBlock(block)) {
             auxBlockCount += color.amount();
         }
     }
