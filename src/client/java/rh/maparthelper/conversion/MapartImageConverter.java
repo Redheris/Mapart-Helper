@@ -80,7 +80,7 @@ public class MapartImageConverter {
                                                         int bgColor, int bgMapColorId, boolean use3D) {
         topLineBright = new int[image.getWidth()];
         topLineCorrect = new int[image.getWidth()];
-        ColorConverter colorConverter = MapartHelper.conversionSettings.colorConverter.createColorConverter(
+        ColorConverter colorConverter = MapartHelper.conversionSettings.getColorConverter().createColorConverter(
                 mapart,
                 image,
                 use3D,
@@ -129,7 +129,7 @@ public class MapartImageConverter {
         private final Path newImagePath;
         private final boolean logExecutionTime;
 
-        private final boolean showOriginalImage = MapartHelper.conversionSettings.showOriginalImage;
+        private final boolean showOriginalImage = MapartHelper.conversionSettings.isShowOriginalImage();
         private final int bgColor = MapartHelper.conversionSettings.getBackgroundRenderColor();
         private final int bgMapColorId = MapartHelper.conversionSettings.getBackgroundColor().mapColor().id;
         private final boolean use3D = MapartHelper.conversionSettings.use3D();

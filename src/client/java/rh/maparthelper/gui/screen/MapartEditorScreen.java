@@ -123,10 +123,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         Text previewMapart = Text.translatable("maparthelper.gui.previewMapart");
         Text previewOriginal = Text.translatable("maparthelper.gui.previewOriginal").formatted(Formatting.GOLD);
         ButtonWidget previewMode = ButtonWidget.builder(
-                MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart,
+                MapartHelper.conversionSettings.isShowOriginalImage() ? previewOriginal : previewMapart,
                 (btn) -> {
-                    MapartHelper.conversionSettings.showOriginalImage = !MapartHelper.conversionSettings.showOriginalImage;
-                    btn.setMessage(MapartHelper.conversionSettings.showOriginalImage ? previewOriginal : previewMapart);
+                    MapartHelper.conversionSettings.toggleShowOriginalImage();
+                    btn.setMessage(MapartHelper.conversionSettings.isShowOriginalImage() ? previewOriginal : previewMapart);
                     MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(baseElementWidth, 20).build();
@@ -170,7 +170,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 e -> {
                     if (MapartHelper.conversionSettings.setStaircaseStyle((StaircaseStyles) e))
                         MapartImageUpdater.updateMapart(mapart);
-                    AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 StaircaseStyles.values()
         );
@@ -179,14 +178,13 @@ public class MapartEditorScreen extends ScreenAdapted {
         EnumDropdownMenuWidget colorConverter = new EnumDropdownMenuWidget(
                 this, 0, 0, baseElementWidth, 20, baseElementWidth,
                 Text.translatable("maparthelper.gui.ditheringAlg"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.colorConverter.name())
+                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getColorConverter().name())
         );
         colorConverter.setLeftScroll(true);
         colorConverter.addEntries(
                 e -> {
-                    MapartHelper.conversionSettings.colorConverter = (ColorConverters) e;
+                    MapartHelper.conversionSettings.setColorConverter((ColorConverters) e);
                     MapartImageUpdater.updateMapart(mapart);
-                    AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
                 },
                 ColorConverters.values()
         );
@@ -224,10 +222,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),
                 settingsLeftPositioner.copy().marginTop(15)
         );
-        String currentAuxBlock = Registries.BLOCK.getId(MapartHelper.conversionSettings.auxBlock).toString();
+        String currentAuxBlock = Registries.BLOCK.getId(MapartHelper.conversionSettings.getAuxBlock()).toString();
         if (currentAuxBlock.contains("minecraft:"))
             currentAuxBlock = currentAuxBlock.substring(10);
-        BlockItemWidget auxBlockPreview = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock, false);
+        BlockItemWidget auxBlockPreview = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.getAuxBlock(), false);
 
         GridWidget auxBlock = new GridWidget().setSpacing(5);
         auxBlock.getMainPositioner().alignVerticalCenter();
@@ -240,16 +238,12 @@ public class MapartEditorScreen extends ScreenAdapted {
                 this, 0, 0,
                 baseElementWidth, 20, baseElementWidth,
                 Text.translatable("maparthelper.gui.use_aux"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.useAuxBlocks)
+                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getUseAuxBlocks())
         );
         useAuxBlocks.addEntries(
                 e -> {
-                    UseAuxBlocks was = MapartHelper.conversionSettings.useAuxBlocks;
-                    MapartHelper.conversionSettings.useAuxBlocks = (UseAuxBlocks) e;
-                    if (was != MapartHelper.conversionSettings.useAuxBlocks) {
-                        updateMaterialList();
-                        AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
-                    }
+                    MapartHelper.conversionSettings.setUseAuxBlocks((UseAuxBlocks) e);
+                    updateMaterialList();
                 },
                 UseAuxBlocks.values()
         );
@@ -320,16 +314,17 @@ public class MapartEditorScreen extends ScreenAdapted {
         Text perMapCountMode = Text.translatable("maparthelper.gui.countMode.perBlock");
         Text fullCountMode = Text.translatable("maparthelper.gui.countMode.full");
         ButtonWidget materialsCountMode = ButtonWidget
-                .builder(MapartHelper.conversionSettings.materialsCountMode == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode,
+                .builder(MapartHelper.conversionSettings.getMaterialsCountMode() == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode,
                         btn -> {
-                            MapartHelper.conversionSettings.materialsCountMode = MaterialsCountModes.nextMode(MapartHelper.conversionSettings.materialsCountMode);
-                            btn.setMessage(MapartHelper.conversionSettings.materialsCountMode == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode);
-                            btn.setTooltip(Tooltip.of(MapartHelper.conversionSettings.materialsCountMode.getDescription()));
+                            MapartHelper.conversionSettings.nextMaterialsCountMode();
+                            MaterialsCountModes mode = MapartHelper.conversionSettings.getMaterialsCountMode();
+                            btn.setMessage(mode == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode);
+                            btn.setTooltip(Tooltip.of(mode.getDescription()));
                             updateMaterialList();
                         })
                 .size(baseElementWidth, 14)
                 .build();
-        materialsCountMode.setTooltip(Tooltip.of(MapartHelper.conversionSettings.materialsCountMode.getDescription()));
+        materialsCountMode.setTooltip(Tooltip.of(MapartHelper.conversionSettings.getMaterialsCountMode().getDescription()));
         settingsRight.add(materialsCountMode);
 
         Text remaining = Text.translatable("maparthelper.gui.amount_remaining").formatted(Formatting.GOLD);
@@ -439,10 +434,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         auxBlockId.setValueConsumer(idStr -> {
             Identifier id = Identifier.of(idStr);
             Block block = Registries.BLOCK.get(id);
-            MapartHelper.conversionSettings.auxBlock = block;
+            MapartHelper.conversionSettings.setAuxBlock(block);
             auxBlockPreview.setBlock(block);
             updateMaterialList();
-            AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
         });
         return auxBlockId;
     }

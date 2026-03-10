@@ -38,6 +38,6 @@ public class CurrentConversionSettings {
     }
 
     public static boolean isMapartConverted() {
-        return !MapartHelper.conversionSettings.showOriginalImage && guiMapartImage != null;
+        return !MapartHelper.conversionSettings.isShowOriginalImage() && guiMapartImage != null;
     }
 }

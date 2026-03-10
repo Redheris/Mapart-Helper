@@ -75,7 +75,7 @@
   "maparthelper.gui.ditheringAlg": "Dithering: ",
   "maparthelper.gui.isOn": "On",
   "maparthelper.gui.isOff": "Off",
-  "maparthelper.gui.useLAB_tooltip": "Improves color matching. May slow down processing, so for medium and large maparts it's recommended to apply §cafter configuring other settings",
+  "maparthelper.gui.useLAB_tooltip": "Improves color matching by using LAB color space",
   "maparthelper.gui.previewMapart":  "Mapart",
   "maparthelper.gui.previewOriginal": "Without color adaption",
   "maparthelper.gui.previewMode": "Preview mode:",

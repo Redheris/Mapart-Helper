@@ -33,8 +33,8 @@ public class MapartSchematicBuilder {
     private List<List<Integer>> heightsZX;
 
     private final StaircaseStyles staircaseStyle = MapartHelper.conversionSettings.getStaircaseStyle();
-    private final UseAuxBlocks useAuxBlocks = MapartHelper.conversionSettings.useAuxBlocks;
-    private final Block auxBlock = MapartHelper.conversionSettings.auxBlock;
+    private final UseAuxBlocks useAuxBlocks = MapartHelper.conversionSettings.getUseAuxBlocks();
+    private final Block auxBlock = MapartHelper.conversionSettings.getAuxBlock();
 
     public MapartSchematicBuilder(int[] mapColors, int mapsWidth, int mapsHeight) {
         this.xSize = mapsWidth * 128;
@@ -148,7 +148,7 @@ public class MapartSchematicBuilder {
     }
 
     public static boolean shouldPlaceAuxBlock(Block block) {
-        if (MapartHelper.conversionSettings.useAuxBlocks == UseAuxBlocks.NO_AUX || block.getDefaultState().isAir())
+        if (MapartHelper.conversionSettings.getUseAuxBlocks() == UseAuxBlocks.NO_AUX || block.getDefaultState().isAir())
             return false;
         return needsAuxBlock(block);
     }

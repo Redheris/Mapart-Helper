@@ -81,7 +81,7 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         if (CurrentConversionSettings.guiMapartImage != null) {
             RenderPipeline pipeline = RenderPipelines.GUI_TEXTURED;
-            if (!MapartHelper.conversionSettings.showOriginalImage && highlightingColor != MapColor.CLEAR) {
+            if (!MapartHelper.conversionSettings.isShowOriginalImage() && highlightingColor != MapColor.CLEAR) {
                 pipeline = CustomPipelines.PREVIEW_COLOR_HIGHLIGHT;
                 ColorsHighlightUniform.set(
                         highlightingColor.getRenderColor(MapColor.Brightness.LOW),

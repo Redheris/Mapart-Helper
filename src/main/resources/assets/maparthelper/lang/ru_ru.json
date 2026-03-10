@@ -75,7 +75,7 @@
   "maparthelper.gui.ditheringAlg": "Дизеринг: ",
   "maparthelper.gui.isOn": "Вкл",
   "maparthelper.gui.isOff": "Выкл",
-  "maparthelper.gui.useLAB_tooltip": "Улучшает подбор цветов. Влияет на скорость обработки, поэтому для средних и больших мапартов рекомендуется применять §cпосле настройки остальных параметров",
+  "maparthelper.gui.useLAB_tooltip": "Улучшает подбор цветов путём использования цветового пространства LAB",
   "maparthelper.gui.previewMapart":  "Мапарт",
   "maparthelper.gui.previewOriginal": "Без адаптации цветов",
   "maparthelper.gui.previewMode": "Режим предпросмотра:",
@@ -144,7 +144,7 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showStaircaseTooltips": "Отображать подсказки для вариантов ступенчатости",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.showImageImportButton": "Отображать кнопку выбора изображения",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.colorsCacheLiveTimeMs": "Время жизни кэша ближайших цветов (в мс)",
-  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.colorsCacheLiveTimeMs.@Tooltip": "Кэш нужен для ускорения адаптации цветов. \nВремя жизни позволяет переиспользовать кэш в нескольких итерациях обновлениях изображения. \n§cНе выставляйте слишком высокое значение, чтобы не засорять память",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.colorsCacheLiveTimeMs.@Tooltip": "Кэш нужен для ускорения адаптации цветов. \nВремя жизни позволяет переиспользовать кэш в нескольких итерациях обновления изображения. \n§cНе выставляйте слишком высокое значение, чтобы не засорять память",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette": "Использовать в палитре:",
   "text.autoconfig.mapart-helper.option.commonConfiguration.useInPalette.@Tooltip[0]": "Какие блоки будут использованы при генерации общей палитры",

@@ -1,5 +1,6 @@
 package rh.maparthelper.config;
 
+import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import net.minecraft.block.Block;
@@ -13,14 +14,61 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 @Config(name = "conversion-settings")
 public class ConversionConfiguration implements ConfigData {
     private StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
-    public UseAuxBlocks useAuxBlocks = UseAuxBlocks.IMPORTANT;
-    public Block auxBlock = Blocks.NETHERRACK;
-    public ColorConverters colorConverter = ColorConverters.SIMPLE;
+    private UseAuxBlocks useAuxBlocks = UseAuxBlocks.IMPORTANT;
+    private Block auxBlock = Blocks.NETHERRACK;
+    private ColorConverters colorConverter = ColorConverters.SIMPLE;
     private MapColorEntry backgroundColor = MapColorEntry.CLEAR;
-    public MaterialsCountModes materialsCountMode = MaterialsCountModes.PER_MAP;
+    private MaterialsCountModes materialsCountMode = MaterialsCountModes.PER_MAP;
+    private boolean useLAB = false;
 
-    private transient boolean useLAB = false;
-    public transient boolean showOriginalImage = false;
+    private transient boolean showOriginalImage = false;
+
+    public boolean isShowOriginalImage() {
+        return showOriginalImage;
+    }
+
+    public void toggleShowOriginalImage() {
+        this.showOriginalImage = !showOriginalImage;
+    }
+
+    public UseAuxBlocks getUseAuxBlocks() {
+        return useAuxBlocks;
+    }
+
+    public void setUseAuxBlocks(UseAuxBlocks useAuxBlocks) {
+        if (this.useAuxBlocks == useAuxBlocks) return;
+        this.useAuxBlocks = useAuxBlocks;
+        saveConfigFile();
+    }
+
+    public Block getAuxBlock() {
+        return auxBlock;
+    }
+
+    public void setAuxBlock(Block auxBlock) {
+        if (this.auxBlock == auxBlock) return;
+        this.auxBlock = auxBlock;
+        saveConfigFile();
+    }
+
+    public ColorConverters getColorConverter() {
+        return colorConverter;
+    }
+
+    public void setColorConverter(ColorConverters colorConverter) {
+        if (this.colorConverter == colorConverter) return;
+        this.colorConverter = colorConverter;
+        saveConfigFile();
+    }
+
+    public MaterialsCountModes getMaterialsCountMode() {
+        return materialsCountMode;
+    }
+
+    public void nextMaterialsCountMode() {
+        this.materialsCountMode = MaterialsCountModes.nextMode(materialsCountMode);
+        saveConfigFile();
+    }
 
     public boolean use3D() {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
@@ -39,12 +87,15 @@ public class ConversionConfiguration implements ConfigData {
     }
 
     public void setBackgroundColor(MapColorEntry backgroundColor) {
+        if (this.backgroundColor.equals(backgroundColor)) return;
         this.backgroundColor = backgroundColor;
+        saveConfigFile();
     }
 
     public void toggleLAB() {
         this.useLAB = !useLAB;
         PaletteColors.clearColorCache();
+        saveConfigFile();
     }
 
     public StaircaseStyles getStaircaseStyle() {
@@ -55,10 +106,15 @@ public class ConversionConfiguration implements ConfigData {
     public boolean setStaircaseStyle(StaircaseStyles staircaseStyle) {
         boolean was3D = use3D();
         this.staircaseStyle = staircaseStyle;
-        if(was3D != use3D()) {
+        saveConfigFile();
+        if (was3D != use3D()) {
             PaletteColors.clearColorCache();
             return true;
         }
         return false;
+    }
+
+    public static void saveConfigFile() {
+        AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
     }
 }

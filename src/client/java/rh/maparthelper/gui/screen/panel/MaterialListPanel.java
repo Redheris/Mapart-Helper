@@ -107,11 +107,11 @@ public class MaterialListPanel extends WrapperWidget {
         GridWidget.Adder materialListAdder = materialList.grid.createAdder(2);
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
 
-        ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionSettings.materialsCountMode);
+        ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionSettings.getMaterialsCountMode());
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
 
         this.auxBlockCount = mapart.getWidth() * 128;
-        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.auxBlock);
+        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.getAuxBlock());
         auxBlockItemWidget.insertToTooltip(1, Text.translatable("maparthelper.aux_block").formatted(Formatting.GRAY));
 
         TextWidget auxAmountText = new TextWidget(Text.empty(), screen.getTextRenderer());
@@ -127,7 +127,7 @@ public class MaterialListPanel extends WrapperWidget {
         }
 
         if (displayRemainingAmount && !hasAuxBlockInColors)
-            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionSettings.auxBlock.asItem(), 0);
+            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionSettings.getAuxBlock().asItem(), 0);
 
         MutableText amountText = Text.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
         if (auxBlockCount <= 0)
@@ -177,7 +177,7 @@ public class MaterialListPanel extends WrapperWidget {
                 })
                 .toList();
 
-        Item auxBlockItem = MapartHelper.conversionSettings.auxBlock.asItem();
+        Item auxBlockItem = MapartHelper.conversionSettings.getAuxBlock().asItem();
         Map<Item, Integer> inventory = inventoryItemsCounter.getCounts();
 
         for (int i = 0; i < colors.length; i++) {
