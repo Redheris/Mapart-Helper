@@ -76,6 +76,7 @@ public abstract class ScreenAdapted extends Screen {
         if (element instanceof ScrollableGridWidget layout) {
             Optional<Widget> optional2 = layout.hoveredElement(mouseX, mouseY);
             if (optional2.isEmpty()) return false;
+            if (optional2.get() == layout) return super.mouseClicked(mouseX, mouseY, button);
             return element.mouseClicked(mouseX, mouseY, button);
         }
 
