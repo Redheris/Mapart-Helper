@@ -14,14 +14,12 @@ import rh.maparthelper.mapart.MapartProcessing;
 import java.util.function.Consumer;
 
 public class ImagePreprocessingDropdown extends WrapperWidget {
-    private final Screen screen;
     private final MapartProcessing mapart;
     private final DropdownMenuWidget imagePreprocessing;
     private final int contentWidth;
 
     public ImagePreprocessingDropdown(Screen screen, MapartProcessing mapart, int btnWidth, int contentWidth) {
         super(0, 0, btnWidth, 20);
-        this.screen = screen;
         this.mapart = mapart;
         this.contentWidth = contentWidth;
         this.imagePreprocessing = new DropdownMenuWidget(
@@ -51,10 +49,6 @@ public class ImagePreprocessingDropdown extends WrapperWidget {
                     sliderSaturation.setValue(0.5f);
                 }
         ).size(80, 20).build();
-        DropdownMenuWidget imagePreprocessing = new DropdownMenuWidget(
-                screen, 0, 0, 100, 20, contentWidth + 4, -1,
-                Text.translatable("maparthelper.gui.image_preprocessing")
-        );
         imagePreprocessing.addEntry(reset);
         imagePreprocessing.addEntry(sliderBrightness);
         imagePreprocessing.addEntry(sliderContrast);
