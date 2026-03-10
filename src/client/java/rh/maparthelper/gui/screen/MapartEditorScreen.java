@@ -35,6 +35,7 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.input.TextFieldPredicates;
 import rh.maparthelper.gui.input.TextFieldValidators;
+import rh.maparthelper.gui.screen.panel.ImagePreprocessingDropdown;
 import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.*;
 import rh.maparthelper.gui.widget.input.AdjTextFieldWidget;
@@ -208,8 +209,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         adder.add(useLAB);
 
-        DropdownMenuWidget imagePreprocessing = createImagePreprocessingDropdown();
-        adder.add(imagePreprocessing);
+        adder.add(new ImagePreprocessingDropdown(this, mapart, 100, baseElementWidth));
 
         GridWidget bgColor = new GridWidget().setColumnSpacing(2);
         bgColor.getMainPositioner().alignVerticalCenter();
@@ -529,74 +529,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         adder.add(heightInput);
 
         return size;
-    }
-
-    private ImageAdjustmentSliderWidget createBrightnessSlider() {
-        Text brightness = Text.translatable("maparthelper.gui.brightness");
-        return new ImageAdjustmentSliderWidget(
-                baseElementWidth, 15, 0.f, 2.f, true,
-                CurrentConversionSettings.brightness,
-                value -> {
-                    CurrentConversionSettings.brightness = value.floatValue();
-                    MapartImageUpdater.updateMapart(mapart);
-                },
-                value -> String.format(brightness.getString() + ": %.2f", value)
-        );
-    }
-
-    private ImageAdjustmentSliderWidget createContrastSlider() {
-        Text contrast = Text.translatable("maparthelper.gui.contrast");
-        return new ImageAdjustmentSliderWidget(
-                baseElementWidth, 15, -255, 255, false,
-                CurrentConversionSettings.contrast,
-                value -> {
-                    CurrentConversionSettings.contrast = value.floatValue();
-                    MapartImageUpdater.updateMapart(mapart);
-                },
-                value -> String.format(contrast.getString() + ": %.0f", value)
-        );
-    }
-
-    private ImageAdjustmentSliderWidget createSaturationSlider() {
-        Text saturation = Text.translatable("maparthelper.gui.saturation");
-        return new ImageAdjustmentSliderWidget(
-                baseElementWidth, 15, 0.f, 2.f, true,
-                CurrentConversionSettings.saturation,
-                value -> {
-                    CurrentConversionSettings.saturation = value.floatValue();
-                    MapartImageUpdater.updateMapart(mapart);
-                },
-                value -> String.format(saturation.getString() + ": %.2f", value)
-        );
-    }
-
-    private DropdownMenuWidget createImagePreprocessingDropdown() {
-        ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();
-        ImageAdjustmentSliderWidget sliderContrast = createContrastSlider();
-        ImageAdjustmentSliderWidget sliderSaturation = createSaturationSlider();
-
-        ButtonWidget reset = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.reset"),
-                (btn) -> {
-                    CurrentConversionSettings.brightness = 1.0f;
-                    CurrentConversionSettings.contrast = 0.0f;
-                    CurrentConversionSettings.saturation = 1.0f;
-                    sliderBrightness.setValue(0.5f);
-                    sliderContrast.setValue(0.5f);
-                    sliderSaturation.setValue(0.5f);
-                }
-        ).size(80, 20).build();
-
-        DropdownMenuWidget imagePreprocessing = new DropdownMenuWidget(
-                this, 0, 0, 100, 20, baseElementWidth + 4, -1,
-                Text.translatable("maparthelper.gui.image_preprocessing")
-        );
-        imagePreprocessing.addEntry(reset);
-        imagePreprocessing.addEntry(sliderBrightness);
-        imagePreprocessing.addEntry(sliderContrast);
-        imagePreprocessing.addEntry(sliderSaturation);
-
-        return imagePreprocessing;
     }
 
     private DropdownMenuWidget createSaveMapartDropdown() {
