@@ -27,9 +27,13 @@ public class BlockItemWidget extends ClickableWidget {
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
         super(x, y, squareSize, squareSize, Text.of(block.getName()));
         this.setBlock(block);
+        initBlockTooltip();
+        this.hasClickAction = hasClickAction;
+    }
+
+    protected void initBlockTooltip() {
         List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
         this.tooltip = new ArrayList<>(tooltip.stream().map(Text::asOrderedText).toList());
-        this.hasClickAction = hasClickAction;
     }
 
     public BlockItemWidget(int x, int y, int squareSize, Block block) {
@@ -43,6 +47,7 @@ public class BlockItemWidget extends ClickableWidget {
         } else {
             this.blockItem = block.asItem();
         }
+        initBlockTooltip();
     }
 
     public void setTooltip(Text tooltip) {
