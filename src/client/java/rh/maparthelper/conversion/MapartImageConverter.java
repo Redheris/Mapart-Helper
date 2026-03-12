@@ -45,9 +45,14 @@ public class MapartImageConverter {
         }
         currentRunnable = createUpdateMapartRunnable(processingMapart, path, imageChangeResult);
 
+        cancelConverting();
+        currentConvertingFuture = convertingExecutor.submit(new FutureTask<>(currentRunnable, null));
+    }
+
+    public static void cancelConverting() {
+        conversionProgress.set(0);
         if (currentConvertingFuture != null)
             currentConvertingFuture.cancel(true);
-        currentConvertingFuture = convertingExecutor.submit(new FutureTask<>(currentRunnable, null));
     }
 
     private static @NotNull UpdateMapartRunnable createUpdateMapartRunnable(MapartProcessing processingMapart, Path path, ImageChangeResult imageChangeResult) {
@@ -58,7 +63,8 @@ public class MapartImageConverter {
     }
 
     public static boolean isConverting() {
-        return currentRunnable != null && currentRunnable.isUpdating();
+        if (currentConvertingFuture == null || currentRunnable == null) return false;
+        return !currentConvertingFuture.isCancelled() && currentRunnable.isUpdating();
     }
 
     public static double getConversionProgress() {
@@ -156,6 +162,7 @@ public class MapartImageConverter {
             synchronized (mapart) {
                 try {
                     long startTime = System.currentTimeMillis();
+                    isUpdating = true;
                     conversionProgress = new AtomicDouble(0.0);
 
                     if (newImagePath != null) {

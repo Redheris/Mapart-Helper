@@ -26,10 +26,13 @@ public class MapartImageUpdater {
     }
 
     public static void resizeMapartImage(MapartProcessing mapart, int width, int height) {
-        mapart.setMapartSize(width, height);
-        if (mapart.isReset()) return;
-        if (mapart.getOriginal() != null) {
-            mapart.autoCropOriginalImage();
+        MapartImageConverter.cancelConverting();
+        synchronized (CurrentConversionSettings.mapart) {
+            mapart.setMapartSize(width, height);
+            if (mapart.isReset()) return;
+            if (mapart.getOriginal() != null) {
+                mapart.autoCropOriginalImage();
+            }
         }
         MapartImageConverter.readAndUpdateMapartImage(mapart, mapart.getImagePath(), ImageChangeResult.NEED_FULL_UPDATE);
     }

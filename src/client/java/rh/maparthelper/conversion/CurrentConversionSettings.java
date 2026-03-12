@@ -23,10 +23,13 @@ public class CurrentConversionSettings {
     public static float saturation = 1.0f;
 
     public static void resetMapart() {
-        PaletteColors.clearExcludingColors();
-        PaletteColors.clearColorCache();
-        guiMapartImage = null;
-        mapart.setReset(true);
+        MapartImageConverter.cancelConverting();
+        synchronized (mapart) {
+            PaletteColors.clearExcludingColors();
+            PaletteColors.clearColorCache();
+            guiMapartImage = null;
+            mapart.setReset(true);
+        }
     }
 
     public static int getMapartWidth() {
