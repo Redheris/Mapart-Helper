@@ -39,7 +39,7 @@ public class MapUtils {
         pos.set(startX, y, startZ);
         for (int color : palette.keySet()) {
             for (Block block : palette.get(color)) {
-                world.setBlockState(pos, PaletteGenerator.getDefaultPaletteState(block), 18);
+                world.setBlockState(pos, PaletteGenerator.getDefaultPaletteState(block), 816);
                 pos = pos.move(Direction.EAST);
                 if (pos.getX() == startX + 128) {
                     pos = pos.move(Direction.WEST, 128);
