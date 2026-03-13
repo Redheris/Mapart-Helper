@@ -12,10 +12,16 @@ import java.util.function.Consumer;
 public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     private final Text fieldName;
     private boolean showTooltips = true;
+    private final boolean showFieldName;
+
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption, boolean showFieldName) {
+        super(parent, x, y, width, height, menuWidth, -1, showFieldName ? fieldName.copy().append(initOption) : initOption);
+        this.fieldName = fieldName;
+        this.showFieldName = showFieldName;
+    }
 
     public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption) {
-        super(parent, x, y, width, height, menuWidth, -1, fieldName.copy().append(initOption));
-        this.fieldName = fieldName;
+        this(parent, x, y, width, height, menuWidth, fieldName, initOption, true);
     }
 
     public void toggleTooltips(boolean showTooltips) {
@@ -25,9 +31,9 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     public void addEntry(Consumer<Enum<?>> action, Enum<?> object) {
         Text objectName = Text.translatable("maparthelper.gui.option." + object.name());
         ButtonWidget widget = ButtonWidget.builder(
-                objectName,
+                        objectName,
                         btn -> {
-                            this.setMessage(fieldName.copy().append(objectName));
+                            this.setMessage(showFieldName ? fieldName.copy().append(objectName) : objectName);
                             action.accept(object);
                         }
                 )

@@ -5,6 +5,7 @@
 - Moving/scaling an image with mouse in manual cropping became more accurate;
 - Added lifetime for closest colors cache that can significantly speed up image converting process when making a few changes in a row;
 - Added prompt to regenerate palette if it was generated for a different version;
+- Adapted UI for minimized window;
 
 <details>
 <summary>Fixes and minor changes</summary>

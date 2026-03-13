@@ -46,6 +46,7 @@ public class MaterialListPanel extends WrapperWidget {
     private boolean materialsAscendingOrder = false;
     private boolean displayRemainingAmount = false;
     private final InventoryItemsCounter inventoryItemsCounter;
+    private boolean displayTotalCount = true;
 
     public MaterialListPanel(MapartEditorScreen screen, MapartProcessing mapart, int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -58,6 +59,10 @@ public class MaterialListPanel extends WrapperWidget {
             inventoryItemsCounter = null;
     }
 
+    public void setDisplayTotalCount(boolean displayTotalCount) {
+        this.displayTotalCount = displayTotalCount;
+    }
+
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
@@ -65,7 +70,8 @@ public class MaterialListPanel extends WrapperWidget {
 
     @Override
     public void forEachElement(Consumer<Widget> consumer) {
-        consumer.accept(materialList);
+        if (materialList != null)
+            consumer.accept(materialList);
     }
 
     public boolean isMaterialsAscendingOrder() {
@@ -212,11 +218,15 @@ public class MaterialListPanel extends WrapperWidget {
             if (stackSize > 1) text.append("§3x").append(stackSize).append("§r");
         }
         if (counted) {
-            text.insert(0, " = ");
+            if (displayTotalCount)
+                text.insert(0, " = ");
             if (items > 0) text.append(" + ").append(items);
         }
 
-        return text.insert(0, "" + amount).toString();
+        if (displayTotalCount || !counted)
+            text.insert(0, "" + amount);
+
+        return text.toString();
     }
 
     public class MaterialListBlockWidget extends BlockItemWidget {
