@@ -151,6 +151,7 @@ public class PaletteConfigManager {
                         hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                         continue;
                     }
+                    preset.colors.entrySet().removeIf(entry -> entry.getValue().equals(Blocks.AIR));
                     String filename = path.getFileName().toString();
                     presetsConfig.presets.put(filename, preset);
                     if (!presetsConfig.presetFiles.containsKey(filename)) {
