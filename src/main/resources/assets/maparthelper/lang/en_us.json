@@ -64,6 +64,10 @@
   "maparthelper.gui.option.IMPORTANT": "Important",
   "maparthelper.gui.option.ALL": "All (optimized)",
 
+  "maparthelper.gui.ask_to_update_palette": "The current palette was generated for %s.\n\nWould you like to regenerate palette?\n§7(It will not affect your presets)",
+  "maparthelper.gui.keep_current_palette": "Keep current",
+  "maparthelper.gui.regenerate_palette": "Regenerate",
+  "maparthelper.gui.for_unknown_game_version": "unknown version",
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
   "maparthelper.gui.import_tooltip": "Import an image to create a mapart",
   "maparthelper.gui.shulker_box_abbr": "SB",

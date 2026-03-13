@@ -274,7 +274,8 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
         );
-        settingsRight.add(new TextWidget(Text.translatable("maparthelper.gui.current_preset_label"), textRenderer));
+        TextWidget currentPresetLabel = new TextWidget(Text.translatable("maparthelper.gui.current_preset_label"), textRenderer);
+        settingsRight.add(currentPresetLabel);
         settingsRight.add(presetsList, settingsRightPositioner.copy().marginTop(0));
 
         ButtonWidget presetsEditor = ButtonWidget.builder(
@@ -349,6 +350,18 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         // Widget positions adjustments
         resetExcludedColors.setX(width - 5 - resetExcludedColors.getWidth());
+
+        if (PaletteConfigManager.isPaletteOutdated()) {
+            Identifier warningTex = Identifier.of("textures/gui/sprites/dialog/warning_button.png");
+            Identifier warningTexHovered = Identifier.of("textures/gui/sprites/dialog/warning_button_highlighted.png");
+            var regenBtn = new DecorativeButtonWidget.Builder(warningTex, btn ->
+                MinecraftClient.getInstance().setScreen(new PaletteUpdateSuggestionScreen(this))
+            )
+                    .dimensions(currentPresetLabel.getX(), 2, 20, 20)
+                    .highlightedTexture(warningTexHovered)
+                    .build();
+            this.addDrawableChild(regenBtn);
+        }
 
         updateMaterialList();
         materialList.setPosition(settingsRight.getX(), settingsRight.getY() + settingsRight.getHeight());

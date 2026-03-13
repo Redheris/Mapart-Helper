@@ -64,6 +64,10 @@
   "maparthelper.gui.option.IMPORTANT": "Важные",
   "maparthelper.gui.option.ALL": "Все",
 
+  "maparthelper.gui.ask_to_update_palette": "Текущая палитра была сгенерирована для %s.\n\nЖелаете сгенерировать заново?\n§7(Это не повлияет на текущие пресеты)",
+  "maparthelper.gui.keep_current_palette": "Оставить текущую",
+  "maparthelper.gui.regenerate_palette": "Сгенерировать",
+  "maparthelper.gui.for_unknown_game_version": "неизвестной версии",
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
   "maparthelper.gui.import_tooltip": "Выбрать изображение для создания мапарта",
   "maparthelper.gui.shulker_box_abbr": "Ш",
