@@ -1,7 +1,7 @@
 package rh.maparthelper.conversion.dithering.ordered;
 
 import net.minecraft.block.MapColor;
-import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.colors.DitherEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverter;
 import rh.maparthelper.conversion.dithering.ConversionContext;
@@ -52,24 +52,21 @@ public class OrderedDithering extends ColorConverter {
                 b = Math.clamp(b + offset, 0, 255);
                 argb = (255 << 24) | (r << 16) | (g << 8) | b;
 
-                MapColorEntry mapColor = PaletteColors.getClosestColor(argb, use3D);
+                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D);
+                byte closestColorByte = mapColors.colorByte1() /* WIP */;
+                MapColor closestColor = mapColors.getFirstMapColor();
                 int newArgb;
-                if (mapColor == MapColorEntry.CLEAR) {
+                if (mapColors == DitherEntry.CLEAR) {
                     newArgb = backgroundColor;
                 } else {
                     if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
-                        newArgb = mapColor.mapColor().getRenderColor(MapColor.Brightness.HIGH);
-                    else {
-                        if (use3D)
-                            newArgb = mapColor.getRenderColor();
-                        else
-                            newArgb = mapColor.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
-                    }
-                    colorsCounter.increment(mapColor.mapColor().id);
+                        newArgb = PaletteColors.getMapRenderColor(closestColorByte, MapColor.Brightness.HIGH);
+                    else newArgb = PaletteColors.getMapRenderColor(closestColorByte);
+                    colorsCounter.increment(closestColor.id);
                 }
                 if (y == mapart.getInsertionY() && x >= mapart.getInsertionX()) {
                     topLineBright[x - mapart.getInsertionX()] = newArgb;
-                    topLineCorrect[x - mapart.getInsertionX()] = mapColor.getRenderColor();
+                    topLineCorrect[x - mapart.getInsertionX()] = MapColor.getRenderColor(mapColors.colorByte1());
                 }
                 resultPixels[x + y * width] = newArgb;
                 progress.addAndGet(progressStep);

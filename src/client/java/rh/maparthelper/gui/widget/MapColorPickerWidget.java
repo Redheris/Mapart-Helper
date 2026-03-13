@@ -83,7 +83,11 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
             if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 return false;
             }
-            if (onlyNormalBrightness || color == MapColor.WATER_BLUE) {
+            if (color == MapColor.WATER_BLUE) {
+                setColor(new MapColorEntry(color, MapColor.Brightness.HIGH));
+                return true;
+            }
+            if (onlyNormalBrightness) {
                 setColor(new MapColorEntry(color, MapColor.Brightness.NORMAL));
                 return true;
             }

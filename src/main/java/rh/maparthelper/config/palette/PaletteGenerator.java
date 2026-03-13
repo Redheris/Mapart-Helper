@@ -64,22 +64,12 @@ public class PaletteGenerator {
     }
 
     private static void addARGBMapColorEntries(MapColor mapColor) {
-        if (mapColor == MapColor.WATER_BLUE) {
-            PaletteColors.argbMapColors.put(
-                    mapColor.getRenderColor(MapColor.Brightness.NORMAL),
-                    new MapColorEntry(mapColor, MapColor.Brightness.NORMAL)
-            );
-        } else {
-            MapColor.Brightness[] brightnesses = new MapColor.Brightness[]{
-                    MapColor.Brightness.LOW,
-                    MapColor.Brightness.NORMAL,
-                    MapColor.Brightness.HIGH
-            };
-            for (MapColor.Brightness brightness : brightnesses) {
-                int argb = mapColor.getRenderColor(brightness);
-                MapColorEntry entry = new MapColorEntry(mapColor, brightness);
-                PaletteColors.argbMapColors.put(argb, entry);
-            }
+        for (MapColor.Brightness brightness : MapColor.Brightness.values()) {
+            int argb = mapColor.getRenderColor(brightness);
+            MapColorEntry entry = new MapColorEntry(mapColor, brightness);
+            PaletteColors.argbMapColors.put(argb, entry);
+            byte colorByte = (byte) ((mapColor.id << 2) | brightness.id);
+            PaletteColors.mapRenderColors[colorByte + 128] = argb;
         }
     }
 
