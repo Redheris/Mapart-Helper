@@ -16,7 +16,7 @@ import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.command.FakeMapsPreview;
-import rh.maparthelper.gui.MapartEditorScreen;
+import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.util.MapUtils;
 
 public class ClientTickHandler {

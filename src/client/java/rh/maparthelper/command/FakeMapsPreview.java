@@ -13,20 +13,19 @@ import net.minecraft.item.Items;
 import net.minecraft.item.map.MapState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import rh.maparthelper.MapartHelper;
+import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
-import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.mapart.MapartProcessing;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {
-    public static boolean createFakeFramesFromMapart(ConvertedMapartImage mapart, ClientPlayerEntity player) {
+    public static boolean createFakeFramesFromMapart(MapartProcessing mapart, ClientPlayerEntity player) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return false;
         removeFakeItemFrames((ClientWorld) player.getEntityWorld());
-        int[][] maps = NativeImageUtils.divideMapartByMaps(mapart);
+        int[][] maps = NativeImageUtils.divideImageByMaps(mapart.getWidth(), mapart.getHeight(), mapart.getNativeImage());
         if (maps == null) return false;
         for (int[] map : maps) {
             addFakeItemFrame(map, player);
@@ -44,10 +43,8 @@ public class FakeMapsPreview {
     public static void addFakeItemFrame(int[] map, ClientPlayerEntity player) {
         MapState mapState = MapState.of((byte) 1, false, null);
         mapState.colors = new byte[map.length];
-        boolean use3D = MapartHelper.conversionSettings.use3D();
-        boolean useDithering = MapartHelper.conversionSettings.useDithering();
         for (int i = 0; i < map.length; i++) {
-            MapColorEntry color = PaletteColors.getClosestColor(map[i], use3D, useDithering);
+            MapColorEntry color = PaletteColors.getMapColorEntryByARGB(map[i]);
             mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());
         }
 
@@ -82,7 +79,9 @@ public class FakeMapsPreview {
             case SOUTH -> LEFT = Direction.EAST;
             case WEST -> LEFT = Direction.SOUTH;
         }
-        pos.move(LEFT, (int)(width / 2.0));
+        double localOffset = player.getEntityPos().getComponentAlongAxis(LEFT.getAxis()) - pos.getComponentAlongAxis(LEFT.getAxis());
+        double leftOffset = width % 2 == 1 || localOffset < 0.5 ? 0 : -1;
+        pos.move(LEFT, (int) (width / 2.0 + leftOffset));
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -99,7 +98,8 @@ public class FakeMapsPreview {
                 posX -= direction.getOffsetX() * 0.03;
                 posZ -= direction.getOffsetZ() * 0.03;
 
-                itemFrame.setPos(posX, pos.getY() - 0.5, posZ);
+                double yOffset = height == 2 ? 0.5 : -0.5;
+                itemFrame.setPos(posX, pos.getY() + yOffset, posZ);
                 ((ClientWorld) player.getEntityWorld()).addEntity(itemFrame);
                 pos.move(LEFT.getOpposite());
             }

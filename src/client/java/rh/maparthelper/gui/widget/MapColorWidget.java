@@ -17,6 +17,7 @@ public class MapColorWidget extends ClickableWidget {
     public final MapColor color;
     protected Text tooltipColorName;
     protected final boolean isHorizontal;
+    protected boolean onlyNormalBrightness = false;
 
     public MapColorWidget(int x, int y, int width, int height, MapColor color, boolean isHorizontal) {
         super(x, y, width, height, Text.empty());
@@ -53,8 +54,9 @@ public class MapColorWidget extends ClickableWidget {
         if (color == MapColor.CLEAR) {
             context.fill(x, y, x + width, y + height, MapColor.LIGHT_GRAY.getRenderColor(MapColor.Brightness.NORMAL));
             drawScrollableText(context, MinecraftClient.getInstance().textRenderer, Text.translatable("maparthelper.gui.background_color_clear"), getX() + 2, getY(), getRight() - 2, getBottom(), Colors.LIGHT_RED);
-        } else if (color == MapColor.WATER_BLUE) {
-            int waterColor = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.NORMAL));
+        } else if (onlyNormalBrightness || color == MapColor.WATER_BLUE) {
+            MapColor.Brightness brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
+            int waterColor = ColorHelper.withAlpha(alpha, color.getRenderColor(brightness));
             context.fill(x, y, x + width, y + height, waterColor);
         } else {
             int low = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.LOW));

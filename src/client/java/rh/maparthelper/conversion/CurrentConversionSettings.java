@@ -4,17 +4,17 @@ import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.util.Identifier;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
+import rh.maparthelper.mapart.MapartProcessing;
 
 public class CurrentConversionSettings {
     // GUI image
-    public final static ConvertedMapartImage mapart = new ConvertedMapartImage();
+    public final static MapartProcessing mapart = new MapartProcessing();
     public static NativeImageBackedTexture guiMapartImage;
     public final static Identifier guiMapartId = Identifier.of(MapartHelper.MOD_ID, "mapart_gui_texture");
 
     public static CroppingMode cropMode = CroppingMode.AUTO_CROP;
     public static boolean doShowGrid = false;
-    public static boolean doShowTransparent = false;
+    public static boolean doShowTranslucent = false;
     public static boolean doShowManualCroppingButtons = true;
 
     // Image preprocessing
@@ -23,9 +23,12 @@ public class CurrentConversionSettings {
     public static float saturation = 1.0f;
 
     public static void resetMapart() {
-        PaletteColors.clearExcludingColors();
-        guiMapartImage = null;
-        mapart.reset();
+        MapartImageConverter.cancelConverting();
+        synchronized (mapart) {
+            PaletteColors.clearExcludingColors();
+            guiMapartImage = null;
+            mapart.setReset(true);
+        }
     }
 
     public static int getMapartWidth() {
@@ -37,6 +40,6 @@ public class CurrentConversionSettings {
     }
 
     public static boolean isMapartConverted() {
-        return !MapartHelper.conversionSettings.showOriginalImage && guiMapartImage != null;
+        return !MapartHelper.conversionSettings.isShowOriginalImage() && guiMapartImage != null;
     }
 }

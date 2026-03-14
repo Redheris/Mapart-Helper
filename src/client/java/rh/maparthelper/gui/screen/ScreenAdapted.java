@@ -1,4 +1,4 @@
-package rh.maparthelper.gui;
+package rh.maparthelper.gui.screen;
 
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.Screen;
@@ -17,7 +17,6 @@ import java.util.Optional;
  */
 public abstract class ScreenAdapted extends Screen {
     private final List<Drawable> drawables = new ArrayList<>();
-    TextFieldWidget selectedTextWidget;
 
     protected ScreenAdapted(Text title) {
         super(title);
@@ -55,12 +54,6 @@ public abstract class ScreenAdapted extends Screen {
 
     @Override
     public boolean mouseClicked(Click click, boolean doubled) {
-        if (selectedTextWidget != null) {
-            selectedTextWidget.setSelectionStart(0);
-            selectedTextWidget.setSelectionEnd(0);
-            selectedTextWidget = null;
-        }
-
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         if (dropdownMenu != null) {
             if (dropdownMenu.isMouseOverMenu(click.x(), click.y()) || dropdownMenu.isMouseOver(click.x(), click.y())) {
@@ -80,23 +73,8 @@ public abstract class ScreenAdapted extends Screen {
         if (element instanceof ScrollableGridWidget layout) {
             Optional<Widget> optional2 = layout.hoveredElement(click.x(), click.y());
             if (optional2.isEmpty()) return false;
-            element = (Element) optional2.get();
-        }
-
-        if (element instanceof TextFieldWidget textField) {
-            if (element.isFocused()) {
-                return element.mouseClicked(click, doubled);
-            }
-
-            selectedTextWidget = textField;
-            this.setFocused(textField);
-            if (click.button() == 0) {
-                textField.setSelectionStart(0);
-                textField.setSelectionEnd(textField.getText().length());
-            } else if (click.button() == 1) {
-                textField.setText("");
-            }
-            return true;
+            if (optional2.get() == layout) return super.mouseClicked(click, doubled);
+            return element.mouseClicked(click, doubled);
         }
 
         return super.mouseClicked(click, doubled);

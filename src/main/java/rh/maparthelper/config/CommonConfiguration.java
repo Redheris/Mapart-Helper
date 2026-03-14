@@ -11,6 +11,7 @@ public class CommonConfiguration implements ConfigData {
     @ConfigEntry.ColorPicker
     public int selectionColor = 0x9900ff;
     public int fakeItemFramesLiveTime = 100;
+    public boolean createDirsForSchematic = true;
 
     @ConfigEntry.Gui.CollapsibleObject()
     public MapartEditorSettings mapartEditor = new MapartEditorSettings();
@@ -22,12 +23,16 @@ public class CommonConfiguration implements ConfigData {
     public static class MapartEditorSettings {
         public boolean logConversionTime = false;
         @ConfigEntry.Gui.Tooltip
+        public boolean displayUnobtainableMode = false;
+        @ConfigEntry.Gui.Tooltip
         @ConfigEntry.ColorPicker(allowAlpha = true)
         public int previewHighlightingColor = 0xFF9900ff;
         public boolean previewHighlightOnHover = true;
         public boolean showUseLABTooltip = true;
         public boolean showStaircaseTooltips = true;
         public boolean showImageImportButton = true;
+        @ConfigEntry.Gui.Tooltip
+        public int colorsCacheLiveTimeMs = 5000;
     }
 
     public static class UseInBlockPalette {

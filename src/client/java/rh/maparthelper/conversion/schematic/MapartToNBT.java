@@ -17,7 +17,10 @@ import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.util.Utils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ExecutorService;
@@ -39,9 +42,16 @@ public class MapartToNBT {
         int mapsHeight = CurrentConversionSettings.getMapartHeight();
         assert mapartImage != null;
 
+        String mapartName = CurrentConversionSettings.mapart.mapartName;
+        Path savingPath;
+        if (!asSingleFile && zipOut == null && MapartHelper.commonConfig.createDirsForSchematic)
+            savingPath = Path.of(Utils.makeUniqueDirName(SCHEMATICS.resolve(mapartName)));
+        else
+            savingPath = SCHEMATICS;
+
         try {
-            if (!Files.exists(SCHEMATICS)) {
-                Files.createDirectory(SCHEMATICS);
+            if (!Files.exists(savingPath)) {
+                Files.createDirectories(savingPath);
             }
         } catch (IOException e) {
             MapartHelper.LOGGER.error("Failed to write schematics directory", e);
@@ -51,7 +61,9 @@ public class MapartToNBT {
         if (asSingleFile) {
             maps = new int[][]{mapartImage.copyPixelsArgb()};
         } else {
-            maps = NativeImageUtils.divideMapartByMaps(CurrentConversionSettings.mapart);
+            maps = NativeImageUtils.divideImageByMaps(
+                    CurrentConversionSettings.getMapartWidth(), CurrentConversionSettings.getMapartHeight(), mapartImage
+            );
         }
         assert maps != null;
 
@@ -66,10 +78,10 @@ public class MapartToNBT {
                 filename += " (" + (i % mapsWidth) + "_" + (i / mapsWidth) + ")";
             }
 
-            String writeFilename = Utils.makeUniqueFilename(SCHEMATICS, filename, "nbt");
+            String writeFilename = Utils.makeUniqueFilename(savingPath, filename, "nbt");
             try {
                 if (zipOut == null) {
-                    NbtIo.writeCompressed(mapartNbt, SCHEMATICS.resolve(writeFilename));
+                    NbtIo.writeCompressed(mapartNbt, savingPath.resolve(writeFilename));
                 } else {
                     ZipEntry zipEntry = new ZipEntry(filename + ".nbt");
                     zipOut.putNextEntry(zipEntry);
@@ -83,13 +95,12 @@ public class MapartToNBT {
             }
         }
 
-        String mapartName = CurrentConversionSettings.mapart.mapartName;
         PlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
             Text openFile;
             if (zipOut == null) {
-                openFile = Text.literal("schematics").styled(style -> style
-                        .withClickEvent(new ClickEvent.OpenFile(SCHEMATICS))
+                openFile = Text.literal(savingPath.getFileName().toString()).styled(style -> style
+                        .withClickEvent(new ClickEvent.OpenFile(savingPath))
                         .withHoverEvent(new HoverEvent.ShowText(Text.translatable("maparthelper.open_folder")))
                         .withUnderline(true)
                 );

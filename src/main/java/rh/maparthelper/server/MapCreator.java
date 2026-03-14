@@ -42,14 +42,14 @@ public class MapCreator {
         }
     }
 
-    private static ItemStack getMapItemStack(MapIdComponent mapIdComponent, Text itemName) {
+    public static ItemStack getMapItemStack(MapIdComponent mapIdComponent, Text itemName) {
         ItemStack itemStack = new ItemStack(Items.FILLED_MAP);
         itemStack.set(DataComponentTypes.MAP_ID, mapIdComponent);
         itemStack.set(DataComponentTypes.ITEM_NAME, itemName);
         return itemStack;
     }
 
-    private static MapIdComponent createMap(int[] colors, ServerWorld world) {
+    public static MapIdComponent createMap(int[] colors, ServerWorld world) {
         MapState mapState = MapState.of((byte) 0, true, world.getRegistryKey());
         mapState.colors = new byte[colors.length];
         for (int i = 0; i < colors.length; i++) {
@@ -57,6 +57,15 @@ public class MapCreator {
             assert color != null;
             mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());
         }
+        MapIdComponent mapIdComponent = world.increaseAndGetMapId();
+        world.putMapState(mapIdComponent, mapState);
+        return mapIdComponent;
+    }
+
+    public static MapIdComponent createMap(byte[] mapColors, ServerWorld world) {
+        MapState mapState = MapState.of((byte) 0, true, world.getRegistryKey());
+        mapState.colors = new byte[mapColors.length];
+        System.arraycopy(mapColors, 0, mapState.colors, 0, mapColors.length);
         MapIdComponent mapIdComponent = world.increaseAndGetMapId();
         world.putMapState(mapIdComponent, mapState);
         return mapIdComponent;
