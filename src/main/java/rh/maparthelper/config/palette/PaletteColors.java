@@ -102,6 +102,11 @@ public class PaletteColors {
             }
         }
 
+        if (secondClosestColorByte == 0) {
+            secondClosestColorByte = closestColorByte;
+            secondMinDist = minDist;
+        }
+
         int errorRed = rgbOriginal[0] - rgbClosest[0];
         int errorGreen = rgbOriginal[1] - rgbClosest[1];
         int errorBlue = rgbOriginal[2] - rgbClosest[2];
@@ -142,15 +147,10 @@ public class PaletteColors {
                 secondClosestColorByte = colorByte;
             }
         }
-        if (secondClosestColorByte != 0) {
-            int rgb1 = MapColor.getRenderColor(closestColorByte);
-            int rgb2 = MapColor.getRenderColor(secondClosestColorByte);
 
-            double distBetween = ColorUtils.colorDistance(rgb1, rgb2, MapartHelper.conversionSettings.useLAB());
-
-            if (distBetween <= secondMinDist) {
-                secondClosestColorByte = closestColorByte;
-            }
+        if (secondClosestColorByte == 0) {
+            secondClosestColorByte = closestColorByte;
+            secondMinDist = minDist;
         }
 
         int errorRed = rgbOriginal[0] - rgbClosest[0];
