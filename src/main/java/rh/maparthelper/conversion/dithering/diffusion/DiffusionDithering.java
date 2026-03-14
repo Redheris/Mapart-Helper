@@ -81,7 +81,7 @@ public abstract class DiffusionDithering extends ColorConverter {
                     newArgb = backgroundColor;
                 } else {
                     spreadDiffusionError(width, x, mapColors.errorRed(), mapColors.errorGreen(), mapColors.errorBlue());
-                    if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
+                    if (!useUnobtainableColors && y > 0 && resultPixels[x + (y - 1) * width] == 0)
                         newArgb = PaletteColors.getMapRenderColor(mapColors.colorByte1(),MapColor.Brightness.HIGH);
                     else
                         newArgb = PaletteColors.getMapRenderColor(mapColors.colorByte1());
