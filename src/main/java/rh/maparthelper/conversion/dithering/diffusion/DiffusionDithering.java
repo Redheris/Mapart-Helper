@@ -73,7 +73,7 @@ public abstract class DiffusionDithering extends ColorConverter {
                 argb0[3] = Math.clamp(argb0[3] + errorsArray[ind + 2], 0, 255);
                 argb = ColorUtils.getARGB(argb0);
 
-                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D, useUnobtainableColors);
+                DitherEntry mapColors = useUnobtainableColors ? PaletteColors.getClosestColorUnconditional(argb) : PaletteColors.getClosestColor(argb, use3D);
                 MapColor closestColor = mapColors.getFirstMapColor();
 
                 int newArgb;

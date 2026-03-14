@@ -31,7 +31,7 @@ public class PaletteColors {
         return mapRenderColors[colorByte + 128];
     }
 
-    private static DitherEntry getClosestColor3D(int argb, boolean unobtainable) {
+    private static DitherEntry findClosestColorUnconditional(int argb) {
         byte closestColorByte = 0;
         byte secondClosestColorByte = 0;
         double minDist = Integer.MAX_VALUE;
@@ -40,12 +40,49 @@ public class PaletteColors {
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
 
-        int brightnessCount = unobtainable ? 4 : 3;
+        for (int colorByteId = 1; colorByteId < 255; colorByteId++) {
+            byte colorByte = (byte) (colorByteId - 128);
+            int renderColor = mapRenderColors[colorByteId];
+            if (renderColor == 0) break;
+            if (renderColor == argb) return new DitherEntry(colorByte);
+
+            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+            if (dist < minDist) {
+                secondMinDist = minDist;
+                minDist = dist;
+                secondClosestColorByte = closestColorByte;
+                closestColorByte = colorByte;
+                rgbClosest = ColorUtils.getRGB(renderColor);
+            } else if (dist < secondMinDist && colorByte != closestColorByte) {
+                secondMinDist = dist;
+                secondClosestColorByte = colorByte;
+            }
+        }
+
+        int errorRed = rgbOriginal[0] - rgbClosest[0];
+        int errorGreen = rgbOriginal[1] - rgbClosest[1];
+        int errorBlue = rgbOriginal[2] - rgbClosest[2];
+        return new DitherEntry(
+                closestColorByte, secondClosestColorByte,
+                (float) (minDist / (minDist + secondMinDist)),
+                errorRed, errorGreen, errorBlue
+        );
+    }
+
+    private static DitherEntry getClosestColor3D(int argb) {
+        byte closestColorByte = 0;
+        byte secondClosestColorByte = 0;
+        double minDist = Integer.MAX_VALUE;
+        double secondMinDist = Integer.MAX_VALUE;
+
+        int[] rgbOriginal = ColorUtils.getRGB(argb);
+        int[] rgbClosest = new int[0];
+
         for (MapColor mapColor : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             if (excludingColors.contains(mapColor)) continue;
 
-            for (int brightness = 0; brightness < brightnessCount; brightness++) {
-                if (!unobtainable && mapColor == MapColor.WATER_BLUE && brightness != 2) continue; // Allow only HIGH for water color
+            for (int brightness = 0; brightness < 3; brightness++) {
+                if (mapColor == MapColor.WATER_BLUE && brightness != 2) continue; // Allow only HIGH for water color
                 byte colorByte = (byte) ((mapColor.id << 2) | brightness);
 
                 int renderColor = mapRenderColors[colorByte + 128];
@@ -126,13 +163,16 @@ public class PaletteColors {
         );
     }
 
-    public static DitherEntry getClosestColor(int argb, boolean use3D, boolean unobtainable) {
+    public static DitherEntry getClosestColor(int argb, boolean use3D) {
         if (((argb >> 24) & 0xFF) < 80) return DitherEntry.CLEAR;
-        if (unobtainable)
-            return cachedClosestColors.computeIfAbsent(argb, c -> getClosestColor3D(c, true));
         if (use3D)
-            return cachedClosestColors.computeIfAbsent(argb, c -> getClosestColor3D(c, false));
+            return cachedClosestColors.computeIfAbsent(argb, PaletteColors::getClosestColor3D);
         return cachedClosestColors.computeIfAbsent(argb, PaletteColors::getClosestColor2D);
+    }
+
+    public static DitherEntry getClosestColorUnconditional(int argb) {
+        if (((argb >> 24) & 0xFF) < 80) return DitherEntry.CLEAR;
+        return cachedClosestColors.computeIfAbsent(argb, PaletteColors::findClosestColorUnconditional);
     }
 
     public static int excludingColorsAmount() {

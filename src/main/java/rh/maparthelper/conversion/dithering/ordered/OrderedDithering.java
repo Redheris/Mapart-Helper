@@ -45,7 +45,7 @@ public class OrderedDithering extends ColorConverter {
                     continue;
                 }
 
-                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D, useUnobtainableColors);
+                DitherEntry mapColors = useUnobtainableColors ? PaletteColors.getClosestColorUnconditional(argb) : PaletteColors.getClosestColor(argb, use3D);
                 byte closestColorByte;
                 MapColor closestColor;
 

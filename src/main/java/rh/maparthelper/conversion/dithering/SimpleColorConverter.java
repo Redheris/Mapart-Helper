@@ -37,7 +37,7 @@ public class SimpleColorConverter extends ColorConverter {
                 }
                 int newArgb;
 
-                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D, useUnobtainableColors);
+                DitherEntry mapColors = useUnobtainableColors ? PaletteColors.getClosestColorUnconditional(argb) : PaletteColors.getClosestColor(argb, use3D);
                 MapColor closestColor = mapColors.getFirstMapColor();
 
                 if (mapColors == DitherEntry.CLEAR) {
