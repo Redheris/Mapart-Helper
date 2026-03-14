@@ -11,10 +11,23 @@ import java.util.function.Consumer;
 public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     private final net.minecraft.text.Text fieldName;
     private boolean showTooltips = true;
+    private final boolean showFieldName;
 
-    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, net.minecraft.text.Text fieldName, net.minecraft.text.Text initOption) {
-        super(parent, x, y, width, height, menuWidth, -1, fieldName.copy().append(initOption));
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight,
+                                  net.minecraft.text.Text fieldName, net.minecraft.text.Text initOption, boolean showFieldName) {
+        super(parent, x, y, width, height, menuWidth, maxMenuHeight, showFieldName ? fieldName.copy().append(initOption) : initOption);
         this.fieldName = fieldName;
+        this.showFieldName = showFieldName;
+    }
+
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth,
+                                  net.minecraft.text.Text fieldName, net.minecraft.text.Text initOption, boolean showFieldName) {
+        this(parent, x, y, width, height, menuWidth, -1, fieldName, initOption, showFieldName);
+    }
+
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth,
+                                  net.minecraft.text.Text fieldName, net.minecraft.text.Text initOption) {
+        this(parent, x, y, width, height, menuWidth, fieldName, initOption, true);
     }
 
     public void toggleTooltips(boolean showTooltips) {
@@ -22,11 +35,12 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     }
 
     public void addEntry(Consumer<Enum<?>> action, Enum<?> object) {
+        if (object == null) return;
         net.minecraft.text.Text objectName = net.minecraft.text.Text.translatable("maparthelper.gui.option." + object.name());
         ButtonWidget widget = ButtonWidget.builder(
-                objectName,
+                        objectName,
                         btn -> {
-                            this.setMessage(fieldName.copy().append(objectName));
+                            this.setMessage(showFieldName ? fieldName.copy().append(objectName) : objectName);
                             action.accept(object);
                         }
                 )

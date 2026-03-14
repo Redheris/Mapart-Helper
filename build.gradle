@@ -152,6 +152,7 @@ publishMods {
 //				link = "BUTTON"
 				color = "#7419CA"
 			}
+			setPlatforms(publishMods.platforms.modrinth, publishMods.platforms.curseforge)
 		}
 	}
 }

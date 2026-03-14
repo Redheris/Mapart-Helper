@@ -4,6 +4,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import net.minecraft.MinecraftVersion;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
@@ -28,14 +29,27 @@ public class PaletteConfigManager {
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
-            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorBlockAdapter())
+            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>() {
+            }.getType(), new MapColorBlockAdapter())
             .create();
+    private static boolean outdatedPalette;
 
     public static @NotNull PalettePresetsConfig presetsConfig = new PalettePresetsConfig();
     public static @NotNull CompletePalette completePalette = new CompletePalette();
 
     public static void regenerateCompletePalette() {
         completePalette = CompletePalette.generate();
+        outdatedPalette = false;
+        saveCompletePalette();
+    }
+
+    public static boolean isPaletteOutdated() {
+        return outdatedPalette;
+    }
+
+    public static void bumpPaletteGameVersion() {
+        completePalette.bumpGameVersion();
+        outdatedPalette = false;
         saveCompletePalette();
     }
 
@@ -54,6 +68,7 @@ public class PaletteConfigManager {
                                 .toList()
                 );
                 PaletteGenerator.initARGBMapColor(completePalette.palette);
+                outdatedPalette = !MinecraftVersion.create().name().equals(completePalette.getGameVersion());
                 return true;
             }
         } catch (Exception e) {
@@ -151,6 +166,7 @@ public class PaletteConfigManager {
                         hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                         continue;
                     }
+                    preset.colors.entrySet().removeIf(entry -> entry.getValue().equals(Blocks.AIR));
                     String filename = path.getFileName().toString();
                     presetsConfig.presets.put(filename, preset);
                     if (!presetsConfig.presetFiles.containsKey(filename)) {
@@ -158,8 +174,7 @@ public class PaletteConfigManager {
                         hasChanges = true;
                     }
                     MapartHelper.LOGGER.info("Preset file \"{}\" successfully read", path);
-                }
-                catch (JsonSyntaxException e) {
+                } catch (JsonSyntaxException e) {
                     MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", path, e.getMessage());
                     hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                 } catch (IOException e) {

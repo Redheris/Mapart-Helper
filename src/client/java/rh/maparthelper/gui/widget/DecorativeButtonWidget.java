@@ -12,16 +12,27 @@ import net.minecraft.util.Identifier;
 
 public class DecorativeButtonWidget extends PressableWidget {
     private final PressAction onPress;
-    private Identifier texture;
+    private final Identifier textureDefault;
+    private final Identifier textureHighlighted;
 
     private DecorativeButtonWidget(int x, int y, int width, int height, Text message, PressAction pressAction) {
         super(x, y, width, height, message);
         this.onPress = pressAction;
+        this.textureDefault = null;
+        this.textureHighlighted = null;
     }
 
     private DecorativeButtonWidget(int x, int y, int width, int height, Identifier texture, PressAction pressAction) {
         super(x, y, width, height, Text.empty());
-        this.texture = texture;
+        this.textureDefault = texture;
+        this.textureHighlighted = texture;
+        this.onPress = pressAction;
+    }
+
+    private DecorativeButtonWidget(int x, int y, int width, int height, Identifier textureDefault, Identifier textureHighlighted, PressAction pressAction) {
+        super(x, y, width, height, Text.empty());
+        this.textureDefault = textureDefault;
+        this.textureHighlighted = textureHighlighted;
         this.onPress = pressAction;
     }
 
@@ -32,15 +43,26 @@ public class DecorativeButtonWidget extends PressableWidget {
 
     @Override
     protected void drawIcon(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        if (texture != null) {
-            context.drawTexture(
-                    RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    getX(), getY(),
-                    0, 0,
-                    width, height,
-                    width, height
-            );
+        if (textureDefault != null) {
+            if (hovered) {
+                context.drawTexture(
+                        RenderPipelines.GUI_TEXTURED,
+                        textureHighlighted,
+                        getX(), getY(),
+                        0, 0,
+                        width, height,
+                        width, height
+                );
+            } else {
+                context.drawTexture(
+                        RenderPipelines.GUI_TEXTURED,
+                        textureDefault,
+                        getX(), getY(),
+                        0, 0,
+                        width, height,
+                        width, height
+                );
+            }
         } else {
             this.drawLabel(context.getHoverListener(this, DrawContext.HoverType.NONE));
         }
@@ -61,7 +83,8 @@ public class DecorativeButtonWidget extends PressableWidget {
 
     public static class Builder {
         private final Text message;
-        private final Identifier texture;
+        private final Identifier textureDefault;
+        private Identifier textureHighlighted;
         private final PressAction onPress;
         private int width = 150;
         private int height = 20;
@@ -70,14 +93,20 @@ public class DecorativeButtonWidget extends PressableWidget {
 
         public Builder(Text message, PressAction onPress) {
             this.message = message;
-            this.texture = null;
+            this.textureDefault = null;
+            this.textureHighlighted = null;
             this.onPress = onPress;
         }
 
         public Builder(Identifier texture, PressAction onPress) {
             this.message = null;
-            this.texture = texture;
+            this.textureDefault = texture;
             this.onPress = onPress;
+        }
+
+        public Builder highlightedTexture(Identifier textureHighlighted) {
+            this.textureHighlighted = textureHighlighted;
+            return this;
         }
 
         public Builder width(int width) {
@@ -104,7 +133,9 @@ public class DecorativeButtonWidget extends PressableWidget {
         public DecorativeButtonWidget build() {
             if (message != null)
                 return new DecorativeButtonWidget(x, y, this.width, this.height, this.message, this.onPress);
-            return new DecorativeButtonWidget(x, y, this.width, this.height, this.texture, this.onPress);
+            if (textureHighlighted != null)
+                return new DecorativeButtonWidget(x, y, this.width, this.height, this.textureDefault, this.textureHighlighted, this.onPress);
+            return new DecorativeButtonWidget(x, y, this.width, this.height, this.textureDefault, this.onPress);
         }
     }
 

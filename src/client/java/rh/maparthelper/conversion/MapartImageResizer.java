@@ -1,17 +1,18 @@
 package rh.maparthelper.conversion;
 
-import rh.maparthelper.conversion.mapart.ConvertedMapartImage;
-import rh.maparthelper.conversion.mapart.ProcessingMapartImage;
+import rh.maparthelper.mapart.MapartProcessing;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class MapartImageResizer {
-    public static BufferedImage adjustToMapartSize(ProcessingMapartImage mapart) {
+    public static BufferedImage adjustToMapartSize(MapartProcessing mapart) {
         BufferedImage image = mapart.getOriginal();
+        if (image == null) return null;
+
         int imageW = image.getWidth();
         int imageH = image.getHeight();
-        ConvertedMapartImage.CroppingFrame frame = mapart.getCroppingFrame();
+        MapartProcessing.CroppingFrame frame = mapart.getCroppingFrame();
 
         int visibleW = frame.getWidth();
         int visibleH = frame.getHeight();
@@ -24,13 +25,12 @@ public class MapartImageResizer {
 
         if (mapartScaledW > 1 && mapartScaledH > 1) {
             mapart.setScaledImage(scaleImage(image, mapartScaledW, mapartScaledH));
-            mapart.setScale(Math.min((double) mapartScaledW / visibleW, (double) mapartScaledH / visibleH));
         }
 
         return placeOnMapartCanvas(mapart, mapartW, mapartH);
     }
 
-    public static BufferedImage placeOnMapartCanvas(ProcessingMapartImage mapart, int mapartWidth, int mapartHeight) {
+    public static BufferedImage placeOnMapartCanvas(MapartProcessing mapart, int mapartWidth, int mapartHeight) {
         BufferedImage mapartImage = new BufferedImage(mapartWidth, mapartHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = mapartImage.createGraphics();
 
@@ -40,7 +40,7 @@ public class MapartImageResizer {
         return mapartImage;
     }
 
-    public static BufferedImage scaleImage(ProcessingMapartImage mapart, int width, int height) {
+    public static BufferedImage scaleImage(MapartProcessing mapart, int width, int height) {
         BufferedImage image = mapart.getOriginal();
         image = scaleImage(image, width, height);
         mapart.setScaledImage(image);

@@ -1,11 +1,20 @@
-0.11.2 was released with some critical issues and a few unpleasant ones. This patch should fix the detected problems. 
-I apologize for not finding them earlier
+### Changes and new features
 
-### Fixes and minor changes
+- Added per-map option for materials counting;
+- Added ordered dithering algorithms (e.g. Bayer);
+- Moving/scaling an image with mouse in manual cropping became more accurate;
+- Added lifetime for closest colors cache that can significantly speed up image converting process when making a few changes in a row;
+- Added prompt to regenerate palette if it was generated for a different version;
 
-- Improved Waves staircasing style for images with transparency
-- Fixed 2D staircasing style not working entirely;
-- Fixed Valley staircasing style for images with transparency;
-- Fixed image reset if all colors from the preset were excluded;
-- Fixed an exception when sending a message about saving NBT;
-- Fixed a warning about exception in logs if the game was closed without opening the Mapart Editor screen;
+<details>
+<summary>Fixes and minor changes</summary>
+
+- By default, schematic files (when saved for each map) are now created in subdirectories;
+- Added option to use unreachable colors;
+- Slightly improved positioning of fake map position for even maparts;
+- Adapted UI for minimized window;
+- Improved `/mart-creative give-map-palette` - now it creates a new locked map;
+- Fixed some exceptions when changing mapart size during converting;
+- Mainly, this update contains codebase changes and reworks which are invisible for users
+
+</details>

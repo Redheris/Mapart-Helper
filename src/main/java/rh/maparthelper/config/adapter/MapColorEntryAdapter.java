@@ -23,6 +23,6 @@ public class MapColorEntryAdapter implements JsonSerializer<MapColorEntry>, Json
             return MapColorEntry.CLEAR;
         }
         int brightnessId = obj.get("brightnessId").getAsInt();
-        return new MapColorEntry(MapColor.get(colorId), MapColor.Brightness.validateAndGet(brightnessId), new int[3]);
+        return new MapColorEntry(MapColor.get(colorId), MapColor.Brightness.validateAndGet(brightnessId));
     }
 }

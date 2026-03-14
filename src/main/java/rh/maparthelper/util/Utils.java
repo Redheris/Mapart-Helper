@@ -1,6 +1,7 @@
 package rh.maparthelper.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,7 +10,7 @@ import java.util.function.Predicate;
 public class Utils {
 
 
-    public static @NotNull String makeUniqueName(@NotNull Predicate<String> existingTest, String filename, String ext, String nameFormat) {
+    public static @NotNull String makeUniqueName(@NotNull Predicate<String> existingTest, String filename, @Nullable String ext, String nameFormat) {
         String suf = ext == null ? "" : "." + ext;
         if (existingTest.test(filename + suf)) {
             int suffix = 1;
@@ -26,5 +27,9 @@ public class Utils {
 
     public static @NotNull String makeUniqueFilename(Path dir, String filename, String ext) {
         return makeUniqueFilename(dir, filename, ext, "%s (%d)");
+    }
+
+    public static @NotNull String makeUniqueDirName(Path dirName) {
+        return makeUniqueName(dir -> Files.exists(Path.of(dir)), dirName.toString(), null, "%s (%d)");
     }
 }

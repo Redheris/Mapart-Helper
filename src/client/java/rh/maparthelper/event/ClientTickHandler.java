@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -16,7 +15,7 @@ import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.command.FakeMapsPreview;
-import rh.maparthelper.gui.MapartEditorScreen;
+import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.util.MapUtils;
 
 public class ClientTickHandler {
@@ -43,9 +42,8 @@ public class ClientTickHandler {
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             if (!ClientCommandsContext.showMapartStartPos()) return;
             MatrixStack matrices = context.matrices();
-            VertexConsumerProvider vertexConsumers = context.consumers();
             World world = MinecraftClient.getInstance().world;
-            if (matrices == null || vertexConsumers == null || world == null)
+            if (world == null)
                 return;
 
             Vec3d cameraPos = context.worldState().cameraRenderState.pos;

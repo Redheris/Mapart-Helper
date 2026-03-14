@@ -1,0 +1,22 @@
+package rh.maparthelper.colors;
+
+import net.minecraft.block.MapColor;
+
+public record DitherEntry(byte colorByte1, byte colorByte2, float distRatio, int errorRed, int errorGreen,
+                          int errorBlue) {
+    public static DitherEntry CLEAR = new DitherEntry(
+            (byte) 0, (byte) 0, 0, 0, 0, 0
+    );
+
+    public DitherEntry(byte colorByte) {
+        this(colorByte, colorByte, 0, 0, 0, 0);
+    }
+
+    public MapColor getFirstMapColor() {
+        return MapColor.get((colorByte1 & 0xFF) >> 2);
+    }
+
+    public MapColor getSecondMapColor() {
+        return MapColor.get((colorByte2 & 0xFF) >> 2);
+    }
+}

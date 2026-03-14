@@ -16,6 +16,7 @@ public class MapColorWidget extends ClickableWidget {
     public final MapColor color;
     protected Text tooltipColorName;
     protected final boolean isHorizontal;
+    protected boolean onlyNormalBrightness = false;
 
     public MapColorWidget(int x, int y, int width, int height, MapColor color, boolean isHorizontal) {
         super(x, y, width, height, Text.empty());
@@ -58,8 +59,9 @@ public class MapColorWidget extends ClickableWidget {
                     getY(),
                     getBottom()
             );
-        } else if (color == MapColor.WATER_BLUE) {
-            int waterColor = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.NORMAL));
+        } else if (onlyNormalBrightness || color == MapColor.WATER_BLUE) {
+            MapColor.Brightness brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
+            int waterColor = ColorHelper.withAlpha(alpha, color.getRenderColor(brightness));
             context.fill(x, y, x + width, y + height, waterColor);
         } else {
             int low = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.LOW));
