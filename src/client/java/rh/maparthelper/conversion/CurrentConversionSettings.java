@@ -26,7 +26,6 @@ public class CurrentConversionSettings {
         MapartImageConverter.cancelConverting();
         synchronized (mapart) {
             PaletteColors.clearExcludingColors();
-            PaletteColors.clearColorCache();
             guiMapartImage = null;
             mapart.setReset(true);
         }
