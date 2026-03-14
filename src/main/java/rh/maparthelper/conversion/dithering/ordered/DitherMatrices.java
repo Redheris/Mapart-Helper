@@ -1,17 +1,22 @@
 package rh.maparthelper.conversion.dithering.ordered;
 
 public class DitherMatrices {
-    public final static float[][] BAYER_2x2 = precalculateMatrix(new int[][]{
+    public final static int[][] BAYER_2x2 = new int[][]{
             {0, 2},
             {3, 1}
-    });
-    public final static float[][] BAYER_4x4 = precalculateMatrix(new int[][]{
+    };
+    public final static int[][] BAYER_4x4 = new int[][]{
             {0, 8, 2, 10},
             {12, 4, 14, 6},
             {3, 11, 1, 9},
             {15, 7, 13, 5}
-    });
-    public final static float[][] HALFTONE_8x8 = precalculateMatrix(new int[][]{
+    };
+    public final static int[][] BAYER_3x3 = new int[][]{
+            {0, 7, 3},
+            {6, 5, 2},
+            {4, 1, 8}
+    };
+    public final static int[][] HALFTONE_8x8 = new int[][]{
             {24, 10, 12, 26, 35, 47, 49, 37},
             {8, 0, 2, 14, 45, 59, 61, 51},
             {22, 6, 4, 16, 43, 57, 63, 53},
@@ -20,14 +25,14 @@ public class DitherMatrices {
             {44, 58, 60, 50, 9, 1, 3, 15},
             {42, 56, 62, 52, 23, 7, 5, 17},
             {32, 40, 54, 38, 31, 21, 19, 29}
-    });
-    public final static float[][] CLUSTER_DOT_4x4 = precalculateMatrix(new int[][]{
+    };
+    public final static int[][] CLUSTER_DOT_4x4 = new int[][]{
             {12, 5, 6, 13},
             {4, 0, 1, 7},
             {11, 3, 2, 8},
             {15, 10, 9, 14}
-    });
-    public final static float[][] BLUE_NOISE_14x14 = precalculateMatrix(new int[][]{
+    };
+    public final static int[][] BLUE_NOISE_14x14 = new int[][]{
             {131, 187, 8, 78, 50, 18, 134, 89, 155, 102, 29, 95, 184, 73},
             {22, 86, 113, 171, 142, 105, 34, 166, 9, 60, 151, 128, 40, 110},
             {168, 137, 45, 28, 64, 188, 82, 54, 124, 189, 80, 13, 156, 56},
@@ -42,8 +47,8 @@ public class DitherMatrices {
             {16, 136, 71, 10, 193, 112, 160, 138, 51, 111, 162, 26, 194, 46},
             {174, 107, 41, 143, 33, 74, 1, 101, 195, 15, 75, 140, 109, 90},
             {32, 62, 157, 98, 167, 119, 179, 59, 36, 130, 175, 55, 0, 150}
-    });
-    public final static float[][] BLUE_NOISE_16x16 = precalculateMatrix(new int[][]{
+    };
+    public final static int[][] BLUE_NOISE_16x16 = new int[][]{
             {212, 62, 85, 150, 110, 252, 203, 235, 88, 107, 132, 251, 68, 25, 46, 154},
             {125, 244, 12, 196, 40, 16, 135, 63, 177, 0, 158, 36, 118, 226, 137, 105},
             {27, 162, 100, 225, 120, 172, 93, 34, 194, 232, 76, 204, 99, 184, 4, 201},
@@ -60,24 +65,5 @@ public class DitherMatrices {
             {140, 116, 206, 241, 28, 83, 6, 228, 153, 31, 180, 237, 112, 7, 123, 57},
             {168, 97, 3, 130, 216, 164, 102, 188, 122, 211, 13, 81, 146, 94, 218, 18},
             {189, 37, 231, 179, 51, 72, 144, 23, 47, 223, 166, 55, 197, 174, 240, 77}
-    });
-
-
-    public static float[][] precalculateMatrix(int[][] matrix) {
-        int n = matrix.length;
-        float factor = 1f / (n * n);
-
-        float[][] result = new float[n][matrix[0].length];
-
-        for (int y = 0; y < n; y++) {
-            int[] row = matrix[y];
-            float[] outRow = result[y];
-
-            for (int x = 0; x < row.length; x++) {
-                outRow[x] = (row[x] + 0.5f) * factor;
-            }
-        }
-
-        return result;
-    }
+    };
 }

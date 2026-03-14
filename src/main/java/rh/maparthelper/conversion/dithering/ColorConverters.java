@@ -19,6 +19,7 @@ public enum ColorConverters {
     SIERRA_LITE(SierraLiteDithering::new),
     SIERRA_2ROW(Sierra2RowDithering::new),
     BAYER_2x2(ctx -> new OrderedDithering(ctx, DitherMatrices.BAYER_2x2)),
+    BAYER_3x3(ctx -> new OrderedDithering(ctx, DitherMatrices.BAYER_3x3)),
     BAYER_4x4(ctx -> new OrderedDithering(ctx, DitherMatrices.BAYER_4x4)),
     BLUE_NOISE_14x14(ctx -> new OrderedDithering(ctx, DitherMatrices.BLUE_NOISE_14x14)),
     BLUE_NOISE_16x16(ctx -> new OrderedDithering(ctx, DitherMatrices.BLUE_NOISE_16x16)),

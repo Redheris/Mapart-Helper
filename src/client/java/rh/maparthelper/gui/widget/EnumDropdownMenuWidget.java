@@ -14,10 +14,14 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     private boolean showTooltips = true;
     private final boolean showFieldName;
 
-    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption, boolean showFieldName) {
-        super(parent, x, y, width, height, menuWidth, -1, showFieldName ? fieldName.copy().append(initOption) : initOption);
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text fieldName, Text initOption, boolean showFieldName) {
+        super(parent, x, y, width, height, menuWidth, maxMenuHeight, showFieldName ? fieldName.copy().append(initOption) : initOption);
         this.fieldName = fieldName;
         this.showFieldName = showFieldName;
+    }
+
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption, boolean showFieldName) {
+        this(parent, x, y, width, height, menuWidth, -1, fieldName, initOption, showFieldName);
     }
 
     public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption) {

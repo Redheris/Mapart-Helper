@@ -35,7 +35,7 @@ public class PaletteColors {
         byte closestColorByte = 0;
         byte secondClosestColorByte = 0;
         double minDist = Integer.MAX_VALUE;
-        double secondMinDist = 0;
+        double secondMinDist = Integer.MAX_VALUE;
 
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
@@ -57,6 +57,9 @@ public class PaletteColors {
                     secondClosestColorByte = closestColorByte;
                     closestColorByte = colorByte;
                     rgbClosest = ColorUtils.getRGB(renderColor);
+                } else if (dist < secondMinDist && colorByte != closestColorByte) {
+                    secondMinDist = dist;
+                    secondClosestColorByte = colorByte;
                 }
             }
         }
@@ -75,7 +78,7 @@ public class PaletteColors {
         byte closestColorByte = 0;
         byte secondClosestColorByte = 0;
         double minDist = Integer.MAX_VALUE;
-        double secondMinDist = 0;
+        double secondMinDist = Integer.MAX_VALUE;
 
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
@@ -96,8 +99,20 @@ public class PaletteColors {
                 secondClosestColorByte = closestColorByte;
                 closestColorByte = colorByte;
                 rgbClosest = ColorUtils.getRGB(renderColor);
+            } else if (dist < secondMinDist && colorByte != closestColorByte) {
+                secondMinDist = dist;
+                secondClosestColorByte = colorByte;
             }
+        }
+        if (secondClosestColorByte != 0) {
+            int rgb1 = MapColor.getRenderColor(closestColorByte);
+            int rgb2 = MapColor.getRenderColor(secondClosestColorByte);
 
+            double distBetween = ColorUtils.colorDistance(rgb1, rgb2, MapartHelper.conversionSettings.useLAB());
+
+            if (distBetween <= secondMinDist) {
+                secondClosestColorByte = closestColorByte;
+            }
         }
 
         int errorRed = rgbOriginal[0] - rgbClosest[0];

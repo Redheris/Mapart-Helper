@@ -28,7 +28,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         this.parent = parent;
         this.topYExpanded = y;
         this.menuWidth = menuWidth;
-        this.maxMenuHeight = maxMenuHeight == -1 ? 160 : maxMenuHeight;
+        this.maxMenuHeight = maxMenuHeight == -1 ? parent.height - y : maxMenuHeight;
         this.menu = new ScrollableGridWidget(
                 null,
                 x, y,

@@ -11,13 +11,15 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 public class OrderedDithering extends ColorConverter {
-    protected final float[][] matrix;
+    protected final int[][] matrix;
     protected final int N;
+    protected final int matrixSize;
 
-    public OrderedDithering(ConversionContext context, float[][] matrix) {
+    public OrderedDithering(ConversionContext context, int[][] matrix) {
         super(context);
         this.matrix = matrix;
         this.N = matrix.length;
+        this.matrixSize = N * N;
     }
 
     @Override
@@ -43,18 +45,19 @@ public class OrderedDithering extends ColorConverter {
                     continue;
                 }
 
-                int r = (argb >> 16) & 255;
-                int g = (argb >> 8) & 255;
-                int b = argb & 255;
-                int offset = (int) (((matrix[y % N][x % N] - 0.5) * 24));
-                r = Math.clamp(r + offset, 0, 255);
-                g = Math.clamp(g + offset, 0, 255);
-                b = Math.clamp(b + offset, 0, 255);
-                argb = (255 << 24) | (r << 16) | (g << 8) | b;
-
                 DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D);
-                byte closestColorByte = mapColors.colorByte1() /* WIP */;
-                MapColor closestColor = mapColors.getFirstMapColor();
+                byte closestColorByte;
+                MapColor closestColor;
+
+                int threshold = matrix[y % N][x % N];
+                if (mapColors.distRatio() * matrixSize > threshold) {
+                    closestColorByte = mapColors.colorByte1();
+                    closestColor = mapColors.getFirstMapColor();
+                } else {
+                    closestColorByte = mapColors.colorByte2();
+                    closestColor = mapColors.getSecondMapColor();
+                }
+
                 int newArgb;
                 if (mapColors == DitherEntry.CLEAR) {
                     newArgb = backgroundColor;
@@ -66,7 +69,7 @@ public class OrderedDithering extends ColorConverter {
                 }
                 if (y == mapart.getInsertionY() && x >= mapart.getInsertionX()) {
                     topLineBright[x - mapart.getInsertionX()] = newArgb;
-                    topLineCorrect[x - mapart.getInsertionX()] = MapColor.getRenderColor(mapColors.colorByte1());
+                    topLineCorrect[x - mapart.getInsertionX()] = PaletteColors.getMapRenderColor(closestColorByte);
                 }
                 resultPixels[x + y * width] = newArgb;
                 progress.addAndGet(progressStep);

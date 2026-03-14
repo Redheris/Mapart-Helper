@@ -278,7 +278,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         if (shortElements)
             adder.add(new TextWidget(Text.translatable("maparthelper.gui.ditheringAlg"), textRenderer));
         EnumDropdownMenuWidget colorConverter = new EnumDropdownMenuWidget(
-                this, 0, 0, elementWidth, 20, elementWidth,
+                this, 0, 0, elementWidth, 20, elementWidth, 280,
                 Text.translatable("maparthelper.gui.ditheringAlg"),
                 Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getColorConverter().name()),
                 !shortElements
