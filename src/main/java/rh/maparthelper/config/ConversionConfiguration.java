@@ -74,6 +74,10 @@ public class ConversionConfiguration implements ConfigData {
         return this.staircaseStyle != StaircaseStyles.FLAT_2D;
     }
 
+    public boolean useUnobtainable() {
+        return this.staircaseStyle == StaircaseStyles.UNOBTAINABLE;
+    }
+
     public boolean useLAB() {
         return useLAB;
     }
@@ -105,9 +109,10 @@ public class ConversionConfiguration implements ConfigData {
     /// @return whether use3D value is changed
     public boolean setStaircaseStyle(StaircaseStyles staircaseStyle) {
         boolean was3D = use3D();
+        boolean needUpdate = this.staircaseStyle == StaircaseStyles.UNOBTAINABLE || staircaseStyle == StaircaseStyles.UNOBTAINABLE;
         this.staircaseStyle = staircaseStyle;
         saveConfigFile();
-        if (was3D != use3D()) {
+        if (needUpdate || was3D != use3D()) {
             PaletteColors.clearColorCache();
             return true;
         }

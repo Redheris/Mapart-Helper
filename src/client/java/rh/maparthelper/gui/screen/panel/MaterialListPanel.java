@@ -104,7 +104,7 @@ public class MaterialListPanel extends WrapperWidget {
                 screen.width - getX() - 5, screen.height - listTop, 6
         );
 
-        if (!CurrentConversionSettings.isMapartConverted()) return;
+        if (!CurrentConversionSettings.isMapartConverted() || MapartHelper.conversionSettings.useUnobtainable()) return;
 
         materialList.setLeftScroll(true);
         materialList.grid.setColumnSpacing(0);

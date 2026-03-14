@@ -33,6 +33,7 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
     }
 
     public void addEntry(Consumer<Enum<?>> action, Enum<?> object) {
+        if (object == null) return;
         Text objectName = Text.translatable("maparthelper.gui.option." + object.name());
         ButtonWidget widget = ButtonWidget.builder(
                         objectName,

@@ -23,6 +23,8 @@ public class CommonConfiguration implements ConfigData {
     public static class MapartEditorSettings {
         public boolean logConversionTime = false;
         @ConfigEntry.Gui.Tooltip
+        public boolean displayUnobtainableMode = false;
+        @ConfigEntry.Gui.Tooltip
         @ConfigEntry.ColorPicker(allowAlpha = true)
         public int previewHighlightingColor = 0xFF9900ff;
         public boolean previewHighlightOnHover = true;

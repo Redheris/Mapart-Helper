@@ -269,8 +269,12 @@ public class MapartEditorScreen extends ScreenAdapted {
                 e -> {
                     if (MapartHelper.conversionSettings.setStaircaseStyle((StaircaseStyles) e))
                         MapartImageUpdater.updateMapart(mapart);
+                    updateMapartOutputButtons();
                 },
-                StaircaseStyles.values()
+                StaircaseStyles.FLAT_2D,
+                StaircaseStyles.VALLEY_3D,
+                StaircaseStyles.WAVES_3D,
+                MapartHelper.commonConfig.mapartEditor.displayUnobtainableMode ? StaircaseStyles.UNOBTAINABLE : null
         );
         if (shortElements) adder.add(staircaseStyle, topLabeledPositioner);
         else adder.add(staircaseStyle);
@@ -616,16 +620,24 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public void updateMapartOutputButtons() {
         boolean active = CurrentConversionSettings.isMapartConverted();
-        saveNBT.active = active;
-        saveSplitNBT.active = active;
-        saveZipNBT.active = active;
+        boolean obtainableNbt = !(MapartHelper.conversionSettings.getStaircaseStyle() == StaircaseStyles.UNOBTAINABLE);
+        saveNBT.active = active && obtainableNbt;
+        saveSplitNBT.active = active && obtainableNbt;
+        saveZipNBT.active = active && obtainableNbt;
         if (getMapItemsButton != null)
             getMapItemsButton.active = active;
         showInWorldButton.active = active;
-        if (active) {
+        if (!obtainableNbt) {
+            Text unobtainableNbt = Text.translatable("maparthelper.gui.nbt_is_unobtainable");
+            saveNBT.setTooltip(Tooltip.of(unobtainableNbt));
+            saveSplitNBT.setTooltip(Tooltip.of(unobtainableNbt));
+            saveZipNBT.setTooltip(Tooltip.of(unobtainableNbt));
+        } else if (active) {
             saveNBT.setTooltip(null);
             saveSplitNBT.setTooltip(null);
             saveZipNBT.setTooltip(null);
+        }
+        if (active) {
             if (getMapItemsButton != null) {
                 getMapItemsButton.setTooltip(Tooltip.of(
                         Text.translatable("maparthelper.gui.singleplayer_only").formatted(Formatting.GOLD)

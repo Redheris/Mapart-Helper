@@ -31,7 +31,7 @@ public class PaletteColors {
         return mapRenderColors[colorByte + 128];
     }
 
-    private static DitherEntry getClosestColor3D(int argb) {
+    private static DitherEntry getClosestColor3D(int argb, boolean unobtainable) {
         byte closestColorByte = 0;
         byte secondClosestColorByte = 0;
         double minDist = Integer.MAX_VALUE;
@@ -40,11 +40,12 @@ public class PaletteColors {
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
 
+        int brightnessCount = unobtainable ? 4 : 3;
         for (MapColor mapColor : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             if (excludingColors.contains(mapColor)) continue;
 
-            for (int brightness = 0; brightness < 3; brightness++) {
-                if (mapColor == MapColor.WATER_BLUE && brightness != 2) continue; // Allow only HIGH for water color
+            for (int brightness = 0; brightness < brightnessCount; brightness++) {
+                if (!unobtainable && mapColor == MapColor.WATER_BLUE && brightness != 2) continue; // Allow only HIGH for water color
                 byte colorByte = (byte) ((mapColor.id << 2) | brightness);
 
                 int renderColor = mapRenderColors[colorByte + 128];
@@ -125,10 +126,12 @@ public class PaletteColors {
         );
     }
 
-    public static DitherEntry getClosestColor(int argb, boolean use3D) {
+    public static DitherEntry getClosestColor(int argb, boolean use3D, boolean unobtainable) {
         if (((argb >> 24) & 0xFF) < 80) return DitherEntry.CLEAR;
+        if (unobtainable)
+            return cachedClosestColors.computeIfAbsent(argb, c -> getClosestColor3D(c, true));
         if (use3D)
-            return cachedClosestColors.computeIfAbsent(argb, PaletteColors::getClosestColor3D);
+            return cachedClosestColors.computeIfAbsent(argb, c -> getClosestColor3D(c, false));
         return cachedClosestColors.computeIfAbsent(argb, PaletteColors::getClosestColor2D);
     }
 

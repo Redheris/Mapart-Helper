@@ -43,7 +43,7 @@ public abstract class DiffusionDithering extends ColorConverter {
     }
 
     @Override
-    public BufferedImage convertColors() {
+    public BufferedImage convertColors(boolean useUnobtainableColors) {
         BufferedImage convertedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = convertedImage.getWidth();
@@ -73,7 +73,7 @@ public abstract class DiffusionDithering extends ColorConverter {
                 argb0[3] = Math.clamp(argb0[3] + errorsArray[ind + 2], 0, 255);
                 argb = ColorUtils.getARGB(argb0);
 
-                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D);
+                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D, useUnobtainableColors);
                 MapColor closestColor = mapColors.getFirstMapColor();
 
                 int newArgb;
@@ -87,7 +87,7 @@ public abstract class DiffusionDithering extends ColorConverter {
                         newArgb = PaletteColors.getMapRenderColor(mapColors.colorByte1());
                     colorsCounter.increment(closestColor.id);
                 }
-                if (y == mapart.getInsertionY() && x >= mapart.getInsertionX()) {
+                if (!useUnobtainableColors && y == mapart.getInsertionY() && x >= mapart.getInsertionX()) {
                     topLineBright[x - mapart.getInsertionX()] = newArgb;
                     topLineCorrect[x - mapart.getInsertionX()] = PaletteColors.getMapRenderColor(mapColors.colorByte1());
                 }

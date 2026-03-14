@@ -45,6 +45,8 @@
   "maparthelper.gui.option.VALLEY_3D._TOOLTIP": "Основной стиль 3D ступенчатости для строительства в выживании",
   "maparthelper.gui.option.WAVES_3D": "Волны",
   "maparthelper.gui.option.WAVES_3D._TOOLTIP": "Стиль механики 3D, очень §cнеоптимизированный §fдля строительства в выживании",
+  "maparthelper.gui.option.UNOBTAINABLE": "§6Недостижимая",
+  "maparthelper.gui.option.UNOBTAINABLE._TOOLTIP": "Использует все игровые цвета, включая недостижимые. Создание NBT недоступно",
   "maparthelper.gui.option.SIMPLE": "Нет",
   "maparthelper.gui.option.FLOYD_STEINBERG": "Floyd-Steinberg",
   "maparthelper.gui.option.ATKINSON": "Atkinson",
@@ -65,6 +67,7 @@
   "maparthelper.gui.option.IMPORTANT": "Важные",
   "maparthelper.gui.option.ALL": "Все",
 
+  "maparthelper.gui.nbt_is_unobtainable": "NBT не может быть создан, если в мапарте используются недостижимые цвета",
   "maparthelper.gui.ask_to_update_palette": "Текущая палитра была сгенерирована для %s.\n\nЖелаете сгенерировать заново?\n§7(Это не повлияет на текущие пресеты)",
   "maparthelper.gui.keep_current_palette": "Оставить текущую",
   "maparthelper.gui.regenerate_palette": "Сгенерировать",
@@ -141,6 +144,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.createDirsForSchematic": "Создавать подпапки для файлов схематики",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor": "Настройки редактора мапартов:",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.displayUnobtainableMode": "Отображать режим недостижимой ступенчатости",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.displayUnobtainableMode.@Tooltip": "В недостижимом режиме используются все игровые цвета, включая неиспользуемые в игре",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.logConversionTime": "Выводить длительность обработки арта в логи",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightingColor": "Цвет выделения на превью мапарта",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightingColor.@Tooltip": "Выделение всех вхождений определённого блока из списка материалов",

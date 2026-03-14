@@ -5,13 +5,14 @@
 - Moving/scaling an image with mouse in manual cropping became more accurate;
 - Added lifetime for closest colors cache that can significantly speed up image converting process when making a few changes in a row;
 - Added prompt to regenerate palette if it was generated for a different version;
-- Adapted UI for minimized window;
 
 <details>
 <summary>Fixes and minor changes</summary>
 
-- By default, schematic files (when saved for each map) are now created in subdirectories;  
+- By default, schematic files (when saved for each map) are now created in subdirectories;
+- Added option to use unreachable colors;
 - Slightly improved positioning of fake map position for even maparts;
+- Adapted UI for minimized window;
 - Improved `/mart-creative give-map-palette` - now it creates a new locked map;
 - Fixed some exceptions when changing mapart size during converting;
 - Mainly, this update contains codebase changes and reworks which are invisible for users

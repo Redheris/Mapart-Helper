@@ -29,5 +29,5 @@ public abstract class ColorConverter {
         this.progress = context.progress();
     }
 
-    public abstract BufferedImage convertColors();
+    public abstract BufferedImage convertColors(boolean useUnobtainableColors);
 }

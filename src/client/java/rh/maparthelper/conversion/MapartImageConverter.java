@@ -83,7 +83,7 @@ public class MapartImageConverter {
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
     private static BufferedImage convertToBlocksPalette(AbstractMapart mapart, BufferedImage image,
-                                                        int bgColor, int bgMapColorId, boolean use3D) {
+                                                        int bgColor, int bgMapColorId, boolean use3D, boolean useUnobtainable) {
         topLineBright = new int[image.getWidth()];
         topLineCorrect = new int[image.getWidth()];
         ColorConverter colorConverter = MapartHelper.conversionSettings.getColorConverter().createColorConverter(
@@ -96,7 +96,7 @@ public class MapartImageConverter {
                 topLineCorrect,
                 conversionProgress
         );
-        return colorConverter.convertColors();
+        return colorConverter.convertColors(useUnobtainable);
     }
 
     private static void swapTopLine(AbstractMapart mapart, BufferedImage image) {
@@ -139,6 +139,7 @@ public class MapartImageConverter {
         private final int bgColor = MapartHelper.conversionSettings.getBackgroundRenderColor();
         private final int bgMapColorId = MapartHelper.conversionSettings.getBackgroundColor().mapColor().id;
         private final boolean use3D = MapartHelper.conversionSettings.use3D();
+        private final boolean useUnobtainable = MapartHelper.conversionSettings.useUnobtainable();
         private final int colorsCacheLiveTimeMs = MapartHelper.commonConfig.mapartEditor.colorsCacheLiveTimeMs;
 
         private boolean isUpdating = true;
@@ -184,7 +185,7 @@ public class MapartImageConverter {
                         mapart.clearColorCounters();
                         if (!showOriginalImage) {
                             if (PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
-                                processingImage = convertToBlocksPalette(mapart, processingImage, bgColor, bgMapColorId, use3D);
+                                processingImage = convertToBlocksPalette(mapart, processingImage, bgColor, bgMapColorId, use3D, useUnobtainable);
                             else
                                 processingImage = new BufferedImage(processingImage.getWidth(), processingImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                         }

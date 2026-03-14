@@ -45,6 +45,8 @@
   "maparthelper.gui.option.VALLEY_3D._TOOLTIP": "Basic 3D style for building in survival",
   "maparthelper.gui.option.WAVES_3D": "Waves",
   "maparthelper.gui.option.WAVES_3D._TOOLTIP": "3D mechanic style, very §cunoptimized §ffor building in survival",
+  "maparthelper.gui.option.UNOBTAINABLE": "§6Unobtainable",
+  "maparthelper.gui.option.UNOBTAINABLE._TOOLTIP": "Uses all existing map colors, including unreachable. Creating an NBT is unavailable",
   "maparthelper.gui.option.SIMPLE": "None",
   "maparthelper.gui.option.FLOYD_STEINBERG": "Floyd-Steinberg",
   "maparthelper.gui.option.ATKINSON": "Atkinson",
@@ -65,6 +67,7 @@
   "maparthelper.gui.option.IMPORTANT": "Important",
   "maparthelper.gui.option.ALL": "All (optimized)",
 
+  "maparthelper.gui.nbt_is_unobtainable": "NBT cannot be created if the mapart contains unreachable colors",
   "maparthelper.gui.ask_to_update_palette": "The current palette was generated for %s.\n\nWould you like to regenerate palette?\n§7(It will not affect your presets)",
   "maparthelper.gui.keep_current_palette": "Keep current",
   "maparthelper.gui.regenerate_palette": "Regenerate",
@@ -141,6 +144,8 @@
   "text.autoconfig.mapart-helper.option.commonConfiguration.createDirsForSchematic": "Create subdirectories for schematic files",
 
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor": "Mapart editor settings:",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.displayUnobtainableMode": "Display unobtainable mode (staircase style)",
+  "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.displayUnobtainableMode.@Tooltip": "Unobtainable mode uses all existing map colors, including unused in the game",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.logConversionTime": "Log art conversion duration",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightingColor": "Highlight color on mapart preview",
   "text.autoconfig.mapart-helper.option.commonConfiguration.mapartEditor.previewHighlightingColor.@Tooltip": "Highlighting all occurrences of a specific block from the material list",

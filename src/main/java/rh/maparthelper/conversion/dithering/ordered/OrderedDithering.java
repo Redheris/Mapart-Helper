@@ -23,7 +23,7 @@ public class OrderedDithering extends ColorConverter {
     }
 
     @Override
-    public BufferedImage convertColors() {
+    public BufferedImage convertColors(boolean useUnobtainableColors) {
         BufferedImage convertedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = convertedImage.getWidth();
@@ -45,7 +45,7 @@ public class OrderedDithering extends ColorConverter {
                     continue;
                 }
 
-                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D);
+                DitherEntry mapColors = PaletteColors.getClosestColor(argb, use3D, useUnobtainableColors);
                 byte closestColorByte;
                 MapColor closestColor;
 
@@ -62,7 +62,7 @@ public class OrderedDithering extends ColorConverter {
                 if (mapColors == DitherEntry.CLEAR) {
                     newArgb = backgroundColor;
                 } else {
-                    if (y > 0 && resultPixels[x + (y - 1) * width] == 0)
+                    if (!useUnobtainableColors && y > 0 && resultPixels[x + (y - 1) * width] == 0)
                         newArgb = PaletteColors.getMapRenderColor(closestColorByte, MapColor.Brightness.HIGH);
                     else newArgb = PaletteColors.getMapRenderColor(closestColorByte);
                     colorsCounter.increment(closestColor.id);

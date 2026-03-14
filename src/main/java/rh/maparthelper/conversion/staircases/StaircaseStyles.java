@@ -5,7 +5,8 @@ import java.util.List;
 public enum StaircaseStyles {
     FLAT_2D(null),
     VALLEY_3D(new Valley3DStaircase()),
-    WAVES_3D(new Waves3DStaircase());
+    WAVES_3D(new Waves3DStaircase()),
+    UNOBTAINABLE(null);
 //    SMOOTH_3D(new Smooth3DStaircase()); // Postponed for now
 
     private final IMapartStaircase staircase;
