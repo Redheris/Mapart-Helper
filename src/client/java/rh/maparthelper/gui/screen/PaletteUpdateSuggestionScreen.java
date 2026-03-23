@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
 public class PaletteUpdateSuggestionScreen extends Screen {
@@ -77,7 +78,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         super.renderBackground(context, mouseX, mouseY, deltaTicks);
 
         context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x77000000);

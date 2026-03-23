@@ -8,6 +8,7 @@ import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
@@ -91,11 +92,11 @@ public class DropdownMenuWidget extends Button implements Layout {
     }
 
     @Override
-    public void visitChildren(Consumer<LayoutElement> consumer) {
+    public void visitChildren(@NotNull Consumer<LayoutElement> consumer) {
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer) {
         super.visitWidgets(consumer);
     }
 
@@ -149,7 +150,7 @@ public class DropdownMenuWidget extends Button implements Layout {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         if (needRelayout) {
             menu.setHeight(maxMenuHeight);
             if (getBottom() + menu.getHeight() > parent.height) {

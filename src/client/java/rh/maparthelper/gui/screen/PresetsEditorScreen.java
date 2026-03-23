@@ -15,6 +15,7 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2fStack;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
@@ -297,7 +298,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         Matrix3x2fStack matrixStack = context.pose();
 
         matrixStack.pushMatrix();
@@ -319,7 +320,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
     }
 
     @Override
@@ -349,7 +350,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
 
             PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);

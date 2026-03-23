@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
+import org.jetbrains.annotations.NotNull;
 
 public class DecorativeButtonWidget extends AbstractButton {
     private final PressAction onPress;
@@ -44,7 +45,7 @@ public class DecorativeButtonWidget extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         Minecraft minecraftClient = Minecraft.getInstance();
         int i = ARGB.color(this.alpha, this.active ? CommonColors.WHITE : CommonColors.LIGHT_GRAY);
         this.renderString(context, minecraftClient.font, i);
@@ -73,7 +74,7 @@ public class DecorativeButtonWidget extends AbstractButton {
     }
 
     @Override
-    public void updateWidgetNarration(NarrationElementOutput builder) {
+    public void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
         this.defaultButtonNarrationText(builder);
     }
 

@@ -41,7 +41,7 @@ public class ScaledItemGuiElementRenderer extends PictureInPictureRenderer<Scale
     }
 
     @Override
-    public void blitTexture(ScaledItemGuiElementRenderState state, GuiRenderState guiRenderState) {
+    public void blitTexture(ScaledItemGuiElementRenderState state, @NotNull GuiRenderState guiRenderState) {
         super.blitTexture(state, guiRenderState);
     }
 

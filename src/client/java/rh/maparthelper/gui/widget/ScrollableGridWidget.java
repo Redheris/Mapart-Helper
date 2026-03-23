@@ -48,11 +48,11 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     @Override
-    public void visitChildren(Consumer<LayoutElement> consumer) {
+    public void visitChildren(@NotNull Consumer<LayoutElement> consumer) {
     }
 
     @Override
-    public void visitWidgets(Consumer<AbstractWidget> consumer) {
+    public void visitWidgets(@NotNull Consumer<AbstractWidget> consumer) {
     }
 
     @Override
@@ -133,7 +133,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         if (needRelayout) {
             grid.setX(this.getX());
             grid.setY((int) (this.getY() - this.scrollAmount()));
@@ -150,7 +150,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     @Override
-    protected void renderScrollbar(GuiGraphics context) {
+    protected void renderScrollbar(@NotNull GuiGraphics context) {
         if (this.scrollbarVisible()) {
             int i = this.scrollBarX();
             int j = this.scrollerHeight();
@@ -182,7 +182,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 
     public static class InnerGridWidget extends GridLayout {
@@ -197,7 +197,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         }
 
         @Override
-        public <T extends LayoutElement> @NotNull T addChild(T widget, int row, int column, int occupiedRows, int occupiedColumns, LayoutSettings positioner) {
+        public <T extends LayoutElement> @NotNull T addChild(T widget, int row, int column, int occupiedRows, int occupiedColumns, @NotNull LayoutSettings positioner) {
             if (widget instanceof Layout layoutWidget) {
                 layoutWidget.visitWidgets(children::add);
             } else {

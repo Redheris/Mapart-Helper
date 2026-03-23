@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.gui.screen.PresetsEditorScreen;
 import rh.maparthelper.util.RenderUtils;
 
@@ -63,7 +64,7 @@ public class BlockItemWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
 
@@ -89,6 +90,6 @@ public class BlockItemWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 }

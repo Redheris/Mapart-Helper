@@ -44,7 +44,7 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    protected void removeWidget(GuiEventListener child) {
+    protected void removeWidget(@NotNull GuiEventListener child) {
         if (child instanceof Renderable)
             this.drawables.remove((Renderable) child);
         super.removeWidget(child);
@@ -95,7 +95,7 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         for (Renderable drawable : drawables) {
             if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY) && !dropdownMenu.isChild((LayoutElement) drawable))

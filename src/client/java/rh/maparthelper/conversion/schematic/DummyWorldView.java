@@ -26,6 +26,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * This annotation-consumer-monster has the only reason of existence - lying to
+ * {@code BlockBehaviour#canSurvive} to check if the block can survive without a support block below it
+ */
+@SuppressWarnings("DataFlowIssue")
 public class DummyWorldView implements LevelReader {
     private final static DummyWorldView INSTANCE = new DummyWorldView();
 
@@ -34,18 +39,18 @@ public class DummyWorldView implements LevelReader {
     }
 
     @Override
-    public int getHeight(Heightmap.Types heightmap, int x, int z) {
+    public int getHeight(@NotNull Heightmap.Types heightmap, int x, int z) {
         return 0;
     }
 
     @Override
-    public @NotNull BlockState getBlockState(BlockPos pos) {
+    public @NotNull BlockState getBlockState(@NotNull BlockPos pos) {
         return Blocks.AIR.defaultBlockState();
     }
 
 
     @Override
-    public @Nullable ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
+    public @Nullable ChunkAccess getChunk(int chunkX, int chunkZ, @NotNull ChunkStatus leastStatus, boolean create) {
         return null;
     }
 
@@ -95,7 +100,7 @@ public class DummyWorldView implements LevelReader {
     }
 
     @Override
-    public float getShade(Direction direction, boolean shaded) {
+    public float getShade(@NotNull Direction direction, boolean shaded) {
         return 0;
     }
 
@@ -110,17 +115,17 @@ public class DummyWorldView implements LevelReader {
     }
 
     @Override
-    public @NotNull List<VoxelShape> getEntityCollisions(@Nullable Entity entity, AABB box) {
+    public @NotNull List<VoxelShape> getEntityCollisions(@Nullable Entity entity, @NotNull AABB box) {
         return List.of();
     }
 
     @Override
-    public @Nullable BlockEntity getBlockEntity(BlockPos pos) {
+    public @Nullable BlockEntity getBlockEntity(@NotNull BlockPos pos) {
         return null;
     }
 
     @Override
-    public @NotNull FluidState getFluidState(BlockPos pos) {
+    public @NotNull FluidState getFluidState(@NotNull BlockPos pos) {
         return null;
     }
 }

@@ -155,6 +155,7 @@ public class MapartSchematicBuilder {
 
     public static boolean needsAuxBlock(Block block) {
         boolean canPlaceAtAir = block.defaultBlockState().canSurvive(DummyWorldView.getInstance(), BlockPos.ZERO);
+        @SuppressWarnings("DataFlowIssue")
         boolean hasNoCollision = block.defaultBlockState().getCollisionShape(null, null) == Shapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
     }

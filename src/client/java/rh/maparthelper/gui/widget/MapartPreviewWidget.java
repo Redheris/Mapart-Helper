@@ -12,6 +12,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CroppingMode;
@@ -63,7 +64,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         int x = getImageX();
         int y = getY();
 
@@ -157,7 +158,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 
     @Override

@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -56,7 +57,7 @@ public class AdjTextFieldWidget extends EditBox {
      */
     @Deprecated
     @Override
-    public void setResponder(Consumer<String> changedListener) {
+    public void setResponder(@NotNull Consumer<String> changedListener) {
     }
 
     private void updateChangedListener() {

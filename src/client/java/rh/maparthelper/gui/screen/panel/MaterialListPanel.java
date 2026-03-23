@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
@@ -69,7 +70,7 @@ public class MaterialListPanel extends AbstractLayout {
     }
 
     @Override
-    public void visitChildren(Consumer<LayoutElement> consumer) {
+    public void visitChildren(@NotNull Consumer<LayoutElement> consumer) {
         if (materialList != null)
             consumer.accept(materialList);
     }
@@ -137,7 +138,7 @@ public class MaterialListPanel extends AbstractLayout {
 
         MutableComponent amountText = Component.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
         if (auxBlockCount <= 0)
-            amountText = amountText.withStyle(ChatFormatting.GREEN);
+            amountText.withStyle(ChatFormatting.GREEN);
         auxAmountText.setWidth(screen.getFont().width(amountText));
         auxAmountText.setMessage(amountText);
         auxAmountText.setTooltip(Tooltip.create(amountText));
@@ -155,7 +156,7 @@ public class MaterialListPanel extends AbstractLayout {
         adder.addChild(blockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
         MutableComponent text = Component.literal(getAmountString(color.amount(), block.asItem().getDefaultMaxStackSize()));
         if (color.amount() == 0)
-            text = text.withStyle(ChatFormatting.GREEN);
+            text.withStyle(ChatFormatting.GREEN);
         StringWidget amountText = new StringWidget(text, screen.getFont());
         adder.addChild(amountText);
         amountText.setTooltip(Tooltip.create(amountText.getMessage()));
@@ -249,7 +250,7 @@ public class MaterialListPanel extends AbstractLayout {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
             if (fixedHighlight == this) {
                 context.nextStratum();

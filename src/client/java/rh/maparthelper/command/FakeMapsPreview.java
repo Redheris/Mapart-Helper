@@ -41,7 +41,8 @@ public class FakeMapsPreview {
     }
 
     public static void addFakeItemFrame(int[] map, LocalPlayer player) {
-        MapItemSavedData mapState = MapItemSavedData.createForClient((byte) 1, false, null);
+        @SuppressWarnings("resource")
+        MapItemSavedData mapState = MapItemSavedData.createForClient((byte) 1, false, player.level().dimension());
         mapState.colors = new byte[map.length];
         for (int i = 0; i < map.length; i++) {
             MapColorEntry color = PaletteColors.getMapColorEntryByARGB(map[i]);

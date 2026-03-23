@@ -9,6 +9,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.colors.MapColors;
 
 public class MapColorWidget extends AbstractWidget {
@@ -37,7 +38,7 @@ public class MapColorWidget extends AbstractWidget {
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 
     @Override
@@ -46,7 +47,7 @@ public class MapColorWidget extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
         if (color == MapColor.NONE) {

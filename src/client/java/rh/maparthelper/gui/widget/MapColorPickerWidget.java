@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
@@ -35,7 +36,7 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         super.renderWidget(context, mouseX, mouseY, deltaTicks);
         int color = MapartHelper.conversionSettings.getBackgroundRenderColor();
         context.fill(getX(), getY(), getRight(), getBottom(), color);
@@ -60,7 +61,7 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
             super.renderWidget(context, mouseX, mouseY, deltaTicks);
             onlyNormalBrightness = !MapartHelper.conversionSettings.use3D();
             if (color != MapColor.NONE && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
