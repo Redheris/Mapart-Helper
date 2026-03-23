@@ -325,6 +325,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     @Override
     public void onClose() {
+        //? <=1.21.8
         assert this.minecraft != null;
         this.minecraft.setScreen(this.parent);
     }

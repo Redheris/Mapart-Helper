@@ -111,6 +111,7 @@ public abstract class ScreenAdapted extends Screen {
 
     @Override
     public void onClose() {
+        //? <=1.21.8
         assert this.minecraft != null;
         super.onClose();
         DropdownMenuWidget.expandedOne = null;

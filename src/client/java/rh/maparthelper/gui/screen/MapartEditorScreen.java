@@ -149,7 +149,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         showInWorldButton = Button.builder(
                 Component.nullToEmpty("\uD83C\uDF0D"),
                 (btn) -> {
-                    if (minecraft == null || minecraft.player == null) return;
+                    //? <=1.21.8
+                    if (minecraft == null) return;
+                    if (minecraft.player == null) return;
                     if (FakeMapsPreview.createFakeFramesFromMapart(mapart, minecraft.player)) {
                         FakeMapsPreview.showFakeFrames(minecraft.player, mapart.getWidth(), mapart.getHeight());
                         this.onClose();
@@ -576,7 +578,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         Button saveImage = Button.builder(
                 Component.translatable("maparthelper.gui.savePNG"),
                 (btn) -> {
-                    Player player = minecraft != null ? minecraft.player : null;
+                    Player player = /*? if <=1.21.8 {*/ minecraft == null ? null : /*?}*/ minecraft.player;
                     MapartSaver.saveMapartImage(mapart.mapartName, CurrentConversionSettings.guiMapartImage, player);
                 }
         ).size(156, 20).build();
