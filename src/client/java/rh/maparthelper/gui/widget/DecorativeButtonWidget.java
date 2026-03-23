@@ -2,22 +2,22 @@ package rh.maparthelper.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
 
-public class DecorativeButtonWidget extends PressableWidget {
+public class DecorativeButtonWidget extends AbstractButton {
     private final PressAction onPress;
     private final Identifier textureDefault;
     private final Identifier textureHighlighted;
 
-    private DecorativeButtonWidget(int x, int y, int width, int height, Text message, PressAction pressAction) {
+    private DecorativeButtonWidget(int x, int y, int width, int height, Component message, PressAction pressAction) {
         super(x, y, width, height, message);
         this.onPress = pressAction;
         this.textureDefault = null;
@@ -25,14 +25,14 @@ public class DecorativeButtonWidget extends PressableWidget {
     }
 
     private DecorativeButtonWidget(int x, int y, int width, int height, Identifier texture, PressAction pressAction) {
-        super(x, y, width, height, Text.empty());
+        super(x, y, width, height, Component.empty());
         this.textureDefault = texture;
         this.textureHighlighted = texture;
         this.onPress = pressAction;
     }
 
     private DecorativeButtonWidget(int x, int y, int width, int height, Identifier textureDefault, Identifier textureHighlighted, PressAction pressAction) {
-        super(x, y, width, height, Text.empty());
+        super(x, y, width, height, Component.empty());
         this.textureDefault = textureDefault;
         this.textureHighlighted = textureHighlighted;
         this.onPress = pressAction;
@@ -44,14 +44,14 @@ public class DecorativeButtonWidget extends PressableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        int i = ColorHelper.withAlpha(this.alpha, this.active ? Colors.WHITE : Colors.LIGHT_GRAY);
-        this.drawMessage(context, minecraftClient.textRenderer, i);
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+        Minecraft minecraftClient = Minecraft.getInstance();
+        int i = ARGB.color(this.alpha, this.active ? CommonColors.WHITE : CommonColors.LIGHT_GRAY);
+        this.renderString(context, minecraftClient.font, i);
 
         if (textureDefault != null) {
-            if (hovered) {
-                context.drawTexture(
+            if (isHovered) {
+                context.blit(
                         RenderPipelines.GUI_TEXTURED,
                         textureHighlighted,
                         getX(), getY(),
@@ -60,7 +60,7 @@ public class DecorativeButtonWidget extends PressableWidget {
                         width, height
                 );
             } else {
-                context.drawTexture(
+                context.blit(
                         RenderPipelines.GUI_TEXTURED,
                         textureDefault,
                         getX(), getY(),
@@ -73,11 +73,11 @@ public class DecorativeButtonWidget extends PressableWidget {
     }
 
     @Override
-    public void appendClickableNarrations(NarrationMessageBuilder builder) {
-        this.appendDefaultNarrations(builder);
+    public void updateWidgetNarration(NarrationElementOutput builder) {
+        this.defaultButtonNarrationText(builder);
     }
 
-    public static DecorativeButtonWidget.Builder builder(Text message, PressAction onPress) {
+    public static DecorativeButtonWidget.Builder builder(Component message, PressAction onPress) {
         return new DecorativeButtonWidget.Builder(message, onPress);
     }
 
@@ -86,7 +86,7 @@ public class DecorativeButtonWidget extends PressableWidget {
     }
 
     public static class Builder {
-        private final Text message;
+        private final Component message;
         private final Identifier textureDefault;
         private Identifier textureHighlighted;
         private final PressAction onPress;
@@ -95,7 +95,7 @@ public class DecorativeButtonWidget extends PressableWidget {
         private int x = 0;
         private int y = 0;
 
-        public Builder(Text message, PressAction onPress) {
+        public Builder(Component message, PressAction onPress) {
             this.message = message;
             this.textureDefault = null;
             this.textureHighlighted = null;

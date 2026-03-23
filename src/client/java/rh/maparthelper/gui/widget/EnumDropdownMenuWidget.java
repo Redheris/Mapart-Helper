@@ -1,30 +1,30 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.function.Consumer;
 
 public class EnumDropdownMenuWidget extends DropdownMenuWidget {
-    private final Text fieldName;
+    private final Component fieldName;
     private boolean showTooltips = true;
     private final boolean showFieldName;
 
-    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text fieldName, Text initOption, boolean showFieldName) {
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Component fieldName, Component initOption, boolean showFieldName) {
         super(parent, x, y, width, height, menuWidth, maxMenuHeight, showFieldName ? fieldName.copy().append(initOption) : initOption);
         this.fieldName = fieldName;
         this.showFieldName = showFieldName;
     }
 
-    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption, boolean showFieldName) {
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Component fieldName, Component initOption, boolean showFieldName) {
         this(parent, x, y, width, height, menuWidth, -1, fieldName, initOption, showFieldName);
     }
 
-    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Text fieldName, Text initOption) {
+    public EnumDropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, Component fieldName, Component initOption) {
         this(parent, x, y, width, height, menuWidth, fieldName, initOption, true);
     }
 
@@ -34,8 +34,8 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
 
     public void addEntry(Consumer<Enum<?>> action, Enum<?> object) {
         if (object == null) return;
-        Text objectName = Text.translatable("maparthelper.gui.option." + object.name());
-        ButtonWidget widget = ButtonWidget.builder(
+        Component objectName = Component.translatable("maparthelper.gui.option." + object.name());
+        Button widget = Button.builder(
                         objectName,
                         btn -> {
                             this.setMessage(showFieldName ? fieldName.copy().append(objectName) : objectName);
@@ -45,8 +45,8 @@ public class EnumDropdownMenuWidget extends DropdownMenuWidget {
                 .size(menuWidth - 4, 15)
                 .build();
         if (showTooltips) {
-            Text tooltip = MutableText.of(new TranslatableTextContent("maparthelper.gui.option." + object.name() + "._TOOLTIP", "", TranslatableTextContent.EMPTY_ARGUMENTS));
-            widget.setTooltip(Tooltip.of(tooltip));
+            Component tooltip = MutableComponent.create(new TranslatableContents("maparthelper.gui.option." + object.name() + "._TOOLTIP", "", TranslatableContents.NO_ARGS));
+            widget.setTooltip(Tooltip.create(tooltip));
         }
         super.addEntry(widget);
     }

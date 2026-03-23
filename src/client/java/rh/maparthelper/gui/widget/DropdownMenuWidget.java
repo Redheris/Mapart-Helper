@@ -1,18 +1,23 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.Layout;
+import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.Consumer;
 
-public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
+// This implementation will soon be replaced by a more elegant one
+public class DropdownMenuWidget extends Button implements Layout {
     public static DropdownMenuWidget expandedOne;
 
     private final Screen parent;
     private final ScrollableGridWidget menu;
-    private final GridWidget.Adder menuAdder;
+    private final GridLayout.RowHelper menuAdder;
     protected int menuWidth;
     private int menuXOffset = 0;
     private final int maxMenuHeight;
@@ -22,8 +27,8 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
 
     private boolean needRelayout = false;
 
-    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, int columns, Text message) {
-        super(x, y, width, height, message, btn -> {}, DEFAULT_NARRATION_SUPPLIER);
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, int columns, Component message) {
+        super(x, y, width, height, message, btn -> {}, DEFAULT_NARRATION);
         expandedOne = null;
         this.parent = parent;
         this.topYExpanded = y;
@@ -36,12 +41,12 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         );
         menu.visible = false;
         menu.setScrollBarColor(0xFFFCFCFC);
-        menu.grid.getMainPositioner().margin(2, 2, 0, 2);
-        menu.grid.setRowSpacing(-2);
-        this.menuAdder = this.menu.grid.createAdder(columns);
+        menu.grid.defaultCellSetting().padding(2, 2, 0, 2);
+        menu.grid.rowSpacing(-2);
+        this.menuAdder = this.menu.grid.createRowHelper(columns);
     }
 
-    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Text message) {
+    public DropdownMenuWidget(Screen parent, int x, int y, int width, int height, int menuWidth, int maxMenuHeight, Component message) {
         this(parent, x, y, width, height, menuWidth, maxMenuHeight, 1, message);
     }
 
@@ -57,20 +62,20 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         return this.getX() + this.menuXOffset;
     }
 
-    public final void addEntry(ClickableWidget widget) {
+    public final void addEntry(AbstractWidget widget) {
         widget.visible = false;
-        menuAdder.add(widget);
+        menuAdder.addChild(widget);
     }
 
-    public final boolean isChild(Widget widget) {
+    public final boolean isChild(LayoutElement widget) {
         return widget == menu || menu.grid.isChild(widget);
     }
 
     @Override
-    public void refreshPositions() {
+    public void arrangeElements() {
         if (getBottom() + menu.getHeight() > parent.height)
             expandUpwards = true;
-        this.menu.refreshPositions();
+        this.menu.arrangeElements();
     }
 
     @Override
@@ -86,24 +91,24 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     @Override
-    public void forEachElement(Consumer<Widget> consumer) {
+    public void visitChildren(Consumer<LayoutElement> consumer) {
     }
 
     @Override
-    public void forEachChild(Consumer<ClickableWidget> consumer) {
-        super.forEachChild(consumer);
+    public void visitWidgets(Consumer<AbstractWidget> consumer) {
+        super.visitWidgets(consumer);
     }
 
-    public void forEachEntry(Consumer<ClickableWidget> consumer) {
-        menu.grid.forEachChild(consumer);
+    public void forEachEntry(Consumer<AbstractWidget> consumer) {
+        menu.grid.visitWidgets(consumer);
     }
 
     public void toggleExpanded(boolean expand) {
         if (expand && expandedOne != null) {
-            expandedOne.menu.forEachChild(c -> c.visible = false);
+            expandedOne.menu.visitWidgets(c -> c.visible = false);
             expandedOne.menu.visible = false;
         }
-        menu.grid.forEachChild(c -> c.visible = expand);
+        menu.grid.visitWidgets(c -> c.visible = expand);
         menu.visible = expand;
         expandedOne = expand ? this : null;
     }
@@ -144,7 +149,7 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         if (needRelayout) {
             menu.setHeight(maxMenuHeight);
             if (getBottom() + menu.getHeight() > parent.height) {
@@ -158,12 +163,12 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
                 menu.setY(topYExpanded);
             }
             menu.setX(getMenuX());
-            menu.refreshPositions();
+            menu.arrangeElements();
 
-            if (menu.getMaxScrollY() > 0) {
+            if (menu.maxScrollAmount() > 0) {
                 if (menu.leftScroll) {
                     menu.setX(getMenuX() - 4);
-                    menu.grid.getMainPositioner().marginLeft(6);
+                    menu.grid.defaultCellSetting().paddingLeft(6);
                 }
                 menu.setWidth(menuWidth + 1);
             } else {
@@ -178,13 +183,12 @@ public class DropdownMenuWidget extends ButtonWidget implements LayoutWidget {
         super.renderWidget(context, mouseX, mouseY, deltaTicks);
     }
 
-    public void renderMenu(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    public void renderMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         int left = menu.leftScroll ? getMenuX() - 4 : getMenuX();
         if (expandUpwards) {
             context.fill(getMenuX(), getY() - menu.getHeight() - 2, getMenuX() + menu.getWidth(), getY(), 0x99FFFFFF);
             context.enableScissor(left, getY() - menu.getHeight() - 2, getMenuX() + menu.getWidth(), getY());
-        }
-        else {
+        } else {
             context.fill(getMenuX(), getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight(), 0x99FFFFFF);
             context.enableScissor(left, getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight());
         }

@@ -1,13 +1,14 @@
 package rh.maparthelper.gui.screen;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
 
@@ -16,12 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Extended Screed class with adjustments of behavior and rendering of {@link TextFieldWidget} and {@link DropdownMenuWidget}
+ * Extended Screen class with adjustments of behavior and rendering of {@link EditBox} and {@link DropdownMenuWidget}
  */
 public abstract class ScreenAdapted extends Screen {
-    private final List<Drawable> drawables = new ArrayList<>();
+    private final List<Renderable> drawables = new ArrayList<>();
 
-    protected ScreenAdapted(Text title) {
+    protected ScreenAdapted(Component title) {
         super(title);
     }
 
@@ -31,27 +32,27 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    protected <T extends Element & Drawable & Selectable> T addDrawableChild(T drawableElement) {
+    protected <T extends GuiEventListener & Renderable & NarratableEntry> @NotNull T addRenderableWidget(T drawableElement) {
         this.drawables.add(drawableElement);
-        return super.addDrawableChild(drawableElement);
+        return super.addRenderableWidget(drawableElement);
     }
 
     @Override
-    protected <T extends Drawable> T addDrawable(T drawable) {
+    protected <T extends Renderable> @NotNull T addRenderableOnly(T drawable) {
         this.drawables.add(drawable);
-        return super.addDrawable(drawable);
+        return super.addRenderableOnly(drawable);
     }
 
     @Override
-    protected void remove(Element child) {
-        if (child instanceof Drawable)
-            this.drawables.remove((Drawable) child);
-        super.remove(child);
+    protected void removeWidget(GuiEventListener child) {
+        if (child instanceof Renderable)
+            this.drawables.remove((Renderable) child);
+        super.removeWidget(child);
     }
 
     @Override
-    protected void clearChildren() {
-        super.clearChildren();
+    protected void clearWidgets() {
+        super.clearWidgets();
         this.drawables.clear();
     }
 
@@ -65,16 +66,16 @@ public abstract class ScreenAdapted extends Screen {
         }
         collapseDropdown();
 
-        Optional<Element> optional = this.hoveredElement(mouseX, mouseY);
+        Optional<GuiEventListener> optional = this.getChildAt(mouseX, mouseY);
         if (optional.isEmpty()) {
             this.setFocused(null);
             collapseDropdown();
             return false;
         }
-        Element element = optional.get();
+        GuiEventListener element = optional.get();
 
         if (element instanceof ScrollableGridWidget layout) {
-            Optional<Widget> optional2 = layout.hoveredElement(mouseX, mouseY);
+            Optional<LayoutElement> optional2 = layout.hoveredElement(mouseX, mouseY);
             if (optional2.isEmpty()) return false;
             if (optional2.get() == layout) return super.mouseClicked(mouseX, mouseY, button);
             return element.mouseClicked(mouseX, mouseY, button);
@@ -94,10 +95,10 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
-        for (Drawable drawable : drawables) {
-            if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY) && !dropdownMenu.isChild((Widget) drawable))
+        for (Renderable drawable : drawables) {
+            if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY) && !dropdownMenu.isChild((LayoutElement) drawable))
                 drawable.render(context, 0, 0, delta);
             else
                 drawable.render(context, mouseX, mouseY, delta);
@@ -109,14 +110,14 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    public void close() {
-        assert this.client != null;
-        super.close();
+    public void onClose() {
+        assert this.minecraft != null;
+        super.onClose();
         DropdownMenuWidget.expandedOne = null;
     }
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 

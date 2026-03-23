@@ -1,7 +1,7 @@
 package rh.maparthelper.conversion;
 
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.Identifier;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -9,8 +9,8 @@ import rh.maparthelper.mapart.MapartProcessing;
 public class CurrentConversionSettings {
     // GUI image
     public final static MapartProcessing mapart = new MapartProcessing();
-    public static NativeImageBackedTexture guiMapartImage;
-    public final static Identifier guiMapartId = Identifier.of(MapartHelper.MOD_ID, "mapart_gui_texture");
+    public static DynamicTexture guiMapartImage;
+    public final static Identifier guiMapartId = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "mapart_gui_texture");
 
     public static CroppingMode cropMode = CroppingMode.AUTO_CROP;
     public static boolean doShowGrid = false;

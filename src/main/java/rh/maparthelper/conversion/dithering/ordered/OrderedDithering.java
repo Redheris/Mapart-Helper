@@ -1,6 +1,6 @@
 package rh.maparthelper.conversion.dithering.ordered;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.DitherEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverter;

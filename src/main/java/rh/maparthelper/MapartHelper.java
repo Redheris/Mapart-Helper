@@ -7,15 +7,15 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
+import net.minecraft.world.level.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.command.ServerCommands;
 import rh.maparthelper.config.CommonConfiguration;
 import rh.maparthelper.config.ConversionConfiguration;
-import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.MapartHelperConfig;
+import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.adapter.MapColorEntryAdapter;
 
 import java.nio.file.Path;

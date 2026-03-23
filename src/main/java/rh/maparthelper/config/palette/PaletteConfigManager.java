@@ -4,10 +4,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.MinecraftVersion;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
+import net.minecraft.DetectedVersion;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
@@ -29,7 +29,8 @@ public class PaletteConfigManager {
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
-            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorBlockAdapter())
+            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>() {
+            }.getType(), new MapColorBlockAdapter())
             .create();
     private static boolean outdatedPalette;
 
@@ -67,7 +68,7 @@ public class PaletteConfigManager {
                                 .toList()
                 );
                 PaletteGenerator.initARGBMapColor(completePalette.palette);
-                outdatedPalette = !MinecraftVersion.CURRENT.name().equals(completePalette.getGameVersion());
+                outdatedPalette = !DetectedVersion.BUILT_IN.name().equals(completePalette.getGameVersion());
                 return true;
             }
         } catch (Exception e) {
@@ -173,8 +174,7 @@ public class PaletteConfigManager {
                         hasChanges = true;
                     }
                     MapartHelper.LOGGER.info("Preset file \"{}\" successfully read", path);
-                }
-                catch (JsonSyntaxException e) {
+                } catch (JsonSyntaxException e) {
                     MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", path, e.getMessage());
                     hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                 } catch (IOException e) {

@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 
 public class Utils {
 
-
     public static @NotNull String makeUniqueName(@NotNull Predicate<String> existingTest, String filename, @Nullable String ext, String nameFormat) {
         String suf = ext == null ? "" : "." + ext;
         if (existingTest.test(filename + suf)) {

@@ -1,6 +1,6 @@
 package rh.maparthelper.mapart;
 
-import net.minecraft.client.texture.NativeImage;
+import com.mojang.blaze3d.platform.NativeImage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.conversion.ImageChangeResult;

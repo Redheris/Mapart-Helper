@@ -1,12 +1,12 @@
 package rh.maparthelper.mapart;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.util.Utils;
 
@@ -16,11 +16,11 @@ import java.nio.file.Path;
 public class MapartSaver {
     public final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
 
-    private static boolean saveMapartImage(NativeImageBackedTexture mapartTexture, Path imagePath) {
+    private static boolean saveMapartImage(DynamicTexture mapartTexture, Path imagePath) {
         try {
-            if (mapartTexture == null || mapartTexture.getImage() == null)
+            if (mapartTexture == null || mapartTexture.getPixels() == null)
                 return false;
-            mapartTexture.getImage().writeTo(imagePath);
+            mapartTexture.getPixels().writeToFile(imagePath);
         } catch (InvalidPathException e) {
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
             throw new RuntimeException(e);
@@ -31,26 +31,26 @@ public class MapartSaver {
         return true;
     }
 
-    public static void saveMapartImage(String mapartName, NativeImageBackedTexture mapartTexture, PlayerEntity player) {
+    public static void saveMapartImage(String mapartName, DynamicTexture mapartTexture, Player player) {
         try {
             String filename = Utils.makeUniqueFilename(SAVED_MAPS_DIR, mapartName, "png");
             Path filepath = SAVED_MAPS_DIR.resolve(filename);
             if (saveMapartImage(mapartTexture, filepath) && player != null) {
-                Text mapartFile = Text.literal(filename)
-                        .styled(style -> style
-                                .withColor(Formatting.GREEN)
+                Component mapartFile = Component.literal(filename)
+                        .withStyle(style -> style
+                                .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent.OpenFile(filepath.toFile()))
-                                .withHoverEvent(new HoverEvent.ShowText(Text.translatable("maparthelper.open_image_file")))
-                                .withUnderline(true)
+                                .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_image_file")))
+                                .withUnderlined(true)
                         );
 
-                player.sendMessage(Text.translatable("maparthelper.mapart_saved", mapartFile).formatted(Formatting.GREEN), false);
+                player.displayClientMessage(Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
             }
         } catch (InvalidPathException e) {
-            player.sendMessage(Text.translatable("maparthelper.saving_path_error").formatted(Formatting.RED), false);
+            player.displayClientMessage(Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
         } catch (Exception e) {
-            player.sendMessage(Text.translatable("maparthelper.saving_error").formatted(Formatting.RED), false);
+            player.displayClientMessage(Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
         }
     }
 }

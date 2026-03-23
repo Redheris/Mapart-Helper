@@ -14,8 +14,6 @@ public class CustomUniformsBind {
     @Inject(method = "bindDefaultUniforms", at = @At("HEAD"))
     private static void bindDefaultUniforms(RenderPass pass, CallbackInfo ci) {
         GpuBuffer gpuBuffer = ColorsHighlightUniform.BUFFER;
-        if (gpuBuffer != null) {
-            pass.setUniform("ColorsHighlight", gpuBuffer);
-        }
+        pass.setUniform("ColorsHighlight", gpuBuffer);
     }
 }

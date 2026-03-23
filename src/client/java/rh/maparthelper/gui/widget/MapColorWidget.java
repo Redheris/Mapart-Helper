@@ -1,24 +1,24 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.block.MapColor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.MapColors;
 
-public class MapColorWidget extends ClickableWidget {
+public class MapColorWidget extends AbstractWidget {
     public final MapColor color;
-    protected Text tooltipColorName;
+    protected Component tooltipColorName;
     protected final boolean isHorizontal;
     protected boolean onlyNormalBrightness = false;
 
     public MapColorWidget(int x, int y, int width, int height, MapColor color, boolean isHorizontal) {
-        super(x, y, width, height, Text.empty());
+        super(x, y, width, height, Component.empty());
         this.color = color;
         this.isHorizontal = isHorizontal;
     }
@@ -27,17 +27,17 @@ public class MapColorWidget extends ClickableWidget {
         if (!enabled) {
             this.tooltipColorName = null;
         } else {
-            this.tooltipColorName = Text.literal(MapColors.findByMapColor(color).name());
+            this.tooltipColorName = Component.literal(MapColors.findByMapColor(color).name());
             if (tooltipColorName.getString().contains("BLACK")) {
-                ((MutableText) tooltipColorName).withColor(MapColor.GRAY.color);
+                ((MutableComponent) tooltipColorName).withColor(MapColor.COLOR_GRAY.col);
             } else {
-                ((MutableText) tooltipColorName).withColor(color.color);
+                ((MutableComponent) tooltipColorName).withColor(color.col);
             }
         }
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
     }
 
     @Override
@@ -46,20 +46,20 @@ public class MapColorWidget extends ClickableWidget {
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
-        if (color == MapColor.CLEAR) {
-            context.fill(x, y, x + width, y + height, MapColor.LIGHT_GRAY.getRenderColor(MapColor.Brightness.NORMAL));
-            drawScrollableText(context, MinecraftClient.getInstance().textRenderer, Text.translatable("maparthelper.gui.background_color_clear"), getX() + 2, getY(), getRight() - 2, getBottom(), Colors.LIGHT_RED);
-        } else if (onlyNormalBrightness || color == MapColor.WATER_BLUE) {
-            MapColor.Brightness brightness = color == MapColor.WATER_BLUE ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
-            int waterColor = ColorHelper.withAlpha(alpha, color.getRenderColor(brightness));
+        if (color == MapColor.NONE) {
+            context.fill(x, y, x + width, y + height, MapColor.COLOR_LIGHT_GRAY.calculateARGBColor(MapColor.Brightness.NORMAL));
+            renderScrollingString(context, Minecraft.getInstance().font, Component.translatable("maparthelper.gui.background_color_clear"), getX() + 2, getY(), getRight() - 2, getBottom(), CommonColors.SOFT_RED);
+        } else if (onlyNormalBrightness || color == MapColor.WATER) {
+            MapColor.Brightness brightness = color == MapColor.WATER ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
+            int waterColor = ARGB.color(alpha, color.calculateARGBColor(brightness));
             context.fill(x, y, x + width, y + height, waterColor);
         } else {
-            int low = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.LOW));
-            int normal = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.NORMAL));
-            int high = ColorHelper.withAlpha(alpha, color.getRenderColor(MapColor.Brightness.HIGH));
+            int low = ARGB.color(alpha, color.calculateARGBColor(MapColor.Brightness.LOW));
+            int normal = ARGB.color(alpha, color.calculateARGBColor(MapColor.Brightness.NORMAL));
+            int high = ARGB.color(alpha, color.calculateARGBColor(MapColor.Brightness.HIGH));
             if (!isHorizontal) {
                 int segHeight = height / 3;
                 context.fill(x, y, x + width, y + segHeight, low);
@@ -72,10 +72,10 @@ public class MapColorWidget extends ClickableWidget {
                 context.fill(x + segWidth * 2, y, x + width, y + height, high);
             }
         }
-        context.drawBorder(x, y, width, height, ColorHelper.withAlpha(alpha, 0xFF555555));
+        context.renderOutline(x, y, width, height, ARGB.color(alpha, 0xFF555555));
 
-        if (tooltipColorName != null && context.scissorContains(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-            context.drawTooltip(tooltipColorName, mouseX, mouseY);
+        if (tooltipColorName != null && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+            context.setTooltipForNextFrame(tooltipColorName, mouseX, mouseY);
         }
     }
 }

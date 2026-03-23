@@ -1,6 +1,6 @@
 package rh.maparthelper.config.palette;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.DitherEntry;
@@ -82,7 +82,7 @@ public class PaletteColors {
             if (excludingColors.contains(mapColor)) continue;
 
             for (int brightness = 0; brightness < 3; brightness++) {
-                if (mapColor == MapColor.WATER_BLUE && brightness != 2) continue; // Allow only HIGH for water color
+                if (mapColor == MapColor.WATER && brightness != 2) continue; // Allow only HIGH for water color
                 byte colorByte = (byte) ((mapColor.id << 2) | brightness);
 
                 int renderColor = mapRenderColors[colorByte + 128];
@@ -129,10 +129,10 @@ public class PaletteColors {
         for (MapColor mapColor : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             if (excludingColors.contains(mapColor)) continue;
 
-            int brightness = mapColor == MapColor.WATER_BLUE ? 2 : 1; // Normal brightness for water color is HIGH(2)
+            int brightness = mapColor == MapColor.WATER ? 2 : 1; // Normal brightness for water color is HIGH(2)
             byte colorByte = (byte) ((mapColor.id << 2) | brightness);
 
-            int renderColor = MapColor.getRenderColor(colorByte);
+            int renderColor = MapColor.getColorFromPackedId(colorByte);
             if (renderColor == argb) return new DitherEntry(colorByte);
 
             double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());

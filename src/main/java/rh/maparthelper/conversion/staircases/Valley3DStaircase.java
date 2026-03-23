@@ -1,6 +1,6 @@
 package rh.maparthelper.conversion.staircases;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,31 +1,32 @@
 package rh.maparthelper.conversion.schematic;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.Heightmap;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.source.BiomeAccess;
-import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkStatus;
-import net.minecraft.world.chunk.light.LightingProvider;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class DummyWorldView implements WorldView {
+public class DummyWorldView implements LevelReader {
     private final static DummyWorldView INSTANCE = new DummyWorldView();
 
     public static DummyWorldView getInstance() {
@@ -33,43 +34,43 @@ public class DummyWorldView implements WorldView {
     }
 
     @Override
-    public int getTopY(Heightmap.Type heightmap, int x, int z) {
+    public int getHeight(Heightmap.Types heightmap, int x, int z) {
         return 0;
     }
 
     @Override
-    public BlockState getBlockState(BlockPos pos) {
-        return Blocks.AIR.getDefaultState();
+    public @NotNull BlockState getBlockState(BlockPos pos) {
+        return Blocks.AIR.defaultBlockState();
     }
 
 
     @Override
-    public @Nullable Chunk getChunk(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
+    public @Nullable ChunkAccess getChunk(int chunkX, int chunkZ, ChunkStatus leastStatus, boolean create) {
         return null;
     }
 
     @Override
-    public boolean isChunkLoaded(int chunkX, int chunkZ) {
+    public boolean hasChunk(int chunkX, int chunkZ) {
         return false;
     }
 
     @Override
-    public int getAmbientDarkness() {
+    public int getSkyDarken() {
         return 0;
     }
 
     @Override
-    public BiomeAccess getBiomeAccess() {
+    public @NotNull BiomeManager getBiomeManager() {
         return null;
     }
 
     @Override
-    public RegistryEntry<Biome> getGeneratorStoredBiome(int biomeX, int biomeY, int biomeZ) {
+    public @NotNull Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
         return null;
     }
 
     @Override
-    public boolean isClient() {
+    public boolean isClientSide() {
         return false;
     }
 
@@ -79,37 +80,37 @@ public class DummyWorldView implements WorldView {
     }
 
     @Override
-    public DimensionType getDimension() {
+    public @NotNull DimensionType dimensionType() {
         return null;
     }
 
     @Override
-    public DynamicRegistryManager getRegistryManager() {
+    public @NotNull RegistryAccess registryAccess() {
         return null;
     }
 
     @Override
-    public FeatureSet getEnabledFeatures() {
+    public @NotNull FeatureFlagSet enabledFeatures() {
         return null;
     }
 
     @Override
-    public float getBrightness(Direction direction, boolean shaded) {
+    public float getShade(Direction direction, boolean shaded) {
         return 0;
     }
 
     @Override
-    public LightingProvider getLightingProvider() {
+    public @NotNull LevelLightEngine getLightEngine() {
         return null;
     }
 
     @Override
-    public WorldBorder getWorldBorder() {
+    public @NotNull WorldBorder getWorldBorder() {
         return null;
     }
 
     @Override
-    public List<VoxelShape> getEntityCollisions(@Nullable Entity entity, Box box) {
+    public @NotNull List<VoxelShape> getEntityCollisions(@Nullable Entity entity, AABB box) {
         return List.of();
     }
 
@@ -119,7 +120,7 @@ public class DummyWorldView implements WorldView {
     }
 
     @Override
-    public FluidState getFluidState(BlockPos pos) {
+    public @NotNull FluidState getFluidState(BlockPos pos) {
         return null;
     }
 }

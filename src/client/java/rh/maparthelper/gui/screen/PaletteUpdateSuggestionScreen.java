@@ -1,13 +1,13 @@
 package rh.maparthelper.gui.screen;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.MultilineTextWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineTextWidget;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
 public class PaletteUpdateSuggestionScreen extends Screen {
@@ -18,74 +18,74 @@ public class PaletteUpdateSuggestionScreen extends Screen {
     private final int boxHeight = 100;
 
     public PaletteUpdateSuggestionScreen(Screen parent) {
-        super(Text.of("Palette update suggestion"));
+        super(Component.nullToEmpty("Palette update suggestion"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
         String paletteGameVersion = PaletteConfigManager.completePalette.getGameVersion();
-        MutableText unknownLabel = Text.translatable("maparthelper.gui.for_unknown_game_version");
-        MutableText gameVersionName;
+        MutableComponent unknownLabel = Component.translatable("maparthelper.gui.for_unknown_game_version");
+        MutableComponent gameVersionName;
         if (paletteGameVersion == null)
             gameVersionName = unknownLabel;
         else
-            gameVersionName = Text.literal(paletteGameVersion);
-        Text gameVersion = gameVersionName.formatted(Formatting.DARK_AQUA);
-        Text suggestionText = Text.translatable(
+            gameVersionName = Component.literal(paletteGameVersion);
+        Component gameVersion = gameVersionName.withStyle(ChatFormatting.DARK_AQUA);
+        Component suggestionText = Component.translatable(
                 "maparthelper.gui.ask_to_update_palette",
                 gameVersion
         );
         boxX = (width - boxWidth) / 2;
         boxY = (height - boxHeight) / 2;
 
-        MultilineTextWidget suggestionLabel = new MultilineTextWidget(suggestionText, textRenderer)
+        MultiLineTextWidget suggestionLabel = new MultiLineTextWidget(suggestionText, font)
                 .setCentered(true)
                 .setMaxWidth(boxWidth - 16);
         suggestionLabel.setPosition(
                 boxX + (boxWidth - suggestionLabel.getWidth()) / 2,
                 boxY + (boxHeight - suggestionLabel.getHeight() - 10) / 2
         );
-        this.addDrawableChild(suggestionLabel);
+        this.addRenderableWidget(suggestionLabel);
 
         int optionBtnWidth = 130;
-        Text keepOption = Text.translatable("maparthelper.gui.keep_current_palette");
-        ButtonWidget deny = ButtonWidget.builder(
+        Component keepOption = Component.translatable("maparthelper.gui.keep_current_palette");
+        Button deny = Button.builder(
                         keepOption,
                         btn -> {
                             PaletteConfigManager.bumpPaletteGameVersion();
-                            MinecraftClient.getInstance().setScreen(new MapartEditorScreen());
+                            Minecraft.getInstance().setScreen(new MapartEditorScreen());
                         }
                 )
-                .position(boxX + 1, boxY + boxHeight - 21)
+                .pos(boxX + 1, boxY + boxHeight - 21)
                 .size(optionBtnWidth, 20)
                 .build();
 
-        Text regenerateOption = Text.translatable("maparthelper.gui.regenerate_palette");
-        ButtonWidget update = ButtonWidget.builder(
+        Component regenerateOption = Component.translatable("maparthelper.gui.regenerate_palette");
+        Button update = Button.builder(
                         regenerateOption,
                         btn -> {
                             PaletteConfigManager.regenerateCompletePalette();
-                            MinecraftClient.getInstance().setScreen(new MapartEditorScreen());
+                            Minecraft.getInstance().setScreen(new MapartEditorScreen());
                         }
                 )
-                .position(boxX + boxWidth - optionBtnWidth - 1, boxY + boxHeight - 21)
+                .pos(boxX + boxWidth - optionBtnWidth - 1, boxY + boxHeight - 21)
                 .size(optionBtnWidth, 20)
                 .build();
-        this.addDrawableChild(deny);
-        this.addDrawableChild(update);
+        this.addRenderableWidget(deny);
+        this.addRenderableWidget(update);
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    public void renderBackground(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         super.renderBackground(context, mouseX, mouseY, deltaTicks);
 
         context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x77000000);
-        context.drawBorder(boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
+        context.renderOutline(boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
     }
 
     @Override
-    public void close() {
-        MinecraftClient.getInstance().setScreen(parent);
+    public void onClose() {
+        Minecraft.getInstance().setScreen(parent);
     }
 }

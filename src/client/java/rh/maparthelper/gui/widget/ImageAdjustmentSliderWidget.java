@@ -1,9 +1,9 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.client.input.KeyCodes;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Executors;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class ImageAdjustmentSliderWidget extends SliderWidget {
+public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
     private final float min;
     private final float max;
     private final boolean isDecimalValue;
@@ -32,7 +32,7 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
             Consumer<Double> onValueChanged,
             Function<Double, String> formatter
     ) {
-        super(0, 0, width, height, Text.empty(), (initialValue - min) / (max - min));
+        super(0, 0, width, height, Component.empty(), (initialValue - min) / (max - min));
         this.min = min;
         this.max = max;
         this.isDecimalValue = isDecimalValue;
@@ -44,7 +44,7 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
 
     @Override
     protected void updateMessage() {
-        setMessage(Text.literal(formatter.apply(getRealValue())));
+        setMessage(Component.literal(formatter.apply(getRealValue())));
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (KeyCodes.isToggle(keyCode)) {
+        if (CommonInputs.selected(keyCode)) {
             this.setFocused(!this.isFocused());
             return true;
         } else {
@@ -96,7 +96,7 @@ public class ImageAdjustmentSliderWidget extends SliderWidget {
 
     public void setValue(double value) {
         double d = this.value;
-        this.value = MathHelper.clamp(value, 0.0F, 1.0F);
+        this.value = Mth.clamp(value, 0.0F, 1.0F);
         if (d != this.value) {
             this.applyValue();
         }

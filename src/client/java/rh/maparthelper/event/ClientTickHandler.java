@@ -1,14 +1,14 @@
 package rh.maparthelper.event;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BeaconRenderer;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
@@ -19,49 +19,50 @@ import rh.maparthelper.util.MapUtils;
 
 public class ClientTickHandler {
     public static void init() {
-        KeyBinding openScreen = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+        KeyMapping openScreen = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.maparthelper.openScreen",
-                InputUtil.Type.KEYSYM,
+                InputConstants.Type.KEYSYM,
                 GLFW.GLFW_KEY_Y,
-                KeyBinding.UI_CATEGORY
+                KeyMapping.CATEGORY_INTERFACE
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (openScreen.wasPressed()) {
+            while (openScreen.consumeClick()) {
                 client.setScreen(new MapartEditorScreen());
             }
-            if (client.world != null && ClientCommandsContext.showFakeItemFrames()) {
-                long liveTime = client.world.getTime() - ClientCommandsContext.getFakeFramesBornTime();
+            if (client.level != null && ClientCommandsContext.showFakeItemFrames()) {
+                long liveTime = client.level.getGameTime() - ClientCommandsContext.getFakeFramesBornTime();
                 if (liveTime >= MapartHelper.commonConfig.fakeItemFramesLiveTime) {
-                    FakeMapsPreview.removeFakeItemFrames(client.world);
+                    FakeMapsPreview.removeFakeItemFrames(client.level);
                 }
             }
         });
 
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             if (!ClientCommandsContext.showMapartStartPos()) return;
-            MatrixStack matrices = context.matrixStack();
-            VertexConsumerProvider vertexConsumers = context.consumers();
+            PoseStack poseStack = context.matrixStack();
+            MultiBufferSource vertexConsumers = context.consumers();
 
-            if (matrices == null || vertexConsumers == null)
+            if (poseStack == null || vertexConsumers == null)
                 return;
 
-            Vec3d pos = context.camera().getPos();
+            Vec3 pos = context.camera().getPosition();
             for (int x = -1; x < 2; x++) {
                 for (int y = -1; y < 2; y++) {
-                    Vector2i mapPos = MapUtils.getMapAreaStartPos((int)pos.x + x * 128, (int)pos.z + y * 128);
-                    if (x == 0 && y == 0 && Math.abs(pos.x - mapPos.x - 0.5) <= 0.4 && Math.abs(pos.z - mapPos.y - 0.5) <= 0.4) continue;
+                    Vector2i mapPos = MapUtils.getMapAreaStartPos((int) pos.x + x * 128, (int) pos.z + y * 128);
+                    if (x == 0 && y == 0 && Math.abs(pos.x - mapPos.x - 0.5) <= 0.4 && Math.abs(pos.z - mapPos.y - 0.5) <= 0.4)
+                        continue;
 
-                    matrices.push();
-                    matrices.translate(mapPos.x - pos.x, context.world().getBottomY() - pos.y, mapPos.y - pos.z);
-                    BeaconBlockEntityRenderer.renderBeam(
-                            matrices, vertexConsumers,
-                            BeaconBlockEntityRenderer.BEAM_TEXTURE,
+                    poseStack.pushPose();
+                    poseStack.translate(mapPos.x - pos.x, context.world().getMinY() - pos.y, mapPos.y - pos.z);
+                    BeaconRenderer.renderBeaconBeam(
+                            poseStack, vertexConsumers,
+                            BeaconRenderer.BEAM_LOCATION,
                             0, 1, 0, 0, context.world().getHeight(),
                             MapartHelper.commonConfig.selectionColor,
                             0.2F, 0.0F
                     );
-                    matrices.pop();
+                    poseStack.popPose();
                 }
             }
         });

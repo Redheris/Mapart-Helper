@@ -1,16 +1,16 @@
 package rh.maparthelper.conversion.schematic;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtInt;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.Shapes;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteColors;
@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MapartSchematicBuilder {
-    private final NbtCompound nbt = new NbtCompound();
-    private final NbtList blocks = new NbtList();
+    private final CompoundTag nbt = new CompoundTag();
+    private final ListTag blocks = new ListTag();
     private final int[][] mapColors;
     private final int xSize;
     private int ySize = 1;
@@ -47,7 +47,7 @@ public class MapartSchematicBuilder {
         addBaseMetadata();
     }
 
-    public NbtCompound build() {
+    public CompoundTag build() {
         if (staircaseStyle != StaircaseStyles.FLAT_2D)
             heightsZX = staircaseStyle.getStaircase(mapColors);
         for (int z = 0; z < zSize; z++) {
@@ -57,7 +57,7 @@ public class MapartSchematicBuilder {
                     addBlock(auxBlock, x, y, z);
                 else {
                     MapColor mapColor = PaletteColors.getMapColorEntryByARGB(mapColors[z - 1][x]).mapColor();
-                    if (mapColor != MapColor.CLEAR)
+                    if (mapColor != MapColor.NONE)
                         addColor(mapColor, x, y, z);
                 }
             }
@@ -110,23 +110,23 @@ public class MapartSchematicBuilder {
     }
 
     private void addBlock(Block block, int x, int y, int z) {
-        NbtCompound entry = new NbtCompound();
-        NbtList pos = new NbtList();
-        pos.add(NbtInt.of(x));
-        pos.add(NbtInt.of(y));
-        pos.add(NbtInt.of(z));
+        CompoundTag entry = new CompoundTag();
+        ListTag pos = new ListTag();
+        pos.add(IntTag.valueOf(x));
+        pos.add(IntTag.valueOf(y));
+        pos.add(IntTag.valueOf(z));
         entry.put("pos", pos);
         int blockId = getBlockMaterialId(block);
-        entry.put("state", NbtInt.of(blockId));
+        entry.put("state", IntTag.valueOf(blockId));
         blocks.add(entry);
         ySize = Math.max(y + 1, ySize);
     }
 
     private void addPaletteAndBlocks() {
-        NbtList palette = new NbtList();
+        ListTag palette = new ListTag();
         for (Block block : blocks_palette) {
             BlockState blockState = PaletteGenerator.getDefaultPaletteState(block);
-            NbtCompound blockEntry = NbtHelper.fromBlockState(blockState);
+            CompoundTag blockEntry = NbtUtils.writeBlockState(blockState);
             palette.add(blockEntry);
         }
         nbt.put("palette", palette);
@@ -134,27 +134,28 @@ public class MapartSchematicBuilder {
     }
 
     private void addSize() {
-        NbtList size = new NbtList();
-        size.add(NbtInt.of(xSize));
-        size.add(NbtInt.of(ySize));
-        size.add(NbtInt.of(zSize));
+        ListTag size = new ListTag();
+        size.add(IntTag.valueOf(xSize));
+        size.add(IntTag.valueOf(ySize));
+        size.add(IntTag.valueOf(zSize));
         nbt.put("size", size);
     }
 
     private void addBaseMetadata() {
-        String author = MinecraftClient.getInstance().getSession().getUsername() + " // using Mapart Helper";
+        String author = Minecraft.getInstance().getUser().getName() + " // using Mapart Helper";
         nbt.putString("author", author);
-        NbtHelper.putDataVersion(nbt);
+        NbtUtils.addCurrentDataVersion(nbt);
     }
 
     public static boolean shouldPlaceAuxBlock(Block block) {
-        if (MapartHelper.conversionSettings.getUseAuxBlocks() == UseAuxBlocks.NO_AUX || block.getDefaultState().isAir())
+        if (MapartHelper.conversionSettings.getUseAuxBlocks() == UseAuxBlocks.NO_AUX || block.defaultBlockState().isAir())
             return false;
         return needsAuxBlock(block);
     }
+
     public static boolean needsAuxBlock(Block block) {
-        boolean canPlaceAtAir = block.getDefaultState().canPlaceAt(DummyWorldView.getInstance(), BlockPos.ORIGIN);
-        boolean hasNoCollision = block.getDefaultState().getCollisionShape(null, null) == VoxelShapes.empty();
+        boolean canPlaceAtAir = block.defaultBlockState().canSurvive(DummyWorldView.getInstance(), BlockPos.ZERO);
+        boolean hasNoCollision = block.defaultBlockState().getCollisionShape(null, null) == Shapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
     }
 }

@@ -1,6 +1,6 @@
 package rh.maparthelper.conversion.staircases;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 
@@ -15,7 +15,7 @@ public interface IMapartStaircase {
                 .map(ints -> Arrays.stream(ints)
                         .map(color -> {
                             MapColorEntry mapColor = PaletteColors.getMapColorEntryByARGB(color);
-                            return mapColor.mapColor() == MapColor.WATER_BLUE ? 1 : mapColor.brightness().id;
+                            return mapColor.mapColor() == MapColor.WATER ? 1 : mapColor.brightness().id;
                         })
                         .toArray()
                 ).toArray(int[][]::new);

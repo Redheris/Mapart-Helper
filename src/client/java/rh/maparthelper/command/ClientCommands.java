@@ -6,12 +6,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.item.FilledMapItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.map.MapState;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -25,12 +25,16 @@ public class ClientCommands {
             dispatcher.register(literal("mart")
                 .executes(ctx -> {
                     var player = ctx.getSource().getPlayer();
-                    player.sendMessage(Text.empty(), false);
-                    player.sendMessage(Text.translatable("maparthelper.commands_list_1").formatted(Formatting.BOLD, Formatting.DARK_AQUA), false);
+                    player.displayClientMessage(Component.empty(), false);
+                    player.displayClientMessage(
+                            Component.translatable("maparthelper.commands_list_1")
+                                    .withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_AQUA),
+                            false
+                    );
                     for (int i = 2; i < 8; i++) {
-                        player.sendMessage(Text.translatable("maparthelper.commands_list_" + i), false);
+                        player.displayClientMessage(Component.translatable("maparthelper.commands_list_" + i), false);
                     }
-                    player.sendMessage(Text.empty(), false);
+                    player.displayClientMessage(Component.empty(), false);
                     return 1;
                 })
                 .then(literal("save")
@@ -52,14 +56,14 @@ public class ClientCommands {
                 .then(literal("beams")
                         .executes(ctx -> {
                             ClientCommandsContext.showMapartStartPos = !ClientCommandsContext.showMapartStartPos;
-                            Text status;
+                            Component status;
                             if (ClientCommandsContext.showMapartStartPos)
-                                status = Text.translatable("maparthelper.beams_on").formatted(Formatting.GREEN);
+                                status = Component.translatable("maparthelper.beams_on").withStyle(ChatFormatting.GREEN);
                             else
-                                status = Text.translatable("maparthelper.beams_off").formatted(Formatting.RED);
-                            ctx.getSource().getPlayer().sendMessage(
-                                    Text.translatable("maparthelper.beams_change_status", status)
-                                            .formatted(Formatting.DARK_AQUA),
+                                status = Component.translatable("maparthelper.beams_off").withStyle(ChatFormatting.RED);
+                            ctx.getSource().getPlayer().displayClientMessage(
+                                    Component.translatable("maparthelper.beams_change_status", status)
+                                            .withStyle(ChatFormatting.DARK_AQUA),
                                     true
                             );
                             return 1;
@@ -70,8 +74,8 @@ public class ClientCommands {
                             .executes(ctx -> {
                                 // Regenerates blocks palette to correspond to the configs and game's blocks list
                                 PaletteConfigManager.regenerateCompletePalette();
-                                ctx.getSource().getPlayer().sendMessage(Text.translatable(
-                                        "maparthelper.blocks_palette_generated").formatted(Formatting.GREEN),
+                                ctx.getSource().getPlayer().displayClientMessage(Component.translatable(
+                                        "maparthelper.blocks_palette_generated").withStyle(ChatFormatting.GREEN),
                                         true
                                 );
                                 return 1;
@@ -80,8 +84,8 @@ public class ClientCommands {
                             .executes(ctx -> {
                                 PaletteConfigManager.updateCompletePalette();
                                 PaletteConfigManager.readPresetsConfigFile();
-                                ctx.getSource().getPlayer().sendMessage(Text.translatable(
-                                                "maparthelper.presets_config_updated").formatted(Formatting.GREEN),
+                                ctx.getSource().getPlayer().displayClientMessage(Component.translatable(
+                                                "maparthelper.presets_config_updated").withStyle(ChatFormatting.GREEN),
                                         true
                                 );
                                 return 1;
@@ -93,21 +97,21 @@ public class ClientCommands {
 
     // Save image from the held FilledMapItem
     private static int saveMapFromHand(CommandContext<FabricClientCommandSource> ctx) {
-        assert ctx.getSource().getEntity() instanceof ClientPlayerEntity;
+        assert ctx.getSource().getEntity() instanceof LocalPlayer;
 
-        ClientPlayerEntity player = (ClientPlayerEntity) ctx.getSource().getEntity();
-        ItemStack itemStack = player.getMainHandStack();
+        LocalPlayer player = (LocalPlayer) ctx.getSource().getEntity();
+        ItemStack itemStack = player.getMainHandItem();
 
-        if (!(itemStack.getItem() instanceof FilledMapItem))
-            itemStack = player.getOffHandStack();
-        if (!(itemStack.getItem() instanceof FilledMapItem)) {
-            player.sendMessage(Text.translatable(
-                            "maparthelper.is_holding_filled_map").formatted(Formatting.RED),
+        if (!(itemStack.getItem() instanceof MapItem))
+            itemStack = player.getOffhandItem();
+        if (!(itemStack.getItem() instanceof MapItem)) {
+            player.displayClientMessage(Component.translatable(
+                            "maparthelper.is_holding_filled_map").withStyle(ChatFormatting.RED),
                     true);
             return 0;
         }
 
-        MapState mapState = FilledMapItem.getMapState(itemStack, player.getWorld());
+        MapItemSavedData mapState = MapItem.getSavedData(itemStack, player.level());
         assert mapState != null;
         byte[] mapColors = mapState.colors.clone();
 
@@ -123,14 +127,14 @@ public class ClientCommands {
 
     // Save image from the item frames the player is looking at
     private static int saveMapFromFrame(CommandContext<FabricClientCommandSource> ctx) {
-        assert ctx.getSource().getEntity() instanceof ClientPlayerEntity;
+        assert ctx.getSource().getEntity() instanceof LocalPlayer;
 
-        ClientPlayerEntity player = (ClientPlayerEntity) ctx.getSource().getEntity();
+        LocalPlayer player = (LocalPlayer) ctx.getSource().getEntity();
         byte[] mapColors = MapartToFile.getMapColorsFromItemFrame();
 
         if (mapColors == null) {
-            player.sendMessage(Text.translatable(
-                            "maparthelper.is_looking_at_frame_with_map").formatted(Formatting.RED),
+            player.displayClientMessage(Component.translatable(
+                            "maparthelper.is_looking_at_frame_with_map").withStyle(ChatFormatting.RED),
                     true);
             return 0;
         }
@@ -147,32 +151,32 @@ public class ClientCommands {
 
     private static int saveMapFromFramesArea(CommandContext<FabricClientCommandSource> ctx) {
         if (ClientCommandsContext.selectedPos2 == null || ClientCommandsContext.selectedPos1 == null) {
-            ctx.getSource().sendFeedback(Text.translatable("maparthelper.selection_required").formatted(Formatting.RED));
+            ctx.getSource().sendFeedback(Component.translatable("maparthelper.selection_required").withStyle(ChatFormatting.RED));
             return 0;
         }
 
         String filename = StringArgumentType.getString(ctx, "filename");
-        ClientPlayerEntity player = (ClientPlayerEntity)ctx.getSource().getEntity();
+        LocalPlayer player = (LocalPlayer)ctx.getSource().getEntity();
 
-        MapartToFile.saveImageFromItemFramesArea(player, player.getWorld(), filename);
+        MapartToFile.saveImageFromItemFramesArea(player, player.level(), filename);
 
         return 1;
     }
 
     // Save image from the selected area of item frames
     private static int selectFrameArea(CommandContext<FabricClientCommandSource> ctx) {
-        assert ctx.getSource().getEntity() instanceof ClientPlayerEntity;
-        ClientPlayerEntity player = (ClientPlayerEntity) ctx.getSource().getEntity();
+        assert ctx.getSource().getEntity() instanceof LocalPlayer;
+        LocalPlayer player = (LocalPlayer) ctx.getSource().getEntity();
 
         if (ClientCommandsContext.selectedPos1 != null || ClientCommandsContext.isSelectingFramesArea) {
             ClientCommandsContext.resetSelection();
-            player.sendMessage(Text.translatable("maparthelper.selecting_stopped").formatted(Formatting.DARK_AQUA), true);
+            player.displayClientMessage(Component.translatable("maparthelper.selecting_stopped").withStyle(ChatFormatting.DARK_AQUA), true);
             return 0;
         }
         ClientCommandsContext.isSelectingFramesArea = true;
 
-        player.sendMessage(Text.translatable("maparthelper.pos_selecting").formatted(Formatting.DARK_AQUA), false);
-        player.sendMessage(Text.translatable("maparthelper.stop_selecting").formatted(Formatting.GRAY, Formatting.ITALIC), false);
+        player.displayClientMessage(Component.translatable("maparthelper.pos_selecting").withStyle(ChatFormatting.DARK_AQUA), false);
+        player.displayClientMessage(Component.translatable("maparthelper.stop_selecting").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
         return 1;
     }
 }

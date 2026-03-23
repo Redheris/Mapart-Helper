@@ -1,7 +1,7 @@
 package rh.maparthelper.config.palette;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.util.Utils;
@@ -90,7 +90,7 @@ public class PalettePresetsConfig {
 
         public String createNewPreset(boolean createDefault, Set<String> updatedPresets, Set<String> deletedPresets) {
             String presetFilename = Utils.makeUniqueName(filename ->
-                    (updatedPresets.contains(filename) || Files.exists(PRESETS_PATH.resolve(filename))) && !deletedPresets.contains(filename),
+                            (updatedPresets.contains(filename) || Files.exists(PRESETS_PATH.resolve(filename))) && !deletedPresets.contains(filename),
                     "new_preset", "json", "%s_%d"
             );
             updatedPresets.add(presetFilename);

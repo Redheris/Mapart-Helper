@@ -2,7 +2,7 @@ package rh.maparthelper.conversion;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.MapartHelper;
@@ -214,7 +214,7 @@ public class MapartImageConverter {
                     }
                     if (Thread.currentThread().isInterrupted()) return;
 
-                    MinecraftClient.getInstance().execute(() -> {
+                    Minecraft.getInstance().execute(() -> {
                         NativeImageUtils.updateMapartImageTexture(mapart.getNativeImage());
                         isUpdating = false;
                         conversionProgress.set(1.0);
@@ -232,8 +232,8 @@ public class MapartImageConverter {
                     MapartHelper.LOGGER.error("Unexpected error occurred while reading and converting an imag: ", e);
                     throw new RuntimeException(e);
                 } finally {
-                    MinecraftClient.getInstance().execute(() -> {
-                        if (MinecraftClient.getInstance().currentScreen instanceof MapartEditorScreen editorScreen) {
+                    Minecraft.getInstance().execute(() -> {
+                        if (Minecraft.getInstance().screen instanceof MapartEditorScreen editorScreen) {
                             editorScreen.updateMaterialList();
                             editorScreen.updateMapartOutputButtons();
                         }

@@ -1,34 +1,34 @@
 package rh.maparthelper.util;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.ItemGuiElementRenderState;
-import net.minecraft.client.render.item.KeyedItemRenderState;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.render.state.GuiItemRenderState;
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3x2f;
 import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 public class RenderUtils {
-    public static void renderItemStack(DrawContext context, ItemStack itemStack, String stateName, int x, int y, int width, int height) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        KeyedItemRenderState keyedItemRenderState = new KeyedItemRenderState();
-        client.getItemModelManager().clearAndUpdate(
+    public static void renderItemStack(GuiGraphics context, ItemStack itemStack, String stateName, int x, int y, int width, int height) {
+        Minecraft client = Minecraft.getInstance();
+        TrackingItemStackRenderState keyedItemRenderState = new TrackingItemStackRenderState();
+        client.getItemModelResolver().updateForTopItem(
                 keyedItemRenderState,
                 itemStack,
                 ItemDisplayContext.GUI,
-                client.world,
+                client.level,
                 client.player,
                 0
         );
-        ItemGuiElementRenderState itemRenderState = new ItemGuiElementRenderState(
+        GuiItemRenderState itemRenderState = new GuiItemRenderState(
                 stateName,
-                new Matrix3x2f(context.getMatrices()),
+                new Matrix3x2f(context.pose()),
                 keyedItemRenderState,
                 x, y,
-                context.scissorStack.peekLast()
+                context.scissorStack.peek()
         );
-        context.state.addSpecialElement(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
+        context.guiRenderState.submitPicturesInPictureState(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
                 itemRenderState,
                 x, y,
                 x + width, y + height,

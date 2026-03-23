@@ -1,12 +1,18 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractScrollArea;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.Layout;
+import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.layouts.LayoutSettings;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,12 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-// To be honest, I would like to rewrite the drop-down menu widget and this one someday.
-// The processing of their behavior looks... not very elegant.
-// But rewriting will take some time, so I'll save this comment here for my future self
-public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidget {
+// This implementation will soon be replaced by a more elegant one
+public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     @Nullable
-    private final Element parentWidget;
+    private final GuiEventListener parentWidget;
     public final InnerGridWidget grid;
     private final int scrollWidth;
     private int visibleTopY;
@@ -27,8 +31,8 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     protected boolean leftScroll = false;
     private int scrollBarColor = 0xFFC8C8C8;
 
-    public ScrollableGridWidget(@Nullable Element parentWidget, int x, int y, int width, int height, int scrollWidth) {
-        super(x, y, width, height, Text.empty());
+    public ScrollableGridWidget(@Nullable GuiEventListener parentWidget, int x, int y, int width, int height, int scrollWidth) {
+        super(x, y, width, height, Component.empty());
         this.parentWidget = parentWidget;
         this.grid = new InnerGridWidget(x, y);
         this.scrollWidth = scrollWidth;
@@ -44,11 +48,11 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     }
 
     @Override
-    public void forEachElement(Consumer<Widget> consumer) {
+    public void visitChildren(Consumer<LayoutElement> consumer) {
     }
 
     @Override
-    public void forEachChild(Consumer<ClickableWidget> consumer) {
+    public void visitWidgets(Consumer<AbstractWidget> consumer) {
     }
 
     @Override
@@ -57,9 +61,9 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     }
 
     @Override
-    public void refreshPositions() {
-        grid.refreshPositions();
-        LayoutWidget.super.refreshPositions();
+    public void arrangeElements() {
+        grid.arrangeElements();
+        Layout.super.arrangeElements();
     }
 
     @Override
@@ -75,45 +79,45 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
         this.needRelayout = true;
     }
 
-    public Optional<Widget> hoveredElement(double mouseX, double mouseY) {
-        boolean onScroll = this.overflows()
-                && mouseX >= this.getScrollbarX()
-                && mouseX <= this.getScrollbarX() + scrollWidth
+    public Optional<LayoutElement> hoveredElement(double mouseX, double mouseY) {
+        boolean onScroll = this.scrollbarVisible()
+                && mouseX >= this.scrollBarX()
+                && mouseX <= this.scrollBarX() + scrollWidth
                 && mouseY >= this.getY()
                 && mouseY < this.getBottom();
         if (onScroll) return Optional.of(this);
         return grid.children.stream().filter(w ->
-                (!(w instanceof ClickableWidget cw) || cw.active && cw.visible) &&
-                mouseX >= w.getX() && mouseX < w.getX() + w.getWidth() && mouseY >= w.getY() && mouseY < w.getY() + w.getHeight()
+                (!(w instanceof AbstractWidget cw) || cw.active && cw.visible) &&
+                        mouseX >= w.getX() && mouseX < w.getX() + w.getWidth() && mouseY >= w.getY() && mouseY < w.getY() + w.getHeight()
         ).findFirst();
     }
 
     @Override
-    protected int getContentsHeightWithPadding() {
+    protected int contentHeight() {
         return grid.getHeight();
     }
 
     @Override
-    protected double getDeltaYPerScroll() {
+    protected double scrollRate() {
         return 15;
     }
 
     @Override
-    public void setScrollY(double scrollY) {
-        super.setScrollY(scrollY);
-        grid.setY((int) (getY() - getScrollY()));
-        grid.refreshPositions();
+    public void setScrollAmount(double scrollY) {
+        super.setScrollAmount(scrollY);
+        grid.setY((int) (getY() - scrollAmount()));
+        grid.arrangeElements();
     }
 
     @Override
-    protected int getScrollbarX() {
+    protected int scrollBarX() {
         return this.leftScroll ? this.getX() : this.getRight() - scrollWidth;
     }
 
     public boolean isOverScroll(double x, double y) {
-        return this.overflows()
-                && x >= this.getScrollbarX()
-                && x <= this.getScrollbarX() + scrollWidth
+        return this.scrollbarVisible()
+                && x >= this.scrollBarX()
+                && x <= this.scrollBarX() + scrollWidth
                 && y >= this.getY()
                 && y < this.getBottom();
     }
@@ -121,7 +125,7 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (parentWidget == null || parentWidget.isMouseOver(mouseX, mouseY)) {
-            if (overflows()) {
+            if (scrollbarVisible()) {
                 return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
             }
         }
@@ -129,28 +133,28 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         if (needRelayout) {
             grid.setX(this.getX());
-            grid.setY((int) (this.getY() - this.getScrollY()));
-            grid.refreshPositions();
+            grid.setY((int) (this.getY() - this.scrollAmount()));
+            grid.arrangeElements();
             this.needRelayout = false;
         }
-        if (parentWidget instanceof Widget w)
+        if (parentWidget instanceof LayoutElement w)
             context.enableScissor(getX(), Math.max(visibleTopY, w.getY()), getRight(), Math.min(visibleTopY + getHeight(), w.getY() + w.getHeight()));
         else
             context.enableScissor(getX(), visibleTopY, getRight(), visibleTopY + getHeight());
-        grid.forEachChild(w -> w.render(context, mouseX, mouseY, deltaTicks));
-        drawScrollbar(context);
+        grid.visitWidgets(w -> w.render(context, mouseX, mouseY, deltaTicks));
+        renderScrollbar(context);
         context.disableScissor();
     }
 
     @Override
-    protected void drawScrollbar(DrawContext context) {
-        if (this.overflows()) {
-            int i = this.getScrollbarX();
-            int j = this.getScrollbarThumbHeight();
-            int k = this.getScrollbarThumbY();
+    protected void renderScrollbar(GuiGraphics context) {
+        if (this.scrollbarVisible()) {
+            int i = this.scrollBarX();
+            int j = this.scrollerHeight();
+            int k = this.scrollBarY();
             context.fill(i, this.getY(), i + scrollWidth, getY() + this.getHeight(), 0xFF555555);
             context.fill(i, k, i + scrollWidth, k + j, scrollBarColor);
         }
@@ -158,14 +162,15 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY)) return false;
-        if (this.checkScrollbarDragged(mouseX, mouseY, button)) return true;
+        if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY))
+            return false;
+        if (this.updateScrolling(mouseX, mouseY, button)) return true;
 
-        for (Widget w : grid.children) {
-            if (!(w instanceof ClickableWidget child)) continue;
+        for (LayoutElement w : grid.children) {
+            if (!(w instanceof AbstractWidget child)) continue;
             if (!child.visible) continue;
             if (child.isMouseOver(mouseX, mouseY)) {
-                Screen currentScreen = MinecraftClient.getInstance().currentScreen;
+                Screen currentScreen = Minecraft.getInstance().screen;
                 if (currentScreen != null) {
                     currentScreen.setFocused(child);
                     currentScreen.setDragging(true);
@@ -177,28 +182,28 @@ public class ScrollableGridWidget extends ScrollableWidget implements LayoutWidg
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
     }
 
-    public static class InnerGridWidget extends GridWidget {
-        private final List<Widget> children = new ArrayList<>();
+    public static class InnerGridWidget extends GridLayout {
+        private final List<LayoutElement> children = new ArrayList<>();
 
         public InnerGridWidget(int x, int y) {
             super(x, y);
         }
 
-        public boolean isChild(Widget widget) {
+        public boolean isChild(LayoutElement widget) {
             return children.contains(widget);
         }
 
         @Override
-        public <T extends Widget> T add(T widget, int row, int column, int occupiedRows, int occupiedColumns, Positioner positioner) {
-            if (widget instanceof LayoutWidget layoutWidget) {
-                layoutWidget.forEachChild(children::add);
+        public <T extends LayoutElement> @NotNull T addChild(T widget, int row, int column, int occupiedRows, int occupiedColumns, LayoutSettings positioner) {
+            if (widget instanceof Layout layoutWidget) {
+                layoutWidget.visitWidgets(children::add);
             } else {
                 children.add(widget);
             }
-            return super.add(widget, row, column, occupiedRows, occupiedColumns, positioner);
+            return super.addChild(widget, row, column, occupiedRows, occupiedColumns, positioner);
         }
     }
 }

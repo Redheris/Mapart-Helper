@@ -3,20 +3,24 @@ package rh.maparthelper.gui.screen;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.LayoutSettings;
+import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
@@ -50,28 +54,28 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
-    private static final Identifier SETTINGS_TEXTURE = Identifier.of(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
+    private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
     protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
 
-    private DirectionalLayoutWidget settingsLeft;
-    private DirectionalLayoutWidget settingsRight;
-    private DirectionalLayoutWidget mapartOptions;
+    private LinearLayout settingsLeft;
+    private LinearLayout settingsRight;
+    private LinearLayout mapartOptions;
     private MapartPreviewWidget mapartPreview;
     private final int baseElementWidth = 165;
     private boolean shortElements = false;
 
-    private ButtonWidget saveNBT;
-    private ButtonWidget saveSplitNBT;
-    private ButtonWidget saveZipNBT;
-    private ButtonWidget getMapItemsButton;
-    private ButtonWidget showInWorldButton;
-    private ButtonWidget resetExcludedColors;
-    private ButtonWidget toggleManualCroppingButtonsButton;
+    private Button saveNBT;
+    private Button saveSplitNBT;
+    private Button saveZipNBT;
+    private Button getMapItemsButton;
+    private Button showInWorldButton;
+    private Button resetExcludedColors;
+    private Button toggleManualCroppingButtonsButton;
 
     private final MaterialListPanel materialList = new MaterialListPanel(this, mapart, 0, 0, 0, 0);
 
     public MapartEditorScreen() {
-        super(Text.translatable("maparthelper.gui.mapart_editor_screen"));
+        super(Component.translatable("maparthelper.gui.mapart_editor_screen"));
     }
 
     public void setHighlightingColor(MapColor color) {
@@ -79,7 +83,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     public void updateMaterialList() {
-        materialList.updateMaterialList(this::addDrawableChild, this::remove);
+        materialList.updateMaterialList(this::addRenderableWidget, this::removeWidget);
     }
 
     @Override
@@ -101,11 +105,11 @@ public class MapartEditorScreen extends ScreenAdapted {
                 settingsLeft.getX() + settingsLeft.getWidth() + 9, 33,
                 settingsRight.getX() - 15, this.height - 20
         );
-        this.addDrawableChild(mapartPreview);
+        this.addRenderableWidget(mapartPreview);
 
         mapartOptions.setPosition(mapartPreview.getImageX(), 10);
-        mapartOptions.refreshPositions();
-        mapartOptions.forEachChild(this::addDrawableChild);
+        mapartOptions.arrangeElements();
+        mapartOptions.visitWidgets(this::addRenderableWidget);
 
         updateMapartOutputButtons();
     }
@@ -115,60 +119,60 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     private void initMapartOptionsPanel() {
-        mapartOptions = DirectionalLayoutWidget.horizontal().spacing(2);
+        mapartOptions = LinearLayout.horizontal().spacing(2);
 
         if (MapartHelper.commonConfig.mapartEditor.showImageImportButton) {
-            ButtonWidget importButton = ButtonWidget.builder(
-                    Text.literal("📂"),
+            Button importButton = Button.builder(
+                    Component.literal("📂"),
                     btn -> FileDialogsUtils.openImageImportDialog(path ->
-                            MinecraftClient.getInstance().execute(() -> readImage(Path.of(path)))
+                            Minecraft.getInstance().execute(() -> readImage(Path.of(path)))
                     )
             ).size(20, 20).build();
 
-            importButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.import_tooltip", "Import Image")));
-            mapartOptions.add(importButton);
+            importButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.import_tooltip", "Import Image")));
+            mapartOptions.addChild(importButton);
         }
 
-        mapartOptions.add(createSaveMapartDropdown());
+        mapartOptions.addChild(createSaveMapartDropdown());
 
-        ButtonWidget showGridButton = ButtonWidget.builder(
-                Text.literal("#").formatted(CurrentConversionSettings.doShowGrid ? Formatting.AQUA : Formatting.RESET),
+        Button showGridButton = Button.builder(
+                Component.literal("#").withStyle(CurrentConversionSettings.doShowGrid ? ChatFormatting.AQUA : ChatFormatting.RESET),
                 (btn) -> {
                     boolean doShowGrid = !CurrentConversionSettings.doShowGrid;
                     CurrentConversionSettings.doShowGrid = doShowGrid;
-                    btn.setMessage(btn.getMessage().copy().formatted(doShowGrid ? Formatting.AQUA : Formatting.RESET));
+                    btn.setMessage(btn.getMessage().copy().withStyle(doShowGrid ? ChatFormatting.AQUA : ChatFormatting.RESET));
                 }
         ).size(20, 20).build();
-        showGridButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showGrid_tooltip")));
-        mapartOptions.add(showGridButton);
+        showGridButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.showGrid_tooltip")));
+        mapartOptions.addChild(showGridButton);
 
-        showInWorldButton = ButtonWidget.builder(
-                Text.of("\uD83C\uDF0D"),
+        showInWorldButton = Button.builder(
+                Component.nullToEmpty("\uD83C\uDF0D"),
                 (btn) -> {
-                    if (client == null || client.player == null) return;
-                    if (FakeMapsPreview.createFakeFramesFromMapart(mapart, client.player)) {
-                        FakeMapsPreview.showFakeFrames(client.player, mapart.getWidth(), mapart.getHeight());
-                        this.close();
+                    if (minecraft == null || minecraft.player == null) return;
+                    if (FakeMapsPreview.createFakeFramesFromMapart(mapart, minecraft.player)) {
+                        FakeMapsPreview.showFakeFrames(minecraft.player, mapart.getWidth(), mapart.getHeight());
+                        this.onClose();
                     }
                 }
         ).size(20, 20).build();
-        showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
-        mapartOptions.add(showInWorldButton);
+        showInWorldButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.showInWorld_tooltip")));
+        mapartOptions.addChild(showInWorldButton);
 
-        toggleManualCroppingButtonsButton = ButtonWidget.builder(
-                Text.literal("\uD83D\uDDBC").formatted(CurrentConversionSettings.doShowManualCroppingButtons ? Formatting.RESET : Formatting.DARK_GRAY),
+        toggleManualCroppingButtonsButton = Button.builder(
+                Component.literal("\uD83D\uDDBC").withStyle(CurrentConversionSettings.doShowManualCroppingButtons ? ChatFormatting.RESET : ChatFormatting.DARK_GRAY),
                 (btn) -> {
                     boolean doShowManualCroppingButtons = !CurrentConversionSettings.doShowManualCroppingButtons;
                     CurrentConversionSettings.doShowManualCroppingButtons = doShowManualCroppingButtons;
-                    btn.setMessage(btn.getMessage().copy().formatted(doShowManualCroppingButtons ? Formatting.RESET : Formatting.DARK_GRAY));
+                    btn.setMessage(btn.getMessage().copy().withStyle(doShowManualCroppingButtons ? ChatFormatting.RESET : ChatFormatting.DARK_GRAY));
                 }
         ).size(20, 20).build();
         toggleManualCroppingButtonsButton.active = CurrentConversionSettings.cropMode == CroppingMode.USER_CROP;
-        toggleManualCroppingButtonsButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.toggle_manual_cropping_buttons")));
-        mapartOptions.add(toggleManualCroppingButtonsButton);
+        toggleManualCroppingButtonsButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.toggle_manual_cropping_buttons")));
+        mapartOptions.addChild(toggleManualCroppingButtonsButton);
 
-        ButtonWidget resetMapartButton = ButtonWidget.builder(
-                Text.literal("⟲").formatted(Formatting.BOLD),
+        Button resetMapartButton = Button.builder(
+                Component.literal("⟲").withStyle(ChatFormatting.BOLD),
                 b -> {
                     CurrentConversionSettings.resetMapart();
                     updateMapartOutputButtons();
@@ -176,37 +180,37 @@ public class MapartEditorScreen extends ScreenAdapted {
                     updateResetExcludedColorsButton(false);
                 }
         ).size(20, 20).build();
-        resetMapartButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.reset_mapart")));
-        mapartOptions.add(resetMapartButton);
-        mapartOptions.refreshPositions();
+        resetMapartButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.reset_mapart")));
+        mapartOptions.addChild(resetMapartButton);
+        mapartOptions.arrangeElements();
     }
 
     private void initLeftPanel() {
         final int elementWidth = currentElementWidth();
-        settingsLeft = DirectionalLayoutWidget.vertical();
+        settingsLeft = LinearLayout.vertical();
         settingsLeft.setPosition(5, 20);
-        Positioner settingsLeftPositioner = settingsLeft.getMainPositioner().marginTop(5);
-        Positioner topLabeledPositioner = settingsLeftPositioner.copy().marginTop(0);
+        LayoutSettings settingsLeftPositioner = settingsLeft.defaultCellSetting().paddingTop(5);
+        LayoutSettings topLabeledPositioner = settingsLeftPositioner.copy().paddingTop(0);
 
         AdjTextFieldWidget mapartName = new AdjTextFieldWidget(
-                textRenderer, elementWidth, 20, mapart.mapartName, "Mapart name"
+                font, elementWidth, 20, mapart.mapartName, "Mapart name"
         );
-        mapartName.setPlaceholder(Text.translatable("maparthelper.gui.mapart_name_field").withColor(Colors.GRAY));
+        mapartName.setHint(Component.translatable("maparthelper.gui.mapart_name_field").withColor(CommonColors.GRAY));
         mapartName.setValueValidator(s -> !s.isBlank());
-        mapartName.setTextPredicate(TextFieldPredicates.validPathName());
+        mapartName.setFilter(TextFieldPredicates.validPathName());
         mapartName.setValueConsumer(newValue -> mapart.mapartName = newValue);
-        settingsLeft.add(new TextWidget(Text.translatable("maparthelper.gui.mapart_name_field"), textRenderer));
-        settingsLeft.add(mapartName, topLabeledPositioner);
+        settingsLeft.addChild(new StringWidget(Component.translatable("maparthelper.gui.mapart_name_field"), font));
+        settingsLeft.addChild(mapartName, topLabeledPositioner);
 
-        GridWidget size = createSizeSettingsGrid();
-        settingsLeft.add(size);
+        GridLayout size = createSizeSettingsGrid();
+        settingsLeft.addChild(size);
 
-        settingsLeft.refreshPositions();
-        settingsLeft.forEachChild(this::addDrawableChild);
+        settingsLeft.arrangeElements();
+        settingsLeft.visitWidgets(this::addRenderableWidget);
 
-        this.addDrawableChild(
+        this.addRenderableWidget(
                 DecorativeButtonWidget.builder(
-                        SETTINGS_TEXTURE, btn -> MinecraftClient.getInstance().setScreen(
+                        SETTINGS_TEXTURE, btn -> Minecraft.getInstance().setScreen(
                                 AutoConfig.getConfigScreen(MapartHelperConfig.class, this).get()
                         )
                 ).dimensions(2, 4, 14, 14).build()
@@ -218,12 +222,12 @@ public class MapartEditorScreen extends ScreenAdapted {
                 settingsLeft.getX(), listTop,
                 elementWidth + 6, height - listTop, 6
         );
-        settingsLeftScrollable.grid.getMainPositioner().marginTop(5);
-        GridWidget.Adder adder = settingsLeftScrollable.grid.createAdder(1);
+        settingsLeftScrollable.grid.defaultCellSetting().paddingTop(5);
+        GridLayout.RowHelper adder = settingsLeftScrollable.grid.createRowHelper(1);
 
-        Text previewMapart = Text.translatable("maparthelper.gui.previewMapart");
-        Text previewOriginal = Text.translatable("maparthelper.gui.previewOriginal").formatted(Formatting.GOLD);
-        ButtonWidget previewMode = ButtonWidget.builder(
+        Component previewMapart = Component.translatable("maparthelper.gui.previewMapart");
+        Component previewOriginal = Component.translatable("maparthelper.gui.previewOriginal").withStyle(ChatFormatting.GOLD);
+        Button previewMode = Button.builder(
                 MapartHelper.conversionSettings.isShowOriginalImage() ? previewOriginal : previewMapart,
                 (btn) -> {
                     MapartHelper.conversionSettings.toggleShowOriginalImage();
@@ -231,17 +235,17 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(elementWidth, 20).build();
-        adder.add(new TextWidget(Text.translatable("maparthelper.gui.previewMode"), textRenderer));
-        adder.add(previewMode, topLabeledPositioner);
+        adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.previewMode"), font));
+        adder.addChild(previewMode, topLabeledPositioner);
 
         // ===============================================
 
         if (shortElements)
-            adder.add(new TextWidget(Text.translatable("maparthelper.gui.cropMode"), textRenderer));
+            adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.cropMode"), font));
         EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
                 this, 0, 0, elementWidth, 20, elementWidth,
-                Text.translatable("maparthelper.gui.cropMode"),
-                Text.translatable("maparthelper.gui.option." + CurrentConversionSettings.cropMode.name()),
+                Component.translatable("maparthelper.gui.cropMode"),
+                Component.translatable("maparthelper.gui.option." + CurrentConversionSettings.cropMode.name()),
                 !shortElements
         );
         croppingMode.addEntries(
@@ -253,15 +257,15 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 CroppingMode.values()
         );
-        if (shortElements) adder.add(croppingMode, topLabeledPositioner);
-        else adder.add(croppingMode);
+        if (shortElements) adder.addChild(croppingMode, topLabeledPositioner);
+        else adder.addChild(croppingMode);
 
         if (shortElements)
-            adder.add(new TextWidget(Text.translatable("maparthelper.gui.staircaseStyle"), textRenderer));
+            adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.staircaseStyle"), font));
         EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
                 this, 0, 0, elementWidth, 20, elementWidth,
-                Text.translatable("maparthelper.gui.staircaseStyle"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getStaircaseStyle().name()),
+                Component.translatable("maparthelper.gui.staircaseStyle"),
+                Component.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getStaircaseStyle().name()),
                 !shortElements
         );
         staircaseStyle.toggleTooltips(MapartHelper.commonConfig.mapartEditor.showStaircaseTooltips);
@@ -276,15 +280,15 @@ public class MapartEditorScreen extends ScreenAdapted {
                 StaircaseStyles.WAVES_3D,
                 MapartHelper.commonConfig.mapartEditor.displayUnobtainableMode ? StaircaseStyles.UNOBTAINABLE : null
         );
-        if (shortElements) adder.add(staircaseStyle, topLabeledPositioner);
-        else adder.add(staircaseStyle);
+        if (shortElements) adder.addChild(staircaseStyle, topLabeledPositioner);
+        else adder.addChild(staircaseStyle);
 
         if (shortElements)
-            adder.add(new TextWidget(Text.translatable("maparthelper.gui.ditheringAlg"), textRenderer));
+            adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.ditheringAlg"), font));
         EnumDropdownMenuWidget colorConverter = new EnumDropdownMenuWidget(
                 this, 0, 0, elementWidth, 20, elementWidth, 280,
-                Text.translatable("maparthelper.gui.ditheringAlg"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getColorConverter().name()),
+                Component.translatable("maparthelper.gui.ditheringAlg"),
+                Component.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getColorConverter().name()),
                 !shortElements
         );
         colorConverter.setLeftScroll(true);
@@ -295,58 +299,58 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 ColorConverters.values()
         );
-        if (shortElements) adder.add(colorConverter, topLabeledPositioner);
-        else adder.add(colorConverter);
+        if (shortElements) adder.addChild(colorConverter, topLabeledPositioner);
+        else adder.addChild(colorConverter);
 
-        Text isOn = Text.translatable("maparthelper.gui.isOn");
-        Text isOff = Text.translatable("maparthelper.gui.isOff");
-        ButtonWidget useLAB = ButtonWidget.builder(
-                Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB() ? isOn : isOff),
+        Component isOn = Component.translatable("maparthelper.gui.isOn");
+        Component isOff = Component.translatable("maparthelper.gui.isOff");
+        Button useLAB = Button.builder(
+                Component.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB() ? isOn : isOff),
                 (btn) -> {
                     MapartHelper.conversionSettings.toggleLAB();
-                    btn.setMessage(Text.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB() ? isOn : isOff));
+                    btn.setMessage(Component.literal("LAB: ").append(MapartHelper.conversionSettings.useLAB() ? isOn : isOff));
                     MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(80, 20).build();
 
         if (MapartHelper.commonConfig.mapartEditor.showUseLABTooltip) {
-            useLAB.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.useLAB_tooltip")));
+            useLAB.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.useLAB_tooltip")));
             useLAB.setTooltipDelay(Duration.ofMillis(500));
         }
-        adder.add(useLAB);
+        adder.addChild(useLAB);
 
-        adder.add(new ImagePreprocessingDropdown(this, mapart, 100, elementWidth));
+        adder.addChild(new ImagePreprocessingDropdown(this, mapart, 100, elementWidth));
 
-        DirectionalLayoutWidget bgColorChoose = DirectionalLayoutWidget.horizontal();
-        bgColorChoose.getMainPositioner().alignVerticalCenter();
-        bgColorChoose.add(new TextWidget(Text.translatable("maparthelper.gui.backgroundColor"), textRenderer));
-        bgColorChoose.add(new MapColorPickerWidget(
+        LinearLayout bgColorChoose = LinearLayout.horizontal();
+        bgColorChoose.defaultCellSetting().alignVerticallyMiddle();
+        bgColorChoose.addChild(new StringWidget(Component.translatable("maparthelper.gui.backgroundColor"), font));
+        bgColorChoose.addChild(new MapColorPickerWidget(
                 this, mapart, 20, 20,
                 elementWidth, 180, 4
         ));
-        adder.add(bgColorChoose);
+        adder.addChild(bgColorChoose);
 
-        adder.add(
-                new TextWidget(Text.translatable("maparthelper.aux_block"), textRenderer),
-                settingsLeftPositioner.copy().marginTop(15)
+        adder.addChild(
+                new StringWidget(Component.translatable("maparthelper.aux_block"), font),
+                settingsLeftPositioner.copy().paddingTop(15)
         );
-        String currentAuxBlock = Registries.BLOCK.getId(MapartHelper.conversionSettings.getAuxBlock()).toString();
+        String currentAuxBlock = BuiltInRegistries.BLOCK.getKey(MapartHelper.conversionSettings.getAuxBlock()).toString();
         if (currentAuxBlock.contains("minecraft:"))
             currentAuxBlock = currentAuxBlock.substring(10);
         BlockItemWidget auxBlockPreview = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.getAuxBlock(), false);
 
-        GridWidget auxBlock = new GridWidget().setSpacing(5);
-        auxBlock.getMainPositioner().alignVerticalCenter();
-        GridWidget.Adder auxAdder = auxBlock.createAdder(2);
-        auxAdder.add(createAuxBlockFieldWidget(auxBlockPreview, currentAuxBlock));
-        auxAdder.add(auxBlockPreview);
-        adder.add(auxBlock);
+        GridLayout auxBlock = new GridLayout().spacing(5);
+        auxBlock.defaultCellSetting().alignVerticallyMiddle();
+        GridLayout.RowHelper auxAdder = auxBlock.createRowHelper(2);
+        auxAdder.addChild(createAuxBlockFieldWidget(auxBlockPreview, currentAuxBlock));
+        auxAdder.addChild(auxBlockPreview);
+        adder.addChild(auxBlock);
 
         EnumDropdownMenuWidget useAuxBlocks = new EnumDropdownMenuWidget(
                 this, 0, 0,
                 elementWidth, 20, elementWidth,
-                Text.translatable("maparthelper.gui.use_aux"),
-                Text.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getUseAuxBlocks())
+                Component.translatable("maparthelper.gui.use_aux"),
+                Component.translatable("maparthelper.gui.option." + MapartHelper.conversionSettings.getUseAuxBlocks())
         );
         useAuxBlocks.addEntries(
                 e -> {
@@ -355,20 +359,20 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 UseAuxBlocks.values()
         );
-        adder.add(useAuxBlocks);
+        adder.addChild(useAuxBlocks);
 
-        settingsLeftScrollable.refreshPositions();
-        this.addDrawableChild(settingsLeftScrollable);
+        settingsLeftScrollable.arrangeElements();
+        this.addRenderableWidget(settingsLeftScrollable);
     }
 
     private void initRightPanel() {
         final int elementWidth = currentElementWidth();
-        settingsRight = DirectionalLayoutWidget.vertical();
-        Positioner settingsRightPositioner = settingsRight.getMainPositioner().marginTop(5);
+        settingsRight = LinearLayout.vertical();
+        LayoutSettings settingsRightPositioner = settingsRight.defaultCellSetting().paddingTop(5);
 
         PresetsDropdownMenuWidget presetsList = new PresetsDropdownMenuWidget(
                 this, 0, 0, elementWidth, 20, elementWidth,
-                Text.of("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
+                Component.nullToEmpty("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
         );
         presetsList.addEntries(
                 s -> {
@@ -383,34 +387,34 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
         );
-        TextWidget currentPresetLabel = new TextWidget(Text.translatable("maparthelper.gui.current_preset_label"), textRenderer);
-        settingsRight.add(currentPresetLabel);
-        settingsRight.add(presetsList, settingsRightPositioner.copy().marginTop(0));
+        StringWidget currentPresetLabel = new StringWidget(Component.translatable("maparthelper.gui.current_preset_label"), font);
+        settingsRight.addChild(currentPresetLabel);
+        settingsRight.addChild(presetsList, settingsRightPositioner.copy().paddingTop(0));
 
-        ButtonWidget presetsEditor = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.presets_editor_screen"),
+        Button presetsEditor = Button.builder(
+                Component.translatable("maparthelper.gui.presets_editor_screen"),
                 (btn) ->
-                        MinecraftClient.getInstance().setScreen(
+                        Minecraft.getInstance().setScreen(
                                 new PresetsEditorScreen(this, 45, 30, 45, 30)
                         )
         ).size(elementWidth, 20).build();
-        settingsRight.add(presetsEditor);
+        settingsRight.addChild(presetsEditor);
 
-        DirectionalLayoutWidget materialListSettings = DirectionalLayoutWidget.horizontal().spacing(2);
-        materialListSettings.getMainPositioner().alignBottom();
-        materialListSettings.add(DecorativeButtonWidget.builder(
-                Text.of(materialList.isMaterialsAscendingOrder() ? "▲" : "▼"),
+        LinearLayout materialListSettings = LinearLayout.horizontal().spacing(2);
+        materialListSettings.defaultCellSetting().alignVerticallyBottom();
+        materialListSettings.addChild(DecorativeButtonWidget.builder(
+                Component.nullToEmpty(materialList.isMaterialsAscendingOrder() ? "▲" : "▼"),
                 btn -> {
                     materialList.toggleMaterialsAscendingOrder();
-                    btn.setMessage(Text.of(materialList.isMaterialsAscendingOrder() ? "▲" : "▼"));
+                    btn.setMessage(Component.nullToEmpty(materialList.isMaterialsAscendingOrder() ? "▲" : "▼"));
                     updateMaterialList();
                 }
         ).size(10, 10).build());
-        materialListSettings.add(new TextWidget(Text.translatable("maparthelper.gui.material_list_label"), textRenderer));
-        resetExcludedColors = ButtonWidget.builder(
-                Text.literal("⟲")
-                        .formatted(Formatting.BOLD)
-                        .formatted(PaletteColors.excludingColorsAmount() > 0 ? Formatting.GOLD : Formatting.WHITE),
+        materialListSettings.addChild(new StringWidget(Component.translatable("maparthelper.gui.material_list_label"), font));
+        resetExcludedColors = Button.builder(
+                Component.literal("⟲")
+                        .withStyle(ChatFormatting.BOLD)
+                        .withStyle(PaletteColors.excludingColorsAmount() > 0 ? ChatFormatting.GOLD : ChatFormatting.WHITE),
                 btn -> {
                     if (PaletteColors.excludingColorsAmount() == 0) return;
                     MapartImageUpdater.revertExcludingColors(mapart);
@@ -418,58 +422,58 @@ public class MapartEditorScreen extends ScreenAdapted {
                 }
         ).size(14, 14).build();
         updateResetExcludedColorsButton(PaletteColors.excludingColorsAmount() > 0);
-        materialListSettings.add(resetExcludedColors);
-        settingsRight.add(materialListSettings);
+        materialListSettings.addChild(resetExcludedColors);
+        settingsRight.addChild(materialListSettings);
 
-        Text perMapCountMode = Text.translatable("maparthelper.gui.countMode.perBlock");
-        Text fullCountMode = Text.translatable("maparthelper.gui.countMode.full");
-        ButtonWidget materialsCountMode = ButtonWidget
+        Component perMapCountMode = Component.translatable("maparthelper.gui.countMode.perBlock");
+        Component fullCountMode = Component.translatable("maparthelper.gui.countMode.full");
+        Button materialsCountMode = Button
                 .builder(MapartHelper.conversionSettings.getMaterialsCountMode() == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode,
                         btn -> {
                             MapartHelper.conversionSettings.nextMaterialsCountMode();
                             MaterialsCountModes mode = MapartHelper.conversionSettings.getMaterialsCountMode();
                             btn.setMessage(mode == MaterialsCountModes.FULL ? fullCountMode : perMapCountMode);
-                            btn.setTooltip(Tooltip.of(mode.getDescription()));
+                            btn.setTooltip(Tooltip.create(mode.getDescription()));
                             updateMaterialList();
                         })
                 .size(elementWidth, 14)
                 .build();
-        materialsCountMode.setTooltip(Tooltip.of(MapartHelper.conversionSettings.getMaterialsCountMode().getDescription()));
-        settingsRight.add(materialsCountMode);
+        materialsCountMode.setTooltip(Tooltip.create(MapartHelper.conversionSettings.getMaterialsCountMode().getDescription()));
+        settingsRight.addChild(materialsCountMode);
 
-        Text remaining = Text.translatable("maparthelper.gui.amount_remaining").formatted(Formatting.GOLD);
-        Text description = Text.translatable("maparthelper.gui.amount_remaining_description");
-        Text total = Text.translatable("maparthelper.gui.amount_total");
-        ButtonWidget amountDisplayMode = ButtonWidget
+        Component remaining = Component.translatable("maparthelper.gui.amount_remaining").withStyle(ChatFormatting.GOLD);
+        Component description = Component.translatable("maparthelper.gui.amount_remaining_description");
+        Component total = Component.translatable("maparthelper.gui.amount_total");
+        Button amountDisplayMode = Button
                 .builder(materialList.isDisplayRemainingAmount() ? remaining : total,
                         btn -> {
                             materialList.toggleDisplayRemainingAmount();
                             btn.setMessage(materialList.isDisplayRemainingAmount() ? remaining : total);
-                            btn.setTooltip(materialList.isDisplayRemainingAmount() ? Tooltip.of(description) : null);
+                            btn.setTooltip(materialList.isDisplayRemainingAmount() ? Tooltip.create(description) : null);
                             updateMaterialList();
                         })
                 .size(elementWidth, 14)
                 .build();
-        amountDisplayMode.setTooltip(materialList.isDisplayRemainingAmount() ? Tooltip.of(description) : null);
-        settingsRight.add(amountDisplayMode, settingsRightPositioner.copy().marginTop(2));
+        amountDisplayMode.setTooltip(materialList.isDisplayRemainingAmount() ? Tooltip.create(description) : null);
+        settingsRight.addChild(amountDisplayMode, settingsRightPositioner.copy().paddingTop(2));
 
-        settingsRight.refreshPositions();
+        settingsRight.arrangeElements();
         settingsRight.setPosition(width - settingsRight.getWidth() - 5, 20);
-        settingsRight.forEachChild(this::addDrawableChild);
+        settingsRight.visitWidgets(this::addRenderableWidget);
 
         // Widget positions adjustments
         resetExcludedColors.setX(width - 5 - resetExcludedColors.getWidth());
 
         if (PaletteConfigManager.isPaletteOutdated()) {
-            Identifier warningTex = Identifier.of("textures/gui/sprites/dialog/warning_button.png");
-            Identifier warningTexHovered = Identifier.of("textures/gui/sprites/dialog/warning_button_highlighted.png");
+            Identifier warningTex = Identifier.parse("textures/gui/sprites/dialog/warning_button.png");
+            Identifier warningTexHovered = Identifier.parse("textures/gui/sprites/dialog/warning_button_highlighted.png");
             var regenBtn = new DecorativeButtonWidget.Builder(warningTex, btn ->
-                    MinecraftClient.getInstance().setScreen(new PaletteUpdateSuggestionScreen(this))
+                    Minecraft.getInstance().setScreen(new PaletteUpdateSuggestionScreen(this))
             )
                     .dimensions(currentPresetLabel.getX(), 2, 20, 20)
                     .highlightedTexture(warningTexHovered)
                     .build();
-            this.addDrawableChild(regenBtn);
+            this.addRenderableWidget(regenBtn);
         }
 
         materialList.setPosition(settingsRight.getX(), settingsRight.getY() + settingsRight.getHeight());
@@ -480,13 +484,13 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     private @NotNull AdjTextFieldWidget createAuxBlockFieldWidget(BlockItemWidget auxBlockPreview, String currentAuxBlock) {
         AdjTextFieldWidget auxBlockId = new AdjTextFieldWidget(
-                textRenderer, currentElementWidth() - auxBlockPreview.getWidth() - 5, 20,
+                font, currentElementWidth() - auxBlockPreview.getWidth() - 5, 20,
                 currentAuxBlock, "Auxiliary block identifier"
         );
         auxBlockId.setValueValidator(TextFieldValidators.auxBlockIdentifier());
         auxBlockId.setValueConsumer(idStr -> {
-            Identifier id = Identifier.of(idStr);
-            Block block = Registries.BLOCK.get(id);
+            Identifier id = Identifier.parse(idStr);
+            Block block = BuiltInRegistries.BLOCK.getValue(id);
             MapartHelper.conversionSettings.setAuxBlock(block);
             auxBlockPreview.setBlock(block);
             updateMaterialList();
@@ -495,7 +499,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
         context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
         super.render(context, mouseX, mouseY, delta);
@@ -525,19 +529,19 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public void onFilesDropped(List<Path> paths) {
+    public void onFilesDrop(List<Path> paths) {
         readImage(paths.getFirst());
     }
 
-    private GridWidget createSizeSettingsGrid() {
-        GridWidget size = new GridWidget().setSpacing(10).setRowSpacing(1);
-        GridWidget.Adder adder = size.createAdder(2);
+    private GridLayout createSizeSettingsGrid() {
+        GridLayout size = new GridLayout().spacing(10).rowSpacing(1);
+        GridLayout.RowHelper adder = size.createRowHelper(2);
 
         AdjTextFieldWidget widthInput = new AdjTextFieldWidget(
-                textRenderer, 30, 20, "" + mapart.getWidth(), "Width"
+                font, 30, 20, "" + mapart.getWidth(), "Width"
         );
-        widthInput.setPlaceholder(Text.literal("x").withColor(Colors.GRAY));
-        widthInput.setTextPredicate(TextFieldPredicates.positiveInt());
+        widthInput.setHint(Component.literal("x").withColor(CommonColors.GRAY));
+        widthInput.setFilter(TextFieldPredicates.positiveInt());
         widthInput.setValueConsumer(s -> {
             int value = Integer.parseInt(s);
             if (value != mapart.getWidth()) {
@@ -547,10 +551,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         });
 
         AdjTextFieldWidget heightInput = new AdjTextFieldWidget(
-                textRenderer, 30, 20, "" + mapart.getHeight(), "Height"
+                font, 30, 20, "" + mapart.getHeight(), "Height"
         );
-        heightInput.setPlaceholder(Text.literal("y").withColor(Colors.GRAY));
-        heightInput.setTextPredicate(TextFieldPredicates.positiveInt());
+        heightInput.setHint(Component.literal("y").withColor(CommonColors.GRAY));
+        heightInput.setFilter(TextFieldPredicates.positiveInt());
         heightInput.setValueConsumer(s -> {
             int value = Integer.parseInt(s);
             if (value != mapart.getHeight()) {
@@ -559,55 +563,55 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
         });
 
-        adder.add(new TextWidget(Text.translatable("maparthelper.gui.mapart_size_label"), textRenderer), 2);
-        adder.add(widthInput);
-        adder.add(heightInput);
+        adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.mapart_size_label"), font), 2);
+        adder.addChild(widthInput);
+        adder.addChild(heightInput);
 
         return size;
     }
 
     private DropdownMenuWidget createSaveMapartDropdown() {
-        boolean isIntegratedServer = MinecraftClient.getInstance().isIntegratedServerRunning();
+        boolean isIntegratedServer = Minecraft.getInstance().hasSingleplayerServer();
 
-        ButtonWidget saveImage = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.savePNG"),
+        Button saveImage = Button.builder(
+                Component.translatable("maparthelper.gui.savePNG"),
                 (btn) -> {
-                    PlayerEntity player = client != null ? client.player : null;
+                    Player player = minecraft != null ? minecraft.player : null;
                     MapartSaver.saveMapartImage(mapart.mapartName, CurrentConversionSettings.guiMapartImage, player);
                 }
         ).size(156, 20).build();
 
-        saveNBT = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.saveNBT"),
+        saveNBT = Button.builder(
+                Component.translatable("maparthelper.gui.saveNBT"),
                 (btn) -> MapartToNBT.saveNBT(true)
         ).size(156, 20).build();
 
-        saveSplitNBT = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.saveEveryNBT"),
+        saveSplitNBT = Button.builder(
+                Component.translatable("maparthelper.gui.saveEveryNBT"),
                 (btn) -> MapartToNBT.saveNBT(false)
         ).size(156, 20).build();
 
-        saveZipNBT = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.saveZip"),
+        saveZipNBT = Button.builder(
+                Component.translatable("maparthelper.gui.saveZip"),
                 (btn) -> MapartToNBT.saveNBTAsZip()
         ).size(156, 20).build();
 
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (isIntegratedServer && mc.getServer() != null && mc.player != null) {
-            ServerPlayerEntity serverPlayer = mc.getServer().getPlayerManager().getPlayer(mc.player.getUuid());
-            getMapItemsButton = ButtonWidget.builder(
-                    Text.translatable("maparthelper.gui.save_map_items").formatted(Formatting.GOLD),
+        Minecraft mc = Minecraft.getInstance();
+        if (isIntegratedServer && mc.getSingleplayerServer() != null && mc.player != null) {
+            ServerPlayer serverPlayer = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+            getMapItemsButton = Button.builder(
+                    Component.translatable("maparthelper.gui.save_map_items").withStyle(ChatFormatting.GOLD),
                     btn -> {
                         int[][] maps = NativeImageUtils.divideImageByMaps(
                                 mapart.getWidth(), mapart.getHeight(), mapart.getNativeImage()
                         );
-                        MapCreator.getMapsForMapart(maps, mapart.getWidth(), mapart.mapartName, mc.getServer().getOverworld(), serverPlayer);
+                        MapCreator.getMapsForMapart(maps, mapart.getWidth(), mapart.mapartName, mc.getSingleplayerServer().overworld(), serverPlayer);
                     }
             ).size(156, 20).build();
         }
 
-        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Text.literal("\uD83D\uDDAB"));
-        saveMapart.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.save_mapart_as")));
+        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Component.literal("\uD83D\uDDAB"));
+        saveMapart.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.save_mapart_as")));
         saveMapart.addEntry(saveImage);
         saveMapart.addEntry(saveNBT);
         saveMapart.addEntry(saveSplitNBT);
@@ -628,10 +632,10 @@ public class MapartEditorScreen extends ScreenAdapted {
             getMapItemsButton.active = active;
         showInWorldButton.active = active;
         if (!obtainableNbt) {
-            Text unobtainableNbt = Text.translatable("maparthelper.gui.nbt_is_unobtainable");
-            saveNBT.setTooltip(Tooltip.of(unobtainableNbt));
-            saveSplitNBT.setTooltip(Tooltip.of(unobtainableNbt));
-            saveZipNBT.setTooltip(Tooltip.of(unobtainableNbt));
+            Component unobtainableNbt = Component.translatable("maparthelper.gui.nbt_is_unobtainable");
+            saveNBT.setTooltip(Tooltip.create(unobtainableNbt));
+            saveSplitNBT.setTooltip(Tooltip.create(unobtainableNbt));
+            saveZipNBT.setTooltip(Tooltip.create(unobtainableNbt));
         } else if (active) {
             saveNBT.setTooltip(null);
             saveSplitNBT.setTooltip(null);
@@ -639,13 +643,13 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         if (active) {
             if (getMapItemsButton != null) {
-                getMapItemsButton.setTooltip(Tooltip.of(
-                        Text.translatable("maparthelper.gui.singleplayer_only").formatted(Formatting.GOLD)
+                getMapItemsButton.setTooltip(Tooltip.create(
+                        Component.translatable("maparthelper.gui.singleplayer_only").withStyle(ChatFormatting.GOLD)
                 ));
             }
-            showInWorldButton.setTooltip(Tooltip.of(Text.translatable("maparthelper.gui.showInWorld_tooltip")));
+            showInWorldButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.showInWorld_tooltip")));
         } else {
-            Tooltip disabled = Tooltip.of(Text.translatable("maparthelper.gui.enableColorAdaptation"));
+            Tooltip disabled = Tooltip.create(Component.translatable("maparthelper.gui.enableColorAdaptation"));
             saveNBT.setTooltip(disabled);
             saveSplitNBT.setTooltip(disabled);
             saveZipNBT.setTooltip(disabled);
@@ -657,16 +661,16 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public void updateResetExcludedColorsButton(boolean active) {
         if (active) {
-            MutableText excludedAmount = Text.translatable("maparthelper.gui.excluded_colors_amount", PaletteColors.excludingColorsAmount());
-            MutableText revertExcluding = Text.translatable("maparthelper.gui.revert_excluding_colors");
-            resetExcludedColors.setMessage(Text.literal("⟲").formatted(Formatting.BOLD, Formatting.GOLD));
-            resetExcludedColors.setTooltip(Tooltip.of(
-                    excludedAmount.formatted(Formatting.GOLD).append("\n")
-                            .append(revertExcluding.formatted(Formatting.GRAY))
+            MutableComponent excludedAmount = Component.translatable("maparthelper.gui.excluded_colors_amount", PaletteColors.excludingColorsAmount());
+            MutableComponent revertExcluding = Component.translatable("maparthelper.gui.revert_excluding_colors");
+            resetExcludedColors.setMessage(Component.literal("⟲").withStyle(ChatFormatting.BOLD, ChatFormatting.GOLD));
+            resetExcludedColors.setTooltip(Tooltip.create(
+                    excludedAmount.withStyle(ChatFormatting.GOLD).append("\n")
+                            .append(revertExcluding.withStyle(ChatFormatting.GRAY))
             ));
             resetExcludedColors.active = true;
         } else {
-            resetExcludedColors.setMessage(Text.literal("⟲").formatted(Formatting.BOLD, Formatting.WHITE));
+            resetExcludedColors.setMessage(Component.literal("⟲").withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
             resetExcludedColors.setTooltip(null);
             resetExcludedColors.active = false;
         }

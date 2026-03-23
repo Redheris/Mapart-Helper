@@ -1,18 +1,18 @@
 package rh.maparthelper.config;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public enum MaterialsCountModes {
-    FULL(Text.translatable("maparthelper.gui.countMode.perBlock_tooltip")),
-    PER_MAP(Text.translatable("maparthelper.gui.countMode.full_tooltip"));
+    FULL(Component.translatable("maparthelper.gui.countMode.perBlock_tooltip")),
+    PER_MAP(Component.translatable("maparthelper.gui.countMode.full_tooltip"));
 
-    private final Text description;
+    private final Component description;
 
-    MaterialsCountModes(Text description) {
+    MaterialsCountModes(Component description) {
         this.description = description;
     }
 
-    public Text getDescription() {
+    public Component getDescription() {
         return description;
     }
 

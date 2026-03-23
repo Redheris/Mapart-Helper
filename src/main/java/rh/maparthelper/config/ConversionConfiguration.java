@@ -3,9 +3,9 @@ package rh.maparthelper.config;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverters;
@@ -83,7 +83,7 @@ public class ConversionConfiguration implements ConfigData {
     }
 
     public int getBackgroundRenderColor() {
-        return use3D() ? backgroundColor.getRenderColor() : backgroundColor.mapColor().getRenderColor(MapColor.Brightness.NORMAL);
+        return use3D() ? backgroundColor.getRenderColor() : backgroundColor.mapColor().calculateARGBColor(MapColor.Brightness.NORMAL);
     }
 
     public MapColorEntry getBackgroundColor() {

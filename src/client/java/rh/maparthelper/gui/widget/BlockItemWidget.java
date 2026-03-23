@@ -1,39 +1,39 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import rh.maparthelper.gui.screen.PresetsEditorScreen;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockItemWidget extends ClickableWidget {
+public class BlockItemWidget extends AbstractWidget {
     private final boolean hasClickAction;
 
     private Block block;
     private Item blockItem;
-    protected List<OrderedText> tooltip;
+    protected List<FormattedCharSequence> tooltip;
 
     public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
-        super(x, y, squareSize, squareSize, Text.of(block.getName()));
+        super(x, y, squareSize, squareSize, Component.translationArg(block.getName()));
         this.setBlock(block);
         initBlockTooltip();
         this.hasClickAction = hasClickAction;
     }
 
     protected void initBlockTooltip() {
-        List<Text> tooltip = PresetsEditorScreen.getTooltipFromItem(MinecraftClient.getInstance(), blockItem.getDefaultStack());
-        this.tooltip = new ArrayList<>(tooltip.stream().map(Text::asOrderedText).toList());
+        List<Component> tooltip = PresetsEditorScreen.getTooltipFromItem(Minecraft.getInstance(), blockItem.getDefaultInstance());
+        this.tooltip = new ArrayList<>(tooltip.stream().map(Component::getVisualOrderText).toList());
     }
 
     public BlockItemWidget(int x, int y, int squareSize, Block block) {
@@ -42,40 +42,40 @@ public class BlockItemWidget extends ClickableWidget {
 
     public void setBlock(Block block) {
         this.block = block;
-        if (block instanceof FluidBlock) {
-            this.blockItem = Registries.FLUID.get(Registries.BLOCK.getId(block)).getBucketItem();
+        if (block instanceof LiquidBlock) {
+            this.blockItem = BuiltInRegistries.FLUID.getValue(BuiltInRegistries.BLOCK.getKey(block)).getBucket();
         } else {
             this.blockItem = block.asItem();
         }
         initBlockTooltip();
     }
 
-    public void setTooltip(Text tooltip) {
-        this.tooltip = new ArrayList<>(List.of(tooltip.asOrderedText()));
+    public void setTooltip(Component tooltip) {
+        this.tooltip = new ArrayList<>(List.of(tooltip.getVisualOrderText()));
     }
 
-    public void insertToTooltip(int i, Text tooltip) {
-        this.tooltip.add(i, tooltip.asOrderedText());
+    public void insertToTooltip(int i, Component tooltip) {
+        this.tooltip.add(i, tooltip.getVisualOrderText());
     }
 
     public int getStackSize() {
-        return this.blockItem.getMaxCount();
+        return this.blockItem.getDefaultMaxStackSize();
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
         int x = getX();
         int y = getY();
 
-        ItemStack blockItem = this.blockItem.getDefaultStack();
+        ItemStack blockItem = this.blockItem.getDefaultInstance();
         RenderUtils.renderItemStack(context, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
 
         boolean isMouseOverBlock = mouseX >= x
                 && mouseX < x + width
                 && mouseY >= y
                 && mouseY < y + height;
-        if (context.scissorContains(mouseX, mouseY) && isMouseOverBlock) {
-            context.drawTooltip(this.tooltip, mouseX, mouseY);
+        if (context.containsPointInScissor(mouseX, mouseY) && isMouseOverBlock) {
+            context.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
         }
     }
 
@@ -89,6 +89,6 @@ public class BlockItemWidget extends ClickableWidget {
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
     }
 }
