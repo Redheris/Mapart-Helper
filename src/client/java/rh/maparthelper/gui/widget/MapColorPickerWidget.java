@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.widget;
 
-import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
-import rh.maparthelper.config.MapartHelperConfig;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -52,7 +50,6 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         MapColorEntry current = MapartHelper.conversionSettings.getBackgroundColor();
         if (current.mapColor() != color.mapColor() || current.brightness() != color.brightness()) {
             MapartHelper.conversionSettings.setBackgroundColor(color);
-            AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
             MapartImageUpdater.updateMapart(mapart);
         }
     }

@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.screen;
 
-import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -54,6 +53,11 @@ import java.util.List;
 
 //? >=1.21.10
 //import net.minecraft.client.input.KeyEvent;
+
+//? if <= 1.21.8 {
+import me.shedaniel.autoconfig.AutoConfig;
+//?} else
+//import me.shedaniel.autoconfig.AutoConfigClient;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
@@ -216,7 +220,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         this.addRenderableWidget(
                 DecorativeButtonWidget.builder(
                         SETTINGS_TEXTURE, btn -> Minecraft.getInstance().setScreen(
+                                //? if <=1.21.8 {
                                 AutoConfig.getConfigScreen(MapartHelperConfig.class, this).get()
+                                //?} else
+                                //AutoConfigClient.getConfigScreen(MapartHelperConfig.class, this).get()
                         )
                 ).dimensions(2, 4, 14, 14).build()
         );
