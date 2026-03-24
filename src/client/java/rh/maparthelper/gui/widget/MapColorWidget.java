@@ -50,18 +50,37 @@ public class MapColorWidget extends AbstractWidget {
         return true;
     }
     //?} else {
-    /*public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean isDoubleClick) {
+    /*public boolean mouseClicked(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick) {
         return true;
     }
     *///?}
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
         if (color == MapColor.NONE) {
             context.fill(x, y, x + width, y + height, MapColor.COLOR_LIGHT_GRAY.calculateARGBColor(MapColor.Brightness.NORMAL));
-            renderScrollingString(context, Minecraft.getInstance().font, Component.translatable("maparthelper.gui.background_color_clear"), getX() + 2, getY(), getRight() - 2, getBottom(), CommonColors.SOFT_RED);
+            //? if <=1.21.8 {
+            renderScrollingString(
+                    context,
+                    Minecraft.getInstance().font,
+                    Component.translatable("maparthelper.gui.background_color_clear"),
+                    getX() + 2,
+                    getY(),
+                    getRight() - 2,
+                    getBottom(),
+                    CommonColors.SOFT_RED
+            );
+            //?} else {
+            /*context.textRenderer().acceptScrollingWithDefaultCenter(
+                    Component.translatable("maparthelper.gui.background_color_clear").withColor(CommonColors.SOFT_RED),
+                    getX() + 2,
+                    getRight() - 2,
+                    getY(),
+                    getBottom()
+            );
+            *///?}
         } else if (onlyNormalBrightness || color == MapColor.WATER) {
             MapColor.Brightness brightness = color == MapColor.WATER ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
             int waterColor = ARGB.color(alpha, color.calculateARGBColor(brightness));

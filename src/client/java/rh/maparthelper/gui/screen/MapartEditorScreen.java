@@ -504,10 +504,10 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
         context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
-        super.render(context, mouseX, mouseY, delta);
+        super.render(context, mouseX, mouseY, partialTick);
 
         if (!MaterialListPanel.MaterialListBlockWidget.isHoveringAny()) {
             MaterialListPanel.MaterialListBlockWidget.setDefaultHighlight(mapartPreview);

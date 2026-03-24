@@ -2,19 +2,19 @@ package rh.maparthelper.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
 
-//? >=1.21.10
-//import net.minecraft.client.input.InputWithModifiers;
+//? if >=1.21.10 {
+/*import net.minecraft.client.input.InputWithModifiers;
+*///?} else
+import net.minecraft.client.Minecraft;
 
 public class DecorativeButtonWidget extends AbstractButton {
     private final PressAction onPress;
@@ -48,11 +48,8 @@ public class DecorativeButtonWidget extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-        Minecraft minecraftClient = Minecraft.getInstance();
-        int i = ARGB.color(this.alpha, this.active ? CommonColors.WHITE : CommonColors.LIGHT_GRAY);
-        this.renderString(context, minecraftClient.font, i);
-
+    //~ if >=1.21.11 'renderWidget' -> 'renderContents'
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (textureDefault != null) {
             if (isHovered) {
                 context.blit(
@@ -73,6 +70,14 @@ public class DecorativeButtonWidget extends AbstractButton {
                         width, height
                 );
             }
+        } else {
+            //? if >=1.21.11 {
+            /*this.renderDefaultLabel(context.textRenderer(
+                    GuiGraphics.HoveredTextEffects.NONE,
+                    style -> style.withColor(CommonColors.LIGHT_GRAY))
+            );
+            *///?} else <=1.21.8
+            this.renderString(context, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
         }
     }
 

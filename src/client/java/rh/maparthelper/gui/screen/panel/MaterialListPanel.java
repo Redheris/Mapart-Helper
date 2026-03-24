@@ -253,8 +253,8 @@ public class MaterialListPanel extends AbstractLayout {
         }
 
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-            super.renderWidget(context, mouseX, mouseY, deltaTicks);
+        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(context, mouseX, mouseY, partialTick);
             if (fixedHighlight == this) {
                 context.nextStratum();
                 context.renderOutline(getX(), getY(), this.width, this.height, MapartHelper.commonConfig.mapartEditor.previewHighlightingColor);

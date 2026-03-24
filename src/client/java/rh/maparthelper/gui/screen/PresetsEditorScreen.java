@@ -301,11 +301,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         Matrix3x2fStack matrixStack = context.pose();
 
         matrixStack.pushMatrix();
-        parent.render(context, 0, 0, deltaTicks);
+        parent.render(context, 0, 0, partialTick);
         matrixStack.popMatrix();
 
         context.guiRenderState.nextStratum();
@@ -319,11 +319,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         context.renderOutline(boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
         context.hLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
 
-        super.render(context, mouseX, mouseY, deltaTicks);
+        super.render(context, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
     }
 
     @Override
@@ -356,8 +356,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         //~ !widget_events
 
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-            super.renderWidget(context, mouseX, mouseY, deltaTicks);
+        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(context, mouseX, mouseY, partialTick);
 
             PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
             Block presetBlock = preset.colors.get(mapColor);

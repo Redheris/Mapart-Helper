@@ -99,17 +99,17 @@ public abstract class ScreenAdapted extends Screen {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         for (Renderable drawable : drawables) {
             if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY) && !dropdownMenu.isChild((LayoutElement) drawable))
-                drawable.render(context, 0, 0, delta);
+                drawable.render(context, 0, 0, partialTick);
             else
-                drawable.render(context, mouseX, mouseY, delta);
+                drawable.render(context, mouseX, mouseY, partialTick);
         }
 
         if (dropdownMenu != null) {
-            dropdownMenu.renderMenu(context, mouseX, mouseY, delta);
+            dropdownMenu.renderMenu(context, mouseX, mouseY, partialTick);
         }
     }
 

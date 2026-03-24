@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 //import net.minecraft.client.input.MouseButtonEvent;
 
 // This implementation will soon be replaced by a more elegant one
-public class DropdownMenuWidget extends Button implements Layout {
+public class DropdownMenuWidget extends Button/*? if >=1.21.11 {*//*.Plain *//*?}*/ implements Layout {
     public static DropdownMenuWidget expandedOne;
 
     private final Screen parent;
@@ -154,8 +154,9 @@ public class DropdownMenuWidget extends Button implements Layout {
                 && mouseY < topYExpanded + menu.getHeight();
     }
 
+    //~ if >=1.21.11 'renderWidget' -> 'renderContents' {
     @Override
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (needRelayout) {
             menu.setHeight(maxMenuHeight);
             if (getBottom() + menu.getHeight() > parent.height) {
@@ -186,10 +187,11 @@ public class DropdownMenuWidget extends Button implements Layout {
             this.needRelayout = false;
         }
 
-        super.renderWidget(context, mouseX, mouseY, deltaTicks);
+        super.renderWidget(context, mouseX, mouseY, partialTick);
     }
+    //~}
 
-    public void renderMenu(GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    public void renderMenu(GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int left = menu.leftScroll ? getMenuX() - 4 : getMenuX();
         if (expandUpwards) {
             context.fill(getMenuX(), getY() - menu.getHeight() - 2, getMenuX() + menu.getWidth(), getY(), 0x99FFFFFF);
@@ -198,7 +200,7 @@ public class DropdownMenuWidget extends Button implements Layout {
             context.fill(getMenuX(), getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight(), 0x99FFFFFF);
             context.enableScissor(left, getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight());
         }
-        this.menu.render(context, mouseX, mouseY, deltaTicks);
+        this.menu.render(context, mouseX, mouseY, partialTick);
         context.disableScissor();
     }
 }

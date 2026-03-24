@@ -136,7 +136,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     @Override
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (needRelayout) {
             grid.setX(this.getX());
             grid.setY((int) (this.getY() - this.scrollAmount()));
@@ -147,7 +147,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
             context.enableScissor(getX(), Math.max(visibleTopY, w.getY()), getRight(), Math.min(visibleTopY + getHeight(), w.getY() + w.getHeight()));
         else
             context.enableScissor(getX(), visibleTopY, getRight(), visibleTopY + getHeight());
-        grid.visitWidgets(w -> w.render(context, mouseX, mouseY, deltaTicks));
+        grid.visitWidgets(w -> w.render(context, mouseX, mouseY, partialTick));
         renderScrollbar(context/*? if >=1.21.10 {*//*, mouseX, mouseY *//*?}*/);
         context.disableScissor();
     }

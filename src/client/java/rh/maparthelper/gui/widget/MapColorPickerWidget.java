@@ -38,13 +38,15 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         }
     }
 
+    //~ if >=1.21.11 'renderWidget' -> 'renderContents' {
     @Override
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-        super.renderWidget(context, mouseX, mouseY, deltaTicks);
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+        super.renderWidget(context, mouseX, mouseY, partialTick);
         int color = MapartHelper.conversionSettings.getBackgroundRenderColor();
         context.fill(getX(), getY(), getRight(), getBottom(), color);
         context.renderOutline(getX(), getY(), getWidth(), getHeight(), 0xFF555555);
     }
+    //~}
 
     private void setColor(MapColorEntry color) {
         MapColorEntry current = MapartHelper.conversionSettings.getBackgroundColor();
@@ -64,8 +66,8 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         }
 
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {
-            super.renderWidget(context, mouseX, mouseY, deltaTicks);
+        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(context, mouseX, mouseY, partialTick);
             onlyNormalBrightness = !MapartHelper.conversionSettings.use3D();
             if (color != MapColor.NONE && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 setAlpha(0.2f);
