@@ -15,6 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 
+//? if >=1.21.10 {
+/*import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+*///?}
+
 public class ScaledItemGuiElementRenderer extends PictureInPictureRenderer<ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState> {
     public ScaledItemGuiElementRenderer(MultiBufferSource.BufferSource vertexConsumers) {
         super(vertexConsumers);
@@ -30,13 +35,22 @@ public class ScaledItemGuiElementRenderer extends PictureInPictureRenderer<Scale
         matrixStack.translate(0, -0.5, 0);
         matrixStack.scale(1.0F, -1.0F, -1.0F);
         TrackingItemStackRenderState keyedItemRenderState = state.guiItemRenderState().itemStackRenderState();
-        boolean isBlock = !keyedItemRenderState.usesBlockLight();
-        if (isBlock) {
+        boolean useBlockLight = !keyedItemRenderState.usesBlockLight();
+        if (useBlockLight) {
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_FLAT);
         } else {
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
         }
 
+        //? if >=1.21.10 {
+        /*FeatureRenderDispatcher renderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
+        SubmitNodeCollector nodeCollector = renderDispatcher.getSubmitNodeStorage();
+        keyedItemRenderState.submit(
+                matrixStack, nodeCollector, 15728880,
+                OverlayTexture.NO_OVERLAY, 0
+        );
+        renderDispatcher.renderAllFeatures();
+        *///?} else
         keyedItemRenderState.render(matrixStack, this.bufferSource, 15728880, OverlayTexture.NO_OVERLAY);
     }
 
