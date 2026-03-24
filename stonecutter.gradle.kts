@@ -21,10 +21,10 @@ publishMods {
     changelog = rootProject.file("CHANGELOG.md").readText()
     version = property("mod.version") as String
     type = versionType
-    dryRun = property("publish.dry_run") == "true"
+    dryRun = property("publish.dry_run") == "true" || env.GITHUB_TOKEN.orElse("") == ""
 
     github {
-        accessToken = env.GITHUB_TOKEN.value
+        accessToken = env.GITHUB_TOKEN.orElse("")
         repository = property("publish.github_repo") as String
         commitish = "main"
         tagName = version

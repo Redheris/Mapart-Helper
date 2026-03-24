@@ -172,7 +172,7 @@ publishMods {
         modrinth {
             projectId = property("publish.modrinth") as String
             accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-            accessToken = env.MODRINTH_TOKEN.value
+            accessToken = env.MODRINTH_TOKEN.orElse("")
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
             requires {
                 slug = "fabric-api"
@@ -190,7 +190,7 @@ publishMods {
             changelog = changelogSimple
             projectId = property("publish.curseforge_id") as String
             projectSlug = property("publish.curseforge_slug") as String
-            accessToken = env.CURSEFORGE_TOKEN.value
+            accessToken = env.CURSEFORGE_TOKEN.orElse("")
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
             requires {
                 slug = "fabric-api"
@@ -204,15 +204,15 @@ publishMods {
     }
 
     github {
-        accessToken = env.GITHUB_TOKEN.value
+        accessToken = env.GITHUB_TOKEN.orElse("")
         parent(rootProject.tasks.named("publishGithub"))
         announcementTitle = "GitHub"
     }
 
     if (sc.current.version == property("publish.announce_for")) {
         discord {
-            webhookUrl = env.DISCORD_WEBHOOK.value
-            dryRunWebhookUrl = env.DRY_RUN_DISCORD_WEBHOOK.value
+            webhookUrl = env.DISCORD_WEBHOOK.orElse("")
+            dryRunWebhookUrl = env.DRY_RUN_DISCORD_WEBHOOK.orElse("")
             username = "Release publisher"
             avatarUrl = "https://i.imgur.com/NiTaw1Z.png"
             content = changelog.map { "# $modName v$modVersion\n$changelogSimple" }
