@@ -26,6 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+//? >=1.21.11
+//import net.minecraft.world.attribute.EnvironmentAttributeReader;
+
 /**
  * This annotation-consumer-monster has the only reason of existence - lying to
  * {@code BlockBehaviour#canSurvive} to check if the block can survive without a support block below it
@@ -98,6 +101,13 @@ public class DummyWorldView implements LevelReader {
     public @NotNull FeatureFlagSet enabledFeatures() {
         return null;
     }
+
+    //? if >= 1.21.11 {
+    /*@Override
+    public @NotNull EnvironmentAttributeReader environmentAttributes() {
+        return null;
+    }
+    *///?}
 
     @Override
     public float getShade(@NotNull Direction direction, boolean shaded) {
