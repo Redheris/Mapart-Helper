@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 //import net.minecraft.client.input.MouseButtonEvent;
 
 // This implementation will soon be replaced by a more elegant one
-public class DropdownMenuWidget extends Button/*? if >=1.21.11 {*//*.Plain *//*?}*/ implements Layout {
+public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*?} else {*/ Button /*?}*/ implements Layout {
     public static DropdownMenuWidget expandedOne;
 
     private final Screen parent;
