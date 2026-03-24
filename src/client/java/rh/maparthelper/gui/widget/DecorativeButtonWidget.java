@@ -13,6 +13,9 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
 
+//? >=1.21.10
+//import net.minecraft.client.input.InputWithModifiers;
+
 public class DecorativeButtonWidget extends AbstractButton {
     private final PressAction onPress;
     private final Identifier textureDefault;
@@ -40,7 +43,7 @@ public class DecorativeButtonWidget extends AbstractButton {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(/*? if >=1.21.10 {*/ /*@NotNull InputWithModifiers input *//*?}*/) {
         this.onPress.onPress(this);
     }
 

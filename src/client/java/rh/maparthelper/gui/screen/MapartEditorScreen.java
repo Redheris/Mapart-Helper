@@ -52,6 +52,9 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
+//? >=1.21.10
+//import net.minecraft.client.input.KeyEvent;
+
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
@@ -512,6 +515,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         MaterialListPanel.MaterialListBlockWidget.resetHovering();
     }
 
+    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
@@ -529,6 +533,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
+    //~ !widget_events
 
     @Override
     public void onFilesDrop(List<Path> paths) {

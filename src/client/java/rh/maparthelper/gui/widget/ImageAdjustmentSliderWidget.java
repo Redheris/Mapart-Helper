@@ -1,7 +1,6 @@
 package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
@@ -12,6 +11,11 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+//? if >=1.21.10 {
+/*import net.minecraft.client.input.KeyEvent;
+import org.jetbrains.annotations.NotNull;
+*///?}
 
 public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
     private final float min;
@@ -64,9 +68,10 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
         return (this.value < 0.5 ? Math.floor(value * 100) : Math.ceil(value * 100)) / 100;
     }
 
+    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (CommonInputs.selected(keyCode)) {
+        if (keyCode == 257 || keyCode == 335) {
             this.setFocused(!this.isFocused());
             return true;
         } else {
@@ -93,6 +98,7 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
         }
         return false;
     }
+    //~ !widget_events
 
     public void setValue(double value) {
         double d = this.value;

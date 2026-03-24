@@ -48,7 +48,7 @@ public class MapartSelectionHandler {
         });
 
         AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea() || !level.isClientSide)
+            if (ClientCommandsContext.isNotSelectingFramesArea() || !level.isClientSide())
                 return InteractionResult.PASS;
 
             // Offset from center to the item frame's box

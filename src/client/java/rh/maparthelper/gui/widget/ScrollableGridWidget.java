@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 // This implementation will soon be replaced by a more elegant one
 public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     @Nullable
@@ -145,12 +148,12 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         else
             context.enableScissor(getX(), visibleTopY, getRight(), visibleTopY + getHeight());
         grid.visitWidgets(w -> w.render(context, mouseX, mouseY, deltaTicks));
-        renderScrollbar(context);
+        renderScrollbar(context/*? if >=1.21.10 {*//*, mouseX, mouseY *//*?}*/);
         context.disableScissor();
     }
 
     @Override
-    protected void renderScrollbar(@NotNull GuiGraphics context) {
+    protected void renderScrollbar(@NotNull GuiGraphics context/*? if >=1.21.10 {*//*, int mouseX, int mouseY *//*?}*/) {
         if (this.scrollbarVisible()) {
             int i = this.scrollBarX();
             int j = this.scrollerHeight();
@@ -160,11 +163,16 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         }
     }
 
+    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY))
             return false;
+        //? if <=1.21.8 {
         if (this.updateScrolling(mouseX, mouseY, button)) return true;
+        //?} else {
+        /*if (this.updateScrolling(mouseEvent)) return true;
+        *///?}
 
         for (LayoutElement w : grid.children) {
             if (!(w instanceof AbstractWidget child)) continue;
@@ -180,6 +188,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         }
         return true;
     }
+    //~ !widget_events
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {

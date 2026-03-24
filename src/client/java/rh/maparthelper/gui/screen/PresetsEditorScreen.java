@@ -29,6 +29,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 public class PresetsEditorScreen extends ScreenAdapted {
     private final MapartEditorScreen parent;
     private final int boxX;
@@ -340,6 +343,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             this.clickAction = clickAction;
         }
 
+        //~ widget_events
         @Override
         public void onClick(double mouseX, double mouseY) {
             this.clickAction.click(mouseX, mouseY);
@@ -349,6 +353,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             return super.mouseClicked(mouseX, mouseY, button);
         }
+        //~ !widget_events
 
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {

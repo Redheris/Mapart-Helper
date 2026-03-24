@@ -38,6 +38,9 @@ import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 public class MaterialListPanel extends AbstractLayout {
     private final MapartEditorScreen screen;
     private final MapartProcessing mapart;
@@ -271,6 +274,7 @@ public class MaterialListPanel extends AbstractLayout {
             }
         }
 
+        //~ widget_events
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (button == 0) {
@@ -306,6 +310,7 @@ public class MaterialListPanel extends AbstractLayout {
             }
             return true;
         }
+        //~ !widget_events
 
         public static boolean isHoveringAny() {
             return hoveringAny;

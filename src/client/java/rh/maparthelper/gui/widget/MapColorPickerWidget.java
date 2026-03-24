@@ -16,6 +16,9 @@ import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.mapart.MapartProcessing;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 public class MapColorPickerWidget extends DropdownMenuWidget {
     private final MapartProcessing mapart;
     private final int columns;
@@ -74,6 +77,7 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
             }
         }
 
+        //~ widget_events
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
@@ -96,5 +100,6 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
             setColor(new MapColorEntry(color, MapColor.Brightness.byId(brightnessId)));
             return true;
         }
+        //~ !widget_events
     }
 }

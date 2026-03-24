@@ -12,6 +12,9 @@ import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.colors.MapColors;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 public class MapColorWidget extends AbstractWidget {
     public final MapColor color;
     protected Component tooltipColorName;
@@ -42,9 +45,15 @@ public class MapColorWidget extends AbstractWidget {
     }
 
     @Override
+    //? if <=1.21.8 {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return true;
     }
+    //?} else {
+    /*public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean isDoubleClick) {
+        return true;
+    }
+    *///?}
 
     @Override
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float deltaTicks) {

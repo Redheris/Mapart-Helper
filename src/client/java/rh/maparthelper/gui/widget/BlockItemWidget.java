@@ -18,6 +18,9 @@ import rh.maparthelper.util.RenderUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 public class BlockItemWidget extends AbstractWidget {
     private final boolean hasClickAction;
 
@@ -84,10 +87,12 @@ public class BlockItemWidget extends AbstractWidget {
         return block;
     }
 
+    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return this.hasClickAction && super.mouseClicked(mouseX, mouseY, button);
     }
+    //~ !widget_events
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {

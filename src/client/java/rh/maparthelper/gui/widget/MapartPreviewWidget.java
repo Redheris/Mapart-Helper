@@ -28,6 +28,11 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+//? if >=1.21.10 {
+/*import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+*///?}
+
 import static rh.maparthelper.gui.sprites.ManualCroppingSprites.*;
 
 public class MapartPreviewWidget extends AbstractWidget {
@@ -179,6 +184,7 @@ public class MapartPreviewWidget extends AbstractWidget {
         return true;
     }
 
+    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
@@ -255,6 +261,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     public void onRelease(double mouseX, double mouseY) {
         repeater.stop();
     }
+    //~ !widget_events
 
     private boolean isMouseOverActionsArea(double mouseX, double mouseY) {
         if (!isMouseOver(mouseX, mouseY) || mouseX < getImageX())

@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+//? if >=1.21.10 {
+/*import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+*///?}
+
 public class AdjTextFieldWidget extends EditBox {
     private Predicate<String> valueValidator;
     private Consumer<String> valueConsumer;
@@ -18,11 +23,20 @@ public class AdjTextFieldWidget extends EditBox {
         setValue(initialValue);
     }
 
+    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 1) {
             this.setValue("");
+            //? if <=1.21.8 {
             return super.mouseClicked(mouseX, mouseY, 0);
+            //?} else {
+            /*var event = new MouseButtonEvent(
+                    mouseX, mouseY,
+                    new MouseButtonInfo(0, mouseEvent.modifiers())
+            );
+            return super.mouseClicked(event, doubleClick);
+            *///?}
         }
         if (button == 0 && !isFocused()) {
             super.mouseClicked(mouseX, mouseY, button);
@@ -32,6 +46,7 @@ public class AdjTextFieldWidget extends EditBox {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
+    //~ !widget_events
 
     @Override
     public void setFocused(boolean focused) {

@@ -77,15 +77,34 @@ stonecutter parameters {
 
         string(current.parsed >= "1.21.10", "widget_events") {
             replace(
+                "mouseReleased(double mouseX, double mouseY, int button)",
+                "mouseReleased(@NotNull MouseButtonEvent mouseEvent)"
+            )
+            replace(
+                "onRelease(double mouseX, double mouseY)",
+                "onRelease(@NotNull MouseButtonEvent mouseEvent)"
+            )
+            replace(
+                "mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY)",
+                "mouseDragged(@NotNull MouseButtonEvent mouseEvent, double deltaX, double deltaY)"
+            )
+            replace(
+                "onClick(double mouseX, double mouseY)",
+                "onClick(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
+            )
+            replace(
                 "(double mouseX, double mouseY, int button)",
                 "(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
             )
             replace("mouseClicked(mouseX, mouseY, button)", "mouseClicked(mouseEvent, doubleClick)")
+            replace("mouseReleased(mouseX, mouseY, button)", "mouseReleased(mouseEvent)")
             replace("mouseX", "mouseEvent.x()")
             replace("mouseY", "mouseEvent.y()")
             replace("button", "mouseEvent.button()")
             replace("(int keyCode, int scanCode, int modifiers)", "(@NotNull KeyEvent keyEvent)")
+            replace("(keyCode, scanCode, modifiers)", "(keyEvent)")
             replace("keyCode == 257 || keyCode == 335", "keyEvent.isConfirmation()")
+            replace("keyCode", "keyEvent.key()")
         }
         string(current.parsed > "26.0", "gui_rendering") {
             replace("renderWidget(", "extractWidgetRenderState(")

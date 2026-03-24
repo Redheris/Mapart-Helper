@@ -1,7 +1,6 @@
 package rh.maparthelper.gui.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -16,8 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 /**
- * Extended Screen class with adjustments of behavior and rendering of {@link EditBox} and {@link DropdownMenuWidget}
+ * Extended Screen class with adjustments of behavior and rendering of {@link DropdownMenuWidget}
  */
 public abstract class ScreenAdapted extends Screen {
     private final List<Renderable> drawables = new ArrayList<>();
@@ -56,6 +58,7 @@ public abstract class ScreenAdapted extends Screen {
         this.drawables.clear();
     }
 
+    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
@@ -83,6 +86,7 @@ public abstract class ScreenAdapted extends Screen {
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
+    //~ !widget_events
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {

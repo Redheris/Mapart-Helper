@@ -12,6 +12,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 // This implementation will soon be replaced by a more elegant one
 public class DropdownMenuWidget extends Button implements Layout {
     public static DropdownMenuWidget expandedOne;
@@ -114,6 +117,7 @@ public class DropdownMenuWidget extends Button implements Layout {
         expandedOne = expand ? this : null;
     }
 
+    //~ widget_events
     @Override
     public void onClick(double mouseX, double mouseY) {
         toggleExpanded(expandedOne == null);
@@ -133,6 +137,7 @@ public class DropdownMenuWidget extends Button implements Layout {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
+    //~ !widget_events
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
