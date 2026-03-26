@@ -19,6 +19,12 @@ public class MapartHelperClient implements ClientModInitializer {
 
         PaletteLoader.load();
 
-        SpecialGuiElementRegistry.register(ctx -> new ScaledItemGuiElementRenderer(ctx.vertexConsumers()));
+        SpecialGuiElementRegistry.register(ctx -> new ScaledItemGuiElementRenderer(
+                //? if <26.1 {
+                ctx.vertexConsumers()
+                //?} else {
+                /*ctx.bufferSource()
+                *///?}
+        ));
     }
 }

@@ -83,6 +83,7 @@ stonecutter parameters {
 
             replace("net.minecraft.client.gui.render.state.", "net.minecraft.client.renderer.state.gui.")
             replace(".command.v2.ClientCommandManager", ".command.v2.ClientCommands")
+            replace("SpecialGuiElementRegistry", "PictureInPictureRendererRegistry")
         }
 
         string(current.parsed >= "1.21.10", "widget_events") {
