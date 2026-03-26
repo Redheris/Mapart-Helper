@@ -1,7 +1,7 @@
 mod.id = "maparthelper"
 mod.name = "Mapart Helper"
 mod.group = "rh.maparthelper"
-mod.version = "0.13.0-beta.1"
+mod.version = "0.13.0-beta.2"
 mod.fabric_loader = "0.18.4"
 mod.version_type = "BETA"
 
@@ -40,11 +40,11 @@ modmenu = "17.0.0-beta.2"
 parchment = "1.21.11:2025.12.20"
 
 ["26.1"]
-mc_dep = "26.1-rc-3"
-mc_dep_fabric ="~26.1-rc.3"
+mc_dep = "26.1"
+mc_dep_fabric ="~26.1"
 release_title = "26.1"
 mc_targets = "26.1"
 # Dependencies
-fabric_api = "0.144.0+26.1"
+fabric_api = "0.144.3+26.1"
 yacl = "3.9.1+26.1-fabric"
-modmenu = "18.0.0-alpha.6"
+modmenu = "18.0.0-alpha.8"
