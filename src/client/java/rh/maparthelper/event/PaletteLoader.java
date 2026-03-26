@@ -6,14 +6,21 @@ import rh.maparthelper.config.palette.PaletteConfigManager;
 public class PaletteLoader {
     public static boolean tagsLoaded = false;
     private static boolean needs_regenerate_palette = false;
-    private static boolean eventRegistered = false;
 
     public static void load() {
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
+            tagsLoaded = true;
+            if (!needs_regenerate_palette) return;
+            PaletteConfigManager.regenerateCompletePalette();
+            PaletteConfigManager.readPresetsConfigFile();
+            needs_regenerate_palette = false;
+        });
+
         if (PaletteConfigManager.readCompletePalette()) {
             PaletteConfigManager.readPresetsConfigFile();
             return;
         }
-        requestRegenerate();
+        needs_regenerate_palette = true;
     }
 
     public static void requestRegenerate() {
@@ -22,20 +29,6 @@ public class PaletteLoader {
             PaletteConfigManager.readPresetsConfigFile();
         } else {
             needs_regenerate_palette = true;
-            registerTagsLoadedEvent();
         }
-    }
-
-    private static void registerTagsLoadedEvent() {
-        if (eventRegistered) return;
-
-        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
-            tagsLoaded = true;
-            if (!needs_regenerate_palette) return;
-            PaletteConfigManager.regenerateCompletePalette();
-            PaletteConfigManager.readPresetsConfigFile();
-            needs_regenerate_palette = false;
-        });
-        eventRegistered = true;
     }
 }
