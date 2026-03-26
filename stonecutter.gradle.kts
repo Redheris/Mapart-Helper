@@ -73,7 +73,7 @@ stonecutter parameters {
     replacements {
         string(current.parsed >= "26.1") {
             replace("world.WorldRenderEvents", "level.LevelRenderEvents")
-            replace("WorldRenderEvents.AFTER_ENTITIES", "LevelRenderEvents.AFTER_EXTRACT")
+            replace("WorldRenderEvents.AFTER_ENTITIES", "LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES")
             replace("WorldRenderEvents", "LevelRenderEvents")
 
             replace("keybinding.v1.KeyBindingHelper", "keymapping.v1.KeyMappingHelper")
@@ -82,6 +82,7 @@ stonecutter parameters {
             replace("GuiGraphics", "GuiGraphicsExtractor")
 
             replace("net.minecraft.client.gui.render.state.", "net.minecraft.client.renderer.state.gui.")
+            replace(".command.v2.ClientCommandManager", ".command.v2.ClientCommands")
         }
 
         string(current.parsed >= "1.21.10", "widget_events") {

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
+import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -147,6 +148,6 @@ public class MapartToNBT {
     }
 
     private static void sendMessageSafe(Player player, Component message) {
-        Minecraft.getInstance().execute(() -> player.displayClientMessage(message, false));
+        Minecraft.getInstance().execute(() -> CompatUtils.sendMessage(player, message, false));
     }
 }

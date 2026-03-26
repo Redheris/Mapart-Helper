@@ -21,6 +21,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.FileUtils;
 
 import java.io.IOException;
@@ -58,11 +59,11 @@ public class MapartToFile {
         itemFrames.addAll(world.getEntities(EntityType.GLOW_ITEM_FRAME, area, ItemFrame::hasFramedMap));
 
         if (itemFrames.isEmpty()) {
-            player.displayClientMessage(Component.translatable("maparthelper.selection_has_no_maps").withStyle(ChatFormatting.RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_has_no_maps").withStyle(ChatFormatting.RED), true);
             return;
         }
         if (itemFrames.size() != size) {
-            player.displayClientMessage(Component.translatable("maparthelper.selection_has_empty_places").withStyle(ChatFormatting.RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_has_empty_places").withStyle(ChatFormatting.RED), true);
             return;
         }
 
@@ -120,10 +121,10 @@ public class MapartToFile {
             saveMapartFile(player, filename, mapart);
 
         } catch (InvalidPathException e) {
-            player.displayClientMessage(Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
         } catch (Exception e) {
-            player.displayClientMessage(Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
             MapartHelper.LOGGER.error("An error occurred during saving the map:\n{}", e.toString());
         }
 
@@ -157,7 +158,7 @@ public class MapartToFile {
                         .withUnderlined(true)
                 );
 
-        player.displayClientMessage(Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
+        CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
     }
 
     public static void saveImageFromMapColors(Player player, byte[] mapColors) {

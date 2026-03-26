@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.util.CompatUtils;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -25,16 +26,16 @@ public class ClientCommands {
             dispatcher.register(literal("mart")
                 .executes(ctx -> {
                     var player = ctx.getSource().getPlayer();
-                    player.displayClientMessage(Component.empty(), false);
-                    player.displayClientMessage(
+                    CompatUtils.sendMessage(player, Component.empty(), false);
+                    CompatUtils.sendMessage(player,
                             Component.translatable("maparthelper.commands_list_1")
                                     .withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_AQUA),
                             false
                     );
                     for (int i = 2; i < 8; i++) {
-                        player.displayClientMessage(Component.translatable("maparthelper.commands_list_" + i), false);
+                        CompatUtils.sendMessage(player, Component.translatable("maparthelper.commands_list_" + i), false);
                     }
-                    player.displayClientMessage(Component.empty(), false);
+                    CompatUtils.sendMessage(player, Component.empty(), false);
                     return 1;
                 })
                 .then(literal("save")
@@ -61,11 +62,10 @@ public class ClientCommands {
                                 status = Component.translatable("maparthelper.beams_on").withStyle(ChatFormatting.GREEN);
                             else
                                 status = Component.translatable("maparthelper.beams_off").withStyle(ChatFormatting.RED);
-                            ctx.getSource().getPlayer().displayClientMessage(
+                            CompatUtils.sendMessage(ctx.getSource().getPlayer(),
                                     Component.translatable("maparthelper.beams_change_status", status)
                                             .withStyle(ChatFormatting.DARK_AQUA),
-                                    true
-                            );
+                                    true);
                             return 1;
                         })
                 )
@@ -74,7 +74,7 @@ public class ClientCommands {
                             .executes(ctx -> {
                                 // Regenerates blocks palette to correspond to the configs and game's blocks list
                                 PaletteConfigManager.regenerateCompletePalette();
-                                ctx.getSource().getPlayer().displayClientMessage(Component.translatable(
+                                CompatUtils.sendMessage(ctx.getSource().getPlayer(), Component.translatable(
                                         "maparthelper.blocks_palette_generated").withStyle(ChatFormatting.GREEN),
                                         true
                                 );
@@ -84,7 +84,7 @@ public class ClientCommands {
                             .executes(ctx -> {
                                 PaletteConfigManager.updateCompletePalette();
                                 PaletteConfigManager.readPresetsConfigFile();
-                                ctx.getSource().getPlayer().displayClientMessage(Component.translatable(
+                                CompatUtils.sendMessage(ctx.getSource().getPlayer(), Component.translatable(
                                                 "maparthelper.presets_config_updated").withStyle(ChatFormatting.GREEN),
                                         true
                                 );
@@ -105,7 +105,7 @@ public class ClientCommands {
         if (!(itemStack.getItem() instanceof MapItem))
             itemStack = player.getOffhandItem();
         if (!(itemStack.getItem() instanceof MapItem)) {
-            player.displayClientMessage(Component.translatable(
+            CompatUtils.sendMessage(player, Component.translatable(
                             "maparthelper.is_holding_filled_map").withStyle(ChatFormatting.RED),
                     true);
             return 0;
@@ -133,7 +133,7 @@ public class ClientCommands {
         byte[] mapColors = MapartToFile.getMapColorsFromItemFrame();
 
         if (mapColors == null) {
-            player.displayClientMessage(Component.translatable(
+            CompatUtils.sendMessage(player, Component.translatable(
                             "maparthelper.is_looking_at_frame_with_map").withStyle(ChatFormatting.RED),
                     true);
             return 0;
@@ -170,13 +170,13 @@ public class ClientCommands {
 
         if (ClientCommandsContext.selectedPos1 != null || ClientCommandsContext.isSelectingFramesArea) {
             ClientCommandsContext.resetSelection();
-            player.displayClientMessage(Component.translatable("maparthelper.selecting_stopped").withStyle(ChatFormatting.DARK_AQUA), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selecting_stopped").withStyle(ChatFormatting.DARK_AQUA), true);
             return 0;
         }
         ClientCommandsContext.isSelectingFramesArea = true;
 
-        player.displayClientMessage(Component.translatable("maparthelper.pos_selecting").withStyle(ChatFormatting.DARK_AQUA), false);
-        player.displayClientMessage(Component.translatable("maparthelper.stop_selecting").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
+        CompatUtils.sendMessage(player, Component.translatable("maparthelper.pos_selecting").withStyle(ChatFormatting.DARK_AQUA), false);
+        CompatUtils.sendMessage(player, Component.translatable("maparthelper.stop_selecting").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
         return 1;
     }
 }

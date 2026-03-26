@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.FileUtils;
 
 import java.nio.file.InvalidPathException;
@@ -18,8 +19,9 @@ public class MapartSaver {
 
     private static boolean saveMapartImage(DynamicTexture mapartTexture, Path imagePath) {
         try {
-            if (mapartTexture == null || mapartTexture.getPixels() == null)
-                return false;
+            if (mapartTexture == null) return false;
+            //? <26.1
+            if (mapartTexture.getPixels() == null) return false;
             mapartTexture.getPixels().writeToFile(imagePath);
         } catch (InvalidPathException e) {
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
@@ -44,13 +46,13 @@ public class MapartSaver {
                                 .withUnderlined(true)
                         );
 
-                player.displayClientMessage(Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
+                CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
             }
         } catch (InvalidPathException e) {
-            player.displayClientMessage(Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
         } catch (Exception e) {
-            player.displayClientMessage(Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
         }
     }
 }
