@@ -36,8 +36,7 @@ public class PaletteGenerator {
 
         for (Block block : BuiltInRegistries.BLOCK) {
             BlockState state = block.defaultBlockState();
-            /*? >=1.21.11*/ //@SuppressWarnings("DataFlowIssue")
-            MapColor color = state.getMapColor(null, null);
+            MapColor color = state.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
             if (color == MapColor.NONE)
                 continue;
             boolean useCreativeBlocks = MapartHelper.commonConfig().creativeBlocks;

@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -155,8 +156,7 @@ public class MapartSchematicBuilder {
 
     public static boolean needsAuxBlock(Block block) {
         boolean canPlaceAtAir = block.defaultBlockState().canSurvive(DummyWorldView.getInstance(), BlockPos.ZERO);
-        /*? >=1.21.11*/ //@SuppressWarnings("DataFlowIssue")
-        boolean hasNoCollision = block.defaultBlockState().getCollisionShape(null, null) == Shapes.empty();
+        boolean hasNoCollision = block.defaultBlockState().getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) == Shapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
     }
 }
