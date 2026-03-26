@@ -1,15 +1,18 @@
 package rh.maparthelper.config.palette;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.piston.MovingPistonBlock;
 import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.Shapes;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 
@@ -82,10 +85,14 @@ public class PaletteGenerator {
         if (useInPalette.anyBlocks) return true;
         if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;
 
-        if (useInPalette.onlySolid) return block.getClass() == Block.class;
+        if (useInPalette.onlySolid && !matchesAny(block, CREATIVE_BLOCKS)) {
+            BlockState state = block.defaultBlockState();
+            if (state.isSolidRender()) return true;
+            return state.getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) == Shapes.block();
+        }
         if (useInPalette.onlyCarpets) return matchesAny(block, CarpetBlock.class, MossyCarpetBlock.class);
 
-        if (!useInPalette.blocksWithEntities && block instanceof BaseEntityBlock) return false;
+        if (!useInPalette.blocksWithEntities && block instanceof EntityBlock) return false;
         if (!useInPalette.buildDecorBlocks && matchesAny(block, BUILD_DECOR_BLOCKS)) return false;
         if (!useInPalette.creativeBlocks && matchesAny(block, CREATIVE_BLOCKS)) return false;
         if (!useInPalette.needWaterBlocks && matchesAny(block, NEED_WATER_BLOCKS)) return false;
@@ -119,7 +126,7 @@ public class PaletteGenerator {
         else if (block instanceof FallingBlock) typePenalty += 1.5f;
         else if (blockState.is(BlockTags.PRESSURE_PLATES)) typePenalty += 0.3f;
         else if (blockState.is(BlockTags.SLABS)) typePenalty += 2.0f;
-        else if (FUNCTIONAL_BLOCKS.contains(block) || block instanceof BaseEntityBlock) typePenalty += 4.0f;
+        else if (FUNCTIONAL_BLOCKS.contains(block) || block instanceof EntityBlock) typePenalty += 4.0f;
 
         return breakTime + typePenalty;
     }
