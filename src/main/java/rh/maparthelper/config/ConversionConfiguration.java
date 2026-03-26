@@ -17,6 +17,7 @@ import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConversionConfiguration {
@@ -33,6 +34,11 @@ public class ConversionConfiguration {
     public static ConversionConfiguration instance;
 
     public static void load() {
+        if (!Files.exists(configPath)) {
+            instance = new ConversionConfiguration();
+            save();
+            return;
+        }
         try (FileReader reader = new FileReader(configPath.toFile())) {
             instance = gson.fromJson(reader, ConversionConfiguration.class);
         } catch (Exception e) {
