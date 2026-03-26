@@ -154,9 +154,13 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
                 && mouseY < topYExpanded + menu.getHeight();
     }
 
-    //~ if >=1.21.11 'renderWidget' -> 'renderContents' {
     @Override
+    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    //?} elif 1.21.11 {
+    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    *///?} elif >=26.1
+    //protected void extractContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (needRelayout) {
             menu.setHeight(maxMenuHeight);
             if (getBottom() + menu.getHeight() > parent.height) {
@@ -186,10 +190,13 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
 
             this.needRelayout = false;
         }
-
+        //? if <=1.21.8 {
         super.renderWidget(context, mouseX, mouseY, partialTick);
+        //?} elif 1.21.11 {
+        /*super.renderContents(context, mouseX, mouseY, partialTick);
+        *///?} elif >=26.1
+        //super.extractContents(context, mouseX, mouseY, partialTick);
     }
-    //~}
 
     public void renderMenu(GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int left = menu.leftScroll ? getMenuX() - 4 : getMenuX();
@@ -200,6 +207,7 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
             context.fill(getMenuX(), getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight(), 0x99FFFFFF);
             context.enableScissor(left, getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight());
         }
+        //~ if >=26.1 'render' -> 'extractRenderState'
         this.menu.render(context, mouseX, mouseY, partialTick);
         context.disableScissor();
     }

@@ -252,12 +252,13 @@ public class MaterialListPanel extends AbstractLayout {
                 this.tooltip.add(Component.literal(BuiltInRegistries.BLOCK.getKey(block).toString()).withStyle(ChatFormatting.DARK_GRAY).getVisualOrderText());
         }
 
+        //~ gui_rendering
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
             if (fixedHighlight == this) {
                 context.nextStratum();
-                context.renderOutline(getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
+                RenderUtils.renderOutline(context, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
             } else if (MapartHelper.commonConfig().previewHighlightOnHover
                     && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 screen.setHighlightingColor(mapColor);
@@ -273,6 +274,7 @@ public class MaterialListPanel extends AbstractLayout {
                 );
             }
         }
+        //~ !gui_rendering
 
         //~ widget_events
         @Override

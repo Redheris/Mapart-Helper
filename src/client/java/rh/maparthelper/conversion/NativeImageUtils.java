@@ -21,8 +21,11 @@ public class NativeImageUtils {
     }
 
     public static int[][] divideImageByMaps(int width, int height, NativeImage image) {
-        if (CurrentConversionSettings.guiMapartImage == null || CurrentConversionSettings.guiMapartImage.getPixels() == null)
+        if (CurrentConversionSettings.guiMapartImage == null)
             return null;
+        //? if <26.1
+        if (CurrentConversionSettings.guiMapartImage.getPixels() == null) return null;
+
         int imageWidth = width * 128;
 
         int[] pixels = image.getPixels();

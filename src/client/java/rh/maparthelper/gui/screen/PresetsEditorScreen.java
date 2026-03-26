@@ -301,6 +301,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         return colorsEditor.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
+    //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         Matrix3x2fStack matrixStack = context.pose();
@@ -326,6 +327,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     @Override
     public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
     }
+    //~ !gui_rendering
 
     @Override
     public void onClose() {
@@ -356,6 +358,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
         //~ !widget_events
 
+        //~ gui_rendering
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
@@ -369,6 +372,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 RenderUtils.renderOutline(context, this.getX(), this.getY(), this.getWidth(), this.getHeight(), CommonColors.HIGH_CONTRAST_DIAMOND);
             }
         }
+        //~ !gui_rendering
 
         interface ClickAction {
             void click(double mouseX, double mouseY);

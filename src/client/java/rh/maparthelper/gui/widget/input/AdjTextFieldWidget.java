@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -13,10 +14,16 @@ import java.util.function.Predicate;
 /*import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 *///?}
+//? if >=26.1 {
+/*import java.util.Objects;
+import net.minecraft.util.StringUtil;
+*///?}
 
 public class AdjTextFieldWidget extends EditBox {
     private Predicate<String> valueValidator;
     private Consumer<String> valueConsumer;
+    //? >=26.1
+    //private Predicate<String> filter = Objects::nonNull;
 
     public AdjTextFieldWidget(Font textRenderer, int width, int height, String initialValue, String narrationTitle) {
         super(textRenderer, width, height, Component.nullToEmpty(narrationTitle));
@@ -47,6 +54,24 @@ public class AdjTextFieldWidget extends EditBox {
         return super.mouseClicked(mouseX, mouseY, button);
     }
     //~ !widget_events
+
+    //? if >=26.1 {
+    /*@Override
+    public void setValue(@NotNull String value) {
+        if (this.filter.test(value))
+            super.setValue(value);
+    }
+
+    @Override
+    public void insertText(@NotNull String input) {
+        if (filter.test(StringUtil.filterText(input)))
+            super.insertText(input);
+    }
+
+    public void setFilter(final Predicate<String> filter) {
+        this.filter = filter;
+    }
+    *///?}
 
     @Override
     public void setFocused(boolean focused) {

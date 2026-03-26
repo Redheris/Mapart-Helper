@@ -78,6 +78,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         this.addRenderableWidget(update);
     }
 
+    //~ gui_rendering
     @Override
     public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(context, mouseX, mouseY, partialTick);
@@ -85,6 +86,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x77000000);
         RenderUtils.renderOutline(context, boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
     }
+    //~ !gui_rendering
 
     @Override
     public void onClose() {

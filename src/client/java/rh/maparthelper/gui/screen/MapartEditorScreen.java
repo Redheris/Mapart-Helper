@@ -507,6 +507,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         return auxBlockId;
     }
 
+    //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
@@ -518,6 +519,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         MaterialListPanel.MaterialListBlockWidget.resetHovering();
     }
+    //~ !gui_rendering
 
     //~ widget_events
     @Override

@@ -67,12 +67,16 @@ public class BlockItemWidget extends AbstractWidget {
     }
 
     @Override
+    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
 
         ItemStack blockItem = this.blockItem.getDefaultInstance();
+        //? <26.1
         RenderUtils.renderItemStack(context, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
+        //? >=26.1
+        //RenderUtils.renderItemStack(context, blockItem, "", x, y, width, height);
 
         boolean isMouseOverBlock = mouseX >= x
                 && mouseX < x + width

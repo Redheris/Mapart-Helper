@@ -47,9 +47,14 @@ public class DecorativeButtonWidget extends AbstractButton {
         this.onPress.onPress(this);
     }
 
+    //~ gui_rendering
     @Override
-    //~ if >=1.21.11 'renderWidget' -> 'renderContents'
+    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    //?} elif 1.21.11 {
+    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+     *///?} elif >=26.1
+    //protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (textureDefault != null) {
             if (isHovered) {
                 context.blit(
@@ -80,6 +85,7 @@ public class DecorativeButtonWidget extends AbstractButton {
             this.renderString(context, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
         }
     }
+    //~ !gui_rendering
 
     @Override
     public void updateWidgetNarration(@NotNull NarrationElementOutput builder) {

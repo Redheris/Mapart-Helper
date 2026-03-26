@@ -70,6 +70,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     }
 
     @Override
+    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getImageX();
         int y = getY();

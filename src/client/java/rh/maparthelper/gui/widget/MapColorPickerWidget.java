@@ -13,6 +13,7 @@ import rh.maparthelper.colors.MapColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.util.RenderUtils;
 
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
@@ -36,15 +37,21 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         }
     }
 
-    //~ if >=1.21.11 'renderWidget' -> 'renderContents' {
     @Override
+    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(context, mouseX, mouseY, partialTick);
+    //?} elif 1.21.11 {
+    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+        super.renderContents(context, mouseX, mouseY, partialTick);
+    *///?} elif >=26.1 {
+    /*protected void extractContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+        super.extractContents(context, mouseX, mouseY, partialTick);
+    *///?}
         int color = MapartHelper.conversionConfig().getBackgroundRenderColor();
         context.fill(getX(), getY(), getRight(), getBottom(), color);
-        context.renderOutline(getX(), getY(), getWidth(), getHeight(), 0xFF555555);
+        RenderUtils.renderOutline(context, getX(), getY(), getWidth(), getHeight(), 0xFF555555);
     }
-    //~}
 
     private void setColor(MapColorEntry color) {
         MapColorEntry current = MapartHelper.conversionConfig().getBackgroundColor();
@@ -62,6 +69,7 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
             this.segWidth = width / 3;
         }
 
+        //~ gui_rendering
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
@@ -75,6 +83,7 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
                 setAlpha(1.0f);
             }
         }
+        //~ !gui_rendering
 
         //~ widget_events
         @Override

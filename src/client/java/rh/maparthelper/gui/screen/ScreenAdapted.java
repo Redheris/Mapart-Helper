@@ -98,20 +98,24 @@ public abstract class ScreenAdapted extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
+    //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         for (Renderable drawable : drawables) {
+            //~ if >=26.1 '.render(' -> '.extractRenderState(' {
             if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY) && !dropdownMenu.isChild((LayoutElement) drawable))
                 drawable.render(context, 0, 0, partialTick);
             else
                 drawable.render(context, mouseX, mouseY, partialTick);
+            //~}
         }
 
         if (dropdownMenu != null) {
             dropdownMenu.renderMenu(context, mouseX, mouseY, partialTick);
         }
     }
+    //~ !gui_rendering
 
     @Override
     public void onClose() {

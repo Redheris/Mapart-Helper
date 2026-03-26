@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.widget;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -12,8 +11,11 @@ import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.colors.MapColors;
 
+//? <=1.21.8
+import net.minecraft.client.Minecraft;
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
+import rh.maparthelper.util.RenderUtils;
 
 public class MapColorWidget extends AbstractWidget {
     public final MapColor color;
@@ -44,18 +46,20 @@ public class MapColorWidget extends AbstractWidget {
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 
-    @Override
     //? if <=1.21.8 {
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return true;
     }
     //?} else {
-    /*public boolean mouseClicked(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick) {
+    /*@Override
+    public boolean mouseClicked(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick) {
         return true;
     }
     *///?}
 
     @Override
+    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
@@ -101,7 +105,7 @@ public class MapColorWidget extends AbstractWidget {
                 context.fill(x + segWidth * 2, y, x + width, y + height, high);
             }
         }
-        context.renderOutline(x, y, width, height, ARGB.color(alpha, 0xFF555555));
+        RenderUtils.renderOutline(context, x, y, width, height, ARGB.color(alpha, 0xFF555555));
 
         if (tooltipColorName != null && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
             context.setTooltipForNextFrame(tooltipColorName, mouseX, mouseY);

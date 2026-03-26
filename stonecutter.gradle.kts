@@ -71,8 +71,17 @@ stonecutter parameters {
     dependencies["fapi"] = node.project.property("fabric_api") as String
 
     replacements {
-        string(current.parsed > "26.0") {
+        string(current.parsed >= "26.1") {
+            replace("world.WorldRenderEvents", "level.LevelRenderEvents")
+            replace("WorldRenderEvents.AFTER_ENTITIES", "LevelRenderEvents.AFTER_EXTRACT")
+            replace("WorldRenderEvents", "LevelRenderEvents")
+
+            replace("keybinding.v1.KeyBindingHelper", "keymapping.v1.KeyMappingHelper")
+            replace("KeyBindingHelper.registerKeyBinding", "KeyMappingHelper.registerKeyMapping")
+
             replace("GuiGraphics", "GuiGraphicsExtractor")
+
+            replace("net.minecraft.client.gui.render.state.", "net.minecraft.client.renderer.state.gui.")
         }
 
         string(current.parsed >= "1.21.10", "widget_events") {
@@ -106,11 +115,23 @@ stonecutter parameters {
             replace("keyCode == 257 || keyCode == 335", "keyEvent.isConfirmation()")
             replace("keyCode", "keyEvent.key()")
         }
-        string(current.parsed > "26.0", "gui_rendering") {
+
+        // gui_rendering
+
+        string(current.parsed >= "26.1", "gui_rendering") {
             replace("renderWidget(", "extractWidgetRenderState(")
             replace("renderBackground(", "extractBackground(")
+            replace("renderBlurredBackground(", "extractBlurredBackground(")
+            replace("renderMenuBackground(", "extractMenuBackground(")
+            replace("renderContents(", "extractContents(")
+            replace("renderDefaultLabel(", "extractDefaultLabel(")
+            replace("renderScrollbar(", "extractScrollbar(")
+
             replace("render(", "extractRenderState(")
+
             replace("context.hLine(", "context.horizontalLine(")
+            replace("context.hLine(", "context.horizontalLine(")
+            replace("scrollbarVisible()", "scrollable()")
         }
     }
 }

@@ -54,7 +54,10 @@ public class ClientTickHandler {
             if (matrices == null || vertexConsumers == null)
                 return;
             Vec3 pos = context.camera().getPosition();
-            //?} else >=1.21.10 {
+            //?} else >=26.1 {
+            /*PoseStack matrices = context.poseStack();
+            Vec3 pos = context.levelState().cameraRenderState.pos;
+            *///?} else >=1.21.10 {
             /*PoseStack matrices = context.matrices();
             Vec3 pos = context.worldState().cameraRenderState.pos;
             *///?}
@@ -73,7 +76,10 @@ public class ClientTickHandler {
                     //? if >=1.21.10 {
                     /*BeaconRenderer.submitBeaconBeam(
                             matrices,
+                            //? if <26.1 {
                             context.commandQueue(),
+                            //?} else
+                            //context.submitNodeCollector(),
                             BeaconRenderer.BEAM_LOCATION,
                             1, 0, 0, level.getHeight(),
                             MapartHelper.commonConfig().selectionColor.getRGB(),

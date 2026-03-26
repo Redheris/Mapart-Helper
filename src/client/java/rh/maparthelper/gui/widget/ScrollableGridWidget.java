@@ -35,6 +35,9 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     private int scrollBarColor = 0xFFC8C8C8;
 
     public ScrollableGridWidget(@Nullable GuiEventListener parentWidget, int x, int y, int width, int height, int scrollWidth) {
+        //? if >=26.1 {
+        /*super(x, y, width, height, Component.empty(), AbstractScrollArea.defaultSettings(15));
+        *///?} else
         super(x, y, width, height, Component.empty());
         this.parentWidget = parentWidget;
         this.grid = new InnerGridWidget(x, y);
@@ -83,7 +86,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     public Optional<LayoutElement> hoveredElement(double mouseX, double mouseY) {
-        boolean onScroll = this.scrollbarVisible()
+        boolean onScroll = /*? if <26.1 {*/this.scrollbarVisible()/*?} else {*/ /*this.scrollable() *//*?}*/
                 && mouseX >= this.scrollBarX()
                 && mouseX <= this.scrollBarX() + scrollWidth
                 && mouseY >= this.getY()
@@ -117,6 +120,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         return this.leftScroll ? this.getX() : this.getRight() - scrollWidth;
     }
 
+    //~ gui_rendering
     public boolean isOverScroll(double x, double y) {
         return this.scrollbarVisible()
                 && x >= this.scrollBarX()
@@ -162,6 +166,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
             context.fill(i, k, i + scrollWidth, k + j, scrollBarColor);
         }
     }
+    //~ !gui_rendering
 
     //~ widget_events
     @Override
