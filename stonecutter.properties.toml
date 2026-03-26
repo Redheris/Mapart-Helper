@@ -41,7 +41,7 @@ parchment = "1.21.11:2025.12.20"
 
 ["26.1"]
 mc_dep = "26.1"
-mc_dep_fabric ="~26.1"
+mc_dep_fabric = "~26.1"
 release_title = "26.1"
 mc_targets = "26.1"
 # Dependencies

@@ -44,6 +44,7 @@ public class InventoryItemsCounter {
                         DataComponents.CONTAINER,
                         ItemContainerContents.EMPTY
                 );
+                //~ if >=26.1 'nonEmptyStream' -> 'nonEmptyItemCopyStream'
                 container.nonEmptyStream()
                         .filter(doCount)
                         .forEach(stack ->

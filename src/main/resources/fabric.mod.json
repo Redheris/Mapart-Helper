@@ -29,8 +29,8 @@
 		"maparthelper.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.8",
+		"fabricloader": ">={fabric_loader}",
+		"minecraft": "${minecraft}",
 		"java": ">=21",
 		"fabric-api": "*",
 		"yet_another_config_lib_v3": "*"

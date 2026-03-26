@@ -174,13 +174,14 @@ public class PaletteGenerator {
                 TallSeagrassBlock.class,
                 KelpPlantBlock.class
         };
+        // FIXME: temporary commented
         MEANINGLESS_BLOCKS = new Class[]{
                 BedBlock.class,
                 DoorBlock.class,
                 FrostedIceBlock.class,
                 BubbleColumnBlock.class,
                 FrogspawnBlock.class,
-                WaterlilyBlock.class,
+//                WaterlilyBlock.class,
                 SnifferEggBlock.class,
                 TurtleEggBlock.class,
                 FlowerPotBlock.class,
@@ -200,7 +201,7 @@ public class PaletteGenerator {
                 HangingRootsBlock.class,
                 LavaCauldronBlock.class,
                 LayeredCauldronBlock.class,
-                FarmBlock.class,
+//                FarmBlock.class,
                 DirtPathBlock.class,
                 HeavyCoreBlock.class
         };
