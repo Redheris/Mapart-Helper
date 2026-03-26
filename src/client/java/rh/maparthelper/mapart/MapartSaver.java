@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.util.Utils;
+import rh.maparthelper.util.FileUtils;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -33,7 +33,7 @@ public class MapartSaver {
 
     public static void saveMapartImage(String mapartName, DynamicTexture mapartTexture, Player player) {
         try {
-            String filename = Utils.makeUniqueFilename(SAVED_MAPS_DIR, mapartName, "png");
+            String filename = FileUtils.makeUniqueFilename(SAVED_MAPS_DIR, mapartName, "png");
             Path filepath = SAVED_MAPS_DIR.resolve(filename);
             if (saveMapartImage(mapartTexture, filepath) && player != null) {
                 Component mapartFile = Component.literal(filename)

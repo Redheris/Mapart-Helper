@@ -21,7 +21,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.util.Utils;
+import rh.maparthelper.util.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -144,7 +144,7 @@ public class MapartToFile {
     }
 
     private static void saveMapartFile(Player player, String filename, NativeImage image) throws IOException {
-        filename = Utils.makeUniqueFilename(SAVE_MAPS_DIR, filename, "png");
+        filename = FileUtils.makeUniqueFilename(SAVE_MAPS_DIR, filename, "png");
 
         Path filePath = SAVE_MAPS_DIR.resolve(filename);
         image.writeToFile(filePath);

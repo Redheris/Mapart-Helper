@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.util.RenderUtils;
 
 public class PaletteUpdateSuggestionScreen extends Screen {
     private final Screen parent;
@@ -82,7 +83,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         super.renderBackground(context, mouseX, mouseY, partialTick);
 
         context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x77000000);
-        context.renderOutline(boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
+        RenderUtils.renderOutline(context, boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
     }
 
     @Override

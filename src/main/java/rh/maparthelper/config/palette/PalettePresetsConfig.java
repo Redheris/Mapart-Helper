@@ -4,7 +4,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.util.Utils;
+import rh.maparthelper.util.FileUtils;
 
 import java.nio.file.Files;
 import java.util.*;
@@ -61,13 +61,13 @@ public class PalettePresetsConfig {
     }
 
     void addPreset(String filename, PalettePreset preset) {
-        String presetName = Utils.makeUniqueName(presetFiles.values()::contains, "New preset", null, "%s (%d)");
+        String presetName = FileUtils.makeUniqueName(presetFiles.values()::contains, "New preset", null, "%s (%d)");
         presetFiles.put(filename, presetName);
         presets.put(filename, preset);
     }
 
     String createDefaultPreset() {
-        String presetFilename = Utils.makeUniqueFilename(PRESETS_PATH, "new_preset", "json", "%s_%d");
+        String presetFilename = FileUtils.makeUniqueFilename(PRESETS_PATH, "new_preset", "json", "%s_%d");
         this.addPreset(presetFilename, PaletteGenerator.getDefaultPreset());
         return presetFilename;
     }
@@ -89,7 +89,7 @@ public class PalettePresetsConfig {
         }
 
         public String createNewPreset(boolean createDefault, Set<String> updatedPresets, Set<String> deletedPresets) {
-            String presetFilename = Utils.makeUniqueName(filename ->
+            String presetFilename = FileUtils.makeUniqueName(filename ->
                             (updatedPresets.contains(filename) || Files.exists(PRESETS_PATH.resolve(filename))) && !deletedPresets.contains(filename),
                     "new_preset", "json", "%s_%d"
             );
@@ -125,7 +125,7 @@ public class PalettePresetsConfig {
         public String duplicatePreset(String filename, Set<String> updatedPresets, Set<String> deletedPresets) {
             PalettePreset preset = new PalettePreset(presets.get(filename));
             String newFilename = FilenameUtils.getBaseName(filename) + " (Copy)";
-            newFilename = Utils.makeUniqueName(fName ->
+            newFilename = FileUtils.makeUniqueName(fName ->
                             (presetFiles.containsKey(fName) || updatedPresets.contains(fName) || Files.exists(PRESETS_PATH.resolve(fName))) && !deletedPresets.contains(fName),
                     newFilename, "json", "%s_%d"
             );

@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.util.ParticleUtils;
+import rh.maparthelper.util.CompatUtils;
 
 public class MapartSelectionHandler {
 
@@ -105,7 +106,7 @@ public class MapartSelectionHandler {
         }
 
         if (!direction.equals(ClientCommandsContext.getSelectedDirection())) {
-            player.displayClientMessage(Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
             return;
         }
 
@@ -118,15 +119,15 @@ public class MapartSelectionHandler {
         };
 
         if (!isFlat) {
-            player.displayClientMessage(Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
             return;
         }
 
         int flag = secondPos ? ClientCommandsContext.setSelectedPos2(pos) : ClientCommandsContext.setSelectedPos1(pos);
 
         if (flag == -1)
-            player.displayClientMessage(Component.translatable("maparthelper.too_many_maps").withStyle(ChatFormatting.RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.too_many_maps").withStyle(ChatFormatting.RED), true);
         else
-            player.displayClientMessage(Component.translatable("maparthelper.selecting_succeeded").withColor(CommonColors.GREEN), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selecting_succeeded").withColor(CommonColors.GREEN), true);
     }
 }

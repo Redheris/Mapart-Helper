@@ -23,6 +23,7 @@ import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
 import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.scheduler.DelayedRepeater;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -110,7 +111,8 @@ public class MapartPreviewWidget extends AbstractWidget {
             int centerX = x + width / 2;
             List<FormattedCharSequence> lines = textRenderer.split(dropFileText, width - 5);
             for (int i = 0; i < lines.size(); i++) {
-                context.drawCenteredString(
+                RenderUtils.centeredText(
+                        context,
                         textRenderer,
                         lines.get(i),
                         centerX, y + 5 + i * 9,
@@ -134,7 +136,8 @@ public class MapartPreviewWidget extends AbstractWidget {
             double conversionProgress = MapartImageConverter.getConversionProgress();
             Font textRenderer = Minecraft.getInstance().font;
             context.fill(x, y, (int) (x + width * conversionProgress), getBottom(), 0x3000FF00);
-            context.drawCenteredString(
+            RenderUtils.centeredText(
+                    context,
                     textRenderer,
                     (int) (conversionProgress * 100) + "%",
                     x + width / 2, y + 14,
@@ -150,7 +153,7 @@ public class MapartPreviewWidget extends AbstractWidget {
             setHoveredAction(null);
         }
 
-        context.renderOutline(x - 1, y - 1, width + 2, height + 2, CommonColors.HIGH_CONTRAST_DIAMOND);
+        RenderUtils.renderOutline(context, x - 1, y - 1, width + 2, height + 2, CommonColors.HIGH_CONTRAST_DIAMOND);
     }
 
     public int getImageX() {

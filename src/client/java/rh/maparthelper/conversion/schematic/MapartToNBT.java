@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
-import rh.maparthelper.util.Utils;
+import rh.maparthelper.util.FileUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,7 +45,7 @@ public class MapartToNBT {
         String mapartName = CurrentConversionSettings.mapart.mapartName;
         Path savingPath;
         if (!asSingleFile && zipOut == null && MapartHelper.commonConfig().createDirsForSchematic)
-            savingPath = Path.of(Utils.makeUniqueDirName(SCHEMATICS.resolve(mapartName)));
+            savingPath = Path.of(FileUtils.makeUniqueDirName(SCHEMATICS.resolve(mapartName)));
         else
             savingPath = SCHEMATICS;
 
@@ -78,7 +78,7 @@ public class MapartToNBT {
                 filename += " (" + (i % mapsWidth) + "_" + (i / mapsWidth) + ")";
             }
 
-            String writeFilename = Utils.makeUniqueFilename(savingPath, filename, "nbt");
+            String writeFilename = FileUtils.makeUniqueFilename(savingPath, filename, "nbt");
             try {
                 if (zipOut == null) {
                     NbtIo.writeCompressed(mapartNbt, savingPath.resolve(writeFilename));
@@ -132,7 +132,7 @@ public class MapartToNBT {
     public static void saveNBTAsZip() {
         if (CurrentConversionSettings.guiMapartImage == null)
             return;
-        String filename = Utils.makeUniqueFilename(SCHEMATICS, CurrentConversionSettings.mapart.mapartName, "zip");
+        String filename = FileUtils.makeUniqueFilename(SCHEMATICS, CurrentConversionSettings.mapart.mapartName, "zip");
         File fileToZip = SCHEMATICS.resolve(filename).toFile();
 
         nbtBuilderExecutor.execute(() -> {
