@@ -30,10 +30,9 @@ import java.util.List;
 //import net.minecraft.world.attribute.EnvironmentAttributeReader;
 
 /**
- * This annotation-consumer-monster has the only reason of existence - lying to
+ * This LevelReader exists to deceive the
  * {@code BlockBehaviour#canSurvive} to check if the block can survive without a support block below it
  */
-@SuppressWarnings("DataFlowIssue")
 public class DummyWorldView implements LevelReader {
     private final static DummyWorldView INSTANCE = new DummyWorldView();
 
@@ -50,7 +49,6 @@ public class DummyWorldView implements LevelReader {
     public @NotNull BlockState getBlockState(@NotNull BlockPos pos) {
         return Blocks.AIR.defaultBlockState();
     }
-
 
     @Override
     public @Nullable ChunkAccess getChunk(int chunkX, int chunkZ, @NotNull ChunkStatus leastStatus, boolean create) {
@@ -69,43 +67,43 @@ public class DummyWorldView implements LevelReader {
 
     @Override
     public @NotNull BiomeManager getBiomeManager() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isClientSide() {
-        return false;
+        return true;
     }
 
     @Override
     public int getSeaLevel() {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull DimensionType dimensionType() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull RegistryAccess registryAccess() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull FeatureFlagSet enabledFeatures() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     //? if >= 1.21.11 {
     /*@Override
     public @NotNull EnvironmentAttributeReader environmentAttributes() {
-        return null;
+        throw new UnsupportedOperationException();
     }
     *///?}
 
@@ -116,17 +114,17 @@ public class DummyWorldView implements LevelReader {
 
     @Override
     public @NotNull LevelLightEngine getLightEngine() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull WorldBorder getWorldBorder() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public @NotNull List<VoxelShape> getEntityCollisions(@Nullable Entity entity, @NotNull AABB box) {
-        return List.of();
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -136,6 +134,6 @@ public class DummyWorldView implements LevelReader {
 
     @Override
     public @NotNull FluidState getFluidState(@NotNull BlockPos pos) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
