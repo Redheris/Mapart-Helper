@@ -108,7 +108,7 @@ public class MaterialListPanel extends AbstractLayout {
                 screen.width - getX() - 5, screen.height - listTop, 6
         );
 
-        if (!CurrentConversionSettings.isMapartConverted() || MapartHelper.conversionSettings.useUnobtainable()) return;
+        if (!CurrentConversionSettings.isMapartConverted() || MapartHelper.conversionConfig().useUnobtainable()) return;
 
         materialList.setLeftScroll(true);
         materialList.grid.columnSpacing(0);
@@ -117,11 +117,11 @@ public class MaterialListPanel extends AbstractLayout {
         GridLayout.RowHelper materialListAdder = materialList.grid.createRowHelper(2);
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
 
-        ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionSettings.getMaterialsCountMode());
+        ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionConfig().getMaterialsCountMode());
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
 
         this.auxBlockCount = mapart.getWidth() * 128;
-        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionSettings.getAuxBlock());
+        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionConfig().getAuxBlock());
         auxBlockItemWidget.insertToTooltip(1, Component.translatable("maparthelper.aux_block").withStyle(ChatFormatting.GRAY));
 
         StringWidget auxAmountText = new StringWidget(Component.empty(), screen.getFont());
@@ -137,7 +137,7 @@ public class MaterialListPanel extends AbstractLayout {
         }
 
         if (displayRemainingAmount && !hasAuxBlockInColors)
-            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionSettings.getAuxBlock().asItem(), 0);
+            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionConfig().getAuxBlock().asItem(), 0);
 
         MutableComponent amountText = Component.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
         if (auxBlockCount <= 0)
@@ -187,7 +187,7 @@ public class MaterialListPanel extends AbstractLayout {
                 })
                 .toList();
 
-        Item auxBlockItem = MapartHelper.conversionSettings.getAuxBlock().asItem();
+        Item auxBlockItem = MapartHelper.conversionConfig().getAuxBlock().asItem();
         Map<Item, Integer> inventory = inventoryItemsCounter.getCounts();
 
         for (int i = 0; i < colors.length; i++) {
@@ -257,8 +257,8 @@ public class MaterialListPanel extends AbstractLayout {
             super.renderWidget(context, mouseX, mouseY, partialTick);
             if (fixedHighlight == this) {
                 context.nextStratum();
-                context.renderOutline(getX(), getY(), this.width, this.height, MapartHelper.commonConfig.mapartEditor.previewHighlightingColor);
-            } else if (MapartHelper.commonConfig.mapartEditor.previewHighlightOnHover
+                context.renderOutline(getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
+            } else if (MapartHelper.commonConfig().previewHighlightOnHover
                     && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 screen.setHighlightingColor(mapColor);
                 hoveringAny = true;

@@ -32,7 +32,7 @@ public class MapartSelectionHandler {
             Vec3 pos1 = ClientCommandsContext.getSelectedPos1();
             Vec3 pos2 = ClientCommandsContext.getSelectedPos2();
 
-            int selectionColor = MapartHelper.commonConfig.selectionColor;
+            int selectionColor = MapartHelper.commonConfig().selectionColor.getRGB();
 
             if (pos1 != null) {
                 pos1 = pos1.relative(direction, 0.05);

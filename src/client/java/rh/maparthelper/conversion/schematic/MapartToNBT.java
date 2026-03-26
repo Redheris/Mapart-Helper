@@ -44,7 +44,7 @@ public class MapartToNBT {
 
         String mapartName = CurrentConversionSettings.mapart.mapartName;
         Path savingPath;
-        if (!asSingleFile && zipOut == null && MapartHelper.commonConfig.createDirsForSchematic)
+        if (!asSingleFile && zipOut == null && MapartHelper.commonConfig().createDirsForSchematic)
             savingPath = Path.of(Utils.makeUniqueDirName(SCHEMATICS.resolve(mapartName)));
         else
             savingPath = SCHEMATICS;

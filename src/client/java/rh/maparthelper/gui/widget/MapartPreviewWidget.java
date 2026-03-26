@@ -63,7 +63,7 @@ public class MapartPreviewWidget extends AbstractWidget {
                     highlightingColor.calculateARGBColor(MapColor.Brightness.LOW),
                     highlightingColor.calculateARGBColor(MapColor.Brightness.NORMAL),
                     highlightingColor.calculateARGBColor(MapColor.Brightness.HIGH),
-                    MapartHelper.commonConfig.selectionColor
+                    MapartHelper.commonConfig().selectionColor.getRGB()
             );
         }
     }
@@ -87,13 +87,13 @@ public class MapartPreviewWidget extends AbstractWidget {
 
         if (CurrentConversionSettings.guiMapartImage != null) {
             RenderPipeline pipeline = RenderPipelines.GUI_TEXTURED;
-            if (!MapartHelper.conversionSettings.isShowOriginalImage() && highlightingColor != MapColor.NONE) {
+            if (!MapartHelper.conversionConfig().isShowOriginalImage() && highlightingColor != MapColor.NONE) {
                 pipeline = CustomPipelines.PREVIEW_COLOR_HIGHLIGHT;
                 ColorsHighlightUniform.set(
                         highlightingColor.calculateARGBColor(MapColor.Brightness.LOW),
                         highlightingColor.calculateARGBColor(MapColor.Brightness.NORMAL),
                         highlightingColor.calculateARGBColor(MapColor.Brightness.HIGH),
-                        MapartHelper.commonConfig.mapartEditor.previewHighlightingColor
+                        MapartHelper.commonConfig().previewHighlightingColor.getRGB()
                 );
             }
             context.blit(

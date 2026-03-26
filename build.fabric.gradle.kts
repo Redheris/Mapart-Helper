@@ -35,7 +35,10 @@ repositories {
     }
     strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
     strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
-    maven("https://maven.shedaniel.me/")
+
+    maven("https://maven.isxander.dev/releases") {
+        name = "Xander Maven"
+    }
     maven("https://maven.terraformersmc.com/releases/")
 }
 
@@ -45,7 +48,7 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${property("mod.fabric_loader")}")
     implementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
 
-    api("me.shedaniel.cloth:cloth-config-fabric:${property("cloth_config")}")
+    implementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
     api("com.terraformersmc:modmenu:${property("modmenu")}")
 }
 
@@ -159,7 +162,7 @@ publishMods {
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
             requires {
                 slug = "fabric-api"
-                slug = "cloth-config"
+                slug = "yacl"
             }
             optional {
                 slug = "modmenu"
@@ -177,7 +180,7 @@ publishMods {
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
             requires {
                 slug = "fabric-api"
-                slug = "cloth-config"
+                slug = "yacl"
             }
             optional {
                 slug = "modmenu"

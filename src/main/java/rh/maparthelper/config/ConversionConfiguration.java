@@ -1,18 +1,54 @@
 package rh.maparthelper.config;
 
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.ConfigData;
-import me.shedaniel.autoconfig.annotation.Config;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.config.adapter.BlockTypeAdapter;
+import rh.maparthelper.config.adapter.MapColorEntryAdapter;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverters;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 
-@Config(name = "conversion-settings")
-public class ConversionConfiguration implements ConfigData {
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+
+public class ConversionConfiguration {
+    private final static Gson gson = new GsonBuilder()
+            .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
+            .registerTypeAdapter(MapColorEntry.class, new MapColorEntryAdapter())
+            .setPrettyPrinting()
+            .create();
+    private final static Path configPath = FabricLoader.getInstance()
+            .getConfigDir()
+            .resolve(MapartHelper.CONFIG_PATH)
+            .resolve("yacl_config_nogui.json");
+
+    public static ConversionConfiguration instance;
+
+    public static void load() {
+        try (FileReader reader = new FileReader(configPath.toFile())) {
+            instance = gson.fromJson(reader, ConversionConfiguration.class);
+        } catch (Exception e) {
+            MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", configPath, e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void save() {
+        try (FileWriter writer = new FileWriter(configPath.toFile())) {
+            gson.toJson(instance, writer);
+        } catch (IOException e) {
+            MapartHelper.LOGGER.error(e.getMessage(), e);
+        }
+    }
+
     private StaircaseStyles staircaseStyle = StaircaseStyles.FLAT_2D;
     private UseAuxBlocks useAuxBlocks = UseAuxBlocks.IMPORTANT;
     private Block auxBlock = Blocks.NETHERRACK;
@@ -22,6 +58,7 @@ public class ConversionConfiguration implements ConfigData {
     private boolean useLAB = false;
 
     private transient boolean showOriginalImage = false;
+
 
     public boolean isShowOriginalImage() {
         return showOriginalImage;
@@ -38,7 +75,6 @@ public class ConversionConfiguration implements ConfigData {
     public void setUseAuxBlocks(UseAuxBlocks useAuxBlocks) {
         if (this.useAuxBlocks == useAuxBlocks) return;
         this.useAuxBlocks = useAuxBlocks;
-        saveConfigFile();
     }
 
     public Block getAuxBlock() {
@@ -48,7 +84,6 @@ public class ConversionConfiguration implements ConfigData {
     public void setAuxBlock(Block auxBlock) {
         if (this.auxBlock == auxBlock) return;
         this.auxBlock = auxBlock;
-        saveConfigFile();
     }
 
     public ColorConverters getColorConverter() {
@@ -58,7 +93,6 @@ public class ConversionConfiguration implements ConfigData {
     public void setColorConverter(ColorConverters colorConverter) {
         if (this.colorConverter == colorConverter) return;
         this.colorConverter = colorConverter;
-        saveConfigFile();
     }
 
     public MaterialsCountModes getMaterialsCountMode() {
@@ -67,7 +101,6 @@ public class ConversionConfiguration implements ConfigData {
 
     public void nextMaterialsCountMode() {
         this.materialsCountMode = MaterialsCountModes.nextMode(materialsCountMode);
-        saveConfigFile();
     }
 
     public boolean use3D() {
@@ -93,13 +126,11 @@ public class ConversionConfiguration implements ConfigData {
     public void setBackgroundColor(MapColorEntry backgroundColor) {
         if (this.backgroundColor.equals(backgroundColor)) return;
         this.backgroundColor = backgroundColor;
-        saveConfigFile();
     }
 
     public void toggleLAB() {
         this.useLAB = !useLAB;
         PaletteColors.clearColorCache();
-        saveConfigFile();
     }
 
     public StaircaseStyles getStaircaseStyle() {
@@ -111,15 +142,10 @@ public class ConversionConfiguration implements ConfigData {
         boolean was3D = use3D();
         boolean needUpdate = this.staircaseStyle == StaircaseStyles.UNOBTAINABLE || staircaseStyle == StaircaseStyles.UNOBTAINABLE;
         this.staircaseStyle = staircaseStyle;
-        saveConfigFile();
         if (needUpdate || was3D != use3D()) {
             PaletteColors.clearColorCache();
             return true;
         }
         return false;
-    }
-
-    public static void saveConfigFile() {
-        AutoConfig.getConfigHolder(MapartHelperConfig.class).save();
     }
 }

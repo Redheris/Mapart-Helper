@@ -46,7 +46,7 @@ public class PaletteColors {
             if (renderColor == 0) break;
             if (renderColor == argb) return new DitherEntry(colorByte);
 
-            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionConfig().useLAB());
             if (dist < minDist) {
                 secondMinDist = minDist;
                 minDist = dist;
@@ -88,7 +88,7 @@ public class PaletteColors {
                 int renderColor = mapRenderColors[colorByte + 128];
                 if (renderColor == argb) return new DitherEntry(colorByte);
 
-                double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+                double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionConfig().useLAB());
                 if (dist < minDist) {
                     secondMinDist = minDist;
                     minDist = dist;
@@ -135,7 +135,7 @@ public class PaletteColors {
             int renderColor = MapColor.getColorFromPackedId(colorByte);
             if (renderColor == argb) return new DitherEntry(colorByte);
 
-            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionConfig().useLAB());
             if (dist < minDist) {
                 secondMinDist = minDist;
                 minDist = dist;

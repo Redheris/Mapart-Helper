@@ -47,7 +47,9 @@ repositories {
     maven("https://maven.gegy.dev/releases/") {
         name = "Gegy"
     }
-    maven("https://maven.shedaniel.me/")
+    maven("https://maven.isxander.dev/releases") {
+        name = "Xander Maven"
+    }
     maven("https://maven.terraformersmc.com/releases/")
 }
 
@@ -62,7 +64,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:${property("mod.fabric_loader")}")
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
 
-    modApi("me.shedaniel.cloth:cloth-config-fabric:${property("cloth_config")}")
+    modImplementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
     modApi("com.terraformersmc:modmenu:${property("modmenu")}")
 }
 
@@ -176,7 +178,7 @@ publishMods {
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
             requires {
                 slug = "fabric-api"
-                slug = "cloth-config"
+                slug = "yacl"
             }
             optional {
                 slug = "modmenu"
@@ -194,7 +196,7 @@ publishMods {
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
             requires {
                 slug = "fabric-api"
-                slug = "cloth-config"
+                slug = "yacl"
             }
             optional {
                 slug = "modmenu"

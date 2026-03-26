@@ -32,7 +32,7 @@ public class ParticleUtils {
     public static void drawSelectionBox(Level world, Vec3 pos1, Vec3 pos2, Direction direction, double step) {
         if (world == null) return;
 
-        DustParticleOptions particle = new DustParticleOptions(MapartHelper.commonConfig.selectionColor, 0.3f);
+        DustParticleOptions particle = new DustParticleOptions(MapartHelper.commonConfig().selectionColor.getRGB(), 0.3f);
         double xMin = Math.min(pos1.x, pos2.x) - 0.5;
         double xMax = Math.max(pos1.x, pos2.x) + 0.5;
         double yMin = Math.min(pos1.y, pos2.y) - 0.5;

@@ -40,16 +40,16 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
     @Override
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(context, mouseX, mouseY, partialTick);
-        int color = MapartHelper.conversionSettings.getBackgroundRenderColor();
+        int color = MapartHelper.conversionConfig().getBackgroundRenderColor();
         context.fill(getX(), getY(), getRight(), getBottom(), color);
         context.renderOutline(getX(), getY(), getWidth(), getHeight(), 0xFF555555);
     }
     //~}
 
     private void setColor(MapColorEntry color) {
-        MapColorEntry current = MapartHelper.conversionSettings.getBackgroundColor();
+        MapColorEntry current = MapartHelper.conversionConfig().getBackgroundColor();
         if (current.mapColor() != color.mapColor() || current.brightness() != color.brightness()) {
-            MapartHelper.conversionSettings.setBackgroundColor(color);
+            MapartHelper.conversionConfig().setBackgroundColor(color);
             MapartImageUpdater.updateMapart(mapart);
         }
     }
@@ -65,7 +65,7 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
-            onlyNormalBrightness = !MapartHelper.conversionSettings.use3D();
+            onlyNormalBrightness = !MapartHelper.conversionConfig().use3D();
             if (color != MapColor.NONE && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 setAlpha(0.2f);
                 if (this.isMouseOver(mouseX, mouseY) && context.containsPointInScissor(mouseX, mouseY)) {

@@ -15,6 +15,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.Shapes;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
+import rh.maparthelper.config.CommonConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class PaletteGenerator {
             MapColor color = state.getMapColor(null, null);
             if (color == MapColor.NONE)
                 continue;
-            boolean useCreativeBlocks = MapartHelper.commonConfig.useInPalette.creativeBlocks;
+            boolean useCreativeBlocks = MapartHelper.commonConfig().creativeBlocks;
             if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE && block != Blocks.PETRIFIED_OAK_SLAB)) {
                 if (!palette.containsKey(color.id))
                     palette.put(color.id, new ArrayList<>());
@@ -80,24 +81,24 @@ public class PaletteGenerator {
     }
 
     private static boolean useBlockInPalette(Block block) {
-        var useInPalette = MapartHelper.commonConfig.useInPalette;
+        CommonConfiguration config = MapartHelper.commonConfig();
 
-        if (useInPalette.anyBlocks) return true;
+        if (config.anyBlocks) return true;
         if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;
 
-        if (useInPalette.onlySolid && !matchesAny(block, CREATIVE_BLOCKS)) {
+        if (config.onlySolid && !matchesAny(block, CREATIVE_BLOCKS)) {
             BlockState state = block.defaultBlockState();
             if (state.isSolidRender()) return true;
             return state.getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) == Shapes.block();
         }
-        if (useInPalette.onlyCarpets) return matchesAny(block, CarpetBlock.class, MossyCarpetBlock.class);
+        if (config.onlyCarpets) return matchesAny(block, CarpetBlock.class, MossyCarpetBlock.class);
 
-        if (!useInPalette.blocksWithEntities && block instanceof EntityBlock) return false;
-        if (!useInPalette.buildDecorBlocks && matchesAny(block, BUILD_DECOR_BLOCKS)) return false;
-        if (!useInPalette.creativeBlocks && matchesAny(block, CREATIVE_BLOCKS)) return false;
-        if (!useInPalette.needWaterBlocks && matchesAny(block, NEED_WATER_BLOCKS)) return false;
-        if (!useInPalette.growableBlocks && matchesAny(block, GROWABLE_BLOCKS)) return false;
-        return useInPalette.grassLikeBlocks || !matchesAny(block, GRASS_LIKE_BLOCKS);
+        if (!config.entityBlocks && block instanceof EntityBlock) return false;
+        if (!config.buildDecorBlocks && matchesAny(block, BUILD_DECOR_BLOCKS)) return false;
+        if (!config.creativeBlocks && matchesAny(block, CREATIVE_BLOCKS)) return false;
+        if (!config.needWaterBlocks && matchesAny(block, NEED_WATER_BLOCKS)) return false;
+        if (!config.growableBlocks && matchesAny(block, GROWABLE_BLOCKS)) return false;
+        return config.grassLikeBlocks || !matchesAny(block, GRASS_LIKE_BLOCKS);
     }
 
     public static BlockState getDefaultPaletteState(Block block) {

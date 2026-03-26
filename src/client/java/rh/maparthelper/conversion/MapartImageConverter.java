@@ -56,7 +56,7 @@ public class MapartImageConverter {
     }
 
     private static @NotNull UpdateMapartRunnable createUpdateMapartRunnable(MapartProcessing processingMapart, Path path, ImageChangeResult imageChangeResult) {
-        boolean logExecutionTime = MapartHelper.commonConfig.mapartEditor.logConversionTime;
+        boolean logExecutionTime = MapartHelper.commonConfig().logConversionTime;
         if (!processingMapart.isReset() && path.equals(processingMapart.getImagePath()))
             return new UpdateMapartRunnable(processingMapart, null, logExecutionTime, imageChangeResult);
         return new UpdateMapartRunnable(processingMapart, path, logExecutionTime, imageChangeResult);
@@ -86,7 +86,7 @@ public class MapartImageConverter {
                                                         int bgColor, int bgMapColorId, boolean use3D, boolean useUnobtainable) {
         topLineBright = new int[image.getWidth()];
         topLineCorrect = new int[image.getWidth()];
-        ColorConverter colorConverter = MapartHelper.conversionSettings.getColorConverter().createColorConverter(
+        ColorConverter colorConverter = MapartHelper.conversionConfig().getColorConverter().createColorConverter(
                 mapart,
                 image,
                 use3D,
@@ -135,12 +135,12 @@ public class MapartImageConverter {
         private final Path newImagePath;
         private final boolean logExecutionTime;
 
-        private final boolean showOriginalImage = MapartHelper.conversionSettings.isShowOriginalImage();
-        private final int bgColor = MapartHelper.conversionSettings.getBackgroundRenderColor();
-        private final int bgMapColorId = MapartHelper.conversionSettings.getBackgroundColor().mapColor().id;
-        private final boolean use3D = MapartHelper.conversionSettings.use3D();
-        private final boolean useUnobtainable = MapartHelper.conversionSettings.useUnobtainable();
-        private final int colorsCacheLiveTimeMs = MapartHelper.commonConfig.mapartEditor.colorsCacheLiveTimeMs;
+        private final boolean showOriginalImage = MapartHelper.conversionConfig().isShowOriginalImage();
+        private final int bgColor = MapartHelper.conversionConfig().getBackgroundRenderColor();
+        private final int bgMapColorId = MapartHelper.conversionConfig().getBackgroundColor().mapColor().id;
+        private final boolean use3D = MapartHelper.conversionConfig().use3D();
+        private final boolean useUnobtainable = MapartHelper.conversionConfig().useUnobtainable();
+        private final int colorsCacheLiveTimeMs = MapartHelper.commonConfig().colorsCacheLiveTimeMs;
 
         private boolean isUpdating = true;
 

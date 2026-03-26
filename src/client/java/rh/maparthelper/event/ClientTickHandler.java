@@ -39,7 +39,7 @@ public class ClientTickHandler {
             }
             if (client.level != null && ClientCommandsContext.showFakeItemFrames()) {
                 long liveTime = client.level.getGameTime() - ClientCommandsContext.getFakeFramesBornTime();
-                if (liveTime >= MapartHelper.commonConfig.fakeItemFramesLiveTime) {
+                if (liveTime >= MapartHelper.commonConfig().fakeItemFramesLiveTime) {
                     FakeMapsPreview.removeFakeItemFrames(client.level);
                 }
             }
@@ -76,7 +76,7 @@ public class ClientTickHandler {
                             context.commandQueue(),
                             BeaconRenderer.BEAM_LOCATION,
                             1, 0, 0, level.getHeight(),
-                            MapartHelper.commonConfig.selectionColor,
+                            MapartHelper.commonConfig().selectionColor.getRGB(),
                             0.2F, 0.0F
                     );
                     *///?} else {
@@ -86,7 +86,7 @@ public class ClientTickHandler {
                             BeaconRenderer.BEAM_LOCATION,
                             0,
                             1, 0, 0, level.getHeight(),
-                            MapartHelper.commonConfig.selectionColor,
+                            MapartHelper.commonConfig().selectionColor.getRGB(),
                             0.2F, 0.0F
                     );
                     //?}
