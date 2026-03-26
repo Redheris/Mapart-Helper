@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -157,6 +158,6 @@ public class MapartSchematicBuilder {
     public static boolean needsAuxBlock(Block block) {
         boolean canPlaceAtAir = block.defaultBlockState().canSurvive(DummyWorldView.getInstance(), BlockPos.ZERO);
         boolean hasNoCollision = block.defaultBlockState().getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) == Shapes.empty();
-        return !canPlaceAtAir || block instanceof FallingBlock || hasNoCollision;
+        return !canPlaceAtAir || block instanceof FallingBlock || block instanceof SlabBlock || hasNoCollision;
     }
 }
