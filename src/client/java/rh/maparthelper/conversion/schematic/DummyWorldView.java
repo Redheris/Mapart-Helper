@@ -107,10 +107,12 @@ public class DummyWorldView implements LevelReader {
     }
     *///?}
 
+    //? if < 26.1 {
     @Override
     public float getShade(@NotNull Direction direction, boolean shaded) {
         return 0;
     }
+    //?}
 
     @Override
     public @NotNull LevelLightEngine getLightEngine() {
