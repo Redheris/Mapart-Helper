@@ -29,7 +29,7 @@
 		"maparthelper.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">={fabric_loader}",
+		"fabricloader": ">=${fabric_loader}",
 		"minecraft": "${minecraft}",
 		"java": ">=21",
 		"fabric-api": "*",

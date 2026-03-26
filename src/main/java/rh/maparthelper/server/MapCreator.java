@@ -20,7 +20,7 @@ import java.util.List;
 //? if >=26.1 {
 /*import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.ItemStackTemplate;
-*///}
+*///?}
 
 public class MapCreator {
     public static void getMapsForMapart(int[][] maps, int mapartWidth, String mapartName, ServerLevel world, ServerPlayer player) {
