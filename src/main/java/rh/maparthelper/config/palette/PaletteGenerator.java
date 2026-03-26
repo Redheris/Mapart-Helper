@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.Shapes;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.CommonConfiguration;
 
 import java.util.*;
@@ -32,7 +31,6 @@ public class PaletteGenerator {
 
     public static void initColors(Map<Integer, List<Block>> palette) {
         palette.clear();
-        PaletteColors.argbMapColors.clear();
 
         for (Block block : BuiltInRegistries.BLOCK) {
             BlockState state = block.defaultBlockState();
@@ -47,8 +45,6 @@ public class PaletteGenerator {
             }
         }
 
-        initARGBMapColor(palette);
-
         ItemStack[] toolItems = {
                 new ItemStack(Items.NETHERITE_SWORD),
                 new ItemStack(Items.NETHERITE_AXE),
@@ -59,23 +55,6 @@ public class PaletteGenerator {
         };
         for (int colorId : palette.keySet()) {
             palette.get(colorId).sort(Comparator.comparingDouble(b -> getBlockScore(b, toolItems)));
-        }
-    }
-
-    public static void initARGBMapColor(Map<Integer, List<Block>> palette) {
-        for (int colorId : palette.keySet()) {
-            if (!palette.get(colorId).isEmpty())
-                addARGBMapColorEntries(MapColor.byId(colorId));
-        }
-    }
-
-    private static void addARGBMapColorEntries(MapColor mapColor) {
-        for (MapColor.Brightness brightness : MapColor.Brightness.values()) {
-            int argb = mapColor.calculateARGBColor(brightness);
-            MapColorEntry entry = new MapColorEntry(mapColor, brightness);
-            PaletteColors.argbMapColors.put(argb, entry);
-            byte colorByte = (byte) ((mapColor.id << 2) | brightness.id);
-            PaletteColors.mapRenderColors[colorByte + 128] = argb;
         }
     }
 

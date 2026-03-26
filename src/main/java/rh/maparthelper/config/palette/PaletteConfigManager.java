@@ -67,7 +67,6 @@ public class PaletteConfigManager {
                                 .filter(b -> b != Blocks.AIR)
                                 .toList()
                 );
-                PaletteGenerator.initARGBMapColor(completePalette.palette);
                 outdatedPalette = !DetectedVersion.BUILT_IN.name().equals(completePalette.getGameVersion());
                 return true;
             }

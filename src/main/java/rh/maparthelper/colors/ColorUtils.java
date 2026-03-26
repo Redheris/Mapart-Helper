@@ -3,14 +3,13 @@ package rh.maparthelper.colors;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Math.clamp;
 
 public class ColorUtils {
-
-    private final static Map<Integer, int[]> rgb2LabCache = new HashMap<>();
+    private final static Map<Integer, int[]> rgb2LabCache = new ConcurrentHashMap<>();
 
     public static void clearRgb2LabCache() {
         rgb2LabCache.clear();
