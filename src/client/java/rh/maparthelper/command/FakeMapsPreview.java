@@ -81,8 +81,13 @@ public class FakeMapsPreview {
             case SOUTH -> LEFT = Direction.EAST;
             case WEST -> LEFT = Direction.SOUTH;
         }
-        double localOffset = player.position().get(LEFT.getAxis()) - pos.get(LEFT.getAxis());
-        double leftOffset = width % 2 == 1 || localOffset < 0.5 ? 0 : -1;
+        double localOffset = Math.abs(player.position().get(LEFT.getAxis()) - pos.get(LEFT.getAxis()));
+        double leftOffset;
+        if (LEFT.getAxisDirection() == Direction.AxisDirection.NEGATIVE)
+            leftOffset = width % 2 == 1 || localOffset < 0.5 ? 0 : -1;
+        else
+            leftOffset = width % 2 == 1 || localOffset < 0.5 ? -1 : 0;
+
         pos.move(LEFT, (int) (width / 2.0 + leftOffset));
 
         for (int y = 0; y < height; y++) {
