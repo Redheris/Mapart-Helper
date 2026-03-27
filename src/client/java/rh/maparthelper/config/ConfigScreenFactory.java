@@ -5,6 +5,7 @@ import dev.isxander.yacl3.gui.controllers.BooleanController;
 import dev.isxander.yacl3.gui.controllers.ColorController;
 import dev.isxander.yacl3.gui.controllers.TickBoxController;
 import dev.isxander.yacl3.gui.controllers.string.number.IntegerFieldController;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -27,11 +28,12 @@ public class ConfigScreenFactory {
 
         CommonConfiguration.HANDLER.load();
         return YetAnotherConfigLib.create(CommonConfiguration.HANDLER, (defaults, config, builder) -> builder
-                .title(Component.literal("Mapart Helper Config"))
+                .title(Component.translatable("maparthelper.config.title"))
                 .category(ConfigCategory.createBuilder()
-                        .name(Component.literal("Common"))
+                        .name(Component.translatable("maparthelper.config.category.common"))
                         .option(Option.<Color>createBuilder()
-                                .name(Component.literal("Map selection color"))
+                                .name(Component.translatable("maparthelper.config.common.mapSelectionColor"))
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.mapSelectionColor")))
                                 .customController(ColorController::new)
                                 .binding(
                                         defaults.selectionColor,
@@ -40,7 +42,8 @@ public class ConfigScreenFactory {
                                 )
                                 .build())
                         .option(Option.<Color>createBuilder()
-                                .name(Component.literal("Highlight color on mapart preview"))
+                                .name(Component.translatable("maparthelper.config.common.previewHighlightingColor"))
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.previewHighlightingColor")))
                                 .customController(opt -> new ColorController(opt, true))
                                 .binding(
                                         defaults.previewHighlightingColor,
@@ -49,7 +52,8 @@ public class ConfigScreenFactory {
                                 )
                                 .build())
                         .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Create dirs for schematic files"))
+                                .name(Component.translatable("maparthelper.config.common.createDirsForSchematic"))
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.createDirsForSchematic")))
                                 .customController(TickBoxController::new)
                                 .binding(
                                         defaults.createDirsForSchematic,
@@ -59,7 +63,7 @@ public class ConfigScreenFactory {
                                 .build())
 
                         .option(Option.<Integer>createBuilder()
-                                .name(Component.literal("Fake item frames display duration (in ticks)"))
+                                .name(Component.translatable("maparthelper.config.common.fakeItemFramesLiveTime"))
                                 .customController(IntegerFieldController::new)
                                 .binding(
                                         defaults.fakeItemFramesLiveTime,
@@ -68,9 +72,10 @@ public class ConfigScreenFactory {
                                 )
                                 .build())
                         .group(OptionGroup.createBuilder()
-                                .name(Component.literal("Conversion settings"))
+                                .name(Component.translatable("maparthelper.config.common.group.conversionSettings"))
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Log image conversion duration"))
+                                        .name(Component.translatable("maparthelper.config.common.logConversionTime"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.logConversionTime")))
                                         .customController(opt -> new BooleanController(opt, true))
                                         .binding(
                                                 defaults.logConversionTime,
@@ -79,7 +84,8 @@ public class ConfigScreenFactory {
                                         )
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Highlight color on preview when the material is hovered"))
+                                        .name(Component.translatable("maparthelper.config.common.previewHighlightOnHover"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.previewHighlightOnHover")))
                                         .customController(TickBoxController::new)
                                         .binding(
                                                 defaults.previewHighlightOnHover,
@@ -88,7 +94,8 @@ public class ConfigScreenFactory {
                                         )
                                         .build())
                                 .option(Option.<Integer>createBuilder()
-                                        .name(Component.literal("Cached closest colors cache lifetime (in ms)"))
+                                        .name(Component.translatable("maparthelper.config.common.colorsCacheLiveTimeMs"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.colorsCacheLiveTimeMs")))
                                         .customController(opt -> new IntegerFieldController(opt, 0, 300000))
                                         .binding(
                                                 defaults.colorsCacheLiveTimeMs,
@@ -98,9 +105,9 @@ public class ConfigScreenFactory {
                                         .build())
                                 .build())
                         .group(OptionGroup.createBuilder()
-                                .name(Component.literal("Elements displaying toggles"))
+                                .name(Component.translatable("maparthelper.config.common.group.elementsDisplaySettings"))
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Show image import button"))
+                                        .name(Component.translatable("maparthelper.config.common.showImageImportButton"))
                                         .customController(TickBoxController::new)
                                         .binding(
                                                 defaults.showImageImportButton,
@@ -109,7 +116,8 @@ public class ConfigScreenFactory {
                                         )
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Display unobtainable mode (staircase style)"))
+                                        .name(Component.translatable("maparthelper.config.common.displayUnobtainableMode"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.displayUnobtainableMode")))
                                         .customController(TickBoxController::new)
                                         .binding(
                                                 defaults.displayUnobtainableMode,
@@ -118,7 +126,7 @@ public class ConfigScreenFactory {
                                         )
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Show tooltip for LAB toggle"))
+                                        .name(Component.translatable("maparthelper.config.common.showUseLABTooltip"))
                                         .customController(TickBoxController::new)
                                         .binding(
                                                 defaults.showUseLABTooltip,
@@ -127,7 +135,7 @@ public class ConfigScreenFactory {
                                         )
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Show tooltips for staircase styles"))
+                                        .name(Component.translatable("maparthelper.config.common.showStaircaseTooltips"))
                                         .customController(TickBoxController::new)
                                         .binding(
                                                 defaults.showStaircaseTooltips,
@@ -138,10 +146,13 @@ public class ConfigScreenFactory {
                                 .build())
                         .build())
                 .category(ConfigCategory.createBuilder()
-                        .name(Component.literal("Palette Generator"))
-                        .option(LabelOption.create(Component.literal("This is category")))
+                        .name(Component.translatable("maparthelper.config.category.paletteGenerator"))
+                        .option(LabelOption.create(Component.translatable("maparthelper.config.paletteGenerator.regenerationWarningLabel")
+                                .withStyle(ChatFormatting.GOLD)))
+                        .option(LabelOption.create(Component.translatable("maparthelper.config.paletteGenerator.headLabel")))
                         .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("§c§nALL§r registered blocks"))
+                                .name(Component.translatable("maparthelper.config.paletteGenerator.anyBlocks"))
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.anyBlocks")))
                                 .customController(TickBoxController::new)
                                 .binding(paletteGenFilterBinding(
                                         defaults.useInPalette.anyBlocks,
@@ -151,7 +162,7 @@ public class ConfigScreenFactory {
                                 .addListener(limiterListener)
                                 .build())
                         .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("§nOnly§r solid blocks"))
+                                .name(Component.translatable("maparthelper.config.paletteGenerator.onlySolid"))
                                 .customController(TickBoxController::new)
                                 .binding(paletteGenFilterBinding(
                                         defaults.useInPalette.onlySolid,
@@ -161,7 +172,7 @@ public class ConfigScreenFactory {
                                 .addListener(limiterListener)
                                 .build())
                         .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("§nOnly§r carpet blocks"))
+                                .name(Component.translatable("maparthelper.config.paletteGenerator.onlyCarpets"))
                                 .customController(TickBoxController::new)
                                 .binding(paletteGenFilterBinding(
                                         defaults.useInPalette.onlyCarpets,
@@ -170,43 +181,53 @@ public class ConfigScreenFactory {
                                         requestPaletteRegenerate))
                                 .addListener(limiterListener)
                                 .build())
-                        .option(LabelOption.create(Component.literal("More detailed settings:")))
+                        .option(LabelOption.create(Component.translatable("maparthelper.config.paletteGenerator.detailedSettingsLabel")))
                         .option(createPaletteGenFilter(
-                                Component.literal("Candles"),
+                                Component.translatable("maparthelper.config.paletteGenerator.candles"),
                                 defaults.useInPalette.candles,
                                 () -> config.useInPalette.candles,
                                 value -> config.useInPalette.candles = value,
-                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate)
+                                .build())
                         .option(createPaletteGenFilter(
-                                Component.literal("Blocks with entities (EntityBlock)"),
+                                Component.translatable("maparthelper.config.paletteGenerator.entityBlocks"),
                                 defaults.useInPalette.entityBlocks,
                                 () -> config.useInPalette.entityBlocks,
                                 value -> config.useInPalette.entityBlocks = value,
-                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate)
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.entityBlocks")))
+                                .build())
                         .option(createPaletteGenFilter(
-                                Component.literal("Decorative blocks"),
+                                Component.translatable("maparthelper.config.paletteGenerator.buildDecorBlocks"),
                                 defaults.useInPalette.buildDecorBlocks,
                                 () -> config.useInPalette.buildDecorBlocks,
                                 value -> config.useInPalette.buildDecorBlocks = value,
-                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate)
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.buildDecorBlocks")))
+                                .build())
                         .option(createPaletteGenFilter(
-                                Component.literal("Creative-only blocks"),
+                                Component.translatable("maparthelper.config.paletteGenerator.creativeBlocks"),
                                 defaults.useInPalette.creativeBlocks,
                                 () -> config.useInPalette.creativeBlocks,
                                 value -> config.useInPalette.creativeBlocks = value,
-                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate)
+                                .build())
                         .option(createPaletteGenFilter(
-                                Component.literal("Growable blocks"),
+                                Component.translatable("maparthelper.config.paletteGenerator.growableBlocks"),
                                 defaults.useInPalette.growableBlocks,
                                 () -> config.useInPalette.growableBlocks,
                                 value -> config.useInPalette.growableBlocks = value,
-                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate)
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.growableBlocks")))
+                                .build())
                         .option(createPaletteGenFilter(
-                                Component.literal("Non-full blocks like tall grass"),
+                                Component.translatable("maparthelper.config.paletteGenerator.grassLikeBlocks"),
                                 defaults.useInPalette.grassLikeBlocks,
                                 () -> config.useInPalette.grassLikeBlocks,
                                 value -> config.useInPalette.grassLikeBlocks = value,
-                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate)
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.grassLikeBlocks")))
+                                .build())
                         .build())
                 .save(() -> {
                     CommonConfiguration.HANDLER.save();
@@ -218,11 +239,11 @@ public class ConfigScreenFactory {
         ).generateScreen(parent);
     }
 
-    private static @NotNull Option<Boolean> createPaletteGenFilter(Component optionName,
-                                                                   Boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter,
-                                                                   Set<Option<Boolean>> paletteGenLimiters,
-                                                                   Set<Option<Boolean>> paletteGenFilters,
-                                                                   AtomicBoolean requestRegen) {
+    private static @NotNull Option.Builder<Boolean> createPaletteGenFilter(Component optionName,
+                                                                           Boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter,
+                                                                           Set<Option<Boolean>> paletteGenLimiters,
+                                                                           Set<Option<Boolean>> paletteGenFilters,
+                                                                           AtomicBoolean requestRegen) {
         return Option.<Boolean>createBuilder()
                 .name(optionName)
                 .customController(TickBoxController::new)
@@ -230,8 +251,7 @@ public class ConfigScreenFactory {
                 .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
                 .addListener((option, event) -> {
                     if (event == OptionEventListener.Event.INITIAL) paletteGenFilters.add(option);
-                })
-                .build();
+                });
     }
 
     private static @NotNull Binding<Boolean> paletteGenFilterBinding(Boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter, AtomicBoolean requestRegen) {
