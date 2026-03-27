@@ -2,13 +2,14 @@
 
 - Update to 26.1;
 - Reworked development environment to make maintenance easier;
-- Changed config API: now the mod uses YACL instead of Cloth-Config;
+- Changed config API: now the mod depends on YACL instead of Cloth-Config;
 
 <details>
 <summary>Fixes and minor changes</summary>
 
-- Fixed unobtainable colors mode;
-- Corrected palette generation settings and added auto-regenerate on changes;
 - Any slab blocks now also needs auxiliary blocks below them;
+- Updated palette generation settings and added auto-regenerate on changes save;
+- Fixed unobtainable colors mode;
+- Fixed /mart beams weren't rendered when using shaders;
 
 </details>

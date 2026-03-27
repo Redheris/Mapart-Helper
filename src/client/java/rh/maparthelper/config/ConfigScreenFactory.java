@@ -20,8 +20,8 @@ import java.util.function.Supplier;
 public class ConfigScreenFactory {
     public static Screen getConfigScreen(Screen parent) {
         Set<Option<Boolean>> paletteGenLimiters = new HashSet<>();
-        Set<Option<Boolean>> paletteGenOptions = new HashSet<>();
-        OptionEventListener<Boolean> limiterListener = createPaletteGenLimiterListener(paletteGenLimiters, paletteGenOptions);
+        Set<Option<Boolean>> paletteGenFilters = new HashSet<>();
+        OptionEventListener<Boolean> limiterListener = createPaletteGenLimiterListener(paletteGenLimiters, paletteGenFilters);
         AtomicBoolean requestPaletteRegenerate = new AtomicBoolean(false);
 
         CommonConfiguration.HANDLER.load();
@@ -142,112 +142,70 @@ public class ConfigScreenFactory {
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.literal("§c§nALL§r registered blocks"))
                                 .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.anyBlocks,
-                                        () -> config.anyBlocks,
-                                        value -> config.anyBlocks = value,
+                                .binding(paletteGenFilterBinding(
+                                        defaults.useInPalette.anyBlocks,
+                                        () -> config.useInPalette.anyBlocks,
+                                        value -> config.useInPalette.anyBlocks = value,
                                         requestPaletteRegenerate))
                                 .addListener(limiterListener)
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.literal("§nOnly§r solid blocks"))
                                 .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.onlySolid,
-                                        () -> config.onlySolid,
-                                        value -> config.onlySolid = value,
+                                .binding(paletteGenFilterBinding(
+                                        defaults.useInPalette.onlySolid,
+                                        () -> config.useInPalette.onlySolid,
+                                        value -> config.useInPalette.onlySolid = value,
                                         requestPaletteRegenerate))
                                 .addListener(limiterListener)
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.literal("§nOnly§r carpet blocks"))
                                 .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.onlyCarpets,
-                                        () -> config.onlyCarpets,
-                                        value -> config.onlyCarpets = value,
+                                .binding(paletteGenFilterBinding(
+                                        defaults.useInPalette.onlyCarpets,
+                                        () -> config.useInPalette.onlyCarpets,
+                                        value -> config.useInPalette.onlyCarpets = value,
                                         requestPaletteRegenerate))
                                 .addListener(limiterListener)
                                 .build())
                         .option(LabelOption.create(Component.literal("More detailed settings:")))
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Blocks with entities (EntityBlock)"))
-                                .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.entityBlocks,
-                                        () -> config.entityBlocks,
-                                        value -> config.entityBlocks = value,
-                                        requestPaletteRegenerate))
-                                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
-                                .addListener((option, event) -> {
-                                    if (event == OptionEventListener.Event.INITIAL) paletteGenOptions.add(option);
-                                })
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Decorative blocks"))
-                                .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.buildDecorBlocks,
-                                        () -> config.buildDecorBlocks,
-                                        value -> config.buildDecorBlocks = value,
-                                        requestPaletteRegenerate))
-                                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
-                                .addListener((option, event) -> {
-                                    if (event == OptionEventListener.Event.INITIAL) paletteGenOptions.add(option);
-                                })
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Require being placed in water"))
-                                .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.needWaterBlocks,
-                                        () -> config.needWaterBlocks,
-                                        value -> config.needWaterBlocks = value,
-                                        requestPaletteRegenerate))
-                                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
-                                .addListener((option, event) -> {
-                                    if (event == OptionEventListener.Event.INITIAL) paletteGenOptions.add(option);
-                                })
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Creative-only blocks"))
-                                .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.creativeBlocks,
-                                        () -> config.creativeBlocks,
-                                        value -> config.creativeBlocks = value,
-                                        requestPaletteRegenerate))
-                                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
-                                .addListener((option, event) -> {
-                                    if (event == OptionEventListener.Event.INITIAL) paletteGenOptions.add(option);
-                                })
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Growable blocks"))
-                                .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.growableBlocks,
-                                        () -> config.growableBlocks,
-                                        value -> config.growableBlocks = value,
-                                        requestPaletteRegenerate))
-                                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
-                                .addListener((option, event) -> {
-                                    if (event == OptionEventListener.Event.INITIAL) paletteGenOptions.add(option);
-                                })
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.literal("Non-full blocks like tall grass"))
-                                .customController(TickBoxController::new)
-                                .binding(paletteGenOptionBinding(
-                                        defaults.grassLikeBlocks,
-                                        () -> config.grassLikeBlocks,
-                                        value -> config.grassLikeBlocks = value,
-                                        requestPaletteRegenerate))
-                                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
-                                .addListener((option, event) -> {
-                                    if (event == OptionEventListener.Event.INITIAL) paletteGenOptions.add(option);
-                                })
-                                .build())
+                        .option(createPaletteGenFilter(
+                                Component.literal("Candles"),
+                                defaults.useInPalette.candles,
+                                () -> config.useInPalette.candles,
+                                value -> config.useInPalette.candles = value,
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                        .option(createPaletteGenFilter(
+                                Component.literal("Blocks with entities (EntityBlock)"),
+                                defaults.useInPalette.entityBlocks,
+                                () -> config.useInPalette.entityBlocks,
+                                value -> config.useInPalette.entityBlocks = value,
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                        .option(createPaletteGenFilter(
+                                Component.literal("Decorative blocks"),
+                                defaults.useInPalette.buildDecorBlocks,
+                                () -> config.useInPalette.buildDecorBlocks,
+                                value -> config.useInPalette.buildDecorBlocks = value,
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                        .option(createPaletteGenFilter(
+                                Component.literal("Creative-only blocks"),
+                                defaults.useInPalette.creativeBlocks,
+                                () -> config.useInPalette.creativeBlocks,
+                                value -> config.useInPalette.creativeBlocks = value,
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                        .option(createPaletteGenFilter(
+                                Component.literal("Growable blocks"),
+                                defaults.useInPalette.growableBlocks,
+                                () -> config.useInPalette.growableBlocks,
+                                value -> config.useInPalette.growableBlocks = value,
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
+                        .option(createPaletteGenFilter(
+                                Component.literal("Non-full blocks like tall grass"),
+                                defaults.useInPalette.grassLikeBlocks,
+                                () -> config.useInPalette.grassLikeBlocks,
+                                value -> config.useInPalette.grassLikeBlocks = value,
+                                paletteGenLimiters, paletteGenFilters, requestPaletteRegenerate))
                         .build())
                 .save(() -> {
                     CommonConfiguration.HANDLER.save();
@@ -259,7 +217,23 @@ public class ConfigScreenFactory {
         ).generateScreen(parent);
     }
 
-    private static @NotNull Binding<Boolean> paletteGenOptionBinding(Boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter, AtomicBoolean requestRegen) {
+    private static @NotNull Option<Boolean> createPaletteGenFilter(Component optionName,
+                                                                   Boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter,
+                                                                   Set<Option<Boolean>> paletteGenLimiters,
+                                                                   Set<Option<Boolean>> paletteGenFilters,
+                                                                   AtomicBoolean requestRegen) {
+        return Option.<Boolean>createBuilder()
+                .name(optionName)
+                .customController(TickBoxController::new)
+                .binding(paletteGenFilterBinding(def, getter, setter, requestRegen))
+                .available(paletteGenLimiters.stream().noneMatch(Option::pendingValue))
+                .addListener((option, event) -> {
+                    if (event == OptionEventListener.Event.INITIAL) paletteGenFilters.add(option);
+                })
+                .build();
+    }
+
+    private static @NotNull Binding<Boolean> paletteGenFilterBinding(Boolean def, Supplier<Boolean> getter, Consumer<Boolean> setter, AtomicBoolean requestRegen) {
         return Binding.generic(
                 def,
                 getter,

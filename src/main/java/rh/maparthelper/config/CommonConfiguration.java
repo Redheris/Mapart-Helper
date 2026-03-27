@@ -1,5 +1,6 @@
 package rh.maparthelper.config;
 
+import com.google.gson.FieldNamingPolicy;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
@@ -20,6 +21,7 @@ public class CommonConfiguration {
                             GsonConfigSerializerBuilder.create(config)
                                     .setPath(MapartHelper.CONFIG_PATH.resolve("yacl_config.json"))
                                     .appendGsonBuilder(gson -> gson
+                                            .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
                                             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
                                             .registerTypeAdapter(MapColorEntry.class, new MapColorEntryAdapter()))
                                     .build())
@@ -55,21 +57,17 @@ public class CommonConfiguration {
     // Palette generation settings
 
     @SerialEntry
-    public boolean anyBlocks = false;
-    @SerialEntry
-    public boolean onlySolid = false;
-    @SerialEntry
-    public boolean onlyCarpets = false;
-    @SerialEntry
-    public boolean entityBlocks = false;
-    @SerialEntry
-    public boolean buildDecorBlocks = false;
-    @SerialEntry
-    public boolean needWaterBlocks = false;
-    @SerialEntry
-    public boolean creativeBlocks = false;
-    @SerialEntry
-    public boolean growableBlocks = false;
-    @SerialEntry
-    public boolean grassLikeBlocks = false;
+    public UseInPalette useInPalette = new UseInPalette();
+
+    public static class UseInPalette {
+        public boolean anyBlocks = false;
+        public boolean onlySolid = false;
+        public boolean onlyCarpets = false;
+        public boolean candles = false;
+        public boolean entityBlocks = false;
+        public boolean buildDecorBlocks = false;
+        public boolean creativeBlocks = false;
+        public boolean growableBlocks = false;
+        public boolean grassLikeBlocks = false;
+    }
 }

@@ -14,14 +14,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.Shapes;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.config.CommonConfiguration;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class PaletteGenerator {
     // Lists of block classes for blocking/enabling by configs
-    private static final Class<?>[] NEED_WATER_BLOCKS;
     private static final Class<?>[] MEANINGLESS_BLOCKS;
     private static final Class<?>[] CREATIVE_BLOCKS;
     private static final Class<?>[] GROWABLE_BLOCKS;
@@ -37,7 +35,7 @@ public class PaletteGenerator {
             MapColor color = state.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
             if (color == MapColor.NONE)
                 continue;
-            boolean useCreativeBlocks = MapartHelper.commonConfig().creativeBlocks;
+            boolean useCreativeBlocks = MapartHelper.commonConfig().useInPalette.creativeBlocks;
             if (useBlockInPalette(block) && (useCreativeBlocks || block != Blocks.BEDROCK && block != Blocks.REINFORCED_DEEPSLATE && block != Blocks.PETRIFIED_OAK_SLAB)) {
                 if (!palette.containsKey(color.id))
                     palette.put(color.id, new ArrayList<>());
@@ -59,24 +57,28 @@ public class PaletteGenerator {
     }
 
     private static boolean useBlockInPalette(Block block) {
-        CommonConfiguration config = MapartHelper.commonConfig();
+        var useInPalette = MapartHelper.commonConfig().useInPalette;
 
-        if (config.anyBlocks) return true;
+        // Limiters
+        if (useInPalette.anyBlocks) return true;
         if (matchesAny(block, MEANINGLESS_BLOCKS)) return false;
 
-        if (config.onlySolid && !matchesAny(block, CREATIVE_BLOCKS)) {
+        if (useInPalette.onlySolid && !matchesAny(block, CREATIVE_BLOCKS)) {
             BlockState state = block.defaultBlockState();
             if (state.isSolidRender()) return true;
             return state.getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) == Shapes.block();
         }
-        if (config.onlyCarpets) return matchesAny(block, CarpetBlock.class, MossyCarpetBlock.class);
+        if (useInPalette.onlyCarpets) return matchesAny(block, CarpetBlock.class, MossyCarpetBlock.class);
 
-        if (!config.entityBlocks && block instanceof EntityBlock) return false;
-        if (!config.buildDecorBlocks && matchesAny(block, BUILD_DECOR_BLOCKS)) return false;
-        if (!config.creativeBlocks && matchesAny(block, CREATIVE_BLOCKS)) return false;
-        if (!config.needWaterBlocks && matchesAny(block, NEED_WATER_BLOCKS)) return false;
-        if (!config.growableBlocks && matchesAny(block, GROWABLE_BLOCKS)) return false;
-        return config.grassLikeBlocks || !matchesAny(block, GRASS_LIKE_BLOCKS);
+        // Filters
+        if (block instanceof CandleBlock) return useInPalette.candles;
+        if (block instanceof EntityBlock) return useInPalette.entityBlocks;
+        if (matchesAny(block, BUILD_DECOR_BLOCKS)) return useInPalette.buildDecorBlocks;
+        if (matchesAny(block, CREATIVE_BLOCKS)) return useInPalette.creativeBlocks;
+        if (matchesAny(block, GROWABLE_BLOCKS)) return useInPalette.growableBlocks;
+        if (matchesAny(block, GRASS_LIKE_BLOCKS)) return useInPalette.grassLikeBlocks;
+
+        return true;
     }
 
     public static BlockState getDefaultPaletteState(Block block) {
@@ -164,16 +166,6 @@ public class PaletteGenerator {
     }
 
     static {
-        NEED_WATER_BLOCKS = new Class[]{
-                CoralBlock.class,
-                CoralPlantBlock.class,
-                CoralFanBlock.class,
-                CoralWallFanBlock.class,
-                KelpBlock.class,
-                SeagrassBlock.class,
-                TallSeagrassBlock.class,
-                KelpPlantBlock.class
-        };
         MEANINGLESS_BLOCKS = new Class[]{
                 BedBlock.class,
                 DoorBlock.class,
@@ -250,7 +242,6 @@ public class PaletteGenerator {
                 StairBlock.class,
                 TrapDoorBlock.class,
                 LanternBlock.class,
-                CandleBlock.class,
                 LightningRodBlock.class,
                 CarvedPumpkinBlock.class
         };
