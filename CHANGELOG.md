@@ -2,7 +2,7 @@
 
 - Update to 26.1;
 - Reworked development environment to make maintenance easier;
-- Changed config API: now the mod depends on YACL instead of Cloth-Config;
+- Changed config API: The mod now depends on YACL instead of Cloth-Config;
 
 <details>
 <summary>Fixes and minor changes</summary>
