@@ -73,7 +73,7 @@ stonecutter parameters {
     replacements {
         string(current.parsed >= "26.1") {
             replace("world.WorldRenderEvents", "level.LevelRenderEvents")
-            replace("WorldRenderEvents.AFTER_ENTITIES", "LevelRenderEvents.AFTER_TRANSLUCENT_FEATURES")
+            replace("WorldRenderEvents.AFTER_ENTITIES", "LevelRenderEvents.COLLECT_SUBMITS")
             replace("WorldRenderEvents", "LevelRenderEvents")
 
             replace("keybinding.v1.KeyBindingHelper", "keymapping.v1.KeyMappingHelper")
