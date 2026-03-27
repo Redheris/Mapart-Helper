@@ -11,5 +11,6 @@
 - Updated palette generation settings and added auto-regenerate on changes save;
 - Fixed unobtainable colors mode;
 - Fixed /mart beams weren't rendered when using shaders;
+- Fixed presets updating without saving;
 
 </details>

@@ -73,10 +73,13 @@ public class PalettePresetsConfig {
     }
 
     public static class Editable extends PalettePresetsConfig {
-        public Editable(PalettePresetsConfig config) {
-            this.currentPresetFile = config.currentPresetFile;
-            this.presetFiles = new TreeMap<>(config.presetFiles);
-            this.presets = new TreeMap<>(config.presets);
+        public Editable(PalettePresetsConfig origin) {
+            this.currentPresetFile = origin.currentPresetFile;
+            this.presetFiles = new TreeMap<>(origin.presetFiles);
+            this.presets = new TreeMap<>();
+            for (var entry : origin.presets.entrySet()) {
+                this.presets.put(entry.getKey(), new PalettePreset(entry.getValue()));
+            }
         }
 
         public void setCurrentPreset(String presetFilename) {
