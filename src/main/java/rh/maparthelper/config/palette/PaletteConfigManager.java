@@ -4,7 +4,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.DetectedVersion;
+import net.minecraft.SharedConstants;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
@@ -67,7 +67,7 @@ public class PaletteConfigManager {
                                 .filter(b -> b != Blocks.AIR)
                                 .toList()
                 );
-                outdatedPalette = !DetectedVersion.BUILT_IN.name().equals(completePalette.getGameVersion());
+                outdatedPalette = !SharedConstants.getCurrentVersion().name().equals(completePalette.getGameVersion());
                 return true;
             }
         } catch (Exception e) {
