@@ -231,8 +231,7 @@ public class PaletteGenerator {
                 BaseCoralPlantBlock.class,
                 BaseCoralFanBlock.class,
                 BaseCoralWallFanBlock.class,
-                BigDripleafBlock.class,
-                PointedDripstoneBlock.class
+                BigDripleafBlock.class
         };
         BUILD_DECOR_BLOCKS = new Class[]{
                 FenceBlock.class,
@@ -242,8 +241,7 @@ public class PaletteGenerator {
                 StairBlock.class,
                 TrapDoorBlock.class,
                 LanternBlock.class,
-                LightningRodBlock.class,
-                CarvedPumpkinBlock.class
+                LightningRodBlock.class
         };
         FUNCTIONAL_BLOCKS = List.of(
                 Blocks.CRAFTING_TABLE,
