@@ -118,11 +118,11 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     private int currentElementWidth() {
-        return shortElements ? 135 : baseElementWidth;
+        return !shortElements ? baseElementWidth : MapartHelper.commonConfig().showImageImportButton ? 125 : 135;
     }
 
     private void initMapartOptionsPanel() {
-        mapartOptions = LinearLayout.horizontal().spacing(2);
+        mapartOptions = LinearLayout.horizontal().spacing(1);
 
         if (MapartHelper.commonConfig().showImageImportButton) {
             Button importButton = Button.builder(
