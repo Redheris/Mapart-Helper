@@ -21,7 +21,7 @@ displaying beams at the north-western positions of map areas.
 | 1.21.8      | ✔️ Active                |
 | ~~1.21.10~~ | ⚠️ Last version `0.12.0` |
 | 1.21.11     | ✔️ Active                |
-| 26.1        | ⌛ WIP `0.13`             |
+| 26.1        | ✔️ Active                |
 
 </details>
 

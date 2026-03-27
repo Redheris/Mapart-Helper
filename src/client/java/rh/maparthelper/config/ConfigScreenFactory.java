@@ -8,6 +8,7 @@ import dev.isxander.yacl3.gui.controllers.string.number.IntegerFieldController;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.event.PaletteLoader;
 
 import java.awt.*;
@@ -210,7 +211,7 @@ public class ConfigScreenFactory {
                 .save(() -> {
                     CommonConfiguration.HANDLER.save();
                     if (requestPaletteRegenerate.get()) {
-                        System.out.println("Regenerate is requested");
+                        MapartHelper.LOGGER.info("Palette generation settings are changed. Requesting a regeneration...");
                         PaletteLoader.requestRegenerate();
                     }
                 })
