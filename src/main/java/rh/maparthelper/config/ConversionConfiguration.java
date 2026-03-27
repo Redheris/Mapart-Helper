@@ -29,9 +29,13 @@ public class ConversionConfiguration {
     private final static Path configPath = FabricLoader.getInstance()
             .getConfigDir()
             .resolve(MapartHelper.CONFIG_PATH)
-            .resolve("yacl_config_nogui.json");
+            .resolve("conversion-settings.json");
 
-    public static ConversionConfiguration instance;
+    private static ConversionConfiguration instance;
+
+    public static ConversionConfiguration getInstance() {
+        return instance;
+    }
 
     public static void load() {
         if (!Files.exists(configPath)) {

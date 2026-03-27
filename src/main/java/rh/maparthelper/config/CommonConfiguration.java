@@ -19,7 +19,7 @@ public class CommonConfiguration {
                     .id(Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "yacl_try"))
                     .serializer(config ->
                             GsonConfigSerializerBuilder.create(config)
-                                    .setPath(MapartHelper.CONFIG_PATH.resolve("yacl_config.json"))
+                                    .setPath(MapartHelper.CONFIG_PATH.resolve("mapart-helper.json"))
                                     .appendGsonBuilder(gson -> gson
                                             .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
                                             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
@@ -33,15 +33,15 @@ public class CommonConfiguration {
     public Color previewHighlightingColor = new Color(0xFF9900ff, true);
 
     @SerialEntry
+    public boolean createDirsForSchematic = true;
+    @SerialEntry
     public boolean logConversionTime = false;
+    @SerialEntry
+    public int fakeItemFramesLiveTime = 100;
     @SerialEntry
     public boolean previewHighlightOnHover = true;
     @SerialEntry
-    public boolean createDirsForSchematic = true;
-    @SerialEntry
     public int colorsCacheLiveTimeMs = 5000;
-    @SerialEntry
-    public int fakeItemFramesLiveTime = 100;
 
     // Elements display settings
 
@@ -60,9 +60,11 @@ public class CommonConfiguration {
     public UseInPalette useInPalette = new UseInPalette();
 
     public static class UseInPalette {
+        // Limiters
         public boolean anyBlocks = false;
         public boolean onlySolid = false;
         public boolean onlyCarpets = false;
+        // Filters
         public boolean candles = false;
         public boolean entityBlocks = false;
         public boolean buildDecorBlocks = false;

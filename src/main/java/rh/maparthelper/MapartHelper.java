@@ -32,6 +32,6 @@ public class MapartHelper implements ModInitializer {
     }
 
     public static ConversionConfiguration conversionConfig() {
-        return ConversionConfiguration.instance;
+        return ConversionConfiguration.getInstance();
     }
 }
