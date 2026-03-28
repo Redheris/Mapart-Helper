@@ -1,6 +1,6 @@
 package rh.maparthelper.mapart;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import java.util.ArrayList;

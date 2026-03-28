@@ -7,8 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Predicate;
 
-public class Utils {
-
+public class FileUtils {
 
     public static @NotNull String makeUniqueName(@NotNull Predicate<String> existingTest, String filename, @Nullable String ext, String nameFormat) {
         String suf = ext == null ? "" : "." + ext;

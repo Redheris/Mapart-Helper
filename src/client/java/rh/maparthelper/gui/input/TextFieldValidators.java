@@ -1,8 +1,8 @@
 package rh.maparthelper.gui.input;
 
-import net.minecraft.block.Block;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
 import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 
 import java.util.function.Predicate;
@@ -19,14 +19,14 @@ public class TextFieldValidators {
     private static Predicate<String> blockIdentifier(boolean onlyAuxBlocks) {
         return s -> {
             int delimiterInd = s.indexOf(':');
-            if (delimiterInd != -1 && !Identifier.isNamespaceValid(s.substring(0, delimiterInd))
-                    || !Identifier.isPathValid(s.substring(delimiterInd + 1))
+            if (delimiterInd != -1 && !Identifier.isValidNamespace(s.substring(0, delimiterInd))
+                    || !Identifier.isValidPath(s.substring(delimiterInd + 1))
             ) {
                 return false;
             }
-            Identifier id = Identifier.of(s);
-            Block block = Registries.BLOCK.get(id);
-            return !onlyAuxBlocks || !block.getDefaultState().isAir() && !MapartSchematicBuilder.needsAuxBlock(block);
+            Identifier id = Identifier.parse(s);
+            Block block = BuiltInRegistries.BLOCK.getValue(id);
+            return !onlyAuxBlocks || !block.defaultBlockState().isAir() && !MapartSchematicBuilder.needsAuxBlock(block);
         };
     }
 }

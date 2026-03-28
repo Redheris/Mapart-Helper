@@ -1,9 +1,9 @@
 package rh.maparthelper.conversion;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.TextureManager;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -11,21 +11,24 @@ import java.awt.image.DataBufferInt;
 public class NativeImageUtils {
 
     public synchronized static void updateMapartImageTexture(NativeImage image) {
-        NativeImageBackedTexture backedTexture = new NativeImageBackedTexture(
+        DynamicTexture backedTexture = new DynamicTexture(
                 () -> "mapart_gui_texture",
                 image
         );
-        TextureManager textureManager = MinecraftClient.getInstance().getTextureManager();
-        textureManager.registerTexture(CurrentConversionSettings.guiMapartId, backedTexture);
+        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        textureManager.register(CurrentConversionSettings.guiMapartId, backedTexture);
         CurrentConversionSettings.guiMapartImage = backedTexture;
     }
 
     public static int[][] divideImageByMaps(int width, int height, NativeImage image) {
-        if (CurrentConversionSettings.guiMapartImage == null || CurrentConversionSettings.guiMapartImage.getImage() == null)
+        if (CurrentConversionSettings.guiMapartImage == null)
             return null;
+        //? if <26.1
+        if (CurrentConversionSettings.guiMapartImage.getPixels() == null) return null;
+
         int imageWidth = width * 128;
 
-        int[] pixels = image.copyPixelsArgb();
+        int[] pixels = image.getPixels();
         int[][] maps = new int[width * height][];
         for (int i = 0; i < maps.length; i++) {
             maps[i] = new int[16384];
@@ -55,12 +58,12 @@ public class NativeImageUtils {
 
                 if (useTranslucent) {
                     if (argb == 0) continue;
-                    nativeImage.setColorArgb(x, y, argb);
+                    nativeImage.setPixel(x, y, argb);
                 } else {
                     if (((argb >> 24) & 0xFF) < 80)
-                        nativeImage.setColorArgb(x, y, bgColor);
+                        nativeImage.setPixel(x, y, bgColor);
                     else
-                        nativeImage.setColorArgb(x, y, argb | 0xFF000000);
+                        nativeImage.setPixel(x, y, argb | 0xFF000000);
                 }
             }
         }
@@ -77,7 +80,7 @@ public class NativeImageUtils {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                nativeImage.setColorArgb(x, y, pixels[x + y * width]);
+                nativeImage.setPixel(x, y, pixels[x + y * width]);
             }
         }
 

@@ -1,10 +1,10 @@
 package rh.maparthelper.gui.screen.panel;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.WrapperWidget;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.layouts.AbstractLayout;
+import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
@@ -13,7 +13,7 @@ import rh.maparthelper.mapart.MapartProcessing;
 
 import java.util.function.Consumer;
 
-public class ImagePreprocessingDropdown extends WrapperWidget {
+public class ImagePreprocessingDropdown extends AbstractLayout {
     private final MapartProcessing mapart;
     private final DropdownMenuWidget imagePreprocessing;
     private final int contentWidth;
@@ -24,13 +24,13 @@ public class ImagePreprocessingDropdown extends WrapperWidget {
         this.contentWidth = contentWidth;
         this.imagePreprocessing = new DropdownMenuWidget(
                 screen, 0, 0, 100, 20, contentWidth + 4, -1,
-                Text.translatable("maparthelper.gui.image_preprocessing")
+                Component.translatable("maparthelper.gui.image_preprocessing")
         );
         initDropdown();
     }
 
     @Override
-    public void forEachElement(Consumer<Widget> consumer) {
+    public void visitChildren(Consumer<LayoutElement> consumer) {
         consumer.accept(imagePreprocessing);
     }
 
@@ -38,8 +38,8 @@ public class ImagePreprocessingDropdown extends WrapperWidget {
         ImageAdjustmentSliderWidget sliderBrightness = createBrightnessSlider();
         ImageAdjustmentSliderWidget sliderContrast = createContrastSlider();
         ImageAdjustmentSliderWidget sliderSaturation = createSaturationSlider();
-        ButtonWidget reset = ButtonWidget.builder(
-                Text.translatable("maparthelper.gui.reset"),
+        Button reset = Button.builder(
+                Component.translatable("maparthelper.gui.reset"),
                 (btn) -> {
                     CurrentConversionSettings.brightness = 1.0f;
                     CurrentConversionSettings.contrast = 0.0f;
@@ -56,7 +56,7 @@ public class ImagePreprocessingDropdown extends WrapperWidget {
     }
 
     private ImageAdjustmentSliderWidget createBrightnessSlider() {
-        Text brightness = Text.translatable("maparthelper.gui.brightness");
+        Component brightness = Component.translatable("maparthelper.gui.brightness");
         return new ImageAdjustmentSliderWidget(
                 contentWidth, 15, 0.f, 2.f, true,
                 CurrentConversionSettings.brightness,
@@ -69,7 +69,7 @@ public class ImagePreprocessingDropdown extends WrapperWidget {
     }
 
     private ImageAdjustmentSliderWidget createContrastSlider() {
-        Text contrast = Text.translatable("maparthelper.gui.contrast");
+        Component contrast = Component.translatable("maparthelper.gui.contrast");
         return new ImageAdjustmentSliderWidget(
                 contentWidth, 15, -255, 255, false,
                 CurrentConversionSettings.contrast,
@@ -82,7 +82,7 @@ public class ImagePreprocessingDropdown extends WrapperWidget {
     }
 
     private ImageAdjustmentSliderWidget createSaturationSlider() {
-        Text saturation = Text.translatable("maparthelper.gui.saturation");
+        Component saturation = Component.translatable("maparthelper.gui.saturation");
         return new ImageAdjustmentSliderWidget(
                 contentWidth, 15, 0.f, 2.f, true,
                 CurrentConversionSettings.saturation,

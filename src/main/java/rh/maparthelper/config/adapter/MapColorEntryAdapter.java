@@ -1,7 +1,7 @@
 package rh.maparthelper.config.adapter;
 
 import com.google.gson.*;
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
 
 import java.lang.reflect.Type;
@@ -23,6 +23,6 @@ public class MapColorEntryAdapter implements JsonSerializer<MapColorEntry>, Json
             return MapColorEntry.CLEAR;
         }
         int brightnessId = obj.get("brightnessId").getAsInt();
-        return new MapColorEntry(MapColor.get(colorId), MapColor.Brightness.validateAndGet(brightnessId));
+        return new MapColorEntry(MapColor.byId(colorId), MapColor.Brightness.byId(brightnessId));
     }
 }

@@ -1,6 +1,6 @@
 package rh.maparthelper.conversion.dithering.diffusion;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.DitherEntry;
 import rh.maparthelper.config.palette.PaletteColors;
@@ -82,7 +82,7 @@ public abstract class DiffusionDithering extends ColorConverter {
                 } else {
                     spreadDiffusionError(width, x, mapColors.errorRed(), mapColors.errorGreen(), mapColors.errorBlue());
                     if (!useUnobtainableColors && y > 0 && resultPixels[x + (y - 1) * width] == 0)
-                        newArgb = PaletteColors.getMapRenderColor(mapColors.colorByte1(),MapColor.Brightness.HIGH);
+                        newArgb = PaletteColors.getMapRenderColor(mapColors.colorByte1(), MapColor.Brightness.HIGH);
                     else
                         newArgb = PaletteColors.getMapRenderColor(mapColors.colorByte1());
                     colorsCounter.increment(closestColor.id);

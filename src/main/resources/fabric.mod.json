@@ -11,7 +11,7 @@
 		"homepage": "https://modrinth.com/mod/mapart-helper",
 		"sources": "https://github.com/Redheris/Mapart-Helper"
 	},
-	"license": "GPL-3.0",
+	"license": "LGPL-3.0",
 	"icon": "assets/maparthelper/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -26,13 +26,12 @@
 		]
 	},
 	"mixins": [
-		"maparthelper-client.mixins.json"
+		"maparthelper.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.8",
-		"java": ">=21",
+		"fabricloader": ">=${fabric_loader}",
+		"minecraft": "${minecraft}",
 		"fabric-api": "*",
-		"cloth-config": "*"
+		"yet_another_config_lib_v3": "*"
 	}
 }

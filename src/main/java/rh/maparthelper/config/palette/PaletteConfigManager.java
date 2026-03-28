@@ -4,10 +4,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.MinecraftVersion;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.MapColor;
+import net.minecraft.SharedConstants;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
@@ -29,7 +29,8 @@ public class PaletteConfigManager {
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeHierarchyAdapter(Block.class, new BlockTypeAdapter())
-            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>(){}.getType(), new MapColorBlockAdapter())
+            .registerTypeAdapter(new TypeToken<Map<MapColor, Block>>() {
+            }.getType(), new MapColorBlockAdapter())
             .create();
     private static boolean outdatedPalette;
 
@@ -37,6 +38,7 @@ public class PaletteConfigManager {
     public static @NotNull CompletePalette completePalette = new CompletePalette();
 
     public static void regenerateCompletePalette() {
+        MapartHelper.LOGGER.info("Regenerating palette...");
         completePalette = CompletePalette.generate();
         outdatedPalette = false;
         saveCompletePalette();
@@ -66,8 +68,7 @@ public class PaletteConfigManager {
                                 .filter(b -> b != Blocks.AIR)
                                 .toList()
                 );
-                PaletteGenerator.initARGBMapColor(completePalette.palette);
-                outdatedPalette = !MinecraftVersion.CURRENT.name().equals(completePalette.getGameVersion());
+                outdatedPalette = !SharedConstants.getCurrentVersion().name().equals(completePalette.getGameVersion());
                 return true;
             }
         } catch (Exception e) {
@@ -86,6 +87,7 @@ public class PaletteConfigManager {
     public static void saveCompletePalette() {
         try (FileWriter writer = new FileWriter(CONFIG_PATH.resolve("complete_palette.json").toFile())) {
             gson.toJson(completePalette, writer);
+            MapartHelper.LOGGER.info("The updated palette was successfully saved");
         } catch (IOException e) {
             MapartHelper.LOGGER.error(e.getMessage(), e);
         }
@@ -131,12 +133,12 @@ public class PaletteConfigManager {
     private static boolean validatePresetsConfig() {
         boolean hasChanges = false;
         if (presetsConfig.presetFiles.isEmpty()) {
-            MapartHelper.LOGGER.info("No preset files found, generating a default");
+            MapartHelper.LOGGER.info("No preset files were found. A default preset will be generated");
             presetsConfig.currentPresetFile = presetsConfig.createDefaultPreset();
             savePresetFiles();
             hasChanges = true;
         } else if (!presetsConfig.presetFiles.containsKey(presetsConfig.currentPresetFile)) {
-            MapartHelper.LOGGER.info("Selected preset file \"{}\" is no longer exist, switching current preset", presetsConfig.currentPresetFile);
+            MapartHelper.LOGGER.warn("Selected preset file \"{}\" is no longer exist, switching current preset", presetsConfig.currentPresetFile);
             presetsConfig.currentPresetFile = presetsConfig.presetFiles.keySet().iterator().next();
             hasChanges = true;
         }
@@ -158,10 +160,10 @@ public class PaletteConfigManager {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(PRESETS_PATH, "*.json")) {
             for (Path path : stream) {
                 try (FileReader reader = new FileReader(path.toFile())) {
-                    MapartHelper.LOGGER.info("Reading JSON file: \"{}\"", path);
+                    MapartHelper.LOGGER.info("Deserializing preset file: \"{}\"...", path);
                     PalettePresetsConfig.PalettePreset preset = gson.fromJson(reader, PalettePresetsConfig.PalettePreset.class);
                     if (preset == null || preset.colors == null) {
-                        MapartHelper.LOGGER.info("JSON file \"{}\" is not a preset, ignoring", path);
+                        MapartHelper.LOGGER.warn("JSON file \"{}\" is not a preset, ignoring", path);
                         hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                         continue;
                     }
@@ -172,13 +174,11 @@ public class PaletteConfigManager {
                         presetsConfig.presetFiles.put(filename, FilenameUtils.getBaseName(filename));
                         hasChanges = true;
                     }
-                    MapartHelper.LOGGER.info("Preset file \"{}\" successfully read", path);
-                }
-                catch (JsonSyntaxException e) {
+                } catch (JsonSyntaxException e) {
                     MapartHelper.LOGGER.error("Failed to read JSON syntax \"{}\": {}", path, e.getMessage());
                     hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                 } catch (IOException e) {
-                    MapartHelper.LOGGER.error("Failed to read preset \"{}\"", path, e);
+                    MapartHelper.LOGGER.error("Failed to read file \"{}\"", path, e);
                     hasChanges |= presetsConfig.presetFiles.remove(path.getFileName().toString()) != null;
                 }
             }
@@ -204,7 +204,7 @@ public class PaletteConfigManager {
     public static void savePresetFile(String filename) {
         Path presetFilePath = PRESETS_PATH.resolve(filename);
         try (FileWriter writer = new FileWriter(presetFilePath.toFile())) {
-            MapartHelper.LOGGER.info("Saving preset \"{}\" JSON file: \"{}\"", presetsConfig.presetFiles.get(filename), presetFilePath);
+            MapartHelper.LOGGER.info("Saving preset \"{}\" to \"{}\"...", presetsConfig.presetFiles.get(filename), presetFilePath);
             PalettePresetsConfig.PalettePreset preset = presetsConfig.presets.get(filename);
             gson.toJson(preset, writer);
         } catch (IOException e) {

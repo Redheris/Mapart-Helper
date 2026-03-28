@@ -13,6 +13,18 @@ available for each specific color.
 It also includes other map-related features, such as saving maps from the world as PNG files or
 displaying beams at the north-western positions of map areas.
 
+<details>
+<summary>Supported versions</summary>
+
+| Version     | Status                   |
+|-------------|--------------------------|
+| 1.21.8      | ✔️ Active                |
+| ~~1.21.10~~ | ⚠️ Last version `0.12.0` |
+| 1.21.11     | ✔️ Active                |
+| 26.1        | ✔️ Active                |
+
+</details>
+
 ---
 
 ![Example of creating a mapart](https://i.imgur.com/VPM78II.gif)

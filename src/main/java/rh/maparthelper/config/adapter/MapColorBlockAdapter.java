@@ -1,10 +1,10 @@
 package rh.maparthelper.config.adapter;
 
 import com.google.gson.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.MapColor;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.MapColors;
 
 import java.lang.reflect.Type;
@@ -18,7 +18,7 @@ public class MapColorBlockAdapter implements JsonSerializer<Map<MapColor, Block>
         JsonObject obj = new JsonObject();
         for (Map.Entry<MapColor, Block> entry : src.entrySet()) {
             String key = MapColors.findByMapColor(entry.getKey()).name();
-            obj.addProperty(key, Registries.BLOCK.getId(entry.getValue()).toString());
+            obj.addProperty(key, BuiltInRegistries.BLOCK.getKey(entry.getValue()).toString());
         }
         return obj;
     }
@@ -29,7 +29,7 @@ public class MapColorBlockAdapter implements JsonSerializer<Map<MapColor, Block>
         JsonObject obj = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
             MapColor color = MapColors.valueOf(entry.getKey()).color;
-            Block block = Registries.BLOCK.get(Identifier.of(entry.getValue().getAsString()));
+            Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(entry.getValue().getAsString()));
             map.put(color, block);
         }
         return map;

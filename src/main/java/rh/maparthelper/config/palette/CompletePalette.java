@@ -1,7 +1,7 @@
 package rh.maparthelper.config.palette;
 
-import net.minecraft.MinecraftVersion;
-import net.minecraft.block.Block;
+import net.minecraft.SharedConstants;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class CompletePalette {
     }
 
     void bumpGameVersion() {
-        gameVersion = MinecraftVersion.CURRENT.name();
+        gameVersion = SharedConstants.getCurrentVersion().name();
     }
 
     static CompletePalette generate() {

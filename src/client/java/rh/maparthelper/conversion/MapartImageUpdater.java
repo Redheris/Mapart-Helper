@@ -1,6 +1,6 @@
 package rh.maparthelper.conversion;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.mapart.MapartProcessing;
 

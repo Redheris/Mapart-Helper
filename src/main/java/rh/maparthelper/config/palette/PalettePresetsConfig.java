@@ -1,16 +1,18 @@
 package rh.maparthelper.config.palette;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.MapColor;
 import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.util.Utils;
+import rh.maparthelper.util.FileUtils;
 
 import java.nio.file.Files;
 import java.util.*;
 
 import static rh.maparthelper.config.palette.PaletteConfigManager.PRESETS_PATH;
 
+// who wrote this?? oh, it was me...
+// Planned for rewriting
 public class PalettePresetsConfig {
     String currentPresetFile;
     public Map<String, String> presetFiles = new TreeMap<>();
@@ -61,22 +63,25 @@ public class PalettePresetsConfig {
     }
 
     void addPreset(String filename, PalettePreset preset) {
-        String presetName = Utils.makeUniqueName(presetFiles.values()::contains, "New preset", null, "%s (%d)");
+        String presetName = FileUtils.makeUniqueName(presetFiles.values()::contains, "New preset", null, "%s (%d)");
         presetFiles.put(filename, presetName);
         presets.put(filename, preset);
     }
 
     String createDefaultPreset() {
-        String presetFilename = Utils.makeUniqueFilename(PRESETS_PATH, "new_preset", "json", "%s_%d");
+        String presetFilename = FileUtils.makeUniqueFilename(PRESETS_PATH, "new_preset", "json", "%s_%d");
         this.addPreset(presetFilename, PaletteGenerator.getDefaultPreset());
         return presetFilename;
     }
 
     public static class Editable extends PalettePresetsConfig {
-        public Editable(PalettePresetsConfig config) {
-            this.currentPresetFile = config.currentPresetFile;
-            this.presetFiles = new TreeMap<>(config.presetFiles);
-            this.presets = new TreeMap<>(config.presets);
+        public Editable(PalettePresetsConfig origin) {
+            this.currentPresetFile = origin.currentPresetFile;
+            this.presetFiles = new TreeMap<>(origin.presetFiles);
+            this.presets = new TreeMap<>();
+            for (var entry : origin.presets.entrySet()) {
+                this.presets.put(entry.getKey(), new PalettePreset(entry.getValue()));
+            }
         }
 
         public void setCurrentPreset(String presetFilename) {
@@ -89,8 +94,8 @@ public class PalettePresetsConfig {
         }
 
         public String createNewPreset(boolean createDefault, Set<String> updatedPresets, Set<String> deletedPresets) {
-            String presetFilename = Utils.makeUniqueName(filename ->
-                    (updatedPresets.contains(filename) || Files.exists(PRESETS_PATH.resolve(filename))) && !deletedPresets.contains(filename),
+            String presetFilename = FileUtils.makeUniqueName(filename ->
+                            (updatedPresets.contains(filename) || Files.exists(PRESETS_PATH.resolve(filename))) && !deletedPresets.contains(filename),
                     "new_preset", "json", "%s_%d"
             );
             updatedPresets.add(presetFilename);
@@ -125,7 +130,7 @@ public class PalettePresetsConfig {
         public String duplicatePreset(String filename, Set<String> updatedPresets, Set<String> deletedPresets) {
             PalettePreset preset = new PalettePreset(presets.get(filename));
             String newFilename = FilenameUtils.getBaseName(filename) + " (Copy)";
-            newFilename = Utils.makeUniqueName(fName ->
+            newFilename = FileUtils.makeUniqueName(fName ->
                             (presetFiles.containsKey(fName) || updatedPresets.contains(fName) || Files.exists(PRESETS_PATH.resolve(fName))) && !deletedPresets.contains(fName),
                     newFilename, "json", "%s_%d"
             );

@@ -1,17 +1,18 @@
 package rh.maparthelper.gui.widget;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.level.material.MapColor;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CroppingMode;
@@ -22,14 +23,20 @@ import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
 import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.scheduler.DelayedRepeater;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+//? if >=1.21.10 {
+/*import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+*///?}
+
 import static rh.maparthelper.gui.sprites.ManualCroppingSprites.*;
 
-public class MapartPreviewWidget extends ClickableWidget {
+public class MapartPreviewWidget extends AbstractWidget {
     private final MapartProcessing mapart;
     private final int maxWidth;
     private final int maxHeight;
@@ -40,10 +47,10 @@ public class MapartPreviewWidget extends ClickableWidget {
     private double offsetYCumulative = 0;
     private boolean scaleToCursor = true;
     private ManualCroppingAction hoveredAction = null;
-    private MapColor highlightingColor = MapColor.CLEAR;
+    private MapColor highlightingColor = MapColor.NONE;
 
     public MapartPreviewWidget(MapartProcessing mapart, int x, int y, int maxX, int maxY) {
-        super(x, y, mapart.getWidth(), mapart.getHeight(), Text.empty());
+        super(x, y, mapart.getWidth(), mapart.getHeight(), Component.empty());
         this.maxWidth = maxX - 16 - x;
         this.maxHeight = maxY - y;
         this.mapart = mapart;
@@ -52,18 +59,19 @@ public class MapartPreviewWidget extends ClickableWidget {
     public void setHighlightingColor(MapColor color) {
         if (this.highlightingColor != color) {
             this.highlightingColor = color;
-            if (color == MapColor.CLEAR) return;
+            if (color == MapColor.NONE) return;
             ColorsHighlightUniform.set(
-                    highlightingColor.getRenderColor(MapColor.Brightness.LOW),
-                    highlightingColor.getRenderColor(MapColor.Brightness.NORMAL),
-                    highlightingColor.getRenderColor(MapColor.Brightness.HIGH),
-                    MapartHelper.commonConfig.selectionColor
+                    highlightingColor.calculateARGBColor(MapColor.Brightness.LOW),
+                    highlightingColor.calculateARGBColor(MapColor.Brightness.NORMAL),
+                    highlightingColor.calculateARGBColor(MapColor.Brightness.HIGH),
+                    MapartHelper.commonConfig().previewHighlightingColor.getRGB()
             );
         }
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
+    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getImageX();
         int y = getY();
 
@@ -81,16 +89,10 @@ public class MapartPreviewWidget extends ClickableWidget {
 
         if (CurrentConversionSettings.guiMapartImage != null) {
             RenderPipeline pipeline = RenderPipelines.GUI_TEXTURED;
-            if (!MapartHelper.conversionSettings.isShowOriginalImage() && highlightingColor != MapColor.CLEAR) {
+            if (!MapartHelper.conversionConfig().isShowOriginalImage() && highlightingColor != MapColor.NONE) {
                 pipeline = CustomPipelines.PREVIEW_COLOR_HIGHLIGHT;
-                ColorsHighlightUniform.set(
-                        highlightingColor.getRenderColor(MapColor.Brightness.LOW),
-                        highlightingColor.getRenderColor(MapColor.Brightness.NORMAL),
-                        highlightingColor.getRenderColor(MapColor.Brightness.HIGH),
-                        MapartHelper.commonConfig.mapartEditor.previewHighlightingColor
-                );
             }
-            context.drawTexture(
+            context.blit(
                     pipeline,
                     CurrentConversionSettings.guiMapartId,
                     x, y,
@@ -99,12 +101,13 @@ public class MapartPreviewWidget extends ClickableWidget {
                     width, height
             );
         } else if (!MapartImageConverter.isConverting()) {
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            Text dropFileText = Text.translatable("maparthelper.gui.drop_here_mapart");
+            Font textRenderer = Minecraft.getInstance().font;
+            Component dropFileText = Component.translatable("maparthelper.gui.drop_here_mapart");
             int centerX = x + width / 2;
-            List<OrderedText> lines = textRenderer.wrapLines(dropFileText, width - 5);
+            List<FormattedCharSequence> lines = textRenderer.split(dropFileText, width - 5);
             for (int i = 0; i < lines.size(); i++) {
-                context.drawCenteredTextWithShadow(
+                RenderUtils.centeredText(
+                        context,
                         textRenderer,
                         lines.get(i),
                         centerX, y + 5 + i * 9,
@@ -116,19 +119,20 @@ public class MapartPreviewWidget extends ClickableWidget {
         if (CurrentConversionSettings.doShowGrid) {
             for (int mapX = 1; mapX < mapartWidth / 128; mapX++) {
                 int lineX = (int) (x + mapX * 128 * scale);
-                context.fill(lineX, y, lineX + 1, y + height, Colors.CYAN);
+                context.fill(lineX, y, lineX + 1, y + height, CommonColors.HIGH_CONTRAST_DIAMOND);
             }
             for (int mapY = 1; mapY < mapartHeight / 128; mapY++) {
                 int lineY = (int) (y + mapY * 128 * scale);
-                context.fill(x, lineY, x + width, lineY + 1, Colors.CYAN);
+                context.fill(x, lineY, x + width, lineY + 1, CommonColors.HIGH_CONTRAST_DIAMOND);
             }
         }
 
         if (MapartImageConverter.isConverting()) {
             double conversionProgress = MapartImageConverter.getConversionProgress();
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            Font textRenderer = Minecraft.getInstance().font;
             context.fill(x, y, (int) (x + width * conversionProgress), getBottom(), 0x3000FF00);
-            context.drawCenteredTextWithShadow(
+            RenderUtils.centeredText(
+                    context,
                     textRenderer,
                     (int) (conversionProgress * 100) + "%",
                     x + width / 2, y + 14,
@@ -144,7 +148,7 @@ public class MapartPreviewWidget extends ClickableWidget {
             setHoveredAction(null);
         }
 
-        context.drawBorder(x - 1, y - 1, width + 2, height + 2, Colors.CYAN);
+        RenderUtils.renderOutline(context, x - 1, y - 1, width + 2, height + 2, CommonColors.HIGH_CONTRAST_DIAMOND);
     }
 
     public int getImageX() {
@@ -157,7 +161,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 
     @Override
@@ -178,6 +182,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         return true;
     }
 
+    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
@@ -254,6 +259,7 @@ public class MapartPreviewWidget extends ClickableWidget {
     public void onRelease(double mouseX, double mouseY) {
         repeater.stop();
     }
+    //~ !widget_events
 
     private boolean isMouseOverActionsArea(double mouseX, double mouseY) {
         if (!isMouseOver(mouseX, mouseY) || mouseX < getImageX())
@@ -270,8 +276,8 @@ public class MapartPreviewWidget extends ClickableWidget {
         }
     }
 
-    private void renderSprite(DrawContext context, Identifier sprite, int x, int y, int width, int height, int alpha) {
-        context.drawTexture(
+    private void renderSprite(GuiGraphics context, Identifier sprite, int x, int y, int width, int height, int alpha) {
+        context.blit(
                 RenderPipelines.GUI_TEXTURED,
                 sprite,
                 x, y,
@@ -282,11 +288,11 @@ public class MapartPreviewWidget extends ClickableWidget {
         );
     }
 
-    private void renderSprite(DrawContext context, Identifier sprite, int x, int y, int width, int height) {
+    private void renderSprite(GuiGraphics context, Identifier sprite, int x, int y, int width, int height) {
         renderSprite(context, sprite, x, y, width, height, 255);
     }
 
-    private void renderManualCroppingButtons(DrawContext context, int mouseX, int mouseY) {
+    private void renderManualCroppingButtons(GuiGraphics context, int mouseX, int mouseY) {
         int size = 50;
         int mLeft = mouseX - getImageX();
         int mTop = mouseY - getY();
@@ -376,7 +382,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         }
     }
 
-    private boolean renderManualCroppingActionSprite(DrawContext context, ManualCroppingAction action, int x, int y,
+    private boolean renderManualCroppingActionSprite(GuiGraphics context, ManualCroppingAction action, int x, int y,
                                                      int width, int height, int alpha, Supplier<Boolean> isHovered) {
         if (isHovered.get()) {
             renderSprite(context, action.highlighted, x, y, width, height);
@@ -388,12 +394,12 @@ public class MapartPreviewWidget extends ClickableWidget {
         }
     }
 
-    private boolean renderManualCroppingActionSprite(DrawContext context, ManualCroppingAction action, int x, int y,
+    private boolean renderManualCroppingActionSprite(GuiGraphics context, ManualCroppingAction action, int x, int y,
                                                      int width, int height, Supplier<Boolean> isHovered) {
         return renderManualCroppingActionSprite(context, action, x, y, width, height, 255, isHovered);
     }
 
-    private boolean renderEdgeArrow(DrawContext context, int dx, int dy, int x, int y,
+    private boolean renderEdgeArrow(GuiGraphics context, int dx, int dy, int x, int y,
                                     ManualCroppingAction bigArrow, ManualCroppingAction smallArrow,
                                     boolean highlight, int size) {
         boolean hovering = false;
@@ -408,7 +414,7 @@ public class MapartPreviewWidget extends ClickableWidget {
         return hovering;
     }
 
-    private boolean renderAxisArrow(DrawContext context, int dStart, int dSide, int x, int y,
+    private boolean renderAxisArrow(GuiGraphics context, int dStart, int dSide, int x, int y,
                                     ManualCroppingAction bigArrow, ManualCroppingAction smallArrow,
                                     boolean highlight, int size) {
         boolean hovering = false;

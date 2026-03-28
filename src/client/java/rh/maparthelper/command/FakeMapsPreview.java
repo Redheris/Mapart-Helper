@@ -2,17 +2,17 @@ package rh.maparthelper.command;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.map.MapState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.CurrentConversionSettings;
@@ -21,10 +21,10 @@ import rh.maparthelper.mapart.MapartProcessing;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {
-    public static boolean createFakeFramesFromMapart(MapartProcessing mapart, ClientPlayerEntity player) {
+    public static boolean createFakeFramesFromMapart(MapartProcessing mapart, LocalPlayer player) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return false;
-        removeFakeItemFrames(player.clientWorld);
+        removeFakeItemFrames((ClientLevel) player.level());
         int[][] maps = NativeImageUtils.divideImageByMaps(mapart.getWidth(), mapart.getHeight(), mapart.getNativeImage());
         if (maps == null) return false;
         for (int[] map : maps) {
@@ -33,38 +33,40 @@ public class FakeMapsPreview {
         return true;
     }
 
-    public static void removeFakeItemFrames(ClientWorld world) {
-        for (ItemFrameEntity itemFrame : ClientCommandsContext.fakeItemFrames)
+    public static void removeFakeItemFrames(ClientLevel world) {
+        for (ItemFrame itemFrame : ClientCommandsContext.fakeItemFrames)
             world.removeEntity(itemFrame.getId(), Entity.RemovalReason.DISCARDED);
         ClientCommandsContext.fakeItemFrames.clear();
         ClientCommandsContext.fakeFramesBornTime = 0;
     }
 
-    public static void addFakeItemFrame(int[] map, ClientPlayerEntity player) {
-        MapState mapState = MapState.of((byte) 1, false, null);
+    public static void addFakeItemFrame(int[] map, LocalPlayer player) {
+        ClientLevel clientLevel = (ClientLevel) player.level();
+        MapItemSavedData mapState = MapItemSavedData.createForClient((byte) 1, false, clientLevel.dimension());
         mapState.colors = new byte[map.length];
         for (int i = 0; i < map.length; i++) {
             MapColorEntry color = PaletteColors.getMapColorEntryByARGB(map[i]);
-            mapState.colors[i] = color.mapColor().getRenderColorByte(color.brightness());
+            mapState.colors[i] = color.mapColor().getPackedId(color.brightness());
         }
 
         ItemStack mapItem = new ItemStack(Items.FILLED_MAP);
-        MapIdComponent mapId = new MapIdComponent(-1 - ClientCommandsContext.fakeItemFrames.size());
-        mapItem.set(DataComponentTypes.MAP_ID, mapId);
+        MapId mapId = new MapId(-1 - ClientCommandsContext.fakeItemFrames.size());
+        mapItem.set(DataComponents.MAP_ID, mapId);
 
-        ItemFrameEntity itemFrame = new ItemFrameEntity(player.clientWorld, player.getBlockPos(), player.getMovementDirection().getOpposite());
-        itemFrame.setHeldItemStack(mapItem);
+        ItemFrame itemFrame = new ItemFrame(clientLevel, player.blockPosition(), player.getMotionDirection().getOpposite());
+        itemFrame.setItem(mapItem);
         itemFrame.setInvisible(true);
 
-        player.clientWorld.putClientsideMapState(mapId, mapState);
+        clientLevel.overrideMapData(mapId, mapState);
 
         ClientCommandsContext.fakeItemFrames.add(itemFrame);
     }
 
-    public static void showFakeFrames(ClientPlayerEntity player, int width, int height) {
-        BlockPos.Mutable pos = player.getBlockPos().mutableCopy();
-        Direction direction = player.getMovementDirection();
-        if (direction.getDirection() == Direction.AxisDirection.NEGATIVE)
+    public static void showFakeFrames(LocalPlayer player, int width, int height) {
+        @SuppressWarnings("resource") ClientLevel clientLevel = (ClientLevel) player.level();
+        BlockPos.MutableBlockPos pos = player.blockPosition().mutable();
+        Direction direction = player.getMotionDirection();
+        if (direction.getAxisDirection() == Direction.AxisDirection.NEGATIVE)
             pos.move(direction);
         else
             pos.move(direction, 2);
@@ -79,33 +81,38 @@ public class FakeMapsPreview {
             case SOUTH -> LEFT = Direction.EAST;
             case WEST -> LEFT = Direction.SOUTH;
         }
-        double localOffset = player.getPos().getComponentAlongAxis(LEFT.getAxis()) - pos.getComponentAlongAxis(LEFT.getAxis());
-        double leftOffset = width % 2 == 1 || localOffset < 0.5 ? 0 : -1;
+        double localOffset = Math.abs(player.position().get(LEFT.getAxis()) - pos.get(LEFT.getAxis()));
+        double leftOffset;
+        if (LEFT.getAxisDirection() == Direction.AxisDirection.NEGATIVE)
+            leftOffset = width % 2 == 1 || localOffset < 0.5 ? 0 : -1;
+        else
+            leftOffset = width % 2 == 1 || localOffset < 0.5 ? -1 : 0;
+
         pos.move(LEFT, (int) (width / 2.0 + leftOffset));
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                ItemFrameEntity itemFrame = ClientCommandsContext.fakeItemFrames.get(x + y * width);
-                double posX = LEFT.getOffsetX() * 0.5;
-                double posZ = LEFT.getOffsetZ() * 0.5;
-                if (LEFT.getDirection() == Direction.AxisDirection.NEGATIVE) {
+                ItemFrame itemFrame = ClientCommandsContext.fakeItemFrames.get(x + y * width);
+                double posX = LEFT.getStepX() * 0.5;
+                double posZ = LEFT.getStepZ() * 0.5;
+                if (LEFT.getAxisDirection() == Direction.AxisDirection.NEGATIVE) {
                     posX = pos.getX() - posX;
                     posZ = pos.getZ() - posZ;
                 } else {
                     posX = pos.getX() + posX;
                     posZ = pos.getZ() + posZ;
                 }
-                posX -= direction.getOffsetX() * 0.03;
-                posZ -= direction.getOffsetZ() * 0.03;
+                posX -= direction.getStepX() * 0.03;
+                posZ -= direction.getStepZ() * 0.03;
 
                 double yOffset = height == 2 ? 0.5 : -0.5;
-                itemFrame.setPos(posX, pos.getY() + yOffset, posZ);
-                player.clientWorld.addEntity(itemFrame);
+                itemFrame.setPosRaw(posX, pos.getY() + yOffset, posZ);
+                clientLevel.addEntity(itemFrame);
                 pos.move(LEFT.getOpposite());
             }
             pos.move(LEFT, width);
             pos.move(Direction.DOWN);
         }
-        ClientCommandsContext.fakeFramesBornTime = player.clientWorld.getTime();
+        ClientCommandsContext.fakeFramesBornTime = clientLevel.getGameTime();
     }
 }

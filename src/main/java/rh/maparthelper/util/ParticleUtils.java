@@ -1,20 +1,20 @@
 package rh.maparthelper.util;
 
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import rh.maparthelper.MapartHelper;
 
 public class ParticleUtils {
 
-    public static void spawnParticle(World world, ParticleEffect particle, Vec3d pos) {
-        world.addParticleClient(particle, pos.x, pos.y, pos.z, 0, 0, 0);
+    public static void spawnParticle(Level world, ParticleOptions particle, Vec3 pos) {
+        world.addParticle(particle, pos.x, pos.y, pos.z, 0, 0, 0);
     }
 
-    public static void drawStraightLine(World world, double x1, double y1, double z1,
-                                        double x2, double y2, double z2, ParticleEffect particle, double step) {
+    public static void drawStraightLine(Level world, double x1, double y1, double z1,
+                                        double x2, double y2, double z2, ParticleOptions particle, double step) {
         int steps = (int) (Math.max(
                 Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)),
                 Math.abs(z2 - z1)
@@ -25,14 +25,14 @@ public class ParticleUtils {
             double x = x1 + (x2 - x1) * t;
             double y = y1 + (y2 - y1) * t;
             double z = z1 + (z2 - z1) * t;
-            world.addParticleClient(particle, x, y, z, 0, 0, 0);
+            world.addParticle(particle, x, y, z, 0, 0, 0);
         }
     }
 
-    public static void drawSelectionBox(World world, Vec3d pos1, Vec3d pos2, Direction direction, double step) {
+    public static void drawSelectionBox(Level world, Vec3 pos1, Vec3 pos2, Direction direction, double step) {
         if (world == null) return;
 
-        DustParticleEffect particle = new DustParticleEffect(MapartHelper.commonConfig.selectionColor, 0.3f);
+        DustParticleOptions particle = new DustParticleOptions(MapartHelper.commonConfig().selectionColor.getRGB(), 0.3f);
         double xMin = Math.min(pos1.x, pos2.x) - 0.5;
         double xMax = Math.max(pos1.x, pos2.x) + 0.5;
         double yMin = Math.min(pos1.y, pos2.y) - 0.5;

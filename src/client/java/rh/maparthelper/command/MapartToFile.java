@@ -1,27 +1,28 @@
 package rh.maparthelper.command;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.FilledMapItem;
-import net.minecraft.item.map.MapState;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.MapItem;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.util.Utils;
+import rh.maparthelper.util.CompatUtils;
+import rh.maparthelper.util.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,31 +45,31 @@ public class MapartToFile {
         }
     }
 
-    public static void saveImageFromItemFramesArea(PlayerEntity player, World world, String filename) {
-        Vec3d pos1 = ClientCommandsContext.selectedPos1;
-        Vec3d pos2 = ClientCommandsContext.selectedPos2;
+    public static void saveImageFromItemFramesArea(Player player, Level world, String filename) {
+        Vec3 pos1 = ClientCommandsContext.selectedPos1;
+        Vec3 pos2 = ClientCommandsContext.selectedPos2;
 
         int width = ClientCommandsContext.selectionWidth;
         int height = ClientCommandsContext.selectionHeight;
         int size = width * height;
 
-        Box area = new Box(pos1, pos2);
+        AABB area = new AABB(pos1, pos2);
 
-        List<ItemFrameEntity> itemFrames = world.getEntitiesByType(EntityType.ITEM_FRAME, area, ItemFrameEntity::containsMap);
-        itemFrames.addAll(world.getEntitiesByType(EntityType.GLOW_ITEM_FRAME, area, ItemFrameEntity::containsMap));
+        List<ItemFrame> itemFrames = world.getEntities(EntityType.ITEM_FRAME, area, ItemFrame::hasFramedMap);
+        itemFrames.addAll(world.getEntities(EntityType.GLOW_ITEM_FRAME, area, ItemFrame::hasFramedMap));
 
         if (itemFrames.isEmpty()) {
-            player.sendMessage(Text.translatable("maparthelper.selection_has_no_maps").formatted(Formatting.RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_has_no_maps").withStyle(ChatFormatting.RED), true);
             return;
         }
         if (itemFrames.size() != size) {
-            player.sendMessage(Text.translatable("maparthelper.selection_has_empty_places").formatted(Formatting.RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_has_empty_places").withStyle(ChatFormatting.RED), true);
             return;
         }
 
         itemFrames = itemFrames.stream().sorted((if1, if2) -> {
-            BlockPos p1 = if1.getBlockPos();
-            BlockPos p2 = if2.getBlockPos();
+            BlockPos p1 = if1.blockPosition();
+            BlockPos p2 = if2.blockPosition();
 
             if (ClientCommandsContext.selectedDirection.getAxis() != Direction.Axis.Y) {
                 int heightCompare = Integer.compare(p2.getY(), p1.getY());
@@ -112,7 +113,7 @@ public class MapartToFile {
                     int resultX = mapX * 128 + localX;
                     int resultY = mapY * 128 + localY;
 
-                    mapart.setColorArgb(resultX, resultY, MapColor.getRenderColor(map[j]));
+                    mapart.setPixel(resultX, resultY, MapColor.getColorFromPackedId(map[j]));
                 }
             }
 
@@ -120,21 +121,20 @@ public class MapartToFile {
             saveMapartFile(player, filename, mapart);
 
         } catch (InvalidPathException e) {
-            player.sendMessage(Text.translatable("maparthelper.saving_path_error").formatted(Formatting.RED), false);
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
-        }
-        catch (Exception e) {
-            player.sendMessage(Text.translatable("maparthelper.saving_error").formatted(Formatting.RED), false);
+        } catch (Exception e) {
+            CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
             MapartHelper.LOGGER.error("An error occurred during saving the map:\n{}", e.toString());
         }
 
     }
 
-    public static void saveImageFromMapColors(PlayerEntity player, byte[] mapColors, String filename) {
+    public static void saveImageFromMapColors(Player player, byte[] mapColors, String filename) {
         try (NativeImage image = new NativeImage(128, 128, false)) {
 
             for (int i = 0; i < mapColors.length; i++)
-                image.setColorArgb(i % 128, i / 128, MapColor.getRenderColor(mapColors[i]));
+                image.setPixel(i % 128, i / 128, MapColor.getColorFromPackedId(mapColors[i]));
 
             saveMapartFile(player, filename, image);
 
@@ -144,45 +144,45 @@ public class MapartToFile {
         }
     }
 
-    private static void saveMapartFile(PlayerEntity player, String filename, NativeImage image) throws IOException {
-        filename = Utils.makeUniqueFilename(SAVE_MAPS_DIR, filename, "png");
+    private static void saveMapartFile(Player player, String filename, NativeImage image) throws IOException {
+        filename = FileUtils.makeUniqueFilename(SAVE_MAPS_DIR, filename, "png");
 
         Path filePath = SAVE_MAPS_DIR.resolve(filename);
-        image.writeTo(filePath);
+        image.writeToFile(filePath);
 
-        Text mapartFile = Text.literal(filename)
-                .styled(style -> style
-                        .withColor(Formatting.GREEN)
+        Component mapartFile = Component.literal(filename)
+                .withStyle(style -> style
+                        .withColor(ChatFormatting.GREEN)
                         .withClickEvent(new ClickEvent.OpenFile(filePath.toAbsolutePath().toString()))
-                        .withHoverEvent(new HoverEvent.ShowText(Text.translatable("maparthelper.open_image_file")))
-                        .withUnderline(true)
+                        .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_image_file")))
+                        .withUnderlined(true)
                 );
 
-        player.sendMessage(Text.translatable("maparthelper.mapart_saved", mapartFile).formatted(Formatting.GREEN), false);
+        CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
     }
 
-    public static void saveImageFromMapColors(PlayerEntity player, byte[] mapColors) {
+    public static void saveImageFromMapColors(Player player, byte[] mapColors) {
         saveImageFromMapColors(player, mapColors, "New map");
     }
 
-    public static byte[] getMapColorsFromItemFrame(ItemFrameEntity itemFrame) {
-        if (!itemFrame.containsMap())
+    public static byte[] getMapColorsFromItemFrame(ItemFrame itemFrame) {
+        if (!itemFrame.hasFramedMap())
             return null;
-        MapState mapState = FilledMapItem.getMapState(itemFrame.getHeldItemStack(), itemFrame.getWorld());
+        MapItemSavedData mapState = MapItem.getSavedData(itemFrame.getItem(), itemFrame.level());
         assert mapState != null;
         return rotateMap(mapState.colors.clone(), itemFrame.getRotation());
     }
 
     public static byte[] getMapColorsFromItemFrame() {
-        HitResult target = MinecraftClient.getInstance().crosshairTarget;
+        HitResult target = Minecraft.getInstance().hitResult;
 
         if (!(target instanceof EntityHitResult entity))
             return null;
 
-        if (entity.getEntity() instanceof ItemFrameEntity itemFrame) {
-            if (!itemFrame.containsMap())
+        if (entity.getEntity() instanceof ItemFrame itemFrame) {
+            if (!itemFrame.hasFramedMap())
                 return null;
-            MapState mapState = FilledMapItem.getMapState(itemFrame.getHeldItemStack(), itemFrame.getWorld());
+            MapItemSavedData mapState = MapItem.getSavedData(itemFrame.getItem(), itemFrame.level());
             assert mapState != null;
             return rotateMap(mapState.colors.clone(), itemFrame.getRotation());
         }
@@ -199,14 +199,10 @@ public class MapartToFile {
                 int toIndex;
 
                 switch (rotation % 4) {
-                    case 0 ->
-                            toIndex = y * 128 + x;
-                    case 1 ->
-                            toIndex = x * 128 + (127 - y);
-                    case 2 ->
-                            toIndex = (127 - y) * 128 + (127 - x);
-                    case 3 ->
-                            toIndex = (127 - x) * 128 + y;
+                    case 0 -> toIndex = y * 128 + x;
+                    case 1 -> toIndex = x * 128 + (127 - y);
+                    case 2 -> toIndex = (127 - y) * 128 + (127 - x);
+                    case 3 -> toIndex = (127 - x) * 128 + y;
                     default -> throw new IllegalArgumentException("Invalid rotation");
                 }
 

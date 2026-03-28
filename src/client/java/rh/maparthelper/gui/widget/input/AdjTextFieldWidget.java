@@ -1,43 +1,84 @@
 package rh.maparthelper.gui.widget.input;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class AdjTextFieldWidget extends TextFieldWidget {
+//? if >=1.21.10 {
+/*import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+*///?}
+//? if >=26.1 {
+/*import java.util.Objects;
+import net.minecraft.util.StringUtil;
+*///?}
+
+public class AdjTextFieldWidget extends EditBox {
     private Predicate<String> valueValidator;
     private Consumer<String> valueConsumer;
+    //? >=26.1
+    //private Predicate<String> filter = Objects::nonNull;
 
-    public AdjTextFieldWidget(TextRenderer textRenderer, int width, int height, String initialValue, String narrationTitle) {
-        super(textRenderer, width, height, Text.of(narrationTitle));
-        setText(initialValue);
+    public AdjTextFieldWidget(Font textRenderer, int width, int height, String initialValue, String narrationTitle) {
+        super(textRenderer, width, height, Component.nullToEmpty(narrationTitle));
+        setValue(initialValue);
     }
 
+    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 1) {
-            this.setText("");
+            this.setValue("");
+            //? if <=1.21.8 {
             return super.mouseClicked(mouseX, mouseY, 0);
+            //?} else {
+            /*var event = new MouseButtonEvent(
+                    mouseX, mouseY,
+                    new MouseButtonInfo(0, mouseEvent.modifiers())
+            );
+            return super.mouseClicked(event, doubleClick);
+            *///?}
         }
         if (button == 0 && !isFocused()) {
             super.mouseClicked(mouseX, mouseY, button);
-            setSelectionStart(0);
-            setSelectionEnd(getText().length());
+            setCursorPosition(0);
+            setHighlightPos(getValue().length());
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
+    //~ !widget_events
+
+    //? if >=26.1 {
+    /*@Override
+    public void setValue(@NotNull String value) {
+        if (this.filter.test(value))
+            super.setValue(value);
+    }
+
+    @Override
+    public void insertText(@NotNull String input) {
+        if (filter.test(StringUtil.filterText(input)))
+            super.insertText(input);
+    }
+
+    public void setFilter(final Predicate<String> filter) {
+        this.filter = filter;
+    }
+    *///?}
 
     @Override
     public void setFocused(boolean focused) {
         super.setFocused(focused);
         if (!focused) {
-            setSelectionStart(getCursor());
-            setSelectionEnd(getCursor());
+            setCursorPosition(getCursorPosition());
+            setHighlightPos(getCursorPosition());
         }
     }
 
@@ -56,14 +97,14 @@ public class AdjTextFieldWidget extends TextFieldWidget {
      */
     @Deprecated
     @Override
-    public void setChangedListener(Consumer<String> changedListener) {
+    public void setResponder(@NotNull Consumer<String> changedListener) {
     }
 
     private void updateChangedListener() {
-        super.setChangedListener(value -> {
-            setEditableColor(Colors.WHITE);
+        super.setResponder(value -> {
+            setTextColor(CommonColors.WHITE);
             if (value.isEmpty()) return;
-            if (valueValidator != null && !valueValidator.test(value)) setEditableColor(Colors.LIGHT_RED);
+            if (valueValidator != null && !valueValidator.test(value)) setTextColor(CommonColors.SOFT_RED);
             else if (valueConsumer != null) valueConsumer.accept(value);
         });
     }

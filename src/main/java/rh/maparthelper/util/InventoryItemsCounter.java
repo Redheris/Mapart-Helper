@@ -1,12 +1,12 @@
 package rh.maparthelper.util;
 
 import com.google.common.base.Predicates;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ public class InventoryItemsCounter {
         this.countAll = false;
     }
 
-    public void count(@NotNull Inventory inventory) {
+    public void count(@NotNull Container inventory) {
         Predicate<ItemStack> doCount = countAll ? Predicates.alwaysTrue()
                 : stack -> counter.containsKey(stack.getItem());
         for (ItemStack itemStack : inventory) {
@@ -39,12 +39,13 @@ public class InventoryItemsCounter {
                         Integer::sum
                 );
             }
-            if (itemStack.isIn(ItemTags.SHULKER_BOXES)) {
-                ContainerComponent container = itemStack.getOrDefault(
-                        DataComponentTypes.CONTAINER,
-                        ContainerComponent.DEFAULT
+            if (itemStack.is(ItemTags.SHULKER_BOXES)) {
+                ItemContainerContents container = itemStack.getOrDefault(
+                        DataComponents.CONTAINER,
+                        ItemContainerContents.EMPTY
                 );
-                container.streamNonEmpty()
+                //~ if >=26.1 'nonEmptyStream' -> 'nonEmptyItemCopyStream'
+                container.nonEmptyStream()
                         .filter(doCount)
                         .forEach(stack ->
                                 counter.merge(

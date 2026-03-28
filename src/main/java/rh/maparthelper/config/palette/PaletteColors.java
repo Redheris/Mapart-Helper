@@ -1,6 +1,6 @@
 package rh.maparthelper.config.palette;
 
-import net.minecraft.block.MapColor;
+import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.DitherEntry;
@@ -10,12 +10,27 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PaletteColors {
-    static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
-    static final Map<Integer, DitherEntry> cachedClosestColors = new HashMap<>();
+    private static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
+    private static final Map<Integer, DitherEntry> cachedClosestColors = new ConcurrentHashMap<>();
+    private static final int[] mapRenderColors = new int[256];
     static final Set<MapColor> excludingColors = new HashSet<>();
-    static final int[] mapRenderColors = new int[256];
+
+    public static void initMapColorsCache() {
+        for (int colorId = 1; colorId < 64; colorId++) {
+            MapColor mapColor = MapColor.byId(colorId);
+            if (mapColor == MapColor.NONE) continue;
+            for (MapColor.Brightness brightness : MapColor.Brightness.values()) {
+                int argb = mapColor.calculateARGBColor(brightness);
+                MapColorEntry entry = new MapColorEntry(mapColor, brightness);
+                PaletteColors.argbMapColors.put(argb, entry);
+                byte colorByte = (byte) ((mapColor.id << 2) | brightness.id);
+                PaletteColors.mapRenderColors[colorByte + 128] = argb;
+            }
+        }
+    }
 
     public static MapColorEntry getMapColorEntryByARGB(int argb) {
         if (argb == 0) return MapColorEntry.CLEAR;
@@ -40,13 +55,13 @@ public class PaletteColors {
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
 
-        for (int colorByteId = 1; colorByteId < 255; colorByteId++) {
-            byte colorByte = (byte) (colorByteId - 128);
+        for (int colorByteId = 4; colorByteId < 255; colorByteId++) {
             int renderColor = mapRenderColors[colorByteId];
-            if (renderColor == 0) break;
+            if (renderColor == 0) continue;
+            byte colorByte = (byte) (colorByteId - 128);
             if (renderColor == argb) return new DitherEntry(colorByte);
 
-            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionConfig().useLAB());
             if (dist < minDist) {
                 secondMinDist = minDist;
                 minDist = dist;
@@ -82,13 +97,13 @@ public class PaletteColors {
             if (excludingColors.contains(mapColor)) continue;
 
             for (int brightness = 0; brightness < 3; brightness++) {
-                if (mapColor == MapColor.WATER_BLUE && brightness != 2) continue; // Allow only HIGH for water color
+                if (mapColor == MapColor.WATER && brightness != 2) continue; // Allow only HIGH for water color
                 byte colorByte = (byte) ((mapColor.id << 2) | brightness);
 
                 int renderColor = mapRenderColors[colorByte + 128];
                 if (renderColor == argb) return new DitherEntry(colorByte);
 
-                double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+                double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionConfig().useLAB());
                 if (dist < minDist) {
                     secondMinDist = minDist;
                     minDist = dist;
@@ -129,13 +144,13 @@ public class PaletteColors {
         for (MapColor mapColor : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
             if (excludingColors.contains(mapColor)) continue;
 
-            int brightness = mapColor == MapColor.WATER_BLUE ? 2 : 1; // Normal brightness for water color is HIGH(2)
+            int brightness = mapColor == MapColor.WATER ? 2 : 1; // Normal brightness for water color is HIGH(2)
             byte colorByte = (byte) ((mapColor.id << 2) | brightness);
 
-            int renderColor = MapColor.getRenderColor(colorByte);
+            int renderColor = MapColor.getColorFromPackedId(colorByte);
             if (renderColor == argb) return new DitherEntry(colorByte);
 
-            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionSettings.useLAB());
+            double dist = ColorUtils.colorDistance(argb, renderColor, MapartHelper.conversionConfig().useLAB());
             if (dist < minDist) {
                 secondMinDist = minDist;
                 minDist = dist;
