@@ -1,9 +1,9 @@
 mod.id = "maparthelper"
 mod.name = "Mapart Helper"
 mod.group = "rh.maparthelper"
-mod.version = "0.13.0-beta.4"
+mod.version = "0.13.0"
 mod.fabric_loader = "0.18.4"
-mod.version_type = "BETA"
+mod.version_type = "STABLE"
 
 publish.modrinth = "qRKpqkGI"
 publish.curseforge_id = "1343604"
@@ -11,7 +11,7 @@ publish.curseforge_slug = "mapart-helper"
 publish.github_repo = "Redheris/Mapart-Helper"
 publish.mod_icon_url = "https://cdn.modrinth.com/data/qRKpqkGI/31d2b319605a07e5b5565eece0e963e78bb92d30.png"
 publish.announce_for = "26.1" # "none" if no announcement
-publish.dry_run = "true"
+publish.dry_run = "false"
 
 ["1.21.8"]
 # Minecraft dependency for fabric.mod.json e.g. ">=1.21.6 <=1.21.8"

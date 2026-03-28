@@ -11,6 +11,8 @@ import java.util.*;
 
 import static rh.maparthelper.config.palette.PaletteConfigManager.PRESETS_PATH;
 
+// who wrote this?? oh, it was me...
+// Planned for rewriting
 public class PalettePresetsConfig {
     String currentPresetFile;
     public Map<String, String> presetFiles = new TreeMap<>();
