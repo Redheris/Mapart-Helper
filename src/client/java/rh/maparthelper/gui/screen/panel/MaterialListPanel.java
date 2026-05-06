@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.config.UseAuxBlocks;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CurrentConversionSettings;
@@ -120,31 +121,39 @@ public class MaterialListPanel extends AbstractLayout {
         ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionConfig().getMaterialsCountMode());
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
 
-        this.auxBlockCount = mapart.getWidth() * 128;
-        BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionConfig().getAuxBlock());
-        auxBlockItemWidget.insertToTooltip(1, Component.translatable("maparthelper.aux_block").withStyle(ChatFormatting.GRAY));
+        if (MapartHelper.conversionConfig().getUseAuxBlocks() != UseAuxBlocks.TRUST_ME) {
+            this.auxBlockCount = mapart.getWidth() * 128;
+            BlockItemWidget auxBlockItemWidget = new BlockItemWidget(0, 0, 24, MapartHelper.conversionConfig().getAuxBlock());
+            auxBlockItemWidget.insertToTooltip(1, Component.translatable("maparthelper.aux_block").withStyle(ChatFormatting.GRAY));
 
-        StringWidget auxAmountText = new StringWidget(Component.empty(), screen.getFont());
-        materialListAdder.addChild(auxBlockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
-        materialListAdder.addChild(auxAmountText);
+            StringWidget auxAmountText = new StringWidget(Component.empty(), screen.getFont());
+            materialListAdder.addChild(auxBlockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
+            materialListAdder.addChild(auxAmountText);
 
-        boolean hasAuxBlockInColors = false;
-        if (displayRemainingAmount)
-            hasAuxBlockInColors = calculateRemainingCounts(colorCounts);
+            boolean hasAuxBlockInColors = false;
+            if (displayRemainingAmount)
+                hasAuxBlockInColors = calculateRemainingCounts(colorCounts);
 
-        for (ColorsCounter.MapColorCount colorCount : colorCounts) {
-            addBlockToMaterialList(materialListAdder, palette, colorCount);
+            for (ColorsCounter.MapColorCount colorCount : colorCounts) {
+                addBlockToMaterialList(materialListAdder, palette, colorCount);
+            }
+
+            if (displayRemainingAmount && !hasAuxBlockInColors)
+                auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionConfig().getAuxBlock().asItem(), 0);
+
+            MutableComponent amountText = Component.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
+            if (auxBlockCount <= 0)
+                amountText.withStyle(ChatFormatting.GREEN);
+            auxAmountText.setWidth(screen.getFont().width(amountText));
+            auxAmountText.setMessage(amountText);
+            auxAmountText.setTooltip(Tooltip.create(amountText));
+        } else {
+            calculateRemainingCounts(colorCounts);
+
+            for (ColorsCounter.MapColorCount colorCount : colorCounts) {
+                addBlockToMaterialList(materialListAdder, palette, colorCount);
+            }
         }
-
-        if (displayRemainingAmount && !hasAuxBlockInColors)
-            auxBlockCount -= inventoryItemsCounter.getCounts().getOrDefault(MapartHelper.conversionConfig().getAuxBlock().asItem(), 0);
-
-        MutableComponent amountText = Component.literal(getAmountString(Math.max(0, auxBlockCount), auxBlockItemWidget.getStackSize()));
-        if (auxBlockCount <= 0)
-            amountText.withStyle(ChatFormatting.GREEN);
-        auxAmountText.setWidth(screen.getFont().width(amountText));
-        auxAmountText.setMessage(amountText);
-        auxAmountText.setTooltip(Tooltip.create(amountText));
 
         materialList.arrangeElements();
         childAdder.accept(materialList);

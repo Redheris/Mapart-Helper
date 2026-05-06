@@ -66,6 +66,8 @@
   "maparthelper.gui.option.NO_AUX": "Верхний ряд",
   "maparthelper.gui.option.IMPORTANT": "Важные",
   "maparthelper.gui.option.ALL": "Все",
+  "maparthelper.gui.option.TRUST_ME": "Никакие",
+  "maparthelper.gui.option.TRUST_ME._TOOLTIP": "Ни под блоками, ни верхний ряд. Используйте только для 2D и только при наличии платформы с верхним рядом",
 
   "maparthelper.gui.nbt_is_unobtainable": "NBT не может быть создан, если в мапарте используются недостижимые цвета",
   "maparthelper.gui.ask_to_update_palette": "Текущая палитра была сгенерирована для %s.\n\nЖелаете сгенерировать заново?\n§7(Это не повлияет на текущие пресеты)",

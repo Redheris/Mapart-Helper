@@ -40,10 +40,11 @@ public class MapartSchematicBuilder {
 
     public MapartSchematicBuilder(int[] mapColors, int mapsWidth, int mapsHeight) {
         this.xSize = mapsWidth * 128;
-        this.zSize = mapsHeight * 128 + 1;
+        this.zSize = useAuxBlocks == UseAuxBlocks.TRUST_ME ? mapsHeight * 128 : mapsHeight * 128 + 1;
         this.prevRowSupportBlock = new boolean[xSize];
-        this.mapColors = new int[zSize - 1][xSize];
-        for (int z = 0; z < zSize - 1; z++) {
+        this.mapColors = useAuxBlocks == UseAuxBlocks.TRUST_ME ? new int[zSize][xSize] : new int[zSize - 1][xSize];
+        int colorsHeight = useAuxBlocks == UseAuxBlocks.TRUST_ME ? zSize : zSize - 1;
+        for (int z = 0; z < colorsHeight; z++) {
             System.arraycopy(mapColors, z * xSize, this.mapColors[z], 0, xSize);
         }
         addBaseMetadata();
@@ -55,9 +56,13 @@ public class MapartSchematicBuilder {
         for (int z = 0; z < zSize; z++) {
             for (int x = 0; x < xSize; x++) {
                 int y = staircaseStyle == StaircaseStyles.FLAT_2D ? 0 : heightsZX.get(z).get(x);
-                if (z == 0)
+                if (useAuxBlocks == UseAuxBlocks.TRUST_ME) {
+                    MapColor mapColor = PaletteColors.getMapColorEntryByARGB(mapColors[z][x]).mapColor();
+                    if (mapColor != MapColor.NONE)
+                        addColor(mapColor, x, y, z);
+                } else if (z == 0) {
                     addBlock(auxBlock, x, y, z);
-                else {
+                } else {
                     MapColor mapColor = PaletteColors.getMapColorEntryByARGB(mapColors[z - 1][x]).mapColor();
                     if (mapColor != MapColor.NONE)
                         addColor(mapColor, x, y, z);
@@ -84,6 +89,8 @@ public class MapartSchematicBuilder {
     }
 
     private void addAuxBlocksForColor(Block colorBlock, int colorX, int colorY, int colorZ) {
+        if (useAuxBlocks == UseAuxBlocks.TRUST_ME) return;
+
         boolean needsSupport = shouldPlaceAuxBlock(colorBlock);
         if (colorY > 0 && needsSupport)
             addBlock(auxBlock, colorX, colorY - 1, colorZ);

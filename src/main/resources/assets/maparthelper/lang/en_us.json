@@ -66,6 +66,8 @@
   "maparthelper.gui.option.NO_AUX": "Only top row",
   "maparthelper.gui.option.IMPORTANT": "Important",
   "maparthelper.gui.option.ALL": "All (optimized)",
+  "maparthelper.gui.option.TRUST_ME": "None",
+  "maparthelper.gui.option.TRUST_ME._TOOLTIP": "No aux blocks, no top row. Use it only for 2D and only if you already have a platform with the top row",
 
   "maparthelper.gui.nbt_is_unobtainable": "NBT cannot be created if the mapart contains unreachable colors",
   "maparthelper.gui.ask_to_update_palette": "The current palette was generated for %s.\n\nWould you like to regenerate palette?\n§7(It will not affect your presets)",
