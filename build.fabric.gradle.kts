@@ -1,10 +1,14 @@
+@file:Suppress("UnstableApiUsage")
+
 import me.modmuss50.mpp.ReleaseType
 
 plugins {
-    id("net.fabricmc.fabric-loom")
+    id("dev.kikugie.loom-back-compat")
     id("me.modmuss50.mod-publish-plugin")
     // `maven-publish`
 }
+
+val isObfuscated = !loomx.isUnobfuscated
 
 version = "${property("mod.version")}+mc${sc.current.version}"
 base.archivesName = property("mod.id") as String
@@ -16,7 +20,10 @@ val modVersion = property("mod.version") as String
 
 val requiredJava = when {
     sc.current.parsed >= "26.0" -> JavaVersion.VERSION_25
-    else -> JavaVersion.VERSION_21
+    sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
+    sc.current.parsed >= "1.18" -> JavaVersion.VERSION_17
+    sc.current.parsed >= "1.17" -> JavaVersion.VERSION_16
+    else -> JavaVersion.VERSION_1_8
 }
 val versionType: ReleaseType = when {
     versionTypeRaw.lowercase() == "stable" -> ReleaseType.STABLE
@@ -35,6 +42,14 @@ repositories {
     }
     strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
     strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
+    if (isObfuscated) {
+        maven("https://maven.parchmentmc.org") {
+            name = "ParchmentMC"
+        }
+        maven("https://maven.gegy.dev/releases/") {
+            name = "Gegy"
+        }
+    }
 
     maven("https://maven.isxander.dev/releases") {
         name = "Xander Maven"
@@ -45,11 +60,20 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:${sc.current.version}")
 
-    implementation("net.fabricmc:fabric-loader:${property("mod.fabric_loader")}")
-    implementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
+    if (isObfuscated) {
+        mappings(loom.layered {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${property("parchment")}@zip")
+            if (hasProperty("mojbackward"))
+                mappings("dev.lambdaurora:yalmm-mojbackward:${property("mojbackward")}")
+        })
+    }
 
-    implementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
-    api("com.terraformersmc:modmenu:${property("modmenu")}")
+    modImplementation("net.fabricmc:fabric-loader:${property("mod.fabric_loader")}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
+
+    modImplementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
+    modApi("com.terraformersmc:modmenu:${property("modmenu")}")
 }
 
 loom {
@@ -130,7 +154,7 @@ tasks {
     // Builds the version into a shared folder in `build/libs/${mod version}/`
     register<Copy>("buildAndCollect") {
         group = "build"
-        from(jar.map { it.archiveFile })
+        from(loomx.modJar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
         dependsOn("build")
     }
@@ -138,9 +162,9 @@ tasks {
 
 // Publishes builds to Modrinth, Curseforge and GitHub with changelog from the CHANGELOG.md file
 publishMods {
-    file = tasks.jar.map { it.archiveFile.get() }
+    file = loomx.modJar.map { it.archiveFile.get() }
 // Adds sources jar
-//    additionalFiles.from(tasks.named<org.gradle.jvm.tasks.Jar>("sourcesJar").map { it.archiveFile.get() })
+//    additionalFiles.from(loomx.modSourcesJar.map { it.archiveFile.get() })
     displayName = "${property("mod.name")} ${property("mod.version")} for ${property("release_title")}"
     version = property("mod.version") as String
     changelog = rootProject.file("CHANGELOG.md").readText()
@@ -160,13 +184,10 @@ publishMods {
             accessToken = providers.environmentVariable("MODRINTH_TOKEN")
             accessToken = env.MODRINTH_TOKEN.orElse("")
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
-            requires {
-                slug = "fabric-api"
-                slug = "yacl"
-            }
-            optional {
-                slug = "modmenu"
-            }
+
+            requires("fabric-api", "yacl")
+            optional("modmenu")
+
             announcementTitle = "Modrinth"
         }
     }
@@ -178,13 +199,10 @@ publishMods {
             projectSlug = property("publish.curseforge_slug") as String
             accessToken = env.CURSEFORGE_TOKEN.orElse("")
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
-            requires {
-                slug = "fabric-api"
-                slug = "yacl"
-            }
-            optional {
-                slug = "modmenu"
-            }
+
+            requires("fabric-api", "yacl")
+            optional("modmenu")
+
             announcementTitle = "CurseForge"
         }
     }

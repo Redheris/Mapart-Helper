@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "maparthelper",
+	"id": "${id}",
 	"version": "${version}",
-	"name": "Mapart Helper",
+	"name": "${name}",
 	"description": "Aims to make mapart creation as convenient and enjoyable as possible right in the game: flexibly generate a schematic, save maps as image files, and more",
 	"authors": [
 		"Redheris"
