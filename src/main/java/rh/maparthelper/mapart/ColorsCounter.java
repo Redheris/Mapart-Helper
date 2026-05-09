@@ -4,19 +4,23 @@ import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class ColorsCounter {
-    private int[] counter;
+    private AtomicIntegerArray counter;
 
     public ColorsCounter() {
-        this.counter = new int[63];
+        this.counter = new AtomicIntegerArray(63);
     }
 
     public ColorsCounter(ColorsCounter counter) {
-        this.counter = Arrays.copyOf(counter.counter, 63);
+        this.counter = new AtomicIntegerArray(63);
+
+        for (int i = 0; i < counter.counter.length(); i++) {
+            this.counter.set(i, counter.counter.get(i));
+        }
     }
 
     public static ColorsCounter intersect(ColorsCounter[] subCounters) {
@@ -26,7 +30,7 @@ public class ColorsCounter {
         for (int i = 1; i < subCounters.length; i++) {
             ColorsCounter subCounter = subCounters[i];
             for (int color = 0; color < 63; color++) {
-                newCounter.counter[color] = Math.max(newCounter.counter[color], subCounter.counter[color]);
+                newCounter.counter.set(color, Math.max(newCounter.counter.get(color), subCounter.counter.get(color)));
             }
         }
         return newCounter;
@@ -39,22 +43,22 @@ public class ColorsCounter {
         for (int i = 1; i < subCounters.length; i++) {
             ColorsCounter subCounter = subCounters[i];
             for (int color = 0; color < 63; color++) {
-                newCounter.counter[color] += subCounter.counter[color];
+                newCounter.counter.addAndGet(color, subCounter.counter.get(color));
             }
         }
         return newCounter;
     }
 
     public void increment(int colorId) {
-        this.counter[colorId - 1]++;
+        this.counter.incrementAndGet(colorId - 1);
     }
 
     public int get(int colorId) {
-        return this.counter[colorId - 1];
+        return this.counter.get(colorId - 1);
     }
 
     public void clear() {
-        this.counter = new int[63];
+        this.counter = new AtomicIntegerArray(63);
     }
 
     public MapColorCount[] getColorCounts(boolean ascending) {
@@ -62,7 +66,7 @@ public class ColorsCounter {
         List<MapColorCount> counts = new ArrayList<>();
 
         for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
-            int amount = counter[color.id - 1];
+            int amount = counter.get(color.id - 1);
             if (amount > 0)
                 counts.add(new MapColorCount(color.id, amount));
         }

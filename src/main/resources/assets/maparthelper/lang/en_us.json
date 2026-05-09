@@ -141,6 +141,8 @@
 
 
   "maparthelper.config.title": "Mapart Helper Configuration",
+  "maparthelper.config.experimental": "§7(Experimental)§r",
+  "maparthelper.config.description.experimental": "This feature is experimental. It means that it still needs testing and can be unstable. You can use it, but if you run into any issues, please let me (the dev) know!",
 
   "maparthelper.config.category.common": "General Settings",
   "maparthelper.config.common.mapSelectionColor": "Highlight color for frames selection and /mart beam",
@@ -163,6 +165,8 @@
   "maparthelper.config.common.description.displayUnobtainableMode": "Displayed among the staircase styles. In this mode, all in-game colors are used without considering whether they can be reproduced in the game world. Schematic creation is not possible in this mode",
   "maparthelper.config.common.showUseLABTooltip": "LAB toggle tooltip",
   "maparthelper.config.common.showStaircaseTooltips": "Staircase style tooltips",
+  "maparthelper.config.common.multithreadColorConversion": "Multithreaded color conversion",
+  "maparthelper.config.common.description.multithreadColorConversion": "Speeds up image conversion by using multiple cores. This option has no effect when selected an error diffusion dithering (Floyd-Steinberg, Atkinson, etc.), because it can't be effectively improved this way",
 
   "maparthelper.config.category.paletteGenerator": "Palette Generator",
   "maparthelper.config.paletteGenerator.regenerationWarningLabel": "Warning: saving changes to this configuration will automatically trigger palette regeneration. This may require entering any world or server",

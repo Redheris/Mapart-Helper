@@ -1,12 +1,14 @@
 package rh.maparthelper.conversion.dithering;
 
 import net.minecraft.world.level.material.MapColor;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.DitherEntry;
 import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.mapart.ColorsCounter;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.stream.IntStream;
 
 public class SimpleColorConverter extends ColorConverter {
     public SimpleColorConverter(ConversionContext context) {
@@ -14,7 +16,7 @@ public class SimpleColorConverter extends ColorConverter {
     }
 
     @Override
-    public BufferedImage convertColors(boolean useUnobtainableColors) {
+    public BufferedImage convertColors(boolean useUnobtainableColors, boolean useMultithreading) {
         BufferedImage convertedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = convertedImage.getWidth();
@@ -22,12 +24,18 @@ public class SimpleColorConverter extends ColorConverter {
         int[] resultPixels = ((DataBufferInt) convertedImage.getRaster().getDataBuffer()).getData();
         double progressStep = 1.0 / originalPixels.length;
 
-        for (int x = 0; x < width; x++) {
+        IntStream xStream;
+        if (useMultithreading)
+            xStream = IntStream.range(0, width).parallel();
+        else
+            xStream = IntStream.range(0, width);
+
+        xStream.forEach(x -> {
             for (int y = 0; y < convertedImage.getHeight(); y++) {
                 ColorsCounter colorsCounter = mapart.getColorsCounterFor(x / 128, y / 128);
                 if (colorsCounter == null || Thread.currentThread().isInterrupted()) {
                     mapart.clearColorCounters();
-                    return null;
+                    return;
                 }
                 int argb = originalPixels[x + y * width];
                 if (argb == 0 && backgroundColor != 0) {
@@ -56,7 +64,7 @@ public class SimpleColorConverter extends ColorConverter {
                 resultPixels[x + y * width] = newArgb;
                 progress.addAndGet(progressStep);
             }
-        }
+        });
 
         return convertedImage;
     }

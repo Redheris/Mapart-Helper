@@ -103,6 +103,20 @@ public class ConfigScreenFactory {
                                                 value -> config.colorsCacheLiveTimeMs = value
                                         )
                                         .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.experimental")
+                                                .append(" ")
+                                                .append(Component.translatable("maparthelper.config.common.multithreadColorConversion")))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.description.experimental")
+                                                .append("\n\n")
+                                                .append(Component.translatable("maparthelper.config.common.description.multithreadColorConversion"))))
+                                        .customController(TickBoxController::new)
+                                        .binding(
+                                                defaults.multithreadColorConversion,
+                                                () -> config.multithreadColorConversion,
+                                                value -> config.multithreadColorConversion = value
+                                        )
+                                        .build())
                                 .build())
                         .group(OptionGroup.createBuilder()
                                 .name(Component.translatable("maparthelper.config.common.group.elementsDisplaySettings"))

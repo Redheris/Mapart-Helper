@@ -83,7 +83,8 @@ public class MapartImageConverter {
      * Computes new image with the original pixels adapted to the current blocks palette colors
      **/
     private static BufferedImage convertToBlocksPalette(AbstractMapart mapart, BufferedImage image,
-                                                        int bgColor, int bgMapColorId, boolean use3D, boolean useUnobtainable) {
+                                                        int bgColor, int bgMapColorId, boolean use3D, boolean useUnobtainable,
+                                                        boolean useMultithreading) {
         topLineBright = new int[image.getWidth()];
         topLineCorrect = new int[image.getWidth()];
         ColorConverter colorConverter = MapartHelper.conversionConfig().getColorConverter().createColorConverter(
@@ -96,7 +97,7 @@ public class MapartImageConverter {
                 topLineCorrect,
                 conversionProgress
         );
-        return colorConverter.convertColors(useUnobtainable);
+        return colorConverter.convertColors(useUnobtainable, useMultithreading);
     }
 
     private static void swapTopLine(AbstractMapart mapart, BufferedImage image) {
@@ -140,6 +141,7 @@ public class MapartImageConverter {
         private final int bgMapColorId = MapartHelper.conversionConfig().getBackgroundColor().mapColor().id;
         private final boolean use3D = MapartHelper.conversionConfig().use3D();
         private final boolean useUnobtainable = MapartHelper.conversionConfig().useUnobtainable();
+        private final boolean multithreadColorConverting = MapartHelper.commonConfig().multithreadColorConversion;
         private final int colorsCacheLiveTimeMs = MapartHelper.commonConfig().colorsCacheLiveTimeMs;
 
         private boolean isUpdating = true;
@@ -184,10 +186,17 @@ public class MapartImageConverter {
 
                         mapart.clearColorCounters();
                         if (!showOriginalImage) {
-                            if (PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset())
-                                processingImage = convertToBlocksPalette(mapart, processingImage, bgColor, bgMapColorId, use3D, useUnobtainable);
-                            else
-                                processingImage = new BufferedImage(processingImage.getWidth(), processingImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                            if (PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset()) {
+                                processingImage = convertToBlocksPalette(
+                                        mapart, processingImage, bgColor, bgMapColorId, use3D,
+                                        useUnobtainable, multithreadColorConverting
+                                );
+                            } else {
+                                processingImage = new BufferedImage(
+                                        processingImage.getWidth(), processingImage.getHeight(),
+                                        BufferedImage.TYPE_INT_ARGB
+                                );
+                            }
                         }
                     } else if (imageChangeResult == ImageChangeResult.ONLY_TOP_LINE) {
                         swapTopLine(mapart, processingImage);

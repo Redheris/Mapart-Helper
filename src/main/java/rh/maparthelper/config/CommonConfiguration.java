@@ -42,6 +42,8 @@ public class CommonConfiguration {
     public boolean previewHighlightOnHover = true;
     @SerialEntry
     public int colorsCacheLiveTimeMs = 5000;
+    @SerialEntry("multithreadColorConversion_experimental")
+    public boolean multithreadColorConversion = false;
 
     // Elements display settings
 

@@ -141,6 +141,8 @@
 
 
   "maparthelper.config.title": "Mapart Helper Configuration",
+  "maparthelper.config.experimental": "§7(Экспериментальное)§r",
+  "maparthelper.config.description.experimental": "Данная функция экспериментальная. Это означает, что она требует больше тестов и может быть нестабильной. Вы можете её использовать, но если столкнётесь с проблемами - пожалуйста, сообщите мне (разработчику)!",
 
   "maparthelper.config.category.common": "Общие настройки",
   "maparthelper.config.common.mapSelectionColor": "Цвет выделения рамок и лучей",
@@ -163,6 +165,8 @@
   "maparthelper.config.common.description.displayUnobtainableMode": "Отображается среди вариантов ступенчатости. В данном режиме используются все игровые цвета без учёта возможности повторить их в игровом мире. Создание схематики при этом невозможно",
   "maparthelper.config.common.showUseLABTooltip": "Подсказка для переключения LAB",
   "maparthelper.config.common.showStaircaseTooltips": "Подсказки для вариантов ступенчатости",
+  "maparthelper.config.common.multithreadColorConversion": "Многопоточная конвертация цветов",
+  "maparthelper.config.common.description.multithreadColorConversion": "Ускоряет обработку изображения путём использования нескольких ядер. Эта опция не имеет эффекта, когда выбран дизеринг с распространением ошибки (Floyd-Steinberg, Atkinson и т.д.), потому что он не может быть эффективно ускорен данным образом",
 
   "maparthelper.config.category.paletteGenerator": "Генератор палитры",
   "maparthelper.config.paletteGenerator.regenerationWarningLabel": "Внимание: сохранение изменений данной конфигурации автоматически вызовет перегенерацию палитры. Для этого может потребоваться зайти в любой мир или на сервер",

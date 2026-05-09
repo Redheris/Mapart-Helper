@@ -43,7 +43,7 @@ public abstract class DiffusionDithering extends ColorConverter {
     }
 
     @Override
-    public BufferedImage convertColors(boolean useUnobtainableColors) {
+    public BufferedImage convertColors(boolean useUnobtainableColors, boolean useMultithreading) {
         BufferedImage convertedImage = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
         int width = convertedImage.getWidth();
