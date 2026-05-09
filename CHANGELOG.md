@@ -1,16 +1,5 @@
 ### Changes and new features
 
-- Update to 26.1;
-- Reworked multiversion development environment to make maintenance easier;
-- Changed config API: The mod now depends on YACL instead of Cloth-Config;
-
-<details>
-<summary>Fixes and minor changes</summary>
-
-- Any slab blocks now also needs auxiliary blocks below them;
-- Updated palette generation settings and added auto-regenerate on changes save;
-- Fixed unobtainable colors mode;
-- Fixed /mart beams weren't rendered when using shaders;
-- Fixed presets updating without saving;
-
-</details>
+- Added new option for auxiliary blocks placement to don't place them at all, including the top row;
+- Added multithreading to color conversion (doesn't affect error diffusion dithering (Floyd-Steinberg, Atkinson, etc.)). It is opt-in and can be toggled in the config. Better test it on different systems for a while, so it's marked as experimental for now;
+- Improved /mart save: image direction from frames on floor and ceiling now depends on player's view direction;

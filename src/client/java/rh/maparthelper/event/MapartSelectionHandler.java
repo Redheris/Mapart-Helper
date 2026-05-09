@@ -17,21 +17,23 @@ import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.command.ClientCommandsContext;
+import rh.maparthelper.state.FramesAreaSelectionState;
 import rh.maparthelper.util.ParticleUtils;
 import rh.maparthelper.util.CompatUtils;
 
 public class MapartSelectionHandler {
 
     public static void init() {
+        FramesAreaSelectionState selectionState = FramesAreaSelectionState.getInstance();
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             assert client.level != null;
-            Vec3 selectedPos = ClientCommandsContext.getSelectedPos();
+            Vec3 selectedPos = selectionState.getSelectedPos();
             if (selectedPos == null) return;
 
-            Direction direction = ClientCommandsContext.getSelectedDirection();
-            Vec3 pos1 = ClientCommandsContext.getSelectedPos1();
-            Vec3 pos2 = ClientCommandsContext.getSelectedPos2();
+            Direction direction = selectionState.getSelectedDirection();
+            Vec3 pos1 = selectionState.getSelectedPos1();
+            Vec3 pos2 = selectionState.getSelectedPos2();
 
             int selectionColor = MapartHelper.commonConfig().selectionColor.getRGB();
 
@@ -49,70 +51,69 @@ public class MapartSelectionHandler {
         });
 
         AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea() || !level.isClientSide())
+            if (selectionState.isNotSelectingFramesArea() || !level.isClientSide())
                 return InteractionResult.PASS;
 
             // Offset from center to the item frame's box
             Vec3 currentPos = pos.getCenter().relative(direction, 0.53);
-            selectPosition(player, currentPos, direction, false);
+            selectPosition(selectionState, player, currentPos, direction, false);
             return InteractionResult.FAIL;
         });
         AttackEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea())
+            if (selectionState.isNotSelectingFramesArea())
                 return InteractionResult.PASS;
 
             if (entity instanceof ItemFrame mapFrame) {
                 BlockPos blockPos = mapFrame.blockPosition().relative(mapFrame.getNearestViewDirection().getOpposite());
                 assert Minecraft.getInstance().gameMode != null;
                 Vec3 currentPos = blockPos.getCenter().relative(mapFrame.getNearestViewDirection(), 0.53);
-                selectPosition(player, currentPos, mapFrame.getNearestViewDirection(), false);
+                selectPosition(selectionState, player, currentPos, mapFrame.getNearestViewDirection(), false);
             }
 
             return InteractionResult.FAIL;
         });
 
         UseBlockCallback.EVENT.register((player, level, hand, hitResult) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea() || !level.isClientSide())
+            if (selectionState.isNotSelectingFramesArea() || !level.isClientSide())
                 return InteractionResult.PASS;
 
             Vec3 currentPos = hitResult.getBlockPos().getCenter().relative(hitResult.getDirection(), 0.53);
-            selectPosition(player, currentPos, hitResult.getDirection(), true);
+            selectPosition(selectionState, player, currentPos, hitResult.getDirection(), true);
 
             return InteractionResult.FAIL;
         });
         UseEntityCallback.EVENT.register((player, level, hand, entity, hitResult) -> {
-            if (ClientCommandsContext.isNotSelectingFramesArea())
+            if (selectionState.isNotSelectingFramesArea())
                 return InteractionResult.PASS;
 
-            if (entity instanceof ItemFrame mapFrame) {
-                BlockPos blockPos = mapFrame.blockPosition().relative(mapFrame.getNearestViewDirection().getOpposite());
-                assert Minecraft.getInstance().gameMode != null;
-                Vec3 currentPos = blockPos.getCenter().relative(mapFrame.getNearestViewDirection(), 0.53);
-                selectPosition(player, currentPos, mapFrame.getNearestViewDirection(), true);
+            if (entity instanceof ItemFrame itemFrame) {
+                BlockPos blockPos = itemFrame.blockPosition().relative(itemFrame.getNearestViewDirection().getOpposite());
+                Vec3 currentPos = blockPos.getCenter().relative(itemFrame.getNearestViewDirection(), 0.53);
+                selectPosition(selectionState, player, currentPos, itemFrame.getNearestViewDirection(), true);
             }
 
             return InteractionResult.FAIL;
         });
     }
 
-    private static void selectPosition(Player player, Vec3 pos, Direction direction, boolean secondPos) {
-        if ((secondPos || ClientCommandsContext.getSelectedPos2() == null) && (!secondPos || ClientCommandsContext.getSelectedPos1() == null)) {
-            ClientCommandsContext.setSelectedDirection(direction);
+    private static void selectPosition(FramesAreaSelectionState selectionState, Player player, Vec3 pos, Direction direction, boolean secondPos) {
+        if ((secondPos || selectionState.getSelectedPos2() == null) && (!secondPos || selectionState.getSelectedPos1() == null)) {
+            selectionState.setSelectedDirection(direction);
             if (secondPos)
-                ClientCommandsContext.setSelectedPos2(pos);
+                selectionState.setSelectedPos2(pos);
             else
-                ClientCommandsContext.setSelectedPos1(pos);
+                selectionState.setSelectedPos1(pos);
             return;
         }
 
-        if (!direction.equals(ClientCommandsContext.getSelectedDirection())) {
+        if (!direction.equals(selectionState.getSelectedDirection())) {
             CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
             return;
         }
 
-        Vec3 selectedPos = secondPos ? ClientCommandsContext.getSelectedPos1() : ClientCommandsContext.getSelectedPos2();
+        Vec3 selectedPos = secondPos ? selectionState.getSelectedPos1() : selectionState.getSelectedPos2();
 
-        boolean isFlat = switch (ClientCommandsContext.getSelectedDirection().getAxis()) {
+        boolean isFlat = switch (selectionState.getSelectedDirection().getAxis()) {
             case Direction.Axis.X -> pos.x == selectedPos.x;
             case Direction.Axis.Y -> pos.y == selectedPos.y;
             case Direction.Axis.Z -> pos.z == selectedPos.z;
@@ -123,7 +124,7 @@ public class MapartSelectionHandler {
             return;
         }
 
-        int flag = secondPos ? ClientCommandsContext.setSelectedPos2(pos) : ClientCommandsContext.setSelectedPos1(pos);
+        int flag = secondPos ? selectionState.setSelectedPos2(pos) : selectionState.setSelectedPos1(pos);
 
         if (flag == -1)
             CompatUtils.sendMessage(player, Component.translatable("maparthelper.too_many_maps").withStyle(ChatFormatting.RED), true);

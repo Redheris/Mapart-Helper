@@ -7,12 +7,10 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MapItem;
-import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.state.FramesAreaSelectionState;
 import rh.maparthelper.util.CompatUtils;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -40,19 +38,19 @@ public class ClientCommands {
                 })
                 .then(literal("save")
                     .then(literal("hand")
-                        .executes(ClientCommands::saveMapFromHand)
-                            .then(argument("filename", StringArgumentType.string())
-                                    .executes(ClientCommands::saveMapFromHand)))
+                        .executes(ClientCommands::saveMapartFromHand)
+                            .then(argument("mapart-name", StringArgumentType.string())
+                                    .executes(ClientCommands::saveMapartFromHand)))
                     .then(literal("frame")
-                        .executes(ClientCommands::saveMapFromFrame)
-                            .then(argument("filename", StringArgumentType.string())
-                                    .executes(ClientCommands::saveMapFromFrame)))
-                    .then(literal("selection")
-                        .executes(ClientCommands::selectFrameArea)
-                            .then(argument("filename", StringArgumentType.string())
-                                    .executes(ClientCommands::saveMapFromFramesArea)
-                            )
-                    )
+                        .executes(ClientCommands::saveMapartFromFrame)
+                            .then(argument("mapart-name", StringArgumentType.string())
+                                    .executes(ClientCommands::saveMapartFromFrame)))
+                        .then(literal("selection")
+                                .executes(ClientCommands::saveMapartFromFramesArea)
+                                .then(argument("mapart-name", StringArgumentType.string())
+                                        .executes(ClientCommands::saveMapartFromFramesArea)
+                                )
+                        )
                 )
                 .then(literal("beams")
                         .executes(ctx -> {
@@ -96,87 +94,48 @@ public class ClientCommands {
     }
 
     // Save image from the held FilledMapItem
-    private static int saveMapFromHand(CommandContext<FabricClientCommandSource> ctx) {
-        assert ctx.getSource().getEntity() instanceof LocalPlayer;
-
-        LocalPlayer player = (LocalPlayer) ctx.getSource().getEntity();
-        ItemStack itemStack = player.getMainHandItem();
-
-        if (!(itemStack.getItem() instanceof MapItem))
-            itemStack = player.getOffhandItem();
-        if (!(itemStack.getItem() instanceof MapItem)) {
-            CompatUtils.sendMessage(player, Component.translatable(
-                            "maparthelper.is_holding_filled_map").withStyle(ChatFormatting.RED),
-                    true);
-            return 0;
-        }
-
-        MapItemSavedData mapState = MapItem.getSavedData(itemStack, player.level());
-        assert mapState != null;
-        byte[] mapColors = mapState.colors.clone();
+    private static int saveMapartFromHand(CommandContext<FabricClientCommandSource> ctx) {
+        Player player = (Player) ctx.getSource().getEntity();
 
         try {
-            String filename = StringArgumentType.getString(ctx, "filename");
-            MapartToFile.saveImageFromMapColors(player, mapColors, filename);
+            String mapartName = StringArgumentType.getString(ctx, "mapart-name");
+            MapartToFile.saveMapImageFromHand(player, mapartName);
         } catch (IllegalArgumentException e) {
-            MapartToFile.saveImageFromMapColors(player, mapColors);
+            MapartToFile.saveMapImageFromHand(player, null);
         }
 
         return 1;
     }
 
     // Save image from the item frames the player is looking at
-    private static int saveMapFromFrame(CommandContext<FabricClientCommandSource> ctx) {
-        assert ctx.getSource().getEntity() instanceof LocalPlayer;
-
-        LocalPlayer player = (LocalPlayer) ctx.getSource().getEntity();
-        byte[] mapColors = MapartToFile.getMapColorsFromItemFrame();
-
-        if (mapColors == null) {
-            CompatUtils.sendMessage(player, Component.translatable(
-                            "maparthelper.is_looking_at_frame_with_map").withStyle(ChatFormatting.RED),
-                    true);
-            return 0;
-        }
+    private static int saveMapartFromFrame(CommandContext<FabricClientCommandSource> ctx) {
+        Player player = (Player) ctx.getSource().getEntity();
 
         try {
-            String filename = StringArgumentType.getString(ctx, "filename");
-            MapartToFile.saveImageFromMapColors(player, mapColors, filename);
+            String mapartName = StringArgumentType.getString(ctx, "mapart-name");
+            MapartToFile.saveMapImageFromItemFrame(player, mapartName);
         } catch (IllegalArgumentException e) {
-            MapartToFile.saveImageFromMapColors(player, mapColors);
+            MapartToFile.saveMapImageFromItemFrame(player, null);
         }
 
         return 1;
     }
 
-    private static int saveMapFromFramesArea(CommandContext<FabricClientCommandSource> ctx) {
-        if (ClientCommandsContext.selectedPos2 == null || ClientCommandsContext.selectedPos1 == null) {
-            ctx.getSource().sendFeedback(Component.translatable("maparthelper.selection_required").withStyle(ChatFormatting.RED));
-            return 0;
+    private static int saveMapartFromFramesArea(CommandContext<FabricClientCommandSource> ctx) {
+        Player player = (Player) ctx.getSource().getEntity();
+        FramesAreaSelectionState selectionState = FramesAreaSelectionState.getInstance();
+
+        try {
+            String mapartName = StringArgumentType.getString(ctx, "mapart-name");
+            if (selectionState.getSelectedPos1() == null || selectionState.getSelectedPos2() == null) {
+                ctx.getSource().sendFeedback(Component.translatable("map_frames_selection.selection_required").withStyle(ChatFormatting.RED));
+                return 0;
+            }
+            MapartToFile.saveImageFromItemFramesArea(player, mapartName);
+        } catch (IllegalArgumentException e) {
+            selectionState.selectFramesArea(player);
         }
 
-        String filename = StringArgumentType.getString(ctx, "filename");
-        LocalPlayer player = (LocalPlayer)ctx.getSource().getEntity();
-
-        MapartToFile.saveImageFromItemFramesArea(player, player.level(), filename);
-
-        return 1;
-    }
-
-    // Save image from the selected area of item frames
-    private static int selectFrameArea(CommandContext<FabricClientCommandSource> ctx) {
-        assert ctx.getSource().getEntity() instanceof LocalPlayer;
-        LocalPlayer player = (LocalPlayer) ctx.getSource().getEntity();
-
-        if (ClientCommandsContext.selectedPos1 != null || ClientCommandsContext.isSelectingFramesArea) {
-            ClientCommandsContext.resetSelection();
-            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selecting_stopped").withStyle(ChatFormatting.DARK_AQUA), true);
-            return 0;
-        }
-        ClientCommandsContext.isSelectingFramesArea = true;
-
-        CompatUtils.sendMessage(player, Component.translatable("maparthelper.pos_selecting").withStyle(ChatFormatting.DARK_AQUA), false);
-        CompatUtils.sendMessage(player, Component.translatable("maparthelper.stop_selecting").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
         return 1;
     }
 }
