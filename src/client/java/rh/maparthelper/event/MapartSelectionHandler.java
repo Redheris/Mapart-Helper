@@ -46,7 +46,7 @@ public class MapartSelectionHandler {
                 ParticleUtils.spawnParticle(client.level, new DustParticleOptions((selectionColor >> 1) & 0x7F7F7F7F, 1.0f), pos2);
             }
             if (pos1 != null && pos2 != null) {
-                ParticleUtils.drawSelectionBox(client.level, pos1, pos2, direction, 0.08);
+                ParticleUtils.drawSelectionBox(client.level, pos1, pos2, direction);
             }
         });
 

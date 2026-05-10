@@ -45,6 +45,6 @@ mc_dep_fabric = "~26.1"
 release_title = "26.1"
 mc_targets = "26.1"
 # Dependencies
-fabric_api = "0.144.3+26.1"
+fabric_api = "0.145.1+26.1"
 yacl = "3.9.1+26.1-fabric"
 modmenu = "18.0.0-alpha.8"
