@@ -82,7 +82,7 @@ public class MapartToFile {
         if (!(itemStack.getItem() instanceof MapItem))
             itemStack = player.getOffhandItem();
         if (!(itemStack.getItem() instanceof MapItem)) {
-            player.displayClientMessage(
+            CompatUtils.sendMessage(player,
                     Component.translatable("map_frames_selection.is_holding_filled_map").withStyle(ChatFormatting.RED),
                     true
             );
@@ -115,7 +115,7 @@ public class MapartToFile {
             }
         }
 
-        player.displayClientMessage(
+        CompatUtils.sendMessage(player,
                 Component.translatable("map_frames_selection.is_looking_at_frame_with_map").withStyle(ChatFormatting.RED),
                 true
         );
@@ -129,16 +129,16 @@ public class MapartToFile {
             saveMapart(player, mapartName, imageData);
             FramesAreaSelectionState.getInstance().resetSelection();
         } catch (SelectionIsEmptyException e) {
-            player.displayClientMessage(Component.translatable("map_frames_selection.selection_has_no_maps")
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.selection_has_no_maps")
                     .withStyle(ChatFormatting.RED), true);
         } catch (SelectionNotFullException e) {
-            player.displayClientMessage(Component.translatable("map_frames_selection.selection_has_empty_places")
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.selection_has_empty_places")
                     .withStyle(ChatFormatting.RED), true);
         }
     }
 
     private static void sendInvalidFilledMapMessage(Player player) {
-        player.displayClientMessage(
+        CompatUtils.sendMessage(player,
                 Component.translatable("maparthelper.invalid_filled_map").withStyle(ChatFormatting.RED),
                 true
         );

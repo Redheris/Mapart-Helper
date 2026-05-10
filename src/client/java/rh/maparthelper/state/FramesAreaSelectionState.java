@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import rh.maparthelper.util.CompatUtils;
 
 public class FramesAreaSelectionState {
     private static final FramesAreaSelectionState INSTANCE = new FramesAreaSelectionState();
@@ -24,13 +25,13 @@ public class FramesAreaSelectionState {
     public void selectFramesArea(Player player) {
         if (selectedPos1 != null || isSelectingFramesArea) {
             resetSelection();
-            player.displayClientMessage(Component.translatable("map_frames_selection.selection_stopped").withStyle(ChatFormatting.DARK_AQUA), true);
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.selection_stopped").withStyle(ChatFormatting.DARK_AQUA), true);
             return;
         }
         isSelectingFramesArea = true;
 
-        player.displayClientMessage(Component.translatable("map_frames_selection.tip_selecting_pos").withStyle(ChatFormatting.DARK_AQUA), false);
-        player.displayClientMessage(Component.translatable("map_frames_selection.tip_stop_selection").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
+        CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.tip_selecting_pos").withStyle(ChatFormatting.DARK_AQUA), false);
+        CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.tip_stop_selection").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC), false);
     }
 
     public Vec3 getSelectedPos() {

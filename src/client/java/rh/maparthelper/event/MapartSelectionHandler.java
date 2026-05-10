@@ -107,7 +107,7 @@ public class MapartSelectionHandler {
         }
 
         if (!direction.equals(selectionState.getSelectedDirection())) {
-            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
             return;
         }
 
@@ -120,15 +120,15 @@ public class MapartSelectionHandler {
         };
 
         if (!isFlat) {
-            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.selection_not_flat").withColor(CommonColors.SOFT_RED), true);
             return;
         }
 
         int flag = secondPos ? selectionState.setSelectedPos2(pos) : selectionState.setSelectedPos1(pos);
 
         if (flag == -1)
-            CompatUtils.sendMessage(player, Component.translatable("maparthelper.too_many_maps").withStyle(ChatFormatting.RED), true);
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.too_many_maps").withStyle(ChatFormatting.RED), true);
         else
-            CompatUtils.sendMessage(player, Component.translatable("maparthelper.selecting_succeeded").withColor(CommonColors.GREEN), true);
+            CompatUtils.sendMessage(player, Component.translatable("map_frames_selection.selection_succeeded").withColor(CommonColors.GREEN), true);
     }
 }
