@@ -7,7 +7,7 @@ plugins {
     id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
 
-stonecutter active "1.21.8"
+stonecutter active "1.21.4"
 
 val versionTypeRaw = property("mod.version_type") as String
 val versionType: ReleaseType = when {
