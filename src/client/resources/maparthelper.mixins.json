@@ -4,9 +4,7 @@
   "package": "rh.maparthelper.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client": [
-    "CustomUniformsBind"
-  ],
+  "client": [],
   "server": [],
   "injectors": {
     "defaultRequire": 1

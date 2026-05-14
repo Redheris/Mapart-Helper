@@ -1,12 +1,11 @@
 package rh.maparthelper.gui.widget;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
@@ -14,25 +13,17 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
-import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageConverter;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.mapart.MapartProcessing;
-import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
-import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.scheduler.DelayedRepeater;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-//? if >=1.21.10 {
-/*import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-*///?}
 
 import static rh.maparthelper.gui.sprites.ManualCroppingSprites.*;
 
@@ -60,17 +51,17 @@ public class MapartPreviewWidget extends AbstractWidget {
         if (this.highlightingColor != color) {
             this.highlightingColor = color;
             if (color == MapColor.NONE) return;
-            ColorsHighlightUniform.set(
-                    highlightingColor.calculateARGBColor(MapColor.Brightness.LOW),
-                    highlightingColor.calculateARGBColor(MapColor.Brightness.NORMAL),
-                    highlightingColor.calculateARGBColor(MapColor.Brightness.HIGH),
-                    MapartHelper.commonConfig().previewHighlightingColor.getRGB()
-            );
+            // TODO: somehow?
+//            ColorsHighlightUniform.set(
+//                    highlightingColor.calculateARGBColor(MapColor.Brightness.LOW),
+//                    highlightingColor.calculateARGBColor(MapColor.Brightness.NORMAL),
+//                    highlightingColor.calculateARGBColor(MapColor.Brightness.HIGH),
+//                    MapartHelper.commonConfig().previewHighlightingColor.getRGB()
+//            );
         }
     }
 
     @Override
-    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getImageX();
         int y = getY();
@@ -88,12 +79,8 @@ public class MapartPreviewWidget extends AbstractWidget {
         }
 
         if (CurrentConversionSettings.guiMapartImage != null) {
-            RenderPipeline pipeline = RenderPipelines.GUI_TEXTURED;
-            if (!MapartHelper.conversionConfig().isShowOriginalImage() && highlightingColor != MapColor.NONE) {
-                pipeline = CustomPipelines.PREVIEW_COLOR_HIGHLIGHT;
-            }
             context.blit(
-                    pipeline,
+                    RenderType::guiTextured,
                     CurrentConversionSettings.guiMapartId,
                     x, y,
                     0.0F, 0.0F,
@@ -182,7 +169,6 @@ public class MapartPreviewWidget extends AbstractWidget {
         return true;
     }
 
-    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
@@ -259,7 +245,6 @@ public class MapartPreviewWidget extends AbstractWidget {
     public void onRelease(double mouseX, double mouseY) {
         repeater.stop();
     }
-    //~ !widget_events
 
     private boolean isMouseOverActionsArea(double mouseX, double mouseY) {
         if (!isMouseOver(mouseX, mouseY) || mouseX < getImageX())
@@ -278,7 +263,7 @@ public class MapartPreviewWidget extends AbstractWidget {
 
     private void renderSprite(GuiGraphics context, Identifier sprite, int x, int y, int width, int height, int alpha) {
         context.blit(
-                RenderPipelines.GUI_TEXTURED,
+                RenderType::guiTextured,
                 sprite,
                 x, y,
                 0.0F, 0.0F,

@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -58,8 +57,8 @@ public class MapartToFile {
                     Component mapartFile = Component.literal(filename)
                             .withStyle(style -> style
                                     .withColor(ChatFormatting.GREEN)
-                                    .withClickEvent(new ClickEvent.OpenFile(filePath.toAbsolutePath().toString()))
-                                    .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_image_file")))
+                                    .withClickEvent(CompatUtils.createClickEvent(ClickEvent.Action.OPEN_FILE, filePath.toAbsolutePath().toString()))
+                                    .withHoverEvent(CompatUtils.createShowTextHoverEvent(Component.translatable("maparthelper.open_image_file")))
                                     .withUnderlined(true)
                             );
 

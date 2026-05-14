@@ -19,7 +19,7 @@ public class CompletePalette {
     }
 
     void bumpGameVersion() {
-        gameVersion = SharedConstants.getCurrentVersion().name();
+        gameVersion = SharedConstants.getCurrentVersion().getName();
     }
 
     static CompletePalette generate() {

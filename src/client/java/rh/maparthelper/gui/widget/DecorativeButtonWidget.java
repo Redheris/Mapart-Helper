@@ -2,19 +2,15 @@ package rh.maparthelper.gui.widget;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
-
-//? if >=1.21.10 {
-/*import net.minecraft.client.input.InputWithModifiers;
-*///?} else
-import net.minecraft.client.Minecraft;
 
 public class DecorativeButtonWidget extends AbstractButton {
     private final PressAction onPress;
@@ -43,22 +39,16 @@ public class DecorativeButtonWidget extends AbstractButton {
     }
 
     @Override
-    public void onPress(/*? if >=1.21.10 {*/ /*@NotNull InputWithModifiers input *//*?}*/) {
+    public void onPress() {
         this.onPress.onPress(this);
     }
 
-    //~ gui_rendering
     @Override
-    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-    //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-     *///?} elif >=26.1
-    //protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (textureDefault != null) {
             if (isHovered) {
                 context.blit(
-                        RenderPipelines.GUI_TEXTURED,
+                        RenderType::guiTextured,
                         textureHighlighted,
                         getX(), getY(),
                         0, 0,
@@ -67,7 +57,7 @@ public class DecorativeButtonWidget extends AbstractButton {
                 );
             } else {
                 context.blit(
-                        RenderPipelines.GUI_TEXTURED,
+                        RenderType::guiTextured,
                         textureDefault,
                         getX(), getY(),
                         0, 0,
@@ -76,16 +66,9 @@ public class DecorativeButtonWidget extends AbstractButton {
                 );
             }
         } else {
-            //? if >=1.21.11 {
-            /*this.renderDefaultLabel(context.textRenderer(
-                    GuiGraphics.HoveredTextEffects.NONE,
-                    style -> style.withColor(CommonColors.LIGHT_GRAY))
-            );
-            *///?} else <=1.21.8
             this.renderString(context, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
         }
     }
-    //~ !gui_rendering
 
     @Override
     public void updateWidgetNarration(@NotNull NarrationElementOutput builder) {

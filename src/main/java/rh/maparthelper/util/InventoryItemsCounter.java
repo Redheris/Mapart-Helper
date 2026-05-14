@@ -30,7 +30,8 @@ public class InventoryItemsCounter {
     public void count(@NotNull Container inventory) {
         Predicate<ItemStack> doCount = countAll ? Predicates.alwaysTrue()
                 : stack -> counter.containsKey(stack.getItem());
-        for (ItemStack itemStack : inventory) {
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack itemStack = inventory.getItem(slot);
             if (itemStack.isEmpty()) continue;
             if (doCount.test(itemStack)) {
                 counter.merge(
@@ -44,7 +45,6 @@ public class InventoryItemsCounter {
                         DataComponents.CONTAINER,
                         ItemContainerContents.EMPTY
                 );
-                //~ if >=26.1 'nonEmptyStream' -> 'nonEmptyItemCopyStream'
                 container.nonEmptyStream()
                         .filter(doCount)
                         .forEach(stack ->

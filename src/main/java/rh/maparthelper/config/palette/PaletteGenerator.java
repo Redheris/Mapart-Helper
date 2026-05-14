@@ -172,10 +172,7 @@ public class PaletteGenerator {
                 FrostedIceBlock.class,
                 BubbleColumnBlock.class,
                 FrogspawnBlock.class,
-                //? <26.1
                 WaterlilyBlock.class,
-                //? >=26.1
-                //LilyPadBlock.class,
                 SnifferEggBlock.class,
                 TurtleEggBlock.class,
                 FlowerPotBlock.class,
@@ -195,10 +192,7 @@ public class PaletteGenerator {
                 HangingRootsBlock.class,
                 LavaCauldronBlock.class,
                 LayeredCauldronBlock.class,
-                //? <26.1
                 FarmBlock.class,
-                //? >=26.1
-                //FarmlandBlock.class,
                 DirtPathBlock.class,
                 HeavyCoreBlock.class
         };
@@ -215,7 +209,7 @@ public class PaletteGenerator {
                 InfestedBlock.class
         };
         GROWABLE_BLOCKS = new Class[]{
-                VegetationBlock.class,
+                BushBlock.class,
                 GrowingPlantBlock.class,
                 BambooStalkBlock.class,
                 BambooSaplingBlock.class,
@@ -223,7 +217,7 @@ public class PaletteGenerator {
                 VineBlock.class
         };
         GRASS_LIKE_BLOCKS = new Class[]{
-                VegetationBlock.class,
+                BushBlock.class,
                 DoublePlantBlock.class,
                 CoralPlantBlock.class,
                 CoralFanBlock.class,

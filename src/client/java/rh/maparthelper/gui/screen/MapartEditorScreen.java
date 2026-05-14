@@ -52,9 +52,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
-//? >=1.21.10
-//import net.minecraft.client.input.KeyEvent;
-
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
@@ -152,7 +149,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         showInWorldButton = Button.builder(
                 Component.nullToEmpty("\uD83C\uDF0D"),
                 (btn) -> {
-                    //? <=1.21.8
                     if (minecraft == null) return;
                     if (minecraft.player == null) return;
                     if (FakeMapsPreview.createFakeFramesFromMapart(mapart, minecraft.player)) {
@@ -187,6 +183,12 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(20, 20).build();
         resetMapartButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.reset_mapart")));
         mapartOptions.addChild(resetMapartButton);
+
+        Button blurPlease = Button.builder(Component.empty(), b -> {})
+                .size(0, 0)
+                .build();
+        mapartOptions.addChild(blurPlease);
+
         mapartOptions.arrangeElements();
     }
 
@@ -343,7 +345,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         String currentAuxBlock = BuiltInRegistries.BLOCK.getKey(MapartHelper.conversionConfig().getAuxBlock()).toString();
         if (currentAuxBlock.contains("minecraft:"))
             currentAuxBlock = currentAuxBlock.substring(10);
-        BlockItemWidget auxBlockPreview = new BlockItemWidget(0, 0, 24, MapartHelper.conversionConfig().getAuxBlock(), false);
+        BlockItemWidget auxBlockPreview = new BlockItemWidget(this, 0, 0, 24, MapartHelper.conversionConfig().getAuxBlock(), false);
 
         GridLayout auxBlock = new GridLayout().spacing(5);
         auxBlock.defaultCellSetting().alignVerticallyMiddle();
@@ -507,9 +509,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         return auxBlockId;
     }
 
-    //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+        renderBackground(context, mouseX, mouseY, partialTick);
+
         context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
         context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
         super.render(context, mouseX, mouseY, partialTick);
@@ -519,9 +522,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         MaterialListPanel.MaterialListBlockWidget.resetHovering();
     }
-    //~ !gui_rendering
 
-    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
@@ -539,7 +540,6 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }
-    //~ !widget_events
 
     @Override
     public void onFilesDrop(List<Path> paths) {
@@ -589,7 +589,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         Button saveImage = Button.builder(
                 Component.translatable("maparthelper.gui.savePNG"),
                 (btn) -> {
-                    Player player = /*? if <=1.21.8 {*/ minecraft == null ? null : /*?}*/ minecraft.player;
+                    Player player = minecraft == null ? null : minecraft.player;
                     MapartSaver.saveMapartImage(mapart.mapartName, CurrentConversionSettings.guiMapartImage, player);
                 }
         ).size(156, 20).build();

@@ -12,7 +12,8 @@ public class NativeImageUtils {
 
     public synchronized static void updateMapartImageTexture(NativeImage image) {
         DynamicTexture backedTexture = new DynamicTexture(
-                () -> "mapart_gui_texture",
+                //? >=1.21.5
+                //() -> "mapart_gui_texture",
                 image
         );
         TextureManager textureManager = Minecraft.getInstance().getTextureManager();
@@ -23,7 +24,6 @@ public class NativeImageUtils {
     public static int[][] divideImageByMaps(int width, int height, NativeImage image) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return null;
-        //? if <26.1
         if (CurrentConversionSettings.guiMapartImage.getPixels() == null) return null;
 
         int imageWidth = width * 128;

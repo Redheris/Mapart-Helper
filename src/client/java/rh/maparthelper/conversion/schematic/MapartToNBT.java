@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
@@ -101,14 +100,14 @@ public class MapartToNBT {
             Component openFile;
             if (zipOut == null) {
                 openFile = Component.literal(savingPath.getFileName().toString()).withStyle(style -> style
-                        .withClickEvent(new ClickEvent.OpenFile(savingPath))
-                        .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_folder")))
+                        .withClickEvent(CompatUtils.createClickEvent(ClickEvent.Action.OPEN_FILE, savingPath.toString()))
+                        .withHoverEvent(CompatUtils.createShowTextHoverEvent(Component.translatable("maparthelper.open_folder")))
                         .withUnderlined(true)
                 );
             } else {
                 openFile = Component.literal(zipFile.getName()).withStyle(style -> style
-                        .withClickEvent(new ClickEvent.OpenFile(zipFile))
-                        .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_file")))
+                        .withClickEvent(CompatUtils.createClickEvent(ClickEvent.Action.OPEN_FILE, zipFile.toString()))
+                        .withHoverEvent(CompatUtils.createShowTextHoverEvent(Component.translatable("maparthelper.open_file")))
                         .withUnderlined(true)
                 );
             }

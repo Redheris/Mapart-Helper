@@ -17,34 +17,20 @@ import rh.maparthelper.config.palette.PaletteColors;
 import java.util.ArrayList;
 import java.util.List;
 
-//? if >=26.1 {
-/*import net.minecraft.core.component.DataComponentPatch;
-import net.minecraft.world.item.ItemStackTemplate;
-*///?}
-
 public class MapCreator {
     public static void getMapsForMapart(int[][] maps, int mapartWidth, String mapartName, ServerLevel world, ServerPlayer player) {
         if (maps == null) return;
-        //? <26.1
         List<ItemStack> mapItems = new ArrayList<>();
-        //? >= 26.1
-        //List<ItemStackTemplate> mapItems = new ArrayList<>();
 
         for (int i = 0; i < maps.length; i++) {
             MapId mapIdComponent = createMap(maps[i], world);
             MutableComponent itemName = Component.literal(mapartName).withStyle(ChatFormatting.GOLD);
             if (maps.length > 1)
                 itemName.append(Component.literal(" [" + i % mapartWidth + " " + i / mapartWidth + "]").withStyle(ChatFormatting.GRAY));
-            //? <26.1
             mapItems.add(getMapItemStack(mapIdComponent, itemName));
-            //? >= 26.1
-            //mapItems.add(getMapItemStackTemplate(mapIdComponent, itemName));
         }
         if (mapItems.size() == 1) {
-            //? <26.1
             player.addItem(mapItems.getFirst());
-            //? >= 26.1
-            //player.addItem(mapItems.getFirst().create());
         } else {
             ItemStack bundleItem = new ItemStack(Items.YELLOW_BUNDLE);
             BundleContents bundleContent = new BundleContents(mapItems);
@@ -62,16 +48,6 @@ public class MapCreator {
         itemStack.set(DataComponents.ITEM_NAME, itemName);
         return itemStack;
     }
-
-    //? if >=26.1 {
-    /*public static ItemStackTemplate getMapItemStackTemplate(MapId mapIdComponent, Component itemName) {
-        DataComponentPatch patch = DataComponentPatch.builder()
-                .set(DataComponents.MAP_ID, mapIdComponent)
-                .set(DataComponents.ITEM_NAME, itemName)
-                .build();
-        return new ItemStackTemplate(Items.FILLED_MAP, patch);
-    }
-    *///?}
 
     public static MapId createMap(int[] colors, ServerLevel world) {
         MapItemSavedData mapState = MapItemSavedData.createForClient((byte) 0, true, world.dimension());

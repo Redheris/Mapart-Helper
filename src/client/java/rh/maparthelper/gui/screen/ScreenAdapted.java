@@ -7,22 +7,23 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
 
 /**
  * Extended Screen class with adjustments of behavior and rendering of {@link DropdownMenuWidget}
  */
 public abstract class ScreenAdapted extends Screen {
     private final List<Renderable> drawables = new ArrayList<>();
+    protected List<FormattedCharSequence> tooltipLines;
 
     protected ScreenAdapted(Component title) {
         super(title);
@@ -52,13 +53,28 @@ public abstract class ScreenAdapted extends Screen {
         super.removeWidget(child);
     }
 
+    public void setTooltipLines(@Nullable List<Component> tooltipLines, boolean splitLines) {
+        if (tooltipLines == null) {
+            this.tooltipLines = null;
+            return;
+        }
+        if (splitLines) {
+            List<FormattedCharSequence> lines = new ArrayList<>();
+            for (Component component : tooltipLines) {
+                lines.addAll(font.split(component, 170));
+            }
+            this.tooltipLines = lines;
+        } else {
+            this.tooltipLines = tooltipLines.stream().map(Component::getVisualOrderText).toList();
+        }
+    }
+
     @Override
     protected void clearWidgets() {
         super.clearWidgets();
         this.drawables.clear();
     }
 
-    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
@@ -86,7 +102,6 @@ public abstract class ScreenAdapted extends Screen {
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
-    //~ !widget_events
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
@@ -98,28 +113,31 @@ public abstract class ScreenAdapted extends Screen {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         DropdownMenuWidget dropdownMenu = DropdownMenuWidget.expandedOne;
         for (Renderable drawable : drawables) {
-            //~ if >=26.1 '.render(' -> '.extractRenderState(' {
             if (dropdownMenu != null && dropdownMenu.isMouseOverMenu(mouseX, mouseY) && !dropdownMenu.isChild((LayoutElement) drawable))
                 drawable.render(context, 0, 0, partialTick);
             else
                 drawable.render(context, mouseX, mouseY, partialTick);
-            //~}
         }
 
         if (dropdownMenu != null) {
-            dropdownMenu.renderMenu(context, mouseX, mouseY, partialTick);
+            RenderUtils.nextStratum(context, () ->
+                    dropdownMenu.renderMenu(context, mouseX, mouseY, partialTick)
+            );
+        }
+        if (tooltipLines != null) {
+            RenderUtils.nextStratum(context, () ->
+                    context.renderTooltip(font, tooltipLines, mouseX, mouseY)
+            );
+            tooltipLines = null;
         }
     }
-    //~ !gui_rendering
 
     @Override
     public void onClose() {
-        //? <=1.21.8
         assert this.minecraft != null;
         super.onClose();
         DropdownMenuWidget.expandedOne = null;

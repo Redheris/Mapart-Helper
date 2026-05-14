@@ -3,10 +3,10 @@ package rh.maparthelper.gui.screen.panel;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.AbstractLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
+import rh.maparthelper.gui.screen.ScreenAdapted;
 import rh.maparthelper.gui.widget.DropdownMenuWidget;
 import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -18,7 +18,7 @@ public class ImagePreprocessingDropdown extends AbstractLayout {
     private final DropdownMenuWidget imagePreprocessing;
     private final int contentWidth;
 
-    public ImagePreprocessingDropdown(Screen screen, MapartProcessing mapart, int btnWidth, int contentWidth) {
+    public ImagePreprocessingDropdown(ScreenAdapted screen, MapartProcessing mapart, int btnWidth, int contentWidth) {
         super(0, 0, btnWidth, 20);
         this.mapart = mapart;
         this.contentWidth = contentWidth;

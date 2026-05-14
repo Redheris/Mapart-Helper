@@ -2,7 +2,6 @@ package rh.maparthelper.gui.widget;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.material.MapColor;
@@ -12,42 +11,32 @@ import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.MapartImageUpdater;
+import rh.maparthelper.gui.screen.ScreenAdapted;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.util.RenderUtils;
-
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
 
 public class MapColorPickerWidget extends DropdownMenuWidget {
     private final MapartProcessing mapart;
     private final int columns;
 
-    public MapColorPickerWidget(Screen parent, MapartProcessing mapart, int width, int height, int menuWidth, int menuHeight, int columns) {
-        super(parent, 0, 0, width, height, menuWidth, menuHeight, columns, Component.empty());
+    public MapColorPickerWidget(ScreenAdapted screen, MapartProcessing mapart, int width, int height, int menuWidth, int menuHeight, int columns) {
+        super(screen, 0, 0, width, height, menuWidth, menuHeight, columns, Component.empty());
         this.mapart = mapart;
         this.columns = columns;
-        initDropdown();
+        initDropdown(screen);
     }
 
-    private void initDropdown() {
+    private void initDropdown(ScreenAdapted screen) {
         int entryWidth = (menuWidth - 10) / columns;
         MapColors[] colors = MapColors.values();
         for (MapColors color : colors) {
-            addEntry(new MapColorSelector(0, 0, entryWidth, 20, color.color));
+            addEntry(new MapColorSelector(screen, 0, 0, entryWidth, 20, color.color));
         }
     }
 
     @Override
-    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(context, mouseX, mouseY, partialTick);
-    //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        super.renderContents(context, mouseX, mouseY, partialTick);
-    *///?} elif >=26.1 {
-    /*protected void extractContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        super.extractContents(context, mouseX, mouseY, partialTick);
-    *///?}
         int color = MapartHelper.conversionConfig().getBackgroundRenderColor();
         context.fill(getX(), getY(), getRight(), getBottom(), color);
         RenderUtils.renderOutline(context, getX(), getY(), getWidth(), getHeight(), 0xFF555555);
@@ -64,12 +53,11 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
     private class MapColorSelector extends MapColorWidget {
         final int segWidth;
 
-        public MapColorSelector(int x, int y, int width, int height, MapColor color) {
-            super(x, y, width, height, color, true);
+        public MapColorSelector(ScreenAdapted screen, int x, int y, int width, int height, MapColor color) {
+            super(screen, x, y, width, height, color, true);
             this.segWidth = width / 3;
         }
 
-        //~ gui_rendering
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
@@ -77,15 +65,17 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
             if (color != MapColor.NONE && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 setAlpha(0.2f);
                 if (this.isMouseOver(mouseX, mouseY) && context.containsPointInScissor(mouseX, mouseY)) {
-                    context.setTooltipForNextFrame(Component.translatable("maparthelper.gui.color_without_block").withColor(CommonColors.SOFT_RED), mouseX, mouseY);
+                    context.renderTooltip(
+                            Minecraft.getInstance().font,
+                            Component.translatable("maparthelper.gui.color_without_block").withColor(CommonColors.SOFT_RED),
+                            mouseX, mouseY
+                    );
                 }
             } else {
                 setAlpha(1.0f);
             }
         }
-        //~ !gui_rendering
 
-        //~ widget_events
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             this.playDownSound(Minecraft.getInstance().getSoundManager());
@@ -108,6 +98,5 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
             setColor(new MapColorEntry(color, MapColor.Brightness.byId(brightnessId)));
             return true;
         }
-        //~ !widget_events
     }
 }

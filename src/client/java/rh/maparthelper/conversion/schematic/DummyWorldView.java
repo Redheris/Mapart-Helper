@@ -26,9 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-//? >=1.21.11
-//import net.minecraft.world.attribute.EnvironmentAttributeReader;
-
 /**
  * This LevelReader exists to deceive the
  * {@code BlockBehaviour#canSurvive} to check if the block can survive without a support block below it
@@ -100,19 +97,10 @@ public class DummyWorldView implements LevelReader {
         throw new UnsupportedOperationException();
     }
 
-    //? if >= 1.21.11 {
-    /*@Override
-    public @NotNull EnvironmentAttributeReader environmentAttributes() {
-        throw new UnsupportedOperationException();
-    }
-    *///?}
-
-    //? if < 26.1 {
     @Override
     public float getShade(@NotNull Direction direction, boolean shaded) {
         return 0;
     }
-    //?}
 
     @Override
     public @NotNull LevelLightEngine getLightEngine() {

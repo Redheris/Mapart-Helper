@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.widget;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -10,21 +11,21 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.colors.MapColors;
-
-//? <=1.21.8
-import net.minecraft.client.Minecraft;
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
+import rh.maparthelper.gui.screen.ScreenAdapted;
 import rh.maparthelper.util.RenderUtils;
 
+import java.util.List;
+
 public class MapColorWidget extends AbstractWidget {
+    private final ScreenAdapted screen;
     public final MapColor color;
     protected Component tooltipColorName;
     protected final boolean isHorizontal;
     protected boolean onlyNormalBrightness = false;
 
-    public MapColorWidget(int x, int y, int width, int height, MapColor color, boolean isHorizontal) {
+    public MapColorWidget(ScreenAdapted screen, int x, int y, int width, int height, MapColor color, boolean isHorizontal) {
         super(x, y, width, height, Component.empty());
+        this.screen = screen;
         this.color = color;
         this.isHorizontal = isHorizontal;
     }
@@ -46,26 +47,19 @@ public class MapColorWidget extends AbstractWidget {
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
     }
 
-    //? if <=1.21.8 {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return true;
     }
-    //?} else {
-    /*@Override
-    public boolean mouseClicked(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick) {
-        return true;
-    }
-    *///?}
+
 
     @Override
-    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
+        int alpha = (int) (this.alpha * 255);
         if (color == MapColor.NONE) {
             context.fill(x, y, x + width, y + height, MapColor.COLOR_LIGHT_GRAY.calculateARGBColor(MapColor.Brightness.NORMAL));
-            //? if <=1.21.8 {
             renderScrollingString(
                     context,
                     Minecraft.getInstance().font,
@@ -76,15 +70,6 @@ public class MapColorWidget extends AbstractWidget {
                     getBottom(),
                     CommonColors.SOFT_RED
             );
-            //?} else {
-            /*context.textRenderer().acceptScrollingWithDefaultCenter(
-                    Component.translatable("maparthelper.gui.background_color_clear").withColor(CommonColors.SOFT_RED),
-                    getX() + 2,
-                    getRight() - 2,
-                    getY(),
-                    getBottom()
-            );
-            *///?}
         } else if (onlyNormalBrightness || color == MapColor.WATER) {
             MapColor.Brightness brightness = color == MapColor.WATER ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
             int waterColor = ARGB.color(alpha, color.calculateARGBColor(brightness));
@@ -108,7 +93,7 @@ public class MapColorWidget extends AbstractWidget {
         RenderUtils.renderOutline(context, x, y, width, height, ARGB.color(alpha, 0xFF555555));
 
         if (tooltipColorName != null && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-            context.setTooltipForNextFrame(tooltipColorName, mouseX, mouseY);
+            screen.setTooltipLines(List.of(tooltipColorName), true);
         }
     }
 }

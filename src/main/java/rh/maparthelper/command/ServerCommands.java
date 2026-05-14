@@ -52,7 +52,7 @@ public class ServerCommands {
                                 }
 
                                 MapId mapId;
-                                mapId = MapCreator.createMap(colors, player.level());
+                                mapId = MapCreator.createMap(colors, player.serverLevel());
 
                                 ItemStack itemStack = MapCreator.getMapItemStack(
                                         mapId,

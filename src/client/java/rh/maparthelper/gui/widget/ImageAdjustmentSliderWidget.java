@@ -12,11 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-//? if >=1.21.10 {
-/*import net.minecraft.client.input.KeyEvent;
-import org.jetbrains.annotations.NotNull;
-*///?}
-
 public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
     private final float min;
     private final float max;
@@ -68,7 +63,6 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
         return (this.value < 0.5 ? Math.floor(value * 100) : Math.ceil(value * 100)) / 100;
     }
 
-    //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == 257 || keyCode == 335) {
@@ -98,7 +92,6 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
         }
         return false;
     }
-    //~ !widget_events
 
     public void setValue(double value) {
         double d = this.value;

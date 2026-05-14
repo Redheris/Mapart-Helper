@@ -5,7 +5,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.util.CompatUtils;
@@ -20,7 +19,6 @@ public class MapartSaver {
     private static boolean saveMapartImage(DynamicTexture mapartTexture, Path imagePath) {
         try {
             if (mapartTexture == null) return false;
-            //? <26.1
             if (mapartTexture.getPixels() == null) return false;
             mapartTexture.getPixels().writeToFile(imagePath);
         } catch (InvalidPathException e) {
@@ -41,8 +39,8 @@ public class MapartSaver {
                 Component mapartFile = Component.literal(filename)
                         .withStyle(style -> style
                                 .withColor(ChatFormatting.GREEN)
-                                .withClickEvent(new ClickEvent.OpenFile(filepath.toFile()))
-                                .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_image_file")))
+                                .withClickEvent(CompatUtils.createClickEvent(ClickEvent.Action.OPEN_FILE, filepath.toString()))
+                                .withHoverEvent(CompatUtils.createShowTextHoverEvent(Component.translatable("maparthelper.open_image_file")))
                                 .withUnderlined(true)
                         );
 

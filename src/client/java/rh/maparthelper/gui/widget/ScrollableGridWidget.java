@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
-
 // This implementation will soon be replaced by a more elegant one
 public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     @Nullable
@@ -35,9 +32,6 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     private int scrollBarColor = 0xFFC8C8C8;
 
     public ScrollableGridWidget(@Nullable GuiEventListener parentWidget, int x, int y, int width, int height, int scrollWidth) {
-        //? if >=26.1 {
-        /*super(x, y, width, height, Component.empty(), AbstractScrollArea.defaultSettings(15));
-        *///?} else
         super(x, y, width, height, Component.empty());
         this.parentWidget = parentWidget;
         this.grid = new InnerGridWidget(x, y);
@@ -86,7 +80,7 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
     }
 
     public Optional<LayoutElement> hoveredElement(double mouseX, double mouseY) {
-        boolean onScroll = /*? if <26.1 {*/this.scrollbarVisible()/*?} else {*/ /*this.scrollable() *//*?}*/
+        boolean onScroll = this.scrollbarVisible()
                 && mouseX >= this.scrollBarX()
                 && mouseX <= this.scrollBarX() + scrollWidth
                 && mouseY >= this.getY()
@@ -120,7 +114,6 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         return this.leftScroll ? this.getX() : this.getRight() - scrollWidth;
     }
 
-    //~ gui_rendering
     public boolean isOverScroll(double x, double y) {
         return this.scrollbarVisible()
                 && x >= this.scrollBarX()
@@ -152,12 +145,12 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         else
             context.enableScissor(getX(), visibleTopY, getRight(), visibleTopY + getHeight());
         grid.visitWidgets(w -> w.render(context, mouseX, mouseY, partialTick));
-        renderScrollbar(context/*? if >=1.21.10 {*//*, mouseX, mouseY *//*?}*/);
+        renderScrollbar(context);
         context.disableScissor();
     }
 
     @Override
-    protected void renderScrollbar(@NotNull GuiGraphics context/*? if >=1.21.10 {*//*, int mouseX, int mouseY *//*?}*/) {
+    protected void renderScrollbar(@NotNull GuiGraphics context) {
         if (this.scrollbarVisible()) {
             int i = this.scrollBarX();
             int j = this.scrollerHeight();
@@ -166,18 +159,12 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
             context.fill(i, k, i + scrollWidth, k + j, scrollBarColor);
         }
     }
-    //~ !gui_rendering
 
-    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (mouseY < visibleTopY || mouseY > visibleTopY + getHeight() || !this.isMouseOver(mouseX, mouseY))
             return false;
-        //? if <=1.21.8 {
         if (this.updateScrolling(mouseX, mouseY, button)) return true;
-        //?} else {
-        /*if (this.updateScrolling(mouseEvent)) return true;
-        *///?}
 
         for (LayoutElement w : grid.children) {
             if (!(w instanceof AbstractWidget child)) continue;
@@ -193,7 +180,6 @@ public class ScrollableGridWidget extends AbstractScrollArea implements Layout {
         }
         return true;
     }
-    //~ !widget_events
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {

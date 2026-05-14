@@ -6,30 +6,29 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.gui.screen.PresetsEditorScreen;
+import rh.maparthelper.gui.screen.ScreenAdapted;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
-
 public class BlockItemWidget extends AbstractWidget {
+    private final ScreenAdapted screen;
     private final boolean hasClickAction;
 
     private Block block;
     private Item blockItem;
-    protected List<FormattedCharSequence> tooltip;
+    protected List<Component> tooltip;
 
-    public BlockItemWidget(int x, int y, int squareSize, Block block, boolean hasClickAction) {
+    public BlockItemWidget(ScreenAdapted screen, int x, int y, int squareSize, Block block, boolean hasClickAction) {
         super(x, y, squareSize, squareSize, Component.translationArg(block.getName()));
+        this.screen = screen;
         this.setBlock(block);
         initBlockTooltip();
         this.hasClickAction = hasClickAction;
@@ -37,11 +36,11 @@ public class BlockItemWidget extends AbstractWidget {
 
     protected void initBlockTooltip() {
         List<Component> tooltip = PresetsEditorScreen.getTooltipFromItem(Minecraft.getInstance(), blockItem.getDefaultInstance());
-        this.tooltip = new ArrayList<>(tooltip.stream().map(Component::getVisualOrderText).toList());
+        this.tooltip = new ArrayList<>(tooltip);
     }
 
-    public BlockItemWidget(int x, int y, int squareSize, Block block) {
-        this(x, y, squareSize, block, false);
+    public BlockItemWidget(ScreenAdapted screen, int x, int y, int squareSize, Block block) {
+        this(screen, x, y, squareSize, block, false);
     }
 
     public void setBlock(Block block) {
@@ -55,11 +54,11 @@ public class BlockItemWidget extends AbstractWidget {
     }
 
     public void setTooltip(Component tooltip) {
-        this.tooltip = new ArrayList<>(List.of(tooltip.getVisualOrderText()));
+        this.tooltip = new ArrayList<>(List.of(tooltip));
     }
 
     public void insertToTooltip(int i, Component tooltip) {
-        this.tooltip.add(i, tooltip.getVisualOrderText());
+        this.tooltip.add(i, tooltip);
     }
 
     public int getStackSize() {
@@ -67,23 +66,19 @@ public class BlockItemWidget extends AbstractWidget {
     }
 
     @Override
-    //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
 
         ItemStack blockItem = this.blockItem.getDefaultInstance();
-        //? <26.1
-        RenderUtils.renderItemStack(context, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
-        //? >=26.1
-        //RenderUtils.renderItemStack(context, blockItem, "", x, y, width, height);
+        RenderUtils.renderItemStack(context, blockItem, x, y, width, height);
 
         boolean isMouseOverBlock = mouseX >= x
                 && mouseX < x + width
                 && mouseY >= y
                 && mouseY < y + height;
         if (context.containsPointInScissor(mouseX, mouseY) && isMouseOverBlock) {
-            context.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+            screen.setTooltipLines(this.tooltip, false);
         }
     }
 
@@ -91,12 +86,10 @@ public class BlockItemWidget extends AbstractWidget {
         return block;
     }
 
-    //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         return this.hasClickAction && super.mouseClicked(mouseX, mouseY, button);
     }
-    //~ !widget_events
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput builder) {

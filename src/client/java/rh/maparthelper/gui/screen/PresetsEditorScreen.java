@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3x2fStack;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageUpdater;
@@ -29,9 +28,6 @@ import rh.maparthelper.util.RenderUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
 
 public class PresetsEditorScreen extends ScreenAdapted {
     private final MapartEditorScreen parent;
@@ -173,7 +169,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             MapColor mapColor = MapColor.byId(i + 1);
             if (mapColor == MapColor.NONE) break;
 
-            MapColorWidget color = new MapColorWidget(0, 0, squareSize, squareSize, mapColor, false);
+            MapColorWidget color = new MapColorWidget(this, 0, 0, squareSize, squareSize, mapColor, false);
             color.showColorName(true);
             int row = 2 * columns * (i / columns);
             if (row == 0)
@@ -301,37 +297,26 @@ public class PresetsEditorScreen extends ScreenAdapted {
         return colorsEditor.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
-    //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        Matrix3x2fStack matrixStack = context.pose();
-
-        matrixStack.pushMatrix();
         parent.render(context, 0, 0, partialTick);
-        matrixStack.popMatrix();
 
-        context.guiRenderState.nextStratum();
-        this.renderBlurredBackground(context);
-        this.renderMenuBackground(context);
+        RenderUtils.nextStratum(context, () -> {
+            this.renderBlurredBackground();
+            this.renderMenuBackground(context);
+            int w = boxWidth;
+            int h = boxHeight;
+            context.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
+            context.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
+            RenderUtils.renderOutline(context, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
+            context.hLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
 
-        int w = boxWidth;
-        int h = boxHeight;
-        context.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
-        context.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
-        RenderUtils.renderOutline(context, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
-        context.hLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
-
-        super.render(context, mouseX, mouseY, partialTick);
+            super.render(context, mouseX, mouseY, partialTick);
+        });
     }
-
-    @Override
-    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-    }
-    //~ !gui_rendering
 
     @Override
     public void onClose() {
-        //? <=1.21.8
         assert this.minecraft != null;
         this.minecraft.setScreen(this.parent);
     }
@@ -341,12 +326,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         private final ClickAction clickAction;
 
         private MapColorBlockWidget(int x, int y, int squareSize, Block block, MapColor mapColor, ClickAction clickAction) {
-            super(x, y, squareSize, block, true);
+            super(PresetsEditorScreen.this, x, y, squareSize, block, true);
             this.mapColor = mapColor;
             this.clickAction = clickAction;
         }
 
-        //~ widget_events
         @Override
         public void onClick(double mouseX, double mouseY) {
             this.clickAction.click(mouseX, mouseY);
@@ -356,9 +340,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             return super.mouseClicked(mouseX, mouseY, button);
         }
-        //~ !widget_events
 
-        //~ gui_rendering
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
@@ -368,11 +350,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
             boolean flag = presetBlock == null && this.getBlock() == Blocks.BARRIER;
             flag = flag || (presetBlock != null && presetBlock == this.getBlock());
             if (flag) {
-                context.guiRenderState.nextStratum();
-                RenderUtils.renderOutline(context, this.getX(), this.getY(), this.getWidth(), this.getHeight(), CommonColors.HIGH_CONTRAST_DIAMOND);
+                RenderUtils.nextStratum(context, () ->
+                        RenderUtils.renderOutline(context, this.getX(), this.getY(), this.getWidth(), this.getHeight(), CommonColors.HIGH_CONTRAST_DIAMOND)
+                );
             }
         }
-        //~ !gui_rendering
 
         interface ClickAction {
             void click(double mouseX, double mouseY);

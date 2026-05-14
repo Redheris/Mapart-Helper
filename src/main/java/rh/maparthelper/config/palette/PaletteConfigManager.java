@@ -68,7 +68,7 @@ public class PaletteConfigManager {
                                 .filter(b -> b != Blocks.AIR)
                                 .toList()
                 );
-                outdatedPalette = !SharedConstants.getCurrentVersion().name().equals(completePalette.getGameVersion());
+                outdatedPalette = !SharedConstants.getCurrentVersion().getName().equals(completePalette.getGameVersion());
                 return true;
             }
         } catch (Exception e) {

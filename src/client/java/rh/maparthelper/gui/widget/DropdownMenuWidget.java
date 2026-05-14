@@ -12,11 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-//? >=1.21.10
-//import net.minecraft.client.input.MouseButtonEvent;
-
 // This implementation will soon be replaced by a more elegant one
-public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*?} else {*/ Button /*?}*/ implements Layout {
+public class DropdownMenuWidget extends Button implements Layout {
     public static DropdownMenuWidget expandedOne;
 
     private final Screen parent;
@@ -117,7 +114,6 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
         expandedOne = expand ? this : null;
     }
 
-    //~ widget_events
     @Override
     public void onClick(double mouseX, double mouseY) {
         toggleExpanded(expandedOne == null);
@@ -137,7 +133,6 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
-    //~ !widget_events
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
@@ -155,12 +150,7 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
     }
 
     @Override
-    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-    //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-    *///?} elif >=26.1
-    //protected void extractContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
         if (needRelayout) {
             menu.setHeight(maxMenuHeight);
             if (getBottom() + menu.getHeight() > parent.height) {
@@ -190,12 +180,7 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
 
             this.needRelayout = false;
         }
-        //? if <=1.21.8 {
         super.renderWidget(context, mouseX, mouseY, partialTick);
-        //?} elif 1.21.11 {
-        /*super.renderContents(context, mouseX, mouseY, partialTick);
-        *///?} elif >=26.1
-        //super.extractContents(context, mouseX, mouseY, partialTick);
     }
 
     public void renderMenu(GuiGraphics context, int mouseX, int mouseY, float partialTick) {
@@ -207,7 +192,6 @@ public class DropdownMenuWidget extends /*? if >=1.21.11 {*/ /*Button.Plain *//*
             context.fill(getMenuX(), getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight(), 0x99FFFFFF);
             context.enableScissor(left, getY() + height, getMenuX() + menu.getWidth(), getY() + height + menu.getHeight());
         }
-        //~ if >=26.1 'render' -> 'extractRenderState'
         this.menu.render(context, mouseX, mouseY, partialTick);
         context.disableScissor();
     }
