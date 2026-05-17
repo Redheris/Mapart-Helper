@@ -520,7 +520,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 //        if (!MaterialListPanel.MaterialListBlockWidget.isHoveringAny()) {
 //            MaterialListPanel.MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
 //        }
-        MaterialListPanel.MaterialListBlockWidget.resetHovering();
+//        MaterialListPanel.MaterialListBlockWidget.resetHovering();
     }
 
     @Override

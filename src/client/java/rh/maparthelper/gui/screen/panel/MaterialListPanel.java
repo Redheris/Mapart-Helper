@@ -241,8 +241,8 @@ public class MaterialListPanel extends AbstractLayout {
 
     public class MaterialListBlockWidget extends BlockItemWidget {
         private static final Set<MapColor> selectedForExcluding = new HashSet<>();
-//        private static MaterialListBlockWidget fixedHighlight;
-        private static boolean hoveringAny = false;
+        //        private static MaterialListBlockWidget fixedHighlight;
+//        private static boolean hoveringAny = false;
         private final MapColor mapColor;
         private boolean confirmRemoving = false;
 
@@ -271,14 +271,14 @@ public class MaterialListPanel extends AbstractLayout {
 //                hoveringAny = true;
 //            }
             if (confirmRemoving) {
-                RenderUtils.nextStratum(context, () -> {
-                    RenderUtils.renderItemStack(
-                            context,
-                            Blocks.BARRIER.asItem().getDefaultInstance(),
-                            getX(), getY(),
-                            width, height
-                    );
-                });
+                RenderUtils.nextStratum(context, () ->
+                        RenderUtils.renderItemStack(
+                                context,
+                                Blocks.BARRIER.asItem().getDefaultInstance(),
+                                getX(), getY(),
+                                width, height
+                        )
+                );
             }
         }
 
@@ -307,24 +307,25 @@ public class MaterialListPanel extends AbstractLayout {
                     confirmRemoving = true;
                     selectedForExcluding.add(mapColor);
                     tooltip.set(1, Component.translatable("maparthelper.gui.LMB_to_confirm").withStyle(ChatFormatting.RED));
-                    tooltip.set(2, Component.translatable("maparthelper.gui.RMB_to_cancel").withStyle(ChatFormatting.RED));
+                    tooltip.add(2, Component.translatable("maparthelper.gui.RMB_to_cancel").withStyle(ChatFormatting.RED));
                 } else {
                     confirmRemoving = false;
                     selectedForExcluding.remove(mapColor);
 //                    tooltip.set(1, Component.translatable("maparthelper.gui.LMB_to_highlight").withStyle(ChatFormatting.GRAY));
-                    tooltip.set(2, Component.translatable("maparthelper.gui.RMB_to_remove").withStyle(ChatFormatting.GRAY));
+                    tooltip.set(1, Component.translatable("maparthelper.gui.RMB_to_remove").withStyle(ChatFormatting.GRAY));
+                    tooltip.remove(2);
                 }
             }
             return true;
         }
 
-        public static boolean isHoveringAny() {
-            return hoveringAny;
-        }
+//        public static boolean isHoveringAny() {
+//            return hoveringAny;
+//        }
 
-        public static void resetHovering() {
-            hoveringAny = false;
-        }
+//        public static void resetHovering() {
+//            hoveringAny = false;
+//        }
 
 //        public static void setDefaultHighlight(MapartPreviewWidget mapartPreview) {
 //            if (fixedHighlight == null)
