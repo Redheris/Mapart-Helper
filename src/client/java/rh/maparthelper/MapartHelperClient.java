@@ -16,5 +16,7 @@ public class MapartHelperClient implements ClientModInitializer {
         ModEventsHandler.registerAll();
 
         PaletteLoader.load();
+
+
     }
 }

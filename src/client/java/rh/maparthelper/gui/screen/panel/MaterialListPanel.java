@@ -29,7 +29,6 @@ import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.gui.screen.ScreenAdapted;
 import rh.maparthelper.gui.widget.BlockItemWidget;
-import rh.maparthelper.gui.widget.MapartPreviewWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
 import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -96,7 +95,7 @@ public class MaterialListPanel extends AbstractLayout {
     }
 
     public void updateMaterialList(Consumer<ScrollableGridWidget> childAdder, Consumer<GuiEventListener> childRemover) {
-        MaterialListBlockWidget.fixedHighlight = null;
+//        MaterialListBlockWidget.fixedHighlight = null;
         MaterialListBlockWidget.selectedForExcluding.clear();
 
         childRemover.accept(materialList);
@@ -242,7 +241,7 @@ public class MaterialListPanel extends AbstractLayout {
 
     public class MaterialListBlockWidget extends BlockItemWidget {
         private static final Set<MapColor> selectedForExcluding = new HashSet<>();
-        private static MaterialListBlockWidget fixedHighlight;
+//        private static MaterialListBlockWidget fixedHighlight;
         private static boolean hoveringAny = false;
         private final MapColor mapColor;
         private boolean confirmRemoving = false;
@@ -252,7 +251,7 @@ public class MaterialListPanel extends AbstractLayout {
             this.mapColor = mapColor;
             this.tooltip = new ArrayList<>(List.of(
                     block.getName(),
-                    Component.translatable("maparthelper.gui.LMB_to_highlight").withStyle(ChatFormatting.GRAY),
+//                    Component.translatable("maparthelper.gui.LMB_to_highlight").withStyle(ChatFormatting.GRAY),
                     Component.translatable("maparthelper.gui.RMB_to_remove").withStyle(ChatFormatting.GRAY)
             ));
             if (Minecraft.getInstance().options.advancedItemTooltips)
@@ -262,15 +261,15 @@ public class MaterialListPanel extends AbstractLayout {
         @Override
         protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(context, mouseX, mouseY, partialTick);
-            if (fixedHighlight == this) {
-                RenderUtils.nextStratum(context, () ->
-                        RenderUtils.renderOutline(context, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB())
-                );
-            } else if (MapartHelper.commonConfig().previewHighlightOnHover
-                    && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-                screen.setHighlightingColor(mapColor);
-                hoveringAny = true;
-            }
+//            if (fixedHighlight == this) {
+//                RenderUtils.nextStratum(context, () ->
+//                        RenderUtils.renderOutline(context, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB())
+//                );
+//            } else if (MapartHelper.commonConfig().previewHighlightOnHover
+//                    && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+//                screen.setHighlightingColor(mapColor);
+//                hoveringAny = true;
+//            }
             if (confirmRemoving) {
                 RenderUtils.nextStratum(context, () -> {
                     RenderUtils.renderItemStack(
@@ -292,18 +291,18 @@ public class MaterialListPanel extends AbstractLayout {
                     selectedForExcluding.clear();
                     return true;
                 }
-                if (fixedHighlight == this) {
-                    fixedHighlight = null;
-                } else {
-                    fixedHighlight = this;
-                    screen.setHighlightingColor(mapColor);
-                }
+//                if (fixedHighlight == this) {
+//                    fixedHighlight = null;
+//                } else {
+//                    fixedHighlight = this;
+//                    screen.setHighlightingColor(mapColor);
+//                }
                 return true;
             }
             if (button == 1) {
-                if (fixedHighlight == this) {
-                    fixedHighlight = null;
-                }
+//                if (fixedHighlight == this) {
+//                    fixedHighlight = null;
+//                }
                 if (!confirmRemoving) {
                     confirmRemoving = true;
                     selectedForExcluding.add(mapColor);
@@ -312,7 +311,7 @@ public class MaterialListPanel extends AbstractLayout {
                 } else {
                     confirmRemoving = false;
                     selectedForExcluding.remove(mapColor);
-                    tooltip.set(1, Component.translatable("maparthelper.gui.LMB_to_highlight").withStyle(ChatFormatting.GRAY));
+//                    tooltip.set(1, Component.translatable("maparthelper.gui.LMB_to_highlight").withStyle(ChatFormatting.GRAY));
                     tooltip.set(2, Component.translatable("maparthelper.gui.RMB_to_remove").withStyle(ChatFormatting.GRAY));
                 }
             }
@@ -327,11 +326,11 @@ public class MaterialListPanel extends AbstractLayout {
             hoveringAny = false;
         }
 
-        public static void setDefaultHighlight(MapartPreviewWidget mapartPreview) {
-            if (fixedHighlight == null)
-                mapartPreview.setHighlightingColor(MapColor.NONE);
-            else
-                mapartPreview.setHighlightingColor(fixedHighlight.mapColor);
-        }
+//        public static void setDefaultHighlight(MapartPreviewWidget mapartPreview) {
+//            if (fixedHighlight == null)
+//                mapartPreview.setHighlightingColor(MapColor.NONE);
+//            else
+//                mapartPreview.setHighlightingColor(fixedHighlight.mapColor);
+//        }
     }
 }

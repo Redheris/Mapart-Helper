@@ -517,9 +517,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
         super.render(context, mouseX, mouseY, partialTick);
 
-        if (!MaterialListPanel.MaterialListBlockWidget.isHoveringAny()) {
-            MaterialListPanel.MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
-        }
+//        if (!MaterialListPanel.MaterialListBlockWidget.isHoveringAny()) {
+//            MaterialListPanel.MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
+//        }
         MaterialListPanel.MaterialListBlockWidget.resetHovering();
     }
 

@@ -7,7 +7,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
 
 //? if >=1.21.5
-import java.net.URI;
+//import java.net.URI;
 
 public class CompatUtils {
     public static void sendMessage(Player player, Component message, boolean overlay) {

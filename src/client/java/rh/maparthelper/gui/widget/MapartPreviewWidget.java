@@ -38,7 +38,6 @@ public class MapartPreviewWidget extends AbstractWidget {
     private double offsetYCumulative = 0;
     private boolean scaleToCursor = true;
     private ManualCroppingAction hoveredAction = null;
-    private MapColor highlightingColor = MapColor.NONE;
 
     public MapartPreviewWidget(MapartProcessing mapart, int x, int y, int maxX, int maxY) {
         super(x, y, mapart.getWidth(), mapart.getHeight(), Component.empty());
@@ -48,17 +47,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     }
 
     public void setHighlightingColor(MapColor color) {
-        if (this.highlightingColor != color) {
-            this.highlightingColor = color;
-            if (color == MapColor.NONE) return;
-            // TODO: somehow?
-//            ColorsHighlightUniform.set(
-//                    highlightingColor.calculateARGBColor(MapColor.Brightness.LOW),
-//                    highlightingColor.calculateARGBColor(MapColor.Brightness.NORMAL),
-//                    highlightingColor.calculateARGBColor(MapColor.Brightness.HIGH),
-//                    MapartHelper.commonConfig().previewHighlightingColor.getRGB()
-//            );
-        }
+        // Well... I didn't manage to figure out custom shader/uniform stuff for <=1.21.5
     }
 
     @Override
