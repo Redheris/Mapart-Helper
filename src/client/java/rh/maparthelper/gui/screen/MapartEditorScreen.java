@@ -52,6 +52,8 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
 
+import static rh.maparthelper.MapartHelper.MOD_ID;
+
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
@@ -475,8 +477,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         resetExcludedColors.setX(width - 5 - resetExcludedColors.getWidth());
 
         if (PaletteConfigManager.isPaletteOutdated()) {
-            Identifier warningTex = Identifier.parse("textures/gui/sprites/dialog/warning_button.png");
-            Identifier warningTexHovered = Identifier.parse("textures/gui/sprites/dialog/warning_button_highlighted.png");
+            Identifier warningTex = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/warning_button.png");
+            Identifier warningTexHovered = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/sprites/warning_button_highlighted.png");
             var regenBtn = new DecorativeButtonWidget.Builder(warningTex, btn -> {
                 ConversionConfiguration.save();
                 Minecraft.getInstance().setScreen(new PaletteUpdateSuggestionScreen(this));
