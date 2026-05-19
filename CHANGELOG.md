@@ -1,1 +1,2 @@
-- 
+- Backported to 1.21.4 and 1.21.5
+- Removed color highlighting on the mapart preview due to adaptation difficulties

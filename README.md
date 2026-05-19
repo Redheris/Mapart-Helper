@@ -22,6 +22,10 @@ displaying beams at the north-western positions of map areas.
 | ~~1.21.10~~ | ⚠️ Last version `0.12.0` |
 | 1.21.11     | ✔️ Active                |
 | 26.1        | ✔️ Active                |
+| 1.21.4-5    | ✔️ Backport* `0.13.1`    |
+
+*Backport versions won't be getting every new update.
+They will be updated only for some major versions and critical fixes
 
 </details>
 
