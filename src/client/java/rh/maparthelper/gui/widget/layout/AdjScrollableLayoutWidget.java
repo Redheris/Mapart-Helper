@@ -60,6 +60,7 @@ public class AdjScrollableLayoutWidget implements Layout {
     public void setHeight(int height) {
         this.height = height;
         this.container.setHeight(Math.min(this.layout.getHeight(), height));
+        this.container.refreshChildrenX();
         this.container.refreshScrollAmount();
     }
 
@@ -243,11 +244,15 @@ public class AdjScrollableLayoutWidget implements Layout {
             }
         }
 
+        private void refreshChildrenX() {
+            int scrollOffset = scrollbarVisible() ? 0 : scrollBarWidth / 2;
+            AdjScrollableLayoutWidget.this.layout.setX(getX() + marginLeft + scrollOffset);
+        }
+
         @Override
         public void setX(int x) {
             super.setX(x);
-            int scrollOffset = scrollbarVisible() ? 0 : scrollBarWidth / 2;
-            AdjScrollableLayoutWidget.this.layout.setX(x + marginLeft + scrollOffset);
+            refreshChildrenX();
         }
 
         @Override
