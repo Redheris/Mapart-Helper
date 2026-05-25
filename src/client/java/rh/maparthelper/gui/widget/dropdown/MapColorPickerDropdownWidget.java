@@ -29,6 +29,7 @@ public class MapColorPickerDropdownWidget extends DropdownOverlayWidget {
 
         this.mapart = mapart;
         initOverlay(overlayWidth, overlayHeight);
+        setOverlayXOffset(width - overlayWidth);
     }
 
     private void initOverlay(int overlayWidth, int overlayHeight) {

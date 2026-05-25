@@ -12,7 +12,7 @@ import org.joml.Matrix3x2f;
 import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 public class RenderUtils {
-    public static void renderItemStack(GuiGraphics context, ItemStack itemStack, String stateName, int x, int y, int width, int height) {
+    public static void renderItemStack(GuiGraphics graphics, ItemStack itemStack, String stateName, int x, int y, int width, int height) {
         Minecraft client = Minecraft.getInstance();
         TrackingItemStackRenderState keyedItemRenderState = new TrackingItemStackRenderState();
         client.getItemModelResolver().updateForTopItem(
@@ -27,13 +27,13 @@ public class RenderUtils {
         GuiItemRenderState itemRenderState = new GuiItemRenderState(
                 //? <26.1
                 stateName,
-                new Matrix3x2f(context.pose()),
+                new Matrix3x2f(graphics.pose()),
                 keyedItemRenderState,
                 x, y,
-                context.scissorStack.peek()
+                graphics.scissorStack.peek()
         );
         //~ if >=26.1 'submitPicturesInPictureState' -> 'addPicturesInPictureState'
-        context.guiRenderState.submitPicturesInPictureState(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
+        graphics.guiRenderState.submitPicturesInPictureState(new ScaledItemGuiElementRenderer.ScaledItemGuiElementRenderState(
                 itemRenderState,
                 x, y,
                 x + width, y + height,
@@ -41,19 +41,19 @@ public class RenderUtils {
         ));
     }
 
-    public static void renderOutline(GuiGraphics context, int x, int y, int width, int height, int color) {
-        context.fill(x, y, x + width, y + 1, color);
-        context.fill(x, y + height - 1, x + width, y + height, color);
-        context.fill(x, y + 1, x + 1, y + height - 1, color);
-        context.fill(x + width - 1, y + 1, x + width, y + height - 1, color);
+    public static void renderOutline(GuiGraphics graphics, int x, int y, int width, int height, int color) {
+        graphics.fill(x, y, x + width, y + 1, color);
+        graphics.fill(x, y + height - 1, x + width, y + height, color);
+        graphics.fill(x, y + 1, x + 1, y + height - 1, color);
+        graphics.fill(x + width - 1, y + 1, x + width, y + height - 1, color);
     }
 
-    public static void centeredText(GuiGraphics context, final Font font, final String str, final int x, final int y, final int color) {
+    public static void centeredText(GuiGraphics graphics, final Font font, final String str, final int x, final int y, final int color) {
         //~ if >=26.1 'drawCenteredString' -> 'centeredText'
-        context.drawCenteredString(font, str, x, y, color);
+        graphics.drawCenteredString(font, str, x, y, color);
     }
-    public static void centeredText(GuiGraphics context, final Font font, final FormattedCharSequence text, final int x, final int y, final int color) {
+    public static void centeredText(GuiGraphics graphics, final Font font, final FormattedCharSequence text, final int x, final int y, final int color) {
         //~ if >=26.1 'drawCenteredString' -> 'centeredText'
-        context.drawCenteredString(font, text, x, y, color);
+        graphics.drawCenteredString(font, text, x, y, color);
     }
 }
