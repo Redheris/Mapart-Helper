@@ -82,7 +82,7 @@ public class BlockItemWidget extends AbstractWidget {
                 && mouseX < x + width
                 && mouseY >= y
                 && mouseY < y + height;
-        if (graphics.containsPointInScissor(mouseX, mouseY) && isMouseOverBlock) {
+        if (RenderUtils.pointInCurrentScissor(graphics, mouseX, mouseY) && isMouseOverBlock) {
             graphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
         }
     }

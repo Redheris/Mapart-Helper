@@ -3,9 +3,9 @@ package rh.maparthelper.gui.screen.panel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.AbstractLayout;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -29,7 +29,7 @@ import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
-import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.util.InventoryItemsCounter;
@@ -45,11 +45,12 @@ import java.util.function.Consumer;
 public class MaterialListPanel extends AbstractLayout {
     private final MapartEditorScreen screen;
     private final MapartProcessing mapart;
-    private ScrollableGridWidget materialList;
+    private GridLayout materialListContent;
+    private AdjScrollableLayoutWidget materialListScrollable;
 
     private int auxBlockCount = 0;
-    private boolean materialsAscendingOrder = false;
-    private boolean displayRemainingAmount = false;
+    private static boolean materialsAscendingOrder = false;
+    private static boolean displayRemainingAmount = false;
     private final InventoryItemsCounter inventoryItemsCounter;
     private boolean displayTotalCount = true;
 
@@ -75,8 +76,8 @@ public class MaterialListPanel extends AbstractLayout {
 
     @Override
     public void visitChildren(@NotNull Consumer<LayoutElement> consumer) {
-        if (materialList != null)
-            consumer.accept(materialList);
+        if (materialListScrollable != null)
+            consumer.accept(materialListScrollable);
     }
 
     public boolean isMaterialsAscendingOrder() {
@@ -84,7 +85,7 @@ public class MaterialListPanel extends AbstractLayout {
     }
 
     public void toggleMaterialsAscendingOrder() {
-        this.materialsAscendingOrder = !materialsAscendingOrder;
+        materialsAscendingOrder = !materialsAscendingOrder;
     }
 
     public boolean isDisplayRemainingAmount() {
@@ -94,28 +95,23 @@ public class MaterialListPanel extends AbstractLayout {
     public void toggleDisplayRemainingAmount() {
         if (inventoryItemsCounter == null)
             return;
-        this.displayRemainingAmount = !displayRemainingAmount;
+        displayRemainingAmount = !displayRemainingAmount;
     }
 
-    public void updateMaterialList(Consumer<ScrollableGridWidget> childAdder, Consumer<GuiEventListener> childRemover) {
+    public void updateMaterialList(Consumer<AbstractWidget> childAdder, Consumer<AbstractWidget> childRemover) {
         MaterialListBlockWidget.fixedHighlight = null;
         MaterialListBlockWidget.selectedForExcluding.clear();
 
-        childRemover.accept(materialList);
+        if (materialListScrollable != null)
+            materialListScrollable.visitWidgets(childRemover);
         int listTop = getY();
-        materialList = new ScrollableGridWidget(
-                null,
-                getX() - 6, listTop,
-                screen.width - getX() - 5, screen.height - listTop, 6
-        );
+
+        materialListContent = new GridLayout();
+        materialListContent.defaultCellSetting().alignVerticallyMiddle();
 
         if (!CurrentConversionSettings.isMapartConverted() || MapartHelper.conversionConfig().useUnobtainable()) return;
 
-        materialList.setLeftScroll(true);
-        materialList.grid.columnSpacing(0);
-        materialList.grid.defaultCellSetting().alignVerticallyMiddle();
-
-        GridLayout.RowHelper materialListAdder = materialList.grid.createRowHelper(2);
+        GridLayout.RowHelper materialListAdder = materialListContent.createRowHelper(2);
         PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
 
         ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionConfig().getMaterialsCountMode());
@@ -127,7 +123,7 @@ public class MaterialListPanel extends AbstractLayout {
             auxBlockItemWidget.insertToTooltip(1, Component.translatable("maparthelper.aux_block").withStyle(ChatFormatting.GRAY));
 
             StringWidget auxAmountText = new StringWidget(Component.empty(), screen.getFont());
-            materialListAdder.addChild(auxBlockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
+            materialListAdder.addChild(auxBlockItemWidget, materialListContent.newCellSettings().paddingLeft(6));
             materialListAdder.addChild(auxAmountText);
 
             boolean hasAuxBlockInColors = false;
@@ -155,8 +151,14 @@ public class MaterialListPanel extends AbstractLayout {
             }
         }
 
-        materialList.arrangeElements();
-        childAdder.accept(materialList);
+        materialListScrollable = new AdjScrollableLayoutWidget(
+                materialListContent, screen.height - listTop
+        );
+        materialListScrollable.setLeftScrollBar(true);
+        materialListScrollable.setPosition(getX() - 6, listTop);
+
+        materialListScrollable.arrangeElements();
+        materialListScrollable.visitWidgets(childAdder);
     }
 
     private void addBlockToMaterialList(GridLayout.RowHelper adder, PalettePresetsConfig palette, ColorsCounter.MapColorCount color) {
@@ -165,7 +167,7 @@ public class MaterialListPanel extends AbstractLayout {
         if (block == null) return;
 
         MaterialListBlockWidget blockItemWidget = new MaterialListBlockWidget(0, 0, 24, block, mapColor);
-        adder.addChild(blockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
+        adder.addChild(blockItemWidget, materialListContent.newCellSettings().paddingLeft(6));
         MutableComponent text = Component.literal(getAmountString(color.amount(), block.asItem().getDefaultMaxStackSize()));
         if (color.amount() == 0)
             text.withStyle(ChatFormatting.GREEN);

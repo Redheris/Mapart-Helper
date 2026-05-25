@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractContainerWidget;
+import net.minecraft.client.gui.components.AbstractScrollArea;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.Layout;
@@ -73,6 +74,10 @@ public class AdjScrollableLayoutWidget implements Layout {
         this.container.refreshScrollAmount();
     }
 
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        return container.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
     @Override
     public void visitChildren(Consumer<LayoutElement> consumer) {
         consumer.accept(this.container);
@@ -137,6 +142,10 @@ public class AdjScrollableLayoutWidget implements Layout {
         container.scrollBarWidth = width;
     }
 
+    public void setLeftScrollBar(boolean leftScrollBar) {
+        container.leftScrollBar = leftScrollBar;
+    }
+
     @Environment(EnvType.CLIENT)
     protected class Container extends AbstractContainerWidget {
         private final Minecraft client;
@@ -148,6 +157,7 @@ public class AdjScrollableLayoutWidget implements Layout {
         private int bgColor = 0;
         private int outlineColor = 0;
         private int scrollBarWidth = 6;
+        private boolean leftScrollBar = false;
 
         private static final Identifier SCROLLER_BACKGROUND_SPRITE = Identifier.withDefaultNamespace("widget/scroller_background");
 
@@ -245,7 +255,12 @@ public class AdjScrollableLayoutWidget implements Layout {
         }
 
         private void refreshChildrenX() {
-            int scrollOffset = scrollbarVisible() ? 0 : scrollBarWidth / 2;
+            int scrollOffset;
+            if (leftScrollBar) {
+                scrollOffset = 0;
+            } else {
+                scrollOffset = scrollbarVisible() ? 0 : scrollBarWidth / 2;
+            }
             AdjScrollableLayoutWidget.this.layout.setX(getX() + marginLeft + scrollOffset);
         }
 
@@ -269,7 +284,7 @@ public class AdjScrollableLayoutWidget implements Layout {
 
         @Override
         protected int scrollBarX() {
-            return this.getRight() - scrollBarWidth;
+            return leftScrollBar ? this.getX() : this.getRight() - scrollBarWidth;
         }
 
         //~ widget_events
@@ -284,6 +299,20 @@ public class AdjScrollableLayoutWidget implements Layout {
             return this.scrolling;
         }
         //~ !widget_events
+
+
+        @Override
+        public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+            if (isMouseOver(mouseX, mouseY)) {
+                for (AbstractWidget child : container.children) {
+                    if (child instanceof AbstractScrollArea scrollArea) {
+                        if (child.isMouseOver(mouseX, mouseY) && scrollArea.maxScrollAmount() > 0)
+                            return child.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+                    }
+                }
+            }
+            return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        }
 
         protected boolean scrollbarVisible() {
             //? if <26.1 {

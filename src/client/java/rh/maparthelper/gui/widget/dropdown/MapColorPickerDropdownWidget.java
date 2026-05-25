@@ -37,13 +37,13 @@ public class MapColorPickerDropdownWidget extends DropdownOverlayWidget {
         grid.defaultCellSetting().padding(1, 2, 2, 2);
 
         GridLayout.RowHelper adder = grid.createRowHelper(4);
-        int entryWidth = (overlayWidth - 14) / 4;
+        int entryWidth = overlayWidth / 4 - 2;
 
         for (MapColors color : MapColors.values()) {
             adder.addChild(new MapColorSelector(0, 0, entryWidth, 20, color.color));
         }
 
-        this.setOverlay(OverlayLayoutFactory.defaultOverlay(grid, overlayHeight, overlayWidth));
+        this.setOverlay(OverlayLayoutFactory.defaultOverlay(grid, overlayHeight, overlayWidth + 8));
     }
 
     @Override

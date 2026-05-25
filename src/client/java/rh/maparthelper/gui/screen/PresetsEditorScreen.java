@@ -22,8 +22,8 @@ import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
-import rh.maparthelper.gui.widget.ScrollableGridWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
+import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.util.RenderUtils;
 
@@ -51,9 +51,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private PresetsListDropdownWidget presetsListDropdownButton;
 
-    //    private PresetsDropdownMenuWidget presetsListDropdown;
     private EditBox presetNameField;
-    private ScrollableGridWidget colorsEditor;
+    private AdjScrollableLayoutWidget colorsEditorScrollable;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
         super(Component.translatable("maparthelper.gui.presets_editor_screen"));
@@ -179,14 +178,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         int squareSize = 24;
         int columns = (boxWidth - 5) / (squareSize + 5);
-        colorsEditor = new ScrollableGridWidget(
-                null,
-                boxX, boxY + 31,
-                boxWidth, boxHeight - 31, 6
-        );
-        GridLayout colorsGrid = colorsEditor.grid;
-        colorsGrid.addChild(SpacerElement.width(boxWidth - 11), 0, 0, 1, columns);
-        colorsGrid.defaultCellSetting().alignHorizontallyCenter().padding(0, 4, 0, 0);
+
+        GridLayout colorsEditorContent = new GridLayout();
+        colorsEditorContent.addChild(SpacerElement.width(boxWidth - 11), 0, 0, 1, columns);
+        colorsEditorContent.defaultCellSetting().alignHorizontallyCenter().padding(0, 4, 0, 0);
 
         for (int i = 0; i < 63; i++) {
             MapColor mapColor = MapColor.byId(i + 1);
@@ -196,18 +191,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
             color.showColorName(true);
             int row = 2 * columns * (i / columns);
             if (row == 0)
-                colorsGrid.addChild(color, row, i % columns);
+                colorsEditorContent.addChild(color, row, i % columns);
             else
-                colorsGrid.addChild(color, row, i % columns, colorsGrid.newCellSettings().paddingTop(10));
+                colorsEditorContent.addChild(color, row, i % columns, colorsEditorContent.newCellSettings().paddingTop(10));
 
-            ScrollableGridWidget blocksList = new ScrollableGridWidget(
-                    colorsEditor,
-                    0, 0,
-                    squareSize + 5, 150, 3
-            );
-            blocksList.grid.defaultCellSetting().alignHorizontallyCenter().alignVerticallyMiddle();
-            GridLayout.RowHelper adder = blocksList.grid.createRowHelper(1);
-            adder.addChild(SpacerElement.width(blocksList.getWidth()));
+            LinearLayout blocksListContent = LinearLayout.vertical();
+            blocksListContent.defaultCellSetting().alignHorizontallyCenter().alignVerticallyMiddle().paddingLeft(1);
 
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
                     0, 0, squareSize,
@@ -219,7 +208,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             );
             noneBlock.setTooltip(Component.translatable("maparthelper.gui.presets.remove_color"));
 
-            adder.addChild(noneBlock, blocksList.grid.newCellSettings().alignHorizontallyCenter());
+            blocksListContent.addChild(noneBlock);
 
             List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
             if (blocks != null) {
@@ -232,21 +221,32 @@ public class PresetsEditorScreen extends ScreenAdapted {
                                 updatedPresets.add(editingPreset);
                             }
                     );
-                    adder.addChild(blockWidget, blocksList.grid.newCellSettings().alignHorizontallyCenter());
+                    blocksListContent.addChild(blockWidget);
                 }
             }
 
-            colorsGrid.addChild(
-                    blocksList,
+            AdjScrollableLayoutWidget blocksListScrollable = new AdjScrollableLayoutWidget(
+                    blocksListContent, 150
+            );
+            blocksListScrollable.setWidth(squareSize + 5);
+            blocksListScrollable.setScrollBarWidth(3);
+
+            colorsEditorContent.addChild(
+                    blocksListScrollable,
                     row + columns,
                     i % columns,
-                    colorsGrid.newCellSettings().alignHorizontallyCenter()
+                    colorsEditorContent.newCellSettings().alignHorizontallyCenter()
             );
-            this.addRenderableWidget(blocksList);
         }
 
-        colorsEditor.arrangeElements();
-        this.addRenderableWidget(colorsEditor);
+        colorsEditorScrollable = new AdjScrollableLayoutWidget(
+                colorsEditorContent, boxHeight - 31
+        );
+        colorsEditorScrollable.setWidth(boxWidth);
+        colorsEditorScrollable.setPosition(boxX, boxY + 31);
+
+        colorsEditorScrollable.arrangeElements();
+        colorsEditorScrollable.visitWidgets(this::addRenderableWidget);
     }
 
     private void createNewPreset(boolean createDefault) {
@@ -314,7 +314,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount))
             return true;
-        return colorsEditor.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        return colorsEditorScrollable.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     //~ gui_rendering

@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
+import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -44,12 +45,12 @@ import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
-import rh.maparthelper.gui.widget.ScrollableGridWidget;
 import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
 import rh.maparthelper.gui.widget.dropdown.EnumListDropdownWidget;
 import rh.maparthelper.gui.widget.dropdown.MapColorPickerDropdownWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
 import rh.maparthelper.gui.widget.input.AdjTextFieldWidget;
+import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -327,6 +328,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         final int elementWidth = currentElementWidth();
         settingsLeft = LinearLayout.vertical();
         settingsLeft.setPosition(5, 20);
+        settingsLeft.addChild(SpacerElement.width(elementWidth + 7));
         LayoutSettings settingsLeftPositioner = settingsLeft.defaultCellSetting().paddingTop(5);
         LayoutSettings topLabeledPositioner = settingsLeftPositioner.copy().paddingTop(0);
 
@@ -356,13 +358,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         );
 
         int listTop = settingsLeft.getY() + settingsLeft.getHeight();
-        ScrollableGridWidget settingsLeftScrollable = new ScrollableGridWidget(
-                null,
-                settingsLeft.getX(), listTop,
-                elementWidth + 6, height - listTop, 6
-        );
-        settingsLeftScrollable.grid.defaultCellSetting().paddingTop(5);
-        GridLayout.RowHelper adder = settingsLeftScrollable.grid.createRowHelper(1);
+        LinearLayout settingsLeftContent = LinearLayout.vertical();
+        settingsLeftContent.defaultCellSetting().paddingTop(5);
 
         Component previewMapart = Component.translatable("maparthelper.gui.previewMapart");
         Component previewOriginal = Component.translatable("maparthelper.gui.previewOriginal").withStyle(ChatFormatting.GOLD);
@@ -374,22 +371,22 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartImageUpdater.updateMapart(mapart);
                 }
         ).size(elementWidth, 20).build();
-        adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.previewMode"), font));
-        adder.addChild(previewMode, topLabeledPositioner);
+        settingsLeftContent.addChild(new StringWidget(Component.translatable("maparthelper.gui.previewMode"), font));
+        settingsLeftContent.addChild(previewMode, topLabeledPositioner);
 
         // ===============================================
 
         if (shortElements) {
-            adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.cropMode"), font));
-            adder.addChild(croppingModeDropdownButton, topLabeledPositioner);
-            adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.staircaseStyle"), font));
-            adder.addChild(staircaseStyleDropdownButton, topLabeledPositioner);
-            adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.ditheringAlg"), font));
-            adder.addChild(colorConverterDropdownButton, topLabeledPositioner);
+            settingsLeftContent.addChild(new StringWidget(Component.translatable("maparthelper.gui.cropMode"), font));
+            settingsLeftContent.addChild(croppingModeDropdownButton, topLabeledPositioner);
+            settingsLeftContent.addChild(new StringWidget(Component.translatable("maparthelper.gui.staircaseStyle"), font));
+            settingsLeftContent.addChild(staircaseStyleDropdownButton, topLabeledPositioner);
+            settingsLeftContent.addChild(new StringWidget(Component.translatable("maparthelper.gui.ditheringAlg"), font));
+            settingsLeftContent.addChild(colorConverterDropdownButton, topLabeledPositioner);
         } else {
-            adder.addChild(croppingModeDropdownButton);
-            adder.addChild(staircaseStyleDropdownButton);
-            adder.addChild(colorConverterDropdownButton);
+            settingsLeftContent.addChild(croppingModeDropdownButton);
+            settingsLeftContent.addChild(staircaseStyleDropdownButton);
+            settingsLeftContent.addChild(colorConverterDropdownButton);
         }
 
         Component isOn = Component.translatable("maparthelper.gui.isOn");
@@ -407,9 +404,9 @@ public class MapartEditorScreen extends ScreenAdapted {
             useLAB.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.useLAB_tooltip")));
             useLAB.setTooltipDelay(Duration.ofMillis(500));
         }
-        adder.addChild(useLAB);
+        settingsLeftContent.addChild(useLAB);
 
-        adder.addChild(new DropdownOverlayWidget(
+        settingsLeftContent.addChild(new DropdownOverlayWidget(
                 this, preprocessingDropdownOverlay,
                 100, 20,
                 Component.translatable("maparthelper.gui.image_preprocessing"),
@@ -420,9 +417,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         bgColorChoose.defaultCellSetting().alignVerticallyMiddle();
         bgColorChoose.addChild(new StringWidget(Component.translatable("maparthelper.gui.backgroundColor"), font));
         bgColorChoose.addChild(mapColorPickerDropdownWidget);
-        adder.addChild(bgColorChoose);
+        settingsLeftContent.addChild(bgColorChoose);
 
-        adder.addChild(
+        settingsLeftContent.addChild(
                 new StringWidget(Component.translatable("maparthelper.aux_block"), font),
                 settingsLeftPositioner.copy().paddingTop(15)
         );
@@ -436,12 +433,19 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridLayout.RowHelper auxAdder = auxBlock.createRowHelper(2);
         auxAdder.addChild(createAuxBlockFieldWidget(auxBlockPreview, currentAuxBlock));
         auxAdder.addChild(auxBlockPreview);
-        adder.addChild(auxBlock);
+        settingsLeftContent.addChild(auxBlock);
 
-        adder.addChild(useAuxBlocksDropdownButton);
+        settingsLeftContent.addChild(useAuxBlocksDropdownButton);
+
+        AdjScrollableLayoutWidget settingsLeftScrollable = new AdjScrollableLayoutWidget(
+                settingsLeftContent, height - listTop
+        );
+        settingsLeftScrollable.setMarginX(1);
+        settingsLeftScrollable.setWidth(settingsLeft.getRectangle().right());
+        settingsLeftScrollable.setPosition(0, listTop);
 
         settingsLeftScrollable.arrangeElements();
-        this.addRenderableWidget(settingsLeftScrollable);
+        settingsLeftScrollable.visitWidgets(this::addRenderableWidget);
     }
 
     private void initRightPanel() {
@@ -566,7 +570,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        graphics.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
+        graphics.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth(), height, 0x77000000);
         graphics.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
         super.render(graphics, mouseX, mouseY, partialTick);
 
