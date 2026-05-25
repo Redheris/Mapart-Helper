@@ -1,0 +1,4 @@
+classTweaker v1 named
+
+accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
+accessible field net/minecraft/client/gui/components/AbstractScrollArea scrolling Z

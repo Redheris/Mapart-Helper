@@ -263,19 +263,19 @@ public class MaterialListPanel extends AbstractLayout {
 
         //~ gui_rendering
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(context, mouseX, mouseY, partialTick);
+        protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
             if (fixedHighlight == this) {
-                context.nextStratum();
-                RenderUtils.renderOutline(context, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
+                graphics.nextStratum();
+                RenderUtils.renderOutline(graphics, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
             } else if (MapartHelper.commonConfig().previewHighlightOnHover
-                    && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+                    && graphics.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 screen.setHighlightingColor(mapColor);
                 hoveringAny = true;
             }
             if (confirmRemoving) {
                 RenderUtils.renderItemStack(
-                        context,
+                        graphics,
                         Blocks.BARRIER.asItem().getDefaultInstance(),
                         "RemoveColor",
                         getX(), getY(),

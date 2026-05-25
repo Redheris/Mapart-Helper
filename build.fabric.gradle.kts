@@ -88,7 +88,7 @@ loom {
 
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
 // For mods with access wideners
-//    accessWidenerPath = rootProject.file("src/main/resources/aw/${sc.current.version}.classtweaker")
+    accessWidenerPath = rootProject.file("src/main/resources/aw/${sc.current.version}.classtweaker")
 
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
@@ -111,14 +111,14 @@ tasks {
     val mixinJava = "JAVA_${requiredJava.majorVersion}"
     processResources {
         // Excluding unnecessary AW files from adding to the jar
-//        exclude("aw/**")
-//        val awFile = loom.accessWidenerPath.asFile.orNull
-//        if (awFile != null) {
-//            from(awFile.parentFile) {
-//                include(awFile.name)
-//                rename(awFile.name, "${project.property("mod.id")}.classtweaker")
-//            }
-//        }
+        exclude("aw/**")
+        val awFile = loom.accessWidenerPath.asFile.orNull
+        if (awFile != null) {
+            from(awFile.parentFile) {
+                include(awFile.name)
+                rename(awFile.name, "${project.property("mod.id")}.classtweaker")
+            }
+        }
 
         // Add LICENSE file into the jar
         from(rootProject.file("LICENSE")) {

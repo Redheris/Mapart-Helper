@@ -22,8 +22,9 @@ import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
-import rh.maparthelper.gui.widget.PresetsDropdownMenuWidget;
 import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
+import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.HashSet;
@@ -48,7 +49,9 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private final Set<String> deletedPresets = new HashSet<>();
     private final Set<String> updatedPresets = new HashSet<>();
 
-    private PresetsDropdownMenuWidget presetsListDropdown;
+    private PresetsListDropdownWidget presetsListDropdownButton;
+
+    //    private PresetsDropdownMenuWidget presetsListDropdown;
     private EditBox presetNameField;
     private ScrollableGridWidget colorsEditor;
 
@@ -62,15 +65,37 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    protected void init() {
+    protected void preInit() {
         parent.width = width;
         parent.height = height;
-        parent.clearWidgets();
         parent.init();
 
         this.boxWidth = parent.width - boxX - marginRight;
         this.boxHeight = parent.height - boxY - marginBottom;
+    }
 
+    @Override
+    protected Set<OverlayLayout> initOverlays() {
+        Set<OverlayLayout> overlays = new HashSet<>();
+
+        presetsListDropdownButton = new PresetsListDropdownWidget(
+                this,
+                20, 20,
+                (int) (boxWidth * 0.35),
+                120,
+                false,
+                Component.nullToEmpty("☰"),
+                this::changeEditingPreset,
+                presetsConfig.presetFiles
+        );
+
+        overlays.add(presetsListDropdownButton.getOverlay());
+
+        return overlays;
+    }
+
+    @Override
+    protected void initContent() {
         LinearLayout presetBarLeft = LinearLayout.horizontal();
         presetBarLeft.setPosition(boxX + 5, boxY + 5);
         LayoutSettings presetBarLeftPositioner = presetBarLeft.defaultCellSetting().alignVerticallyMiddle();
@@ -84,14 +109,9 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetNameField.setValue(presetsConfig.presetFiles.get(editingPreset));
         presetBarLeft.addChild(presetNameField);
 
-        presetsListDropdown = new PresetsDropdownMenuWidget(
-                this, 0, 0, 20, 20, presetNameField.getWidth() + 20,
-                Component.nullToEmpty("☰")
-        );
-        presetsListDropdown.setMenuXOffset(-presetNameField.getWidth());
-        presetsListDropdown.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.choose_preset")));
-        presetsListDropdown.addEntries(this::changeEditingPreset, presetsConfig.presetFiles);
-        presetBarLeft.addChild(presetsListDropdown);
+        presetsListDropdownButton.setOverlayXOffset(-presetNameField.getWidth());
+        presetsListDropdownButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.choose_preset")));
+        presetBarLeft.addChild(presetsListDropdownButton);
 
         presetNameField.setResponder(value -> {
             if (value.isBlank()) {
@@ -100,8 +120,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
             }
             presetNameField.setSuggestion(null);
             presetsConfig.presetFiles.put(editingPreset, value);
-            if (presetsListDropdown != null)
-                presetsListDropdown.updateNames(presetsConfig.presetFiles.values());
+            presetsListDropdownButton.updateNames(presetsConfig.presetFiles.values());
         });
 
         Button createEmptyPreset = Button.builder(Component.nullToEmpty("\uD83D\uDDCB"), b -> this.createNewPreset(false))
@@ -232,7 +251,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private void createNewPreset(boolean createDefault) {
         String newPreset = presetsConfig.createNewPreset(createDefault, updatedPresets, deletedPresets);
-        presetsListDropdown = null;
         changeEditingPreset(newPreset);
         rebuildWidgets();
     }
@@ -245,14 +263,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
         } else {
             updatedPresets.remove(editingPreset);
         }
-        presetsListDropdown = null;
         changeEditingPreset(presetsConfig.getCurrentPresetFilename());
         rebuildWidgets();
     }
 
     private void duplicatePreset() {
         String newPreset = presetsConfig.duplicatePreset(editingPreset, updatedPresets, deletedPresets);
-        presetsListDropdown = null;
         changeEditingPreset(newPreset);
         rebuildWidgets();
     }
@@ -303,29 +319,29 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     //~ gui_rendering
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        Matrix3x2fStack matrixStack = context.pose();
+    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        Matrix3x2fStack matrixStack = graphics.pose();
 
         matrixStack.pushMatrix();
-        parent.render(context, 0, 0, partialTick);
+        parent.render(graphics, 0, 0, partialTick);
         matrixStack.popMatrix();
 
-        context.guiRenderState.nextStratum();
-        this.renderBlurredBackground(context);
-        this.renderMenuBackground(context);
+        graphics.guiRenderState.nextStratum();
+        this.renderBlurredBackground(graphics);
+        this.renderMenuBackground(graphics);
 
         int w = boxWidth;
         int h = boxHeight;
-        context.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
-        context.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
-        RenderUtils.renderOutline(context, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
-        context.hLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
+        graphics.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
+        graphics.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
+        RenderUtils.renderOutline(graphics, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
+        graphics.hLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
 
-        super.render(context, mouseX, mouseY, partialTick);
+        super.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    public void renderBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
     }
     //~ !gui_rendering
 
@@ -360,16 +376,16 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         //~ gui_rendering
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(context, mouseX, mouseY, partialTick);
+        protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
 
             PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
             Block presetBlock = preset.colors.get(mapColor);
             boolean flag = presetBlock == null && this.getBlock() == Blocks.BARRIER;
             flag = flag || (presetBlock != null && presetBlock == this.getBlock());
             if (flag) {
-                context.guiRenderState.nextStratum();
-                RenderUtils.renderOutline(context, this.getX(), this.getY(), this.getWidth(), this.getHeight(), CommonColors.HIGH_CONTRAST_DIAMOND);
+                graphics.guiRenderState.nextStratum();
+                RenderUtils.renderOutline(graphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), CommonColors.HIGH_CONTRAST_DIAMOND);
             }
         }
         //~ !gui_rendering

@@ -1,7 +1,8 @@
-package rh.maparthelper.gui.widget;
+package rh.maparthelper.gui.widget.dropdown;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
@@ -12,45 +13,52 @@ import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
 import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.MapartImageUpdater;
+import rh.maparthelper.gui.widget.MapColorWidget;
+import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.util.RenderUtils;
 
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
-public class MapColorPickerWidget extends DropdownMenuWidget {
+public class MapColorPickerDropdownWidget extends DropdownOverlayWidget {
     private final MapartProcessing mapart;
-    private final int columns;
 
-    public MapColorPickerWidget(Screen parent, MapartProcessing mapart, int width, int height, int menuWidth, int menuHeight, int columns) {
-        super(parent, 0, 0, width, height, menuWidth, menuHeight, columns, Component.empty());
+    public MapColorPickerDropdownWidget(@NotNull Screen screen, MapartProcessing mapart, int width, int height, int overlayWidth, int overlayHeight) {
+        super(screen, null, width, height, Component.empty());
+
         this.mapart = mapart;
-        this.columns = columns;
-        initDropdown();
+        initOverlay(overlayWidth, overlayHeight);
     }
 
-    private void initDropdown() {
-        int entryWidth = (menuWidth - 10) / columns;
-        MapColors[] colors = MapColors.values();
-        for (MapColors color : colors) {
-            addEntry(new MapColorSelector(0, 0, entryWidth, 20, color.color));
+    private void initOverlay(int overlayWidth, int overlayHeight) {
+        GridLayout grid = new GridLayout().rowSpacing(-2);
+        grid.defaultCellSetting().padding(1, 2, 2, 2);
+
+        GridLayout.RowHelper adder = grid.createRowHelper(4);
+        int entryWidth = (overlayWidth - 14) / 4;
+
+        for (MapColors color : MapColors.values()) {
+            adder.addChild(new MapColorSelector(0, 0, entryWidth, 20, color.color));
         }
+
+        this.setOverlay(OverlayLayoutFactory.defaultOverlay(grid, overlayHeight, overlayWidth));
     }
 
     @Override
     //? if <=1.21.8 {
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        super.renderWidget(context, mouseX, mouseY, partialTick);
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderWidget(graphics, mouseX, mouseY, partialTick);
     //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        super.renderContents(context, mouseX, mouseY, partialTick);
+    /*protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContents(graphics, mouseX, mouseY, partialTick);
     *///?} elif >=26.1 {
-    /*protected void extractContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        super.extractContents(context, mouseX, mouseY, partialTick);
+    /*protected void extractContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractContents(graphics, mouseX, mouseY, partialTick);
     *///?}
         int color = MapartHelper.conversionConfig().getBackgroundRenderColor();
-        context.fill(getX(), getY(), getRight(), getBottom(), color);
-        RenderUtils.renderOutline(context, getX(), getY(), getWidth(), getHeight(), 0xFF555555);
+        graphics.fill(getX(), getY(), getRight(), getBottom(), color);
+        RenderUtils.renderOutline(graphics, getX(), getY(), getWidth(), getHeight(), 0xFF555555);
     }
 
     private void setColor(MapColorEntry color) {
@@ -71,13 +79,13 @@ public class MapColorPickerWidget extends DropdownMenuWidget {
 
         //~ gui_rendering
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(context, mouseX, mouseY, partialTick);
+        protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
             onlyNormalBrightness = !MapartHelper.conversionConfig().use3D();
             if (color != MapColor.NONE && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
                 setAlpha(0.2f);
-                if (this.isMouseOver(mouseX, mouseY) && context.containsPointInScissor(mouseX, mouseY)) {
-                    context.setTooltipForNextFrame(Component.translatable("maparthelper.gui.color_without_block").withColor(CommonColors.SOFT_RED), mouseX, mouseY);
+                if (this.isMouseOver(mouseX, mouseY) && graphics.containsPointInScissor(mouseX, mouseY)) {
+                    graphics.setTooltipForNextFrame(Component.translatable("maparthelper.gui.color_without_block").withColor(CommonColors.SOFT_RED), mouseX, mouseY);
                 }
             } else {
                 setAlpha(1.0f);

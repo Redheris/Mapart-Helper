@@ -39,10 +39,19 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.input.TextFieldPredicates;
 import rh.maparthelper.gui.input.TextFieldValidators;
-import rh.maparthelper.gui.screen.panel.ImagePreprocessingDropdown;
+import rh.maparthelper.gui.screen.panel.ImagePreprocessingOverlay;
 import rh.maparthelper.gui.screen.panel.MaterialListPanel;
-import rh.maparthelper.gui.widget.*;
+import rh.maparthelper.gui.widget.BlockItemWidget;
+import rh.maparthelper.gui.widget.DecorativeButtonWidget;
+import rh.maparthelper.gui.widget.MapartPreviewWidget;
+import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
+import rh.maparthelper.gui.widget.dropdown.EnumListDropdownWidget;
+import rh.maparthelper.gui.widget.dropdown.MapColorPickerDropdownWidget;
+import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
 import rh.maparthelper.gui.widget.input.AdjTextFieldWidget;
+import rh.maparthelper.gui.widget.layout.OverlayLayout;
+import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.mapart.MapartSaver;
 import rh.maparthelper.server.MapCreator;
@@ -50,7 +59,9 @@ import rh.maparthelper.util.FileDialogsUtils;
 
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 //? >=1.21.10
 //import net.minecraft.client.input.KeyEvent;
@@ -66,6 +77,16 @@ public class MapartEditorScreen extends ScreenAdapted {
     private MapartPreviewWidget mapartPreview;
     private final int baseElementWidth = 165;
     private boolean shortElements = false;
+
+    private EnumListDropdownWidget croppingModeDropdownButton;
+    private EnumListDropdownWidget staircaseStyleDropdownButton;
+    private EnumListDropdownWidget colorConverterDropdownButton;
+    private EnumListDropdownWidget useAuxBlocksDropdownButton;
+    private PresetsListDropdownWidget presetsListDropdownButton;
+    private MapColorPickerDropdownWidget mapColorPickerDropdownWidget;
+    private DropdownOverlayWidget saveMapartDropdownWidget;
+
+    private OverlayLayout preprocessingDropdownOverlay;
 
     private Button saveNBT;
     private Button saveSplitNBT;
@@ -90,15 +111,16 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     @Override
-    protected void init() {
-        super.init();
-
+    protected void preInit() {
         initMapartOptionsPanel();
 
         int middleWidth = width - 2 * baseElementWidth - 42;
         int widthDiff = mapartOptions.getWidth() - middleWidth;
         shortElements = widthDiff > 0;
+    }
 
+    @Override
+    protected void initContent() {
         initRightPanel();
         initLeftPanel();
 
@@ -115,6 +137,110 @@ public class MapartEditorScreen extends ScreenAdapted {
         mapartOptions.visitWidgets(this::addRenderableWidget);
 
         updateMapartOutputButtons();
+    }
+
+    @Override
+    protected Set<OverlayLayout> initOverlays() {
+        final int elementWidth = currentElementWidth();
+        Set<OverlayLayout> overlays = new HashSet<>();
+
+        croppingModeDropdownButton = new EnumListDropdownWidget(
+                this,
+                elementWidth, 20,
+                elementWidth, 150,
+                Component.translatable("maparthelper.gui.cropMode"),
+                CurrentConversionSettings.cropMode,
+                !shortElements,
+                true,
+                e -> {
+                    CroppingMode cropMode = (CroppingMode) e;
+                    CurrentConversionSettings.cropMode = cropMode;
+                    toggleManualCroppingButtonsButton.active = cropMode == CroppingMode.USER_CROP;
+                    MapartImageUpdater.changeCroppingMode(mapart, cropMode);
+                },
+                CroppingMode.values()
+        );
+        staircaseStyleDropdownButton = new EnumListDropdownWidget(
+                this,
+                elementWidth, 20,
+                elementWidth, 150,
+                Component.translatable("maparthelper.gui.staircaseStyle"),
+                MapartHelper.conversionConfig().getStaircaseStyle(),
+                !shortElements,
+                MapartHelper.commonConfig().showStaircaseTooltips,
+                e -> {
+                    if (MapartHelper.conversionConfig().setStaircaseStyle((StaircaseStyles) e))
+                        MapartImageUpdater.updateMapart(mapart);
+                    updateMapartOutputButtons();
+                },
+                StaircaseStyles.FLAT_2D,
+                StaircaseStyles.VALLEY_3D,
+                StaircaseStyles.WAVES_3D,
+                MapartHelper.commonConfig().displayUnobtainableMode ? StaircaseStyles.UNOBTAINABLE : null
+        );
+        colorConverterDropdownButton = new EnumListDropdownWidget(
+                this,
+                elementWidth, 20,
+                elementWidth, 280,
+                Component.translatable("maparthelper.gui.ditheringAlg"),
+                MapartHelper.conversionConfig().getColorConverter(),
+                !shortElements,
+                e -> {
+                    MapartHelper.conversionConfig().setColorConverter((ColorConverters) e);
+                    MapartImageUpdater.updateMapart(mapart);
+                },
+                ColorConverters.values()
+        );
+        useAuxBlocksDropdownButton = new EnumListDropdownWidget(
+                this,
+                elementWidth, 20,
+                elementWidth, 150,
+                Component.translatable("maparthelper.gui.use_aux"),
+                MapartHelper.conversionConfig().getUseAuxBlocks(),
+                true, true,
+                e -> {
+                    MapartHelper.conversionConfig().setUseAuxBlocks((UseAuxBlocks) e);
+                    updateMaterialList();
+                },
+                UseAuxBlocks.values()
+        );
+        presetsListDropdownButton = new PresetsListDropdownWidget(
+                this,
+                elementWidth, 20,
+                elementWidth, 150,
+                true,
+                Component.nullToEmpty("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""),
+                s -> {
+                    PaletteColors.clearExcludingColors();
+                    updateResetExcludedColorsButton(false);
+                    PaletteConfigManager.changeCurrentPreset(s);
+                    MapColor oldBgColor = MapartHelper.conversionConfig().getBackgroundColor().mapColor();
+                    if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
+                        MapartHelper.conversionConfig().setBackgroundColor(MapColorEntry.CLEAR);
+                    }
+                    MapartImageUpdater.updateMapart(mapart);
+                },
+                PaletteConfigManager.presetsConfig.presetFiles
+        );
+        mapColorPickerDropdownWidget = new MapColorPickerDropdownWidget(
+                this,
+                mapart,
+                20, 20,
+                elementWidth, 160
+        );
+        preprocessingDropdownOverlay = ImagePreprocessingOverlay.create(mapart, elementWidth);
+        OverlayLayout saveMapartDropdownOverlay = saveMapartDropdownWidget.getOverlay();
+
+        overlays.add(croppingModeDropdownButton.getOverlay());
+        overlays.add(staircaseStyleDropdownButton.getOverlay());
+        overlays.add(colorConverterDropdownButton.getOverlay());
+        overlays.add(useAuxBlocksDropdownButton.getOverlay());
+        overlays.add(presetsListDropdownButton.getOverlay());
+        overlays.add(mapColorPickerDropdownWidget.getOverlay());
+        overlays.add(preprocessingDropdownOverlay);
+        overlays.add(saveMapartDropdownOverlay);
+
+        return overlays;
     }
 
     private int currentElementWidth() {
@@ -136,7 +262,13 @@ public class MapartEditorScreen extends ScreenAdapted {
             mapartOptions.addChild(importButton);
         }
 
-        mapartOptions.addChild(createSaveMapartDropdown());
+        saveMapartDropdownWidget = new DropdownOverlayWidget(
+                this, createSaveMapartDropdown(),
+                20, 20,
+                Component.literal("\uD83D\uDDAB")
+        );
+        saveMapartDropdownWidget.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.save_mapart_as")));
+        mapartOptions.addChild(saveMapartDropdownWidget);
 
         Button showGridButton = Button.builder(
                 Component.literal("#").withStyle(CurrentConversionSettings.doShowGrid ? ChatFormatting.AQUA : ChatFormatting.RESET),
@@ -191,6 +323,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     }
 
     private void initLeftPanel() {
+
         final int elementWidth = currentElementWidth();
         settingsLeft = LinearLayout.vertical();
         settingsLeft.setPosition(5, 20);
@@ -246,67 +379,18 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         // ===============================================
 
-        if (shortElements)
+        if (shortElements) {
             adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.cropMode"), font));
-        EnumDropdownMenuWidget croppingMode = new EnumDropdownMenuWidget(
-                this, 0, 0, elementWidth, 20, elementWidth,
-                Component.translatable("maparthelper.gui.cropMode"),
-                Component.translatable("maparthelper.gui.option." + CurrentConversionSettings.cropMode.name()),
-                !shortElements
-        );
-        croppingMode.addEntries(
-                e -> {
-                    CroppingMode cropMode = (CroppingMode) e;
-                    CurrentConversionSettings.cropMode = cropMode;
-                    toggleManualCroppingButtonsButton.active = cropMode == CroppingMode.USER_CROP;
-                    MapartImageUpdater.changeCroppingMode(mapart, cropMode);
-                },
-                CroppingMode.values()
-        );
-        if (shortElements) adder.addChild(croppingMode, topLabeledPositioner);
-        else adder.addChild(croppingMode);
-
-        if (shortElements)
+            adder.addChild(croppingModeDropdownButton, topLabeledPositioner);
             adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.staircaseStyle"), font));
-        EnumDropdownMenuWidget staircaseStyle = new EnumDropdownMenuWidget(
-                this, 0, 0, elementWidth, 20, elementWidth,
-                Component.translatable("maparthelper.gui.staircaseStyle"),
-                Component.translatable("maparthelper.gui.option." + MapartHelper.conversionConfig().getStaircaseStyle().name()),
-                !shortElements
-        );
-        staircaseStyle.toggleTooltips(MapartHelper.commonConfig().showStaircaseTooltips);
-        staircaseStyle.addEntries(
-                e -> {
-                    if (MapartHelper.conversionConfig().setStaircaseStyle((StaircaseStyles) e))
-                        MapartImageUpdater.updateMapart(mapart);
-                    updateMapartOutputButtons();
-                },
-                StaircaseStyles.FLAT_2D,
-                StaircaseStyles.VALLEY_3D,
-                StaircaseStyles.WAVES_3D,
-                MapartHelper.commonConfig().displayUnobtainableMode ? StaircaseStyles.UNOBTAINABLE : null
-        );
-        if (shortElements) adder.addChild(staircaseStyle, topLabeledPositioner);
-        else adder.addChild(staircaseStyle);
-
-        if (shortElements)
+            adder.addChild(staircaseStyleDropdownButton, topLabeledPositioner);
             adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.ditheringAlg"), font));
-        EnumDropdownMenuWidget colorConverter = new EnumDropdownMenuWidget(
-                this, 0, 0, elementWidth, 20, elementWidth, 280,
-                Component.translatable("maparthelper.gui.ditheringAlg"),
-                Component.translatable("maparthelper.gui.option." + MapartHelper.conversionConfig().getColorConverter().name()),
-                !shortElements
-        );
-        colorConverter.setLeftScroll(true);
-        colorConverter.addEntries(
-                e -> {
-                    MapartHelper.conversionConfig().setColorConverter((ColorConverters) e);
-                    MapartImageUpdater.updateMapart(mapart);
-                },
-                ColorConverters.values()
-        );
-        if (shortElements) adder.addChild(colorConverter, topLabeledPositioner);
-        else adder.addChild(colorConverter);
+            adder.addChild(colorConverterDropdownButton, topLabeledPositioner);
+        } else {
+            adder.addChild(croppingModeDropdownButton);
+            adder.addChild(staircaseStyleDropdownButton);
+            adder.addChild(colorConverterDropdownButton);
+        }
 
         Component isOn = Component.translatable("maparthelper.gui.isOn");
         Component isOff = Component.translatable("maparthelper.gui.isOff");
@@ -325,15 +409,17 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
         adder.addChild(useLAB);
 
-        adder.addChild(new ImagePreprocessingDropdown(this, mapart, 100, elementWidth));
+        adder.addChild(new DropdownOverlayWidget(
+                this, preprocessingDropdownOverlay,
+                100, 20,
+                Component.translatable("maparthelper.gui.image_preprocessing"),
+                true
+        ));
 
         LinearLayout bgColorChoose = LinearLayout.horizontal();
         bgColorChoose.defaultCellSetting().alignVerticallyMiddle();
         bgColorChoose.addChild(new StringWidget(Component.translatable("maparthelper.gui.backgroundColor"), font));
-        bgColorChoose.addChild(new MapColorPickerWidget(
-                this, mapart, 20, 20,
-                elementWidth, 180, 4
-        ));
+        bgColorChoose.addChild(mapColorPickerDropdownWidget);
         adder.addChild(bgColorChoose);
 
         adder.addChild(
@@ -352,20 +438,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         auxAdder.addChild(auxBlockPreview);
         adder.addChild(auxBlock);
 
-        EnumDropdownMenuWidget useAuxBlocks = new EnumDropdownMenuWidget(
-                this, 0, 0,
-                elementWidth, 20, elementWidth,
-                Component.translatable("maparthelper.gui.use_aux"),
-                Component.translatable("maparthelper.gui.option." + MapartHelper.conversionConfig().getUseAuxBlocks())
-        );
-        useAuxBlocks.addEntries(
-                e -> {
-                    MapartHelper.conversionConfig().setUseAuxBlocks((UseAuxBlocks) e);
-                    updateMaterialList();
-                },
-                UseAuxBlocks.values()
-        );
-        adder.addChild(useAuxBlocks);
+        adder.addChild(useAuxBlocksDropdownButton);
 
         settingsLeftScrollable.arrangeElements();
         this.addRenderableWidget(settingsLeftScrollable);
@@ -376,26 +449,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsRight = LinearLayout.vertical();
         LayoutSettings settingsRightPositioner = settingsRight.defaultCellSetting().paddingTop(5);
 
-        PresetsDropdownMenuWidget presetsList = new PresetsDropdownMenuWidget(
-                this, 0, 0, elementWidth, 20, elementWidth,
-                Component.nullToEmpty("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""), true
-        );
-        presetsList.addEntries(
-                s -> {
-                    PaletteColors.clearExcludingColors();
-                    updateResetExcludedColorsButton(false);
-                    PaletteConfigManager.changeCurrentPreset(s);
-                    MapColor oldBgColor = MapartHelper.conversionConfig().getBackgroundColor().mapColor();
-                    if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
-                        MapartHelper.conversionConfig().setBackgroundColor(MapColorEntry.CLEAR);
-                    }
-                    MapartImageUpdater.updateMapart(mapart);
-                },
-                PaletteConfigManager.presetsConfig.presetFiles
-        );
         StringWidget currentPresetLabel = new StringWidget(Component.translatable("maparthelper.gui.current_preset_label"), font);
         settingsRight.addChild(currentPresetLabel);
-        settingsRight.addChild(presetsList, settingsRightPositioner.copy().paddingTop(0));
+        settingsRight.addChild(presetsListDropdownButton, settingsRightPositioner.copy().paddingTop(0));
 
         Button presetsEditor = Button.builder(
                 Component.translatable("maparthelper.gui.presets_editor_screen"),
@@ -509,10 +565,10 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     //~ gui_rendering
     @Override
-    public void render(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        context.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
-        context.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
-        super.render(context, mouseX, mouseY, partialTick);
+    public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.fill(0, 0, settingsLeft.getX() + settingsLeft.getWidth() + 7, height, 0x77000000);
+        graphics.fill(settingsRight.getX() - 7, 0, width, height, 0x77000000);
+        super.render(graphics, mouseX, mouseY, partialTick);
 
         if (!MaterialListPanel.MaterialListBlockWidget.isHoveringAny()) {
             MaterialListPanel.MaterialListBlockWidget.setDefaultHighlight(mapartPreview);
@@ -583,7 +639,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         return size;
     }
 
-    private DropdownMenuWidget createSaveMapartDropdown() {
+    private OverlayLayout createSaveMapartDropdown() {
         boolean isIntegratedServer = Minecraft.getInstance().hasSingleplayerServer();
 
         Button saveImage = Button.builder(
@@ -592,22 +648,22 @@ public class MapartEditorScreen extends ScreenAdapted {
                     Player player = /*? if <=1.21.8 {*/ minecraft == null ? null : /*?}*/ minecraft.player;
                     MapartSaver.saveMapartImage(mapart.mapartName, CurrentConversionSettings.guiMapartImage, player);
                 }
-        ).size(156, 20).build();
+        ).size(150, 20).build();
 
         saveNBT = Button.builder(
                 Component.translatable("maparthelper.gui.saveNBT"),
                 (btn) -> MapartToNBT.saveNBT(true)
-        ).size(156, 20).build();
+        ).size(150, 20).build();
 
         saveSplitNBT = Button.builder(
                 Component.translatable("maparthelper.gui.saveEveryNBT"),
                 (btn) -> MapartToNBT.saveNBT(false)
-        ).size(156, 20).build();
+        ).size(150, 20).build();
 
         saveZipNBT = Button.builder(
                 Component.translatable("maparthelper.gui.saveZip"),
                 (btn) -> MapartToNBT.saveNBTAsZip()
-        ).size(156, 20).build();
+        ).size(150, 20).build();
 
         Minecraft mc = Minecraft.getInstance();
         if (isIntegratedServer && mc.getSingleplayerServer() != null && mc.player != null) {
@@ -620,19 +676,13 @@ public class MapartEditorScreen extends ScreenAdapted {
                         );
                         MapCreator.getMapsForMapart(maps, mapart.getWidth(), mapart.mapartName, mc.getSingleplayerServer().overworld(), serverPlayer);
                     }
-            ).size(156, 20).build();
+            ).size(150, 20).build();
         }
 
-        DropdownMenuWidget saveMapart = new DropdownMenuWidget(this, 0, 0, 20, 20, 160, -1, Component.literal("\uD83D\uDDAB"));
-        saveMapart.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.save_mapart_as")));
-        saveMapart.addEntry(saveImage);
-        saveMapart.addEntry(saveNBT);
-        saveMapart.addEntry(saveSplitNBT);
-        saveMapart.addEntry(saveZipNBT);
-        if (isIntegratedServer)
-            saveMapart.addEntry(getMapItemsButton);
-
-        return saveMapart;
+        return OverlayLayoutFactory.listMenu(
+                150, 160,
+                saveImage, saveNBT, saveSplitNBT, saveZipNBT, getMapItemsButton
+        );
     }
 
     public void updateMapartOutputButtons() {

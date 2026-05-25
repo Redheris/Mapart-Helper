@@ -50,14 +50,14 @@ public class DecorativeButtonWidget extends AbstractButton {
     //~ gui_rendering
     @Override
     //? if <=1.21.8 {
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
     //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    /*protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
      *///?} elif >=26.1
-    //protected void renderContents(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    //protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (textureDefault != null) {
             if (isHovered) {
-                context.blit(
+                graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
                         textureHighlighted,
                         getX(), getY(),
@@ -66,7 +66,7 @@ public class DecorativeButtonWidget extends AbstractButton {
                         width, height
                 );
             } else {
-                context.blit(
+                graphics.blit(
                         RenderPipelines.GUI_TEXTURED,
                         textureDefault,
                         getX(), getY(),
@@ -77,12 +77,12 @@ public class DecorativeButtonWidget extends AbstractButton {
             }
         } else {
             //? if >=1.21.11 {
-            /*this.renderDefaultLabel(context.textRenderer(
+            /*this.renderDefaultLabel(graphics.textRenderer(
                     GuiGraphics.HoveredTextEffects.NONE,
                     style -> style.withColor(CommonColors.LIGHT_GRAY))
             );
             *///?} else <=1.21.8
-            this.renderString(context, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
+            this.renderString(graphics, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
         }
     }
     //~ !gui_rendering

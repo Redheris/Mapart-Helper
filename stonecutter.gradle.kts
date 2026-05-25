@@ -104,6 +104,10 @@ stonecutter parameters {
                 "onClick(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
             )
             replace(
+                "updateScrolling(double mouseX, double mouseY, int button)",
+                "updateScrolling(@NotNull MouseButtonEvent mouseEvent)"
+            )
+            replace(
                 "(double mouseX, double mouseY, int button)",
                 "(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
             )
@@ -111,6 +115,7 @@ stonecutter parameters {
             replace("mouseReleased(mouseX, mouseY, button)", "mouseReleased(mouseEvent)")
             replace("mouseX", "mouseEvent.x()")
             replace("mouseY", "mouseEvent.y()")
+            replace("isValidClickButton(button)", "isValidClickButton(mouseEvent.buttonInfo())")
             replace("button", "mouseEvent.button()")
             replace("(int keyCode, int scanCode, int modifiers)", "(@NotNull KeyEvent keyEvent)")
             replace("(keyCode, scanCode, modifiers)", "(keyEvent)")
@@ -131,8 +136,8 @@ stonecutter parameters {
 
             replace("render(", "extractRenderState(")
 
-            replace("context.hLine(", "context.horizontalLine(")
-            replace("context.hLine(", "context.horizontalLine(")
+            replace("graphics.hLine(", "graphics.horizontalLine(")
+            replace("graphics.vLine(", "graphics.verticalLine(")
             replace("scrollbarVisible()", "scrollable()")
         }
     }
