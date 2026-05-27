@@ -33,10 +33,10 @@ import java.util.List;
  * This LevelReader exists to deceive the
  * {@code BlockBehaviour#canSurvive} to check if the block can survive without a support block below it
  */
-public class DummyWorldView implements LevelReader {
-    private final static DummyWorldView INSTANCE = new DummyWorldView();
+public class DummyLevelView implements LevelReader {
+    private final static DummyLevelView INSTANCE = new DummyLevelView();
 
-    public static DummyWorldView getInstance() {
+    public static DummyLevelView getInstance() {
         return INSTANCE;
     }
 

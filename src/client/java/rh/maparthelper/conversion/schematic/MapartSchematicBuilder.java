@@ -163,7 +163,7 @@ public class MapartSchematicBuilder {
     }
 
     public static boolean needsAuxBlock(Block block) {
-        boolean canPlaceAtAir = block.defaultBlockState().canSurvive(DummyWorldView.getInstance(), BlockPos.ZERO);
+        boolean canPlaceAtAir = block.defaultBlockState().canSurvive(DummyLevelView.getInstance(), BlockPos.ZERO);
         boolean hasNoCollision = block.defaultBlockState().getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) == Shapes.empty();
         return !canPlaceAtAir || block instanceof FallingBlock || block instanceof SlabBlock || hasNoCollision;
     }
