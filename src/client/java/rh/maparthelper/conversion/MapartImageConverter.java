@@ -95,7 +95,10 @@ public class MapartImageConverter {
                 bgMapColorId,
                 topLineBright,
                 topLineCorrect,
-                conversionProgress
+                conversionProgress,
+                CurrentConversionSettings.redPropagation,
+                CurrentConversionSettings.greenPropagation,
+                CurrentConversionSettings.bluePropagation
         );
         return colorConverter.convertColors(useUnobtainable, useMultithreading);
     }

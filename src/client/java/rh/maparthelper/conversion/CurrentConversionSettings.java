@@ -22,6 +22,11 @@ public class CurrentConversionSettings {
     public static float contrast = 0.0f;
     public static float saturation = 1.0f;
 
+    // Error propagation weights
+    public static float redPropagation = 1.0f;
+    public static float greenPropagation = 1.0f;
+    public static float bluePropagation = 1.0f;
+
     public static void resetMapart() {
         MapartImageConverter.cancelConverting();
         synchronized (mapart) {

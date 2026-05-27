@@ -19,11 +19,10 @@ public class PresetsListDropdownWidget extends DropdownOverlayWidget {
                                      Consumer<String> action, Map<String, String> presets) {
         super(screen, null, width, height, initOption);
 
-        presetButtons = initOverlay(this, dynamicText, overlayHeight, overlayWidth, action, presets);
+        presetButtons = initOverlay(dynamicText, overlayHeight, overlayWidth, action, presets);
     }
 
-    public Button[] initOverlay(PresetsListDropdownWidget dropdownWidget, boolean dynamicText,
-                                int height, int width,
+    public Button[] initOverlay(boolean dynamicText, int height, int width,
                                 Consumer<String> action, Map<String, String> presets) {
         Button[] widgets = new Button[presets.size()];
         int id = 0;
@@ -36,7 +35,7 @@ public class PresetsListDropdownWidget extends DropdownOverlayWidget {
                             valueText,
                             btn -> {
                                 if (dynamicText)
-                                    dropdownWidget.setMessage(valueText);
+                                    this.setMessage(valueText);
                                 action.accept(presetFile);
                             }
                     )

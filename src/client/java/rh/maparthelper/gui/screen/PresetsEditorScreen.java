@@ -103,7 +103,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarLeft.addChild(presetNameLabel, presetBarLeftPositioner.copy().paddingRight(5));
 
         presetNameField = new AdjEditBox(
-                font, (int) (boxWidth * 0.35), 20, presetsConfig.presetFiles.get(editingPreset), "Preset name"
+                font, (int) (boxWidth * 0.3), 20, presetsConfig.presetFiles.get(editingPreset), "Preset name"
         );
         presetBarLeft.addChild(presetNameField);
 

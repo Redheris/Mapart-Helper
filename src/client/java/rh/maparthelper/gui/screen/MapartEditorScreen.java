@@ -36,10 +36,12 @@ import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.conversion.dithering.ColorConverters;
+import rh.maparthelper.conversion.dithering.DitheringTypes;
 import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.input.TextFieldPredicates;
 import rh.maparthelper.gui.input.TextFieldValidators;
+import rh.maparthelper.gui.screen.panel.ErrorPropagationWeightsOverlay;
 import rh.maparthelper.gui.screen.panel.ImagePreprocessingOverlay;
 import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.BlockItemWidget;
@@ -86,6 +88,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private PresetsListDropdownWidget presetsListDropdownButton;
     private MapColorPickerDropdownWidget mapColorPickerDropdownWidget;
     private DropdownOverlayWidget saveMapartDropdownWidget;
+    private DropdownOverlayWidget rgbPropagationDropdownWidget;
 
     private OverlayLayout preprocessingDropdownOverlay;
 
@@ -186,10 +189,22 @@ public class MapartEditorScreen extends ScreenAdapted {
                 Component.translatable("maparthelper.gui.ditheringAlg"),
                 MapartHelper.conversionConfig().getColorConverter(),
                 !shortElements,
+                true,
+                btn -> {
+                    if (MapartHelper.conversionConfig().getColorConverter().ditheringType() == DitheringTypes.ERROR_DIFFUSION) {
+                        btn.setWidth(elementWidth - rgbPropagationDropdownWidget.getWidth() - 2);
+                        rgbPropagationDropdownWidget.visible = true;
+                        rgbPropagationDropdownWidget.setX(btn.getRight() + 2);
+                    } else {
+                        btn.setWidth(elementWidth);
+                        rgbPropagationDropdownWidget.visible = false;
+                    }
+                },
                 e -> {
                     MapartHelper.conversionConfig().setColorConverter((ColorConverters) e);
                     MapartImageUpdater.updateMapart(mapart);
                 },
+
                 ColorConverters.values()
         );
         useAuxBlocksDropdownButton = new EnumListDropdownWidget(
@@ -229,8 +244,22 @@ public class MapartEditorScreen extends ScreenAdapted {
                 20, 20,
                 elementWidth, 160
         );
-        preprocessingDropdownOverlay = ImagePreprocessingOverlay.create(mapart, elementWidth);
         OverlayLayout saveMapartDropdownOverlay = saveMapartDropdownWidget.getOverlay();
+        LinearLayout propagationContent = LinearLayout.vertical();
+        propagationContent.addChild(SpacerElement.width(40));
+        propagationContent.addChild(SpacerElement.height(40));
+        rgbPropagationDropdownWidget = new DropdownOverlayWidget(
+                this, ErrorPropagationWeightsOverlay.create(mapart, elementWidth),
+                20, 20,
+                Component.literal("\uD83D\uDD27"),
+                true
+        );
+
+        rgbPropagationDropdownWidget.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.errorPropagation")));
+        rgbPropagationDropdownWidget.visible = false;
+        rgbPropagationDropdownWidget.setOverlayXOffset(-rgbPropagationDropdownWidget.getOverlay().getWidth());
+
+        preprocessingDropdownOverlay = ImagePreprocessingOverlay.create(mapart, elementWidth);
 
         overlays.add(croppingModeDropdownButton.getOverlay());
         overlays.add(staircaseStyleDropdownButton.getOverlay());
@@ -240,6 +269,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         overlays.add(mapColorPickerDropdownWidget.getOverlay());
         overlays.add(preprocessingDropdownOverlay);
         overlays.add(saveMapartDropdownOverlay);
+        overlays.add(rgbPropagationDropdownWidget.getOverlay());
 
         return overlays;
     }
@@ -382,12 +412,21 @@ public class MapartEditorScreen extends ScreenAdapted {
             settingsLeftContent.addChild(new StringWidget(Component.translatable("maparthelper.gui.staircaseStyle"), font));
             settingsLeftContent.addChild(staircaseStyleDropdownButton, topLabeledPositioner);
             settingsLeftContent.addChild(new StringWidget(Component.translatable("maparthelper.gui.ditheringAlg"), font));
-            settingsLeftContent.addChild(colorConverterDropdownButton, topLabeledPositioner);
         } else {
             settingsLeftContent.addChild(croppingModeDropdownButton);
             settingsLeftContent.addChild(staircaseStyleDropdownButton);
-            settingsLeftContent.addChild(colorConverterDropdownButton);
         }
+
+        LinearLayout colorConverterLine = LinearLayout.horizontal().spacing(2);
+        if (MapartHelper.conversionConfig().getColorConverter().ditheringType() == DitheringTypes.ERROR_DIFFUSION) {
+            colorConverterDropdownButton.setWidth(elementWidth - rgbPropagationDropdownWidget.getWidth() - 2);
+            rgbPropagationDropdownWidget.visible = true;
+        }
+
+        colorConverterLine.addChild(colorConverterDropdownButton);
+        colorConverterLine.addChild(rgbPropagationDropdownWidget);
+        if (shortElements) settingsLeftContent.addChild(colorConverterLine, topLabeledPositioner);
+        else settingsLeftContent.addChild(colorConverterLine);
 
         Component isOn = Component.translatable("maparthelper.gui.isOn");
         Component isOff = Component.translatable("maparthelper.gui.isOff");

@@ -3,17 +3,9 @@ package rh.maparthelper.gui.widget.layout;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.Layout;
 import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.gui.widget.dropdown.EnumListDropdownWidget;
-
-import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
 public class OverlayLayoutFactory {
@@ -43,37 +35,5 @@ public class OverlayLayoutFactory {
             menu.addChild(entry);
         }
         return defaultOverlay(menu, height, width);
-    }
-
-    public static @NotNull OverlayLayout enumsList(EnumListDropdownWidget dropdownWidget, int height, int width,
-                                                   Component fieldName, boolean showTooltips, boolean showFieldName,
-                                                   Consumer<Enum<?>> action, Enum<?>... values) {
-        Button[] widgets = new Button[values.length];
-
-        for (int i = 0; i < values.length; i++) {
-            Enum<?> value = values[i];
-            if (value == null) continue;
-            Component objectName = Component.translatable("maparthelper.gui.option." + value.name());
-            Button widget = Button.builder(
-                            objectName,
-                            btn -> {
-                                dropdownWidget.setMessage(showFieldName ? fieldName.copy().append(objectName) : objectName);
-                                action.accept(value);
-                            }
-                    )
-                    .size(width - 10, 15)
-                    .build();
-            if (showTooltips) {
-                Component tooltip = MutableComponent.create(new TranslatableContents(
-                        "maparthelper.gui.option." + value.name() + "._TOOLTIP",
-                        "",
-                        TranslatableContents.NO_ARGS)
-                );
-                widget.setTooltip(Tooltip.create(tooltip));
-            }
-            widgets[i] = widget;
-        }
-
-        return listMenu(height, width, widgets);
     }
 }

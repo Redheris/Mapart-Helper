@@ -126,9 +126,9 @@ public abstract class DiffusionDithering extends ColorConverter {
     private void putError(int width, int x, int y, float r, float g, float b) {
         if (x < 0 || x >= width || y < 0 || y >= rowsNumber) return;
         int ind = (y * width + x) * 3;
-        errorsArray[ind] += Math.round(r);
-        errorsArray[ind + 1] += Math.round(g);
-        errorsArray[ind + 2] += Math.round(b);
+        errorsArray[ind] += Math.round(r * redPropagationWeight);
+        errorsArray[ind + 1] += Math.round(g * greenPropagationWeight);
+        errorsArray[ind + 2] += Math.round(b * bluePropagationWeight);
     }
 
     protected static float[] createKernelFromWeights(int... weights) {
