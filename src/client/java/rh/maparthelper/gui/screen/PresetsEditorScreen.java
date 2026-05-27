@@ -3,7 +3,6 @@ package rh.maparthelper.gui.screen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -23,6 +22,7 @@ import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
+import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.util.RenderUtils;
@@ -51,7 +51,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private PresetsListDropdownWidget presetsListDropdownButton;
 
-    private EditBox presetNameField;
+    private AdjEditBox presetNameField;
     private AdjScrollableLayoutWidget colorsEditorScrollable;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
@@ -102,22 +102,17 @@ public class PresetsEditorScreen extends ScreenAdapted {
         StringWidget presetNameLabel = new StringWidget(Component.translatable("maparthelper.gui.preset"), font);
         presetBarLeft.addChild(presetNameLabel, presetBarLeftPositioner.copy().paddingRight(5));
 
-        presetNameField = new EditBox(
-                font, (int) (boxWidth * 0.35), 20, Component.empty()
+        presetNameField = new AdjEditBox(
+                font, (int) (boxWidth * 0.35), 20, presetsConfig.presetFiles.get(editingPreset), "Preset name"
         );
-        presetNameField.setValue(presetsConfig.presetFiles.get(editingPreset));
         presetBarLeft.addChild(presetNameField);
 
         presetsListDropdownButton.setOverlayXOffset(-presetNameField.getWidth());
         presetsListDropdownButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.choose_preset")));
         presetBarLeft.addChild(presetsListDropdownButton);
 
-        presetNameField.setResponder(value -> {
-            if (value.isBlank()) {
-                presetNameField.setSuggestion(Component.translatable("maparthelper.gui.presets.preset_name").getString());
-                return;
-            }
-            presetNameField.setSuggestion(null);
+        presetNameField.setHint(Component.translatable("maparthelper.gui.presets.preset_name").withColor(CommonColors.GRAY));
+        presetNameField.setValueConsumer(value -> {
             presetsConfig.presetFiles.put(editingPreset, value);
             presetsListDropdownButton.updateNames(presetsConfig.presetFiles.values());
         });

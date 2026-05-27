@@ -2,6 +2,7 @@ package rh.maparthelper.gui.input;
 
 import java.util.function.Predicate;
 
+/// Predicates for filtering input
 public class TextFieldPredicates {
     public static Predicate<String> positiveInt() {
         return integer(1, null);

@@ -19,13 +19,13 @@ import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.util.StringUtil;
 *///?}
 
-public class AdjTextFieldWidget extends EditBox {
+public class AdjEditBox extends EditBox {
     private Predicate<String> valueValidator;
     private Consumer<String> valueConsumer;
     //? >=26.1
     //private Predicate<String> filter = Objects::nonNull;
 
-    public AdjTextFieldWidget(Font textRenderer, int width, int height, String initialValue, String narrationTitle) {
+    public AdjEditBox(Font textRenderer, int width, int height, String initialValue, String narrationTitle) {
         super(textRenderer, width, height, Component.nullToEmpty(narrationTitle));
         setValue(initialValue);
     }

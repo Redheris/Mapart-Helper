@@ -46,9 +46,12 @@ public abstract class ScreenAdapted extends Screen {
     //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (this.getFocused() instanceof ContainerEventHandler l)
-            l.setFocused(null);
-        this.setFocused(null);
+        if (this.getFocused() instanceof ContainerEventHandler l) {
+            if (l.getFocused() == null || !l.getFocused().isMouseOver(mouseX, mouseY))
+                l.setFocused(null);
+        }
+        if (this.getFocused() == null || !this.getFocused().isMouseOver(mouseX, mouseY))
+            this.setFocused(null);
 
         OverlaysManager.handleMouseClick(mouseX, mouseY);
         return super.mouseClicked(mouseX, mouseY, button);

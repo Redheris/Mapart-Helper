@@ -49,7 +49,7 @@ import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
 import rh.maparthelper.gui.widget.dropdown.EnumListDropdownWidget;
 import rh.maparthelper.gui.widget.dropdown.MapColorPickerDropdownWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
-import rh.maparthelper.gui.widget.input.AdjTextFieldWidget;
+import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
@@ -332,7 +332,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         LayoutSettings settingsLeftPositioner = settingsLeft.defaultCellSetting().paddingTop(5);
         LayoutSettings topLabeledPositioner = settingsLeftPositioner.copy().paddingTop(0);
 
-        AdjTextFieldWidget mapartName = new AdjTextFieldWidget(
+        AdjEditBox mapartName = new AdjEditBox(
                 font, elementWidth, 20, mapart.mapartName, "Mapart name"
         );
         mapartName.setHint(Component.translatable("maparthelper.gui.mapart_name_field").withColor(CommonColors.GRAY));
@@ -551,8 +551,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         updateMaterialList();
     }
 
-    private @NotNull AdjTextFieldWidget createAuxBlockFieldWidget(BlockItemWidget auxBlockPreview, String currentAuxBlock) {
-        AdjTextFieldWidget auxBlockId = new AdjTextFieldWidget(
+    private @NotNull AdjEditBox createAuxBlockFieldWidget(BlockItemWidget auxBlockPreview, String currentAuxBlock) {
+        AdjEditBox auxBlockId = new AdjEditBox(
                 font, currentElementWidth() - auxBlockPreview.getWidth() - 5, 20,
                 currentAuxBlock, "Auxiliary block identifier"
         );
@@ -610,7 +610,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridLayout size = new GridLayout().spacing(10).rowSpacing(1);
         GridLayout.RowHelper adder = size.createRowHelper(2);
 
-        AdjTextFieldWidget widthInput = new AdjTextFieldWidget(
+        AdjEditBox widthInput = new AdjEditBox(
                 font, 30, 20, "" + mapart.getWidth(), "Width"
         );
         widthInput.setHint(Component.literal("x").withColor(CommonColors.GRAY));
@@ -623,7 +623,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
         });
 
-        AdjTextFieldWidget heightInput = new AdjTextFieldWidget(
+        AdjEditBox heightInput = new AdjEditBox(
                 font, 30, 20, "" + mapart.getHeight(), "Height"
         );
         heightInput.setHint(Component.literal("y").withColor(CommonColors.GRAY));
