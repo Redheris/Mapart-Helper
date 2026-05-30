@@ -68,6 +68,10 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
         return (this.value < 0.5 ? Math.floor(value * 100) : Math.ceil(value * 100)) / 100;
     }
 
+    public boolean isMiddleValue() {
+        return value == 0.5;
+    }
+
     //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {

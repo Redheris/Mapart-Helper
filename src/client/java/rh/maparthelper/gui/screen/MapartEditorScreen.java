@@ -41,16 +41,11 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.input.TextFieldPredicates;
 import rh.maparthelper.gui.input.TextFieldValidators;
-import rh.maparthelper.gui.screen.panel.ErrorPropagationWeightsOverlay;
-import rh.maparthelper.gui.screen.panel.ImagePreprocessingOverlay;
 import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
-import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
-import rh.maparthelper.gui.widget.dropdown.EnumListDropdownWidget;
-import rh.maparthelper.gui.widget.dropdown.MapColorPickerDropdownWidget;
-import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
+import rh.maparthelper.gui.widget.dropdown.*;
 import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
@@ -89,8 +84,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private MapColorPickerDropdownWidget mapColorPickerDropdownWidget;
     private DropdownOverlayWidget saveMapartDropdownWidget;
     private DropdownOverlayWidget rgbPropagationDropdownWidget;
-
-    private OverlayLayout preprocessingDropdownOverlay;
+    private ImagePreprocessingDropdownWidget preprocessingDropdownWidget;
 
     private Button saveNBT;
     private Button saveSplitNBT;
@@ -248,18 +242,24 @@ public class MapartEditorScreen extends ScreenAdapted {
         LinearLayout propagationContent = LinearLayout.vertical();
         propagationContent.addChild(SpacerElement.width(40));
         propagationContent.addChild(SpacerElement.height(40));
-        rgbPropagationDropdownWidget = new DropdownOverlayWidget(
-                this, ErrorPropagationWeightsOverlay.create(mapart, elementWidth),
+
+        rgbPropagationDropdownWidget = new ErrorPropagationDropdownWidget(
+                this, mapart,
                 20, 20,
-                Component.literal("\uD83D\uDD27"),
-                true
+                elementWidth + 4, 124,
+                Component.literal("\uD83D\uDD27")
         );
 
         rgbPropagationDropdownWidget.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.errorPropagation")));
         rgbPropagationDropdownWidget.visible = false;
         rgbPropagationDropdownWidget.setOverlayXOffset(-rgbPropagationDropdownWidget.getOverlay().getWidth());
 
-        preprocessingDropdownOverlay = ImagePreprocessingOverlay.create(mapart, elementWidth);
+        preprocessingDropdownWidget = new ImagePreprocessingDropdownWidget(
+                this, mapart,
+                100, 20,
+                elementWidth + 4, 124,
+                Component.translatable("maparthelper.gui.image_preprocessing")
+        );
 
         overlays.add(croppingModeDropdownButton.getOverlay());
         overlays.add(staircaseStyleDropdownButton.getOverlay());
@@ -267,9 +267,9 @@ public class MapartEditorScreen extends ScreenAdapted {
         overlays.add(useAuxBlocksDropdownButton.getOverlay());
         overlays.add(presetsListDropdownButton.getOverlay());
         overlays.add(mapColorPickerDropdownWidget.getOverlay());
-        overlays.add(preprocessingDropdownOverlay);
-        overlays.add(saveMapartDropdownOverlay);
         overlays.add(rgbPropagationDropdownWidget.getOverlay());
+        overlays.add(preprocessingDropdownWidget.getOverlay());
+        overlays.add(saveMapartDropdownOverlay);
 
         return overlays;
     }
@@ -444,13 +444,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             useLAB.setTooltipDelay(Duration.ofMillis(500));
         }
         settingsLeftContent.addChild(useLAB);
-
-        settingsLeftContent.addChild(new DropdownOverlayWidget(
-                this, preprocessingDropdownOverlay,
-                100, 20,
-                Component.translatable("maparthelper.gui.image_preprocessing"),
-                true
-        ));
+        settingsLeftContent.addChild(preprocessingDropdownWidget);
 
         LinearLayout bgColorChoose = LinearLayout.horizontal();
         bgColorChoose.defaultCellSetting().alignVerticallyMiddle();
