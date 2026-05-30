@@ -418,8 +418,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         }
 
         LinearLayout colorConverterLine = LinearLayout.horizontal().spacing(2);
+        colorConverterDropdownButton.setWidth(elementWidth - rgbPropagationDropdownWidget.getWidth() - 2);
         if (MapartHelper.conversionConfig().getColorConverter().ditheringType() == DitheringTypes.ERROR_DIFFUSION) {
-            colorConverterDropdownButton.setWidth(elementWidth - rgbPropagationDropdownWidget.getWidth() - 2);
             rgbPropagationDropdownWidget.visible = true;
         }
 
@@ -485,6 +485,10 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         settingsLeftScrollable.arrangeElements();
         settingsLeftScrollable.visitWidgets(this::addRenderableWidget);
+
+        if (MapartHelper.conversionConfig().getColorConverter().ditheringType() != DitheringTypes.ERROR_DIFFUSION) {
+            colorConverterDropdownButton.setWidth(elementWidth);
+        }
     }
 
     private void initRightPanel() {
