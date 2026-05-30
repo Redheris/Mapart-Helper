@@ -11,15 +11,15 @@ import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import rh.maparthelper.mapart.MapartProcessing;
 
-public class ErrorPropagationDropdownWidget extends ImageAdjustmentsDropdownWidget {
+public class ErrorPropagationDropdown extends ImageAdjustmentsDropdown {
     private final MapartProcessing mapart;
 
     private ImageAdjustmentSliderWidget sliderRed;
     private ImageAdjustmentSliderWidget sliderGreen;
     private ImageAdjustmentSliderWidget sliderBlue;
 
-    public ErrorPropagationDropdownWidget(@NotNull Screen screen, MapartProcessing mapart, int width, int height,
-                                          int overlayWidth, int overlayHeight, Component message) {
+    public ErrorPropagationDropdown(@NotNull Screen screen, MapartProcessing mapart, int width, int height,
+                                    int overlayWidth, int overlayHeight, Component message) {
         super(screen, width, height, overlayWidth, overlayHeight, message);
         this.mapart = mapart;
     }

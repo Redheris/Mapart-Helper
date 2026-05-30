@@ -76,15 +76,15 @@ public class MapartEditorScreen extends ScreenAdapted {
     private final int baseElementWidth = 165;
     private boolean shortElements = false;
 
-    private EnumListDropdownWidget croppingModeDropdownButton;
-    private EnumListDropdownWidget staircaseStyleDropdownButton;
-    private EnumListDropdownWidget colorConverterDropdownButton;
-    private EnumListDropdownWidget useAuxBlocksDropdownButton;
-    private PresetsListDropdownWidget presetsListDropdownButton;
-    private MapColorPickerDropdownWidget mapColorPickerDropdownWidget;
+    private EnumListDropdown croppingModeDropdownButton;
+    private EnumListDropdown staircaseStyleDropdownButton;
+    private EnumListDropdown colorConverterDropdownButton;
+    private EnumListDropdown useAuxBlocksDropdownButton;
+    private PresetsListDropdown presetsListDropdownButton;
+    private MapColorPickerDropdown mapColorPickerDropdownWidget;
     private DropdownOverlayWidget saveMapartDropdownWidget;
     private DropdownOverlayWidget rgbPropagationDropdownWidget;
-    private ImagePreprocessingDropdownWidget preprocessingDropdownWidget;
+    private ImagePreprocessingDropdown preprocessingDropdownWidget;
 
     private Button saveNBT;
     private Button saveSplitNBT;
@@ -142,7 +142,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         final int elementWidth = currentElementWidth();
         Set<OverlayLayout> overlays = new HashSet<>();
 
-        croppingModeDropdownButton = new EnumListDropdownWidget(
+        croppingModeDropdownButton = new EnumListDropdown(
                 this,
                 elementWidth, 20,
                 elementWidth, 150,
@@ -158,7 +158,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 CroppingMode.values()
         );
-        staircaseStyleDropdownButton = new EnumListDropdownWidget(
+        staircaseStyleDropdownButton = new EnumListDropdown(
                 this,
                 elementWidth, 20,
                 elementWidth, 150,
@@ -176,7 +176,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 StaircaseStyles.WAVES_3D,
                 MapartHelper.commonConfig().displayUnobtainableMode ? StaircaseStyles.UNOBTAINABLE : null
         );
-        colorConverterDropdownButton = new EnumListDropdownWidget(
+        colorConverterDropdownButton = new EnumListDropdown(
                 this,
                 elementWidth, 20,
                 elementWidth, 280,
@@ -201,7 +201,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
                 ColorConverters.values()
         );
-        useAuxBlocksDropdownButton = new EnumListDropdownWidget(
+        useAuxBlocksDropdownButton = new EnumListDropdown(
                 this,
                 elementWidth, 20,
                 elementWidth, 150,
@@ -214,7 +214,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 UseAuxBlocks.values()
         );
-        presetsListDropdownButton = new PresetsListDropdownWidget(
+        presetsListDropdownButton = new PresetsListDropdown(
                 this,
                 elementWidth, 20,
                 elementWidth, 150,
@@ -232,7 +232,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 },
                 PaletteConfigManager.presetsConfig.presetFiles
         );
-        mapColorPickerDropdownWidget = new MapColorPickerDropdownWidget(
+        mapColorPickerDropdownWidget = new MapColorPickerDropdown(
                 this,
                 mapart,
                 20, 20,
@@ -243,7 +243,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         propagationContent.addChild(SpacerElement.width(40));
         propagationContent.addChild(SpacerElement.height(40));
 
-        rgbPropagationDropdownWidget = new ErrorPropagationDropdownWidget(
+        rgbPropagationDropdownWidget = new ErrorPropagationDropdown(
                 this, mapart,
                 20, 20,
                 elementWidth + 4, 124,
@@ -254,7 +254,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         rgbPropagationDropdownWidget.visible = false;
         rgbPropagationDropdownWidget.setOverlayXOffset(-rgbPropagationDropdownWidget.getOverlay().getWidth());
 
-        preprocessingDropdownWidget = new ImagePreprocessingDropdownWidget(
+        preprocessingDropdownWidget = new ImagePreprocessingDropdown(
                 this, mapart,
                 100, 20,
                 elementWidth + 4, 124,

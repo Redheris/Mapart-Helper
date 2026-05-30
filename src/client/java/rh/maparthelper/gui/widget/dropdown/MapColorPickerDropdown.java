@@ -21,10 +21,10 @@ import rh.maparthelper.util.RenderUtils;
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
-public class MapColorPickerDropdownWidget extends DropdownOverlayWidget {
+public class MapColorPickerDropdown extends DropdownOverlayWidget {
     private final MapartProcessing mapart;
 
-    public MapColorPickerDropdownWidget(@NotNull Screen screen, MapartProcessing mapart, int width, int height, int overlayWidth, int overlayHeight) {
+    public MapColorPickerDropdown(@NotNull Screen screen, MapartProcessing mapart, int width, int height, int overlayWidth, int overlayHeight) {
         super(screen, null, width, height, Component.empty());
 
         this.mapart = mapart;

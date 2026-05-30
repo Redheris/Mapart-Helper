@@ -21,7 +21,7 @@ import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
-import rh.maparthelper.gui.widget.dropdown.PresetsListDropdownWidget;
+import rh.maparthelper.gui.widget.dropdown.PresetsListDropdown;
 import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
@@ -49,7 +49,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private final Set<String> deletedPresets = new HashSet<>();
     private final Set<String> updatedPresets = new HashSet<>();
 
-    private PresetsListDropdownWidget presetsListDropdownButton;
+    private PresetsListDropdown presetsListDropdownButton;
 
     private AdjEditBox presetNameField;
     private AdjScrollableLayoutWidget colorsEditorScrollable;
@@ -77,7 +77,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     protected Set<OverlayLayout> initOverlays() {
         Set<OverlayLayout> overlays = new HashSet<>();
 
-        presetsListDropdownButton = new PresetsListDropdownWidget(
+        presetsListDropdownButton = new PresetsListDropdown(
                 this,
                 20, 20,
                 (int) (boxWidth * 0.35),

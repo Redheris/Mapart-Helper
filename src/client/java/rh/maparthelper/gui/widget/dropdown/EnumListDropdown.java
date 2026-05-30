@@ -11,21 +11,21 @@ import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 
 import java.util.function.Consumer;
 
-public class EnumListDropdownWidget extends DropdownOverlayWidget {
+public class EnumListDropdown extends DropdownOverlayWidget {
     private final OnPress modifySwitchButtonOnChange;
 
-    public EnumListDropdownWidget(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
-                                  Component fieldName, Enum<?> initOption, boolean showFieldName, boolean showTooltips,
-                                  OnPress modifySwitchButtonOnChange, Consumer<Enum<?>> action, Enum<?>... entries) {
+    public EnumListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
+                            Component fieldName, Enum<?> initOption, boolean showFieldName, boolean showTooltips,
+                            OnPress modifySwitchButtonOnChange, Consumer<Enum<?>> action, Enum<?>... entries) {
         super(screen, null, width, height, constructInitComponent(fieldName, showFieldName, initOption));
 
         this.modifySwitchButtonOnChange = modifySwitchButtonOnChange;
         initOverlay(overlayHeight, overlayWidth, fieldName, showTooltips, showFieldName, action, entries);
     }
 
-    public EnumListDropdownWidget(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
-                                  Component fieldName, Enum<?> initOption, boolean showFieldName, boolean showTooltips,
-                                  Consumer<Enum<?>> action, Enum<?>... entries) {
+    public EnumListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
+                            Component fieldName, Enum<?> initOption, boolean showFieldName, boolean showTooltips,
+                            Consumer<Enum<?>> action, Enum<?>... entries) {
         this(
                 screen, width, height, overlayWidth, overlayHeight,
                 fieldName, initOption, showFieldName, showTooltips,

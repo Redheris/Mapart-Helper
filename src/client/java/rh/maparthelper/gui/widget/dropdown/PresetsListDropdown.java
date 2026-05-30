@@ -11,12 +11,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class PresetsListDropdownWidget extends DropdownOverlayWidget {
+public class PresetsListDropdown extends DropdownOverlayWidget {
     private final Button[] presetButtons;
 
-    public PresetsListDropdownWidget(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
-                                     boolean dynamicText, Component initOption,
-                                     Consumer<String> action, Map<String, String> presets) {
+    public PresetsListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
+                               boolean dynamicText, Component initOption,
+                               Consumer<String> action, Map<String, String> presets) {
         super(screen, null, width, height, initOption);
 
         presetButtons = initOverlay(dynamicText, overlayHeight, overlayWidth, action, presets);

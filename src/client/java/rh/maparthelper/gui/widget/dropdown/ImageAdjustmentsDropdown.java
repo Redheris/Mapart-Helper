@@ -8,11 +8,11 @@ import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public abstract class ImageAdjustmentsDropdownWidget extends DropdownOverlayWidget {
+public abstract class ImageAdjustmentsDropdown extends DropdownOverlayWidget {
     protected boolean isDefaultState = true;
 
-    public ImageAdjustmentsDropdownWidget(@NotNull Screen screen, int width, int height,
-                                          int overlayWidth, int overlayHeight, Component message) {
+    public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
+                                    int overlayWidth, int overlayHeight, Component message) {
         super(screen, null, width, height, message);
 
         initOverlay(overlayHeight, overlayWidth);
