@@ -42,6 +42,10 @@ public class OverlayLayout extends AbstractLayout {
         layout.setHeight(height);
     }
 
+    public void setAlpha(float alpha) {
+        visitWidgets(w -> w.setAlpha(alpha));
+    }
+
     public boolean isVisible() {
         return visible;
     }

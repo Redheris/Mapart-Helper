@@ -186,7 +186,12 @@ public class AdjScrollableLayoutWidget implements Layout {
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float deltaTicks) {
             graphics.enableScissor(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height);
             if (bgColor != 0) {
-                graphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, this.bgColor);
+                graphics.fill(
+                        this.getX(), this.getY(),
+                        this.getX() + this.width,
+                        this.getY() + this.height,
+                        ARGB.color(ARGB.alphaFloat(bgColor) * alpha, this.bgColor)
+                );
             }
 
             for (AbstractWidget clickableWidget : this.children) {
@@ -195,7 +200,12 @@ public class AdjScrollableLayoutWidget implements Layout {
 
             graphics.disableScissor();
             if (outlineColor != 0) {
-                RenderUtils.renderOutline(graphics, getX() - 1, getY() - 1, this.width + 2, this.height + 2, 0x77000000);
+                RenderUtils.renderOutline(
+                        graphics,
+                        getX() - 1, getY() - 1,
+                        this.width + 2, this.height + 2,
+                        ARGB.color(0.47f * alpha, 0)
+                );
             }
             this.renderScrollbar(graphics/*? if >=1.21.10 {*//*, mouseX, mouseY *//*?}*/);
         }
@@ -208,22 +218,22 @@ public class AdjScrollableLayoutWidget implements Layout {
                 int scrollBarY = this.scrollBarY();
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_BACKGROUND_SPRITE,
                         scrollBarX, this.getY(), scrollBarWidth, this.getHeight(),
-                        0.6f
+                        0.6f * alpha
                 );
                 graphics.fill(
                         scrollBarX, scrollBarY,
                         scrollBarX + scrollBarWidth, scrollBarY + scrollerHeight,
-                        0xFFE2E2E2
+                        ARGB.color(alpha, 0xE2E2E2)
                 );
                 graphics.vLine(
                         scrollBarX,
                         scrollBarY - 1, scrollBarY + scrollerHeight,
-                        ARGB.color(0.2f, 0x000000)
+                        ARGB.color(0.2f * alpha, 0)
                 );
                 graphics.vLine(
                         scrollBarX + scrollBarWidth - 1,
                         scrollBarY - 1, scrollBarY + scrollerHeight,
-                        ARGB.color(0.2f, 0x000000)
+                        ARGB.color(0.2f * alpha, 0)
                 );
             }
         }
@@ -252,6 +262,12 @@ public class AdjScrollableLayoutWidget implements Layout {
                     this.setScrollAmount(this.scrollAmount() + bottomDelta + 14.0);
                 }
             }
+        }
+
+        @Override
+        public void setAlpha(float alpha) {
+            super.setAlpha(alpha);
+            children.forEach(w -> w.setAlpha(alpha));
         }
 
         private void refreshChildrenX() {
