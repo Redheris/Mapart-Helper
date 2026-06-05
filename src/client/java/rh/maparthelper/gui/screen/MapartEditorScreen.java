@@ -97,7 +97,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private final MaterialListPanel materialList = new MaterialListPanel(this, mapart, 0, 0, 0, 0);
 
     public MapartEditorScreen() {
-        super(Component.translatable("maparthelper.gui.mapart_editor_screen"));
+        super(null, Component.translatable("maparthelper.gui.mapart_editor_screen"));
     }
 
     public void setHighlightingColor(MapColor color) {

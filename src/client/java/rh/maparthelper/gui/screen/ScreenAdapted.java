@@ -16,8 +16,11 @@ import java.util.Set;
 //import net.minecraft.client.input.MouseButtonEvent;
 
 public abstract class ScreenAdapted extends Screen {
-    protected ScreenAdapted(Component title) {
+    protected final Screen parentScreen;
+
+    protected ScreenAdapted(Screen parentScreen, Component title) {
         super(title);
+        this.parentScreen = parentScreen;
     }
 
     protected void preInit() {
@@ -80,8 +83,8 @@ public abstract class ScreenAdapted extends Screen {
     public void onClose() {
         OverlaysManager.close();
         //? <=1.21.8
-        assert this.minecraft != null;
-        super.onClose();
+        if (minecraft == null) return;
+        minecraft.setScreen(parentScreen);
     }
 
     @Override

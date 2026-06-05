@@ -55,7 +55,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private AdjScrollableLayoutWidget colorsEditorScrollable;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
-        super(Component.translatable("maparthelper.gui.presets_editor_screen"));
+        super(parent, Component.translatable("maparthelper.gui.presets_editor_screen"));
         this.parent = parent;
         this.boxX = x;
         this.boxY = y;
@@ -339,13 +339,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
     public void renderBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
     }
     //~ !gui_rendering
-
-    @Override
-    public void onClose() {
-        //? <=1.21.8
-        assert this.minecraft != null;
-        this.minecraft.setScreen(this.parent);
-    }
 
     private class MapColorBlockWidget extends BlockItemWidget {
         private final MapColor mapColor;
