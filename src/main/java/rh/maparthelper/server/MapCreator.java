@@ -78,7 +78,9 @@ public class MapCreator {
         mapState.colors = new byte[colors.length];
         for (int i = 0; i < colors.length; i++) {
             MapColorEntry color = PaletteColors.getMapColorEntryByARGB(colors[i]);
-            assert color != null;
+            if (color == null) {
+                throw new IllegalArgumentException("Color " + colors[i] + " is not a vanilla map color");
+            }
             mapState.colors[i] = color.mapColor().getPackedId(color.brightness());
         }
         MapId mapIdComponent = world.getFreeMapId();

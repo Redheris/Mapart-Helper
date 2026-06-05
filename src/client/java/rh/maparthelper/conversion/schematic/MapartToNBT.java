@@ -41,7 +41,11 @@ public class MapartToNBT {
         NativeImage mapartImage = CurrentConversionSettings.guiMapartImage.getPixels();
         int mapsWidth = CurrentConversionSettings.getMapartWidth();
         int mapsHeight = CurrentConversionSettings.getMapartHeight();
-        assert mapartImage != null;
+
+        if (mapartImage == null) {
+            MapartHelper.LOGGER.error("Cannot create a schematic for an empty mapart");
+            return;
+        }
 
         String mapartName = CurrentConversionSettings.mapart.mapartName;
         Path savingPath;
@@ -62,11 +66,8 @@ public class MapartToNBT {
         if (asSingleFile) {
             maps = new int[][]{mapartImage.getPixels()};
         } else {
-            maps = NativeImageUtils.divideImageByMaps(
-                    CurrentConversionSettings.getMapartWidth(), CurrentConversionSettings.getMapartHeight(), mapartImage
-            );
+            maps = NativeImageUtils.divideImageByMaps(mapartImage);
         }
-        assert maps != null;
 
         for (int i = 0; i < maps.length; i++) {
             String filename = CurrentConversionSettings.mapart.mapartName;

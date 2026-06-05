@@ -712,9 +712,8 @@ public class MapartEditorScreen extends ScreenAdapted {
             getMapItemsButton = Button.builder(
                     Component.translatable("maparthelper.gui.save_map_items").withStyle(ChatFormatting.GOLD),
                     btn -> {
-                        int[][] maps = NativeImageUtils.divideImageByMaps(
-                                mapart.getWidth(), mapart.getHeight(), mapart.getNativeImage()
-                        );
+                        if (mapart.getNativeImage() == null) return;
+                        int[][] maps = NativeImageUtils.divideImageByMaps(mapart.getNativeImage());
                         MapCreator.getMapsForMapart(maps, mapart.getWidth(), mapart.mapartName, mc.getSingleplayerServer().overworld(), serverPlayer);
                     }
             ).size(150, 20).build();

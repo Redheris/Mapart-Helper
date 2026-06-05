@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -27,7 +26,8 @@ public class MapartSelectionHandler {
         FramesAreaSelectionState selectionState = FramesAreaSelectionState.getInstance();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            assert client.level != null;
+            if (client.level == null) return;
+
             Vec3 selectedPos = selectionState.getSelectedPos();
             if (selectedPos == null) return;
 
@@ -65,7 +65,6 @@ public class MapartSelectionHandler {
 
             if (entity instanceof ItemFrame mapFrame) {
                 BlockPos blockPos = mapFrame.blockPosition().relative(mapFrame.getNearestViewDirection().getOpposite());
-                assert Minecraft.getInstance().gameMode != null;
                 Vec3 currentPos = blockPos.getCenter().relative(mapFrame.getNearestViewDirection(), 0.53);
                 selectPosition(selectionState, player, currentPos, mapFrame.getNearestViewDirection(), false);
             }
