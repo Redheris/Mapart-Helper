@@ -9,18 +9,21 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 public class NativeImageUtils {
+    private static final Object mapartTextureUploadLock = new Object();
 
-    public synchronized static void updateMapartImageTexture(NativeImage image) {
-        DynamicTexture backedTexture = new DynamicTexture(
-                () -> "mapart_gui_texture",
-                image
-        );
-        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        textureManager.register(CurrentConversionSettings.guiMapartId, backedTexture);
-        CurrentConversionSettings.guiMapartImage = backedTexture;
+    public static void updateMapartImageTexture(NativeImage image) {
+        synchronized (mapartTextureUploadLock) {
+            DynamicTexture backedTexture = new DynamicTexture(
+                    CurrentConversionSettings.guiMapartId::getPath,
+                    image
+            );
+            TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+            textureManager.register(CurrentConversionSettings.guiMapartId, backedTexture);
+            CurrentConversionSettings.guiMapartImage = backedTexture;
+        }
     }
 
-    public static int[][] divideImageByMaps(int width, int height, NativeImage image) {
+    public static int [][] divideImageByMaps(int width, int height, NativeImage image) {
         if (CurrentConversionSettings.guiMapartImage == null)
             return null;
         //? if <26.1
