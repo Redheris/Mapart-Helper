@@ -42,7 +42,7 @@ public class AdjEditBox extends EditBox {
                     mouseX, mouseY,
                     new MouseButtonInfo(0, mouseEvent.modifiers())
             );
-            return super.mouseClicked(event, doubleClick);
+            return super.mouseClicked(event, isDoubleClick);
             *///?}
         }
         if (button == 0 && !isFocused()) {

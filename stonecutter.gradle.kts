@@ -100,16 +100,8 @@ stonecutter parameters {
                 "mouseDragged(@NotNull MouseButtonEvent mouseEvent, double dragX, double dragY)"
             )
             replace(
-                "mouseMoved(double mouseX, double mouseY)",
-                "mouseMoved(double mouseX, double mouseY)"
-            )
-            replace(
-                "mouseMoved(mouseX, mouseY)",
-                "mouseMoved(mouseEvent, dragX, dragY)"
-            )
-            replace(
                 "onClick(double mouseX, double mouseY)",
-                "onClick(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
+                "onClick(@NotNull MouseButtonEvent mouseEvent, boolean isDoubleClick)"
             )
             replace(
                 "updateScrolling(double mouseX, double mouseY, int button)",
@@ -117,10 +109,11 @@ stonecutter parameters {
             )
             replace(
                 "(double mouseX, double mouseY, int button)",
-                "(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
+                "(@NotNull MouseButtonEvent mouseEvent, boolean isDoubleClick)"
             )
-            replace("mouseClicked(mouseX, mouseY, button)", "mouseClicked(mouseEvent, doubleClick)")
+            replace("mouseClicked(mouseX, mouseY, button)", "mouseClicked(mouseEvent, isDoubleClick)")
             replace("mouseReleased(mouseX, mouseY, button)", "mouseReleased(mouseEvent)")
+            replace("mouseDragged(mouseX, mouseY, button, dragX, dragY)", "mouseDragged(mouseEvent, dragX, dragY)")
             replace("mouseX", "mouseEvent.x()")
             replace("mouseY", "mouseEvent.y()")
             replace("isValidClickButton(button)", "isValidClickButton(mouseEvent.buttonInfo())")
