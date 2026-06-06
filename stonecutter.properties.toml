@@ -1,7 +1,7 @@
 mod.id = "maparthelper"
 mod.name = "Mapart Helper"
 mod.group = "rh.maparthelper"
-mod.version = "0.14.0-alpha.3"
+mod.version = "0.14.0-alpha.4"
 mod.fabric_loader = "0.18.4"
 mod.version_type = "ALPHA"
 

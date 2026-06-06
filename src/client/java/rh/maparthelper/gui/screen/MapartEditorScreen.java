@@ -66,6 +66,7 @@ import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
+    private static final Identifier FULLSCREEN_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/fullscreen.png");
     private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/settings.png");
     protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
 
@@ -280,6 +281,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     private void initMapartOptionsPanel() {
         mapartOptions = LinearLayout.horizontal().spacing(1);
+        mapartOptions.defaultCellSetting().alignVerticallyMiddle();
 
         if (MapartHelper.commonConfig().showImageImportButton) {
             Button importButton = Button.builder(
@@ -350,6 +352,14 @@ public class MapartEditorScreen extends ScreenAdapted {
         ).size(20, 20).build();
         resetMapartButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.reset_mapart")));
         mapartOptions.addChild(resetMapartButton);
+
+        DecorativeButtonWidget fullscreenButton = DecorativeButtonWidget.builder(
+                FULLSCREEN_TEXTURE,
+                btn -> Minecraft.getInstance().setScreen(new FullscreenImageViewScreen(this))
+        ).size(16, 16).build();
+        fullscreenButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.open_view_screen")));
+        mapartOptions.addChild(fullscreenButton);
+
         mapartOptions.arrangeElements();
     }
 

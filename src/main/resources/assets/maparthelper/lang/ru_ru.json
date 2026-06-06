@@ -144,6 +144,9 @@
   "maparthelper.gui.save": "Сохранить",
   "maparthelper.gui.presets.remove_color": "Не использовать цвет",
 
+  "maparthelper.gui.fullscreen_view.open_view_screen": "Полноэкранный режим просмотра",
+  "maparthelper.gui.fullscreen_view.reset_scale_and_offset": "Сбросить масштаб и сдвиг изображения",
+
   "key.maparthelper.openScreen": "Открыть редактор мапартов",
 
 

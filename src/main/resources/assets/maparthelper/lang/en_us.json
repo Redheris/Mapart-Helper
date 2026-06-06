@@ -144,6 +144,9 @@
   "maparthelper.gui.save": "Save",
   "maparthelper.gui.presets.remove_color": "Do not use this color",
 
+  "maparthelper.gui.fullscreen_view.open_view_screen": "Fullscreen view mode",
+  "maparthelper.gui.fullscreen_view.reset_scale_and_offset": "Reset image scale and offset",
+
   "key.maparthelper.openScreen": "Open mapart editor",
 
 
