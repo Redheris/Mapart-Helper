@@ -80,7 +80,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetsListDropdownButton = new PresetsListDropdown(
                 this,
                 20, 20,
-                (int) (boxWidth * 0.35),
+                (int) (boxWidth * 0.3) + 20,
                 120,
                 false,
                 Component.nullToEmpty("☰"),

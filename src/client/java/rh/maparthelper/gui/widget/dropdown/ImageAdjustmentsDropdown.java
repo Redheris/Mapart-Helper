@@ -13,7 +13,7 @@ public abstract class ImageAdjustmentsDropdown extends DropdownOverlayWidget {
 
     public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
                                     int overlayWidth, int overlayHeight, Component message) {
-        super(screen, null, width, height, message);
+        super(screen, null, width, height, message, true);
 
         initOverlay(overlayHeight, overlayWidth);
         updateStateAndMessage();

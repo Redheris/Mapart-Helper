@@ -66,7 +66,7 @@ import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class MapartEditorScreen extends ScreenAdapted {
-    private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/sprites/mapart_editor/settings.png");
+    private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/settings.png");
     protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
 
     private LinearLayout settingsLeft;
@@ -378,14 +378,12 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.arrangeElements();
         settingsLeft.visitWidgets(this::addRenderableWidget);
 
-        this.addRenderableWidget(
-                DecorativeButtonWidget.builder(
-                        SETTINGS_TEXTURE, btn -> {
-                            ConversionConfiguration.save();
-                            Minecraft.getInstance().setScreen(ConfigScreenFactory.getConfigScreen(this));
-                        }
-                ).dimensions(2, 4, 14, 14).build()
-        );
+        this.addRenderableWidget(DecorativeButtonWidget.builder(
+                SETTINGS_TEXTURE, btn -> {
+                    ConversionConfiguration.save();
+                    Minecraft.getInstance().setScreen(ConfigScreenFactory.getConfigScreen(this));
+                }
+        ).dimensions(2, 4, 16, 16).build());
 
         int listTop = settingsLeft.getY() + settingsLeft.getHeight();
         LinearLayout settingsLeftContent = LinearLayout.vertical();
