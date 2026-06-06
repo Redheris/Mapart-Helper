@@ -202,7 +202,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (mapart.isReset() || mapart.getScaledImage() == null)
             return false;
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
@@ -224,8 +224,8 @@ public class MapartPreviewWidget extends AbstractWidget {
         else
             scaleY = (double) mapart.getCroppingFrame().getHeight() / height;
 
-        offsetXCumulative += deltaX * scaleX;
-        offsetYCumulative += deltaY * scaleY;
+        offsetXCumulative += dragX * scaleX;
+        offsetYCumulative += dragY * scaleY;
 
         int imageDeltaX = (int) offsetXCumulative;
         int imageDeltaY = (int) offsetYCumulative;

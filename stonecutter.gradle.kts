@@ -96,8 +96,16 @@ stonecutter parameters {
                 "onRelease(@NotNull MouseButtonEvent mouseEvent)"
             )
             replace(
-                "mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY)",
-                "mouseDragged(@NotNull MouseButtonEvent mouseEvent, double deltaX, double deltaY)"
+                "mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY)",
+                "mouseDragged(@NotNull MouseButtonEvent mouseEvent, double dragX, double dragY)"
+            )
+            replace(
+                "mouseMoved(double mouseX, double mouseY)",
+                "mouseMoved(double mouseX, double mouseY)"
+            )
+            replace(
+                "mouseMoved(mouseX, mouseY)",
+                "mouseMoved(mouseEvent, dragX, dragY)"
             )
             replace(
                 "onClick(double mouseX, double mouseY)",
