@@ -8,6 +8,7 @@ import rh.maparthelper.command.ServerCommands;
 import rh.maparthelper.config.CommonConfiguration;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.event.PaletteLoader;
 
 import java.nio.file.Path;
 
@@ -23,6 +24,7 @@ public class MapartHelper implements ModInitializer {
         CommonConfiguration.HANDLER.load();
         ConversionConfiguration.load();
         PaletteColors.initMapColorsCache();
+        PaletteLoader.load();
 
         ServerCommands.registerCommands();
     }
