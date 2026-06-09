@@ -120,7 +120,7 @@ public class RegisteredPresetPatch {
             this.colorsChanged = !colors.equals(origin.colors());
         }
 
-        if (!shortFilename.equals(origin.filename()) || !presetName.equals(origin.presetName()) || colorsChanged) {
+        if (!(shortFilename + ".json").equals(origin.filename()) || !presetName.equals(origin.presetName()) || colorsChanged) {
             this.changeState = PatchTypes.CHANGED;
         } else {
             this.changeState = PatchTypes.UNCHANGED;

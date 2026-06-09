@@ -48,21 +48,15 @@ public class MapColorPickerDropdown extends DropdownOverlayWidget {
         this.setOverlay(OverlayLayoutFactory.defaultOverlay(grid, overlayHeight, overlayWidth + 8));
     }
 
+    //~ render_button_contents
     @Override
-    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.renderWidget(graphics, mouseX, mouseY, partialTick);
-    //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.renderContents(graphics, mouseX, mouseY, partialTick);
-    *///?} elif >=26.1 {
-    /*protected void extractContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractContents(graphics, mouseX, mouseY, partialTick);
-    *///?}
         int color = MapartHelper.conversionConfig().getBackgroundRenderColor();
         graphics.fill(getX(), getY(), getRight(), getBottom(), color);
         RenderUtils.renderOutline(graphics, getX(), getY(), getWidth(), getHeight(), 0xFF555555);
     }
+    //~ !render_button_contents
 
     private void setColor(MapColorEntry color) {
         MapColorEntry current = MapartHelper.conversionConfig().getBackgroundColor();

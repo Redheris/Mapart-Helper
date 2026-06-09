@@ -140,7 +140,8 @@
   "maparthelper.gui.presets.createEmptyPreset_tooltip": "Создать пустой пресет",
   "maparthelper.gui.presets.createDefaultPreset_tooltip": "Создать новый пресет",
   "maparthelper.gui.presets.duplicatePreset_tooltip": "Дублировать выбранный пресет",
-  "maparthelper.gui.presets.deletePreset_tooltip": "Удалить выбранный пресет",
+  "maparthelper.gui.presets.deletePreset_tooltip": "Удалить пресет",
+  "maparthelper.gui.presets.cancel_deletePreset_tooltip": "Отменить удаление",
   "maparthelper.gui.save": "Сохранить",
   "maparthelper.gui.presets.remove_color": "Не использовать цвет",
 

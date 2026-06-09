@@ -101,6 +101,13 @@ stonecutter parameters {
             replace("keyCode", "keyEvent.key()")
         }
 
+        string(current.parsed >= "26.1", "render_button_contents") {
+            replace("renderContents", "extractContents")
+        }
+        string(current.parsed >= "1.21.10", "render_button_contents") {
+            replace("renderWidget", "renderContents")
+        }
+
         // gui_rendering
 
         string(current.parsed >= "26.1", "gui_rendering") {

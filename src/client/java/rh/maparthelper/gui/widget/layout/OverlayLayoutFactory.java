@@ -2,8 +2,8 @@ package rh.maparthelper.gui.widget.layout;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.layouts.Layout;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,12 +25,12 @@ public class OverlayLayoutFactory {
         return defaultOverlay(contentLayout, height, 0);
     }
 
-    public static @NotNull OverlayLayout listMenu(int height, int width, AbstractWidget... entries) {
+    public static @NotNull OverlayLayout listMenu(int height, int width, LayoutElement... entries) {
         LinearLayout menu = LinearLayout.vertical().spacing(-2);
         menu.defaultCellSetting()
                 .alignHorizontallyCenter()
                 .padding(2, 2, 2, 2);
-        for (AbstractWidget entry : entries) {
+        for (LayoutElement entry : entries) {
             if (entry == null) continue;
             menu.addChild(entry);
         }

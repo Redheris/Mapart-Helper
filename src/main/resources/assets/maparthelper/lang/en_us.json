@@ -140,7 +140,8 @@
   "maparthelper.gui.presets.createEmptyPreset_tooltip": "Create an empty preset",
   "maparthelper.gui.presets.createDefaultPreset_tooltip": "Create a new preset",
   "maparthelper.gui.presets.duplicatePreset_tooltip": "Duplicate current preset",
-  "maparthelper.gui.presets.deletePreset_tooltip": "Delete current preset",
+  "maparthelper.gui.presets.deletePreset_tooltip": "Delete preset",
+  "maparthelper.gui.presets.cancel_deletePreset_tooltip": "Cancel deletion",
   "maparthelper.gui.save": "Save",
   "maparthelper.gui.presets.remove_color": "Do not use this color",
 

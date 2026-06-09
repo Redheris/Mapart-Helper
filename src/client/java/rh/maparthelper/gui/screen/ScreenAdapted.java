@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.screen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
@@ -75,7 +76,9 @@ public abstract class ScreenAdapted extends Screen {
             //~}
         }
 
-        OverlaysManager.renderVisibleOne(graphics, mouseX, mouseY, partialTick);
+        if (Minecraft.getInstance().screen == this) {
+            OverlaysManager.renderVisibleOne(graphics, mouseX, mouseY, partialTick);
+        }
     }
     //~ !gui_rendering
 

@@ -13,26 +13,21 @@ import org.jetbrains.annotations.NotNull;
 
 //? if >=1.21.10 {
 /*import net.minecraft.client.input.InputWithModifiers;
-*///?} else
+ *///?} else
 import net.minecraft.client.Minecraft;
 
 public class DecorativeButtonWidget extends AbstractButton {
     private final PressAction onPress;
     private final Identifier textureDefault;
     private final Identifier textureHighlighted;
+    private int defaultTextureColor = -1;
+    private int hoveredTextureColor = -1;
 
     private DecorativeButtonWidget(int x, int y, int width, int height, Component message, PressAction pressAction) {
         super(x, y, width, height, message);
         this.onPress = pressAction;
         this.textureDefault = null;
         this.textureHighlighted = null;
-    }
-
-    private DecorativeButtonWidget(int x, int y, int width, int height, Identifier texture, PressAction pressAction) {
-        super(x, y, width, height, Component.empty());
-        this.textureDefault = texture;
-        this.textureHighlighted = texture;
-        this.onPress = pressAction;
     }
 
     private DecorativeButtonWidget(int x, int y, int width, int height, Identifier textureDefault, Identifier textureHighlighted, PressAction pressAction) {
@@ -42,42 +37,43 @@ public class DecorativeButtonWidget extends AbstractButton {
         this.onPress = pressAction;
     }
 
+    public void setTextureColor(int color) {
+        this.setDefaultTextureColor(color);
+        this.setHoveredTextureColor(color);
+    }
+
+    public void setDefaultTextureColor(int color) {
+        this.defaultTextureColor = color;
+    }
+
+    public void setHoveredTextureColor(int color) {
+        this.hoveredTextureColor = color;
+    }
+
     @Override
     public void onPress(/*? if >=1.21.10 {*/ /*@NotNull InputWithModifiers input *//*?}*/) {
         this.onPress.onPress(this);
     }
 
-    //~ gui_rendering
+    //~ render_button_contents
     @Override
-    //? if <=1.21.8 {
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-    //?} elif 1.21.11 {
-    /*protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-     *///?} elif >=26.1
-    //protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (textureDefault != null) {
-            if (isHovered) {
-                graphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
-                        textureHighlighted,
-                        getX(), getY(),
-                        0, 0,
-                        width, height,
-                        width, height
-                );
-            } else {
-                graphics.blit(
-                        RenderPipelines.GUI_TEXTURED,
-                        textureDefault,
-                        getX(), getY(),
-                        0, 0,
-                        width, height,
-                        width, height
-                );
-            }
+            Identifier texture = isHovered && textureHighlighted != null ? textureHighlighted : textureDefault;
+            int textureColor = isHovered ? hoveredTextureColor : defaultTextureColor;
+            graphics.blit(
+                    RenderPipelines.GUI_TEXTURED,
+                    texture,
+                    getX(), getY(),
+                    0, 0,
+                    width, height,
+                    width, height,
+                    textureColor
+            );
         } else {
             //? if >=1.21.11 {
-            /*this.renderDefaultLabel(graphics.textRenderer(
+            /*//~ if >=26.1 'renderDefaultLabel(' -> 'extractDefaultLabel('
+            this.renderDefaultLabel(graphics.textRenderer(
                     GuiGraphics.HoveredTextEffects.NONE,
                     style -> style.withColor(CommonColors.LIGHT_GRAY))
             );
@@ -85,7 +81,7 @@ public class DecorativeButtonWidget extends AbstractButton {
             this.renderString(graphics, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
         }
     }
-    //~ !gui_rendering
+    //~ !render_button_contents
 
     @Override
     public void updateWidgetNarration(@NotNull NarrationElementOutput builder) {
@@ -152,9 +148,7 @@ public class DecorativeButtonWidget extends AbstractButton {
         public DecorativeButtonWidget build() {
             if (message != null)
                 return new DecorativeButtonWidget(x, y, this.width, this.height, this.message, this.onPress);
-            if (textureHighlighted != null)
-                return new DecorativeButtonWidget(x, y, this.width, this.height, this.textureDefault, this.textureHighlighted, this.onPress);
-            return new DecorativeButtonWidget(x, y, this.width, this.height, this.textureDefault, this.onPress);
+            return new DecorativeButtonWidget(x, y, this.width, this.height, this.textureDefault, this.textureHighlighted, this.onPress);
         }
     }
 

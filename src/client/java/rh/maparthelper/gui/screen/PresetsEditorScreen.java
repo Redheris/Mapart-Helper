@@ -87,6 +87,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 false,
                 Component.nullToEmpty("☰"),
                 this::changeEditingPreset,
+                patch -> {
+                    if (patch.getState() == PatchTypes.CREATED) {
+                        deletePatch(patch.getUUID());
+                    }
+                    updatePresetNameFieldState();
+                },
                 patches
         );
 
@@ -141,12 +147,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 .build();
         duplicatePreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.duplicatePreset_tooltip")));
         presetBarLeft.addChild(duplicatePreset);
-
-        Button deletePreset = Button.builder(Component.nullToEmpty("\uD83D\uDDD1"), b -> this.deletePreset())
-                .size(17, 20)
-                .build();
-        deletePreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.deletePreset_tooltip")));
-        presetBarLeft.addChild(deletePreset);
 
         presetBarLeft.arrangeElements();
         presetBarLeft.visitWidgets(this::addRenderableWidget);
@@ -278,16 +278,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
         rebuildWidgets();
     }
 
-    private void deletePreset() {
-        if (editingPreset.getState() != PatchTypes.CREATED) {
-            editingPreset.toggleToRemove();
-            updatePresetNameFieldState();
-            presetsListDropdownButton.updateNameFor(editingPreset);
-        } else {
-            patches.remove(editingPresetUUID);
+    private void deletePatch(UUID presetUUID) {
+        patches.remove(presetUUID);
+        if (presetUUID.equals(editingPresetUUID)) {
             changeEditingPreset(presetsHandler.getSelectedPreset().uuid());
-            rebuildWidgets();
         }
+        rebuildWidgets();
+        presetsListDropdownButton.getOverlay().setVisible(true);
     }
 
     private void updatePresetNameFieldState() {
