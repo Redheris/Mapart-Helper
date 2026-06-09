@@ -14,6 +14,7 @@ public class RegisteredPresetPatch {
     private PatchTypes changeState;
     private boolean toRemove;
     private boolean colorsChanged;
+    private boolean autoFilename = true;
 
     private final UUID uuid;
     private final Map<MapColor, Block> colors = new HashMap<>();
@@ -40,6 +41,7 @@ public class RegisteredPresetPatch {
 
     public RegisteredPresetPatch(RegisteredPalettePreset origin) {
         this.changeState = PatchTypes.UNCHANGED;
+        this.autoFilename = false;
         this.origin = origin;
         this.uuid = origin.uuid();
         this.colors.putAll(origin.colors());
@@ -53,6 +55,7 @@ public class RegisteredPresetPatch {
 
     public void setShortFilename(String fileName) {
         if (toRemove) return;
+        this.autoFilename = false;
         this.shortFilename = fileName;
         updateChangedState(false);
     }
@@ -60,6 +63,9 @@ public class RegisteredPresetPatch {
     public void setPresetName(String presetName) {
         if (toRemove) return;
         this.presetName = presetName;
+        if (autoFilename) {
+            this.shortFilename = presetName.replaceAll("[\\\\/:*?\"<>|]", "");
+        }
         updateChangedState(false);
     }
 

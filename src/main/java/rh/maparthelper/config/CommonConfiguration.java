@@ -62,6 +62,7 @@ public class CommonConfiguration {
     public UseInPalette useInPalette = new UseInPalette();
 
     public static class UseInPalette {
+        public boolean onlyVanillaBlocks = true;
         // Limiters
         public boolean anyBlocks = false;
         public boolean onlySolid = false;

@@ -165,6 +165,16 @@ public class ConfigScreenFactory {
                                 .withStyle(ChatFormatting.GOLD)))
                         .option(LabelOption.create(Component.translatable("maparthelper.config.paletteGenerator.headLabel")))
                         .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatable("maparthelper.config.paletteGenerator.onlyVanillaBlocks"))
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.onlyVanillaBlocks")))
+                                .customController(TickBoxController::new)
+                                .binding(paletteGenFilterBinding(
+                                        defaults.useInPalette.onlyVanillaBlocks,
+                                        () -> config.useInPalette.onlyVanillaBlocks,
+                                        value -> config.useInPalette.onlyVanillaBlocks = value,
+                                        requestPaletteRegenerate))
+                                .build())
+                        .option(Option.<Boolean>createBuilder()
                                 .name(Component.translatable("maparthelper.config.paletteGenerator.anyBlocks"))
                                 .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.anyBlocks")))
                                 .customController(TickBoxController::new)

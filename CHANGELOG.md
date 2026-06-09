@@ -16,6 +16,7 @@ preset name.
 <details>
 <summary>Fixes and minor changes</summary>
 
-- 
+- By default, palette will be generating only from vanilla (`minecraft:*`) blocks.
+  This can be changed in the config
 
 </details>

@@ -2,6 +2,7 @@ package rh.maparthelper.palette;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,6 +18,7 @@ import rh.maparthelper.MapartHelper;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PaletteGenerator {
     // Lists of block classes for blocking/enabling by configs
@@ -30,7 +32,17 @@ public class PaletteGenerator {
     public static void generatePalette(Map<Integer, List<Block>> palette) {
         palette.clear();
 
-        for (Block block : BuiltInRegistries.BLOCK) {
+        Stream<Block> blocksStream = BuiltInRegistries.BLOCK.stream();
+        if (MapartHelper.commonConfig().useInPalette.onlyVanillaBlocks) {
+            blocksStream = blocksStream.filter(block ->
+                    BuiltInRegistries.BLOCK.getKey(block).getNamespace().equals(Identifier.DEFAULT_NAMESPACE)
+            );
+        }
+        Iterator<Block> blocksIterator = blocksStream.iterator();
+
+        while (blocksIterator.hasNext()) {
+            Block block = blocksIterator.next();
+            BuiltInRegistries.BLOCK.getKey(block);
             BlockState state = block.defaultBlockState();
             MapColor color = state.getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
             if (color == MapColor.NONE)

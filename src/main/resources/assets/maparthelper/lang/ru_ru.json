@@ -181,6 +181,8 @@
   "maparthelper.config.category.paletteGenerator": "Генератор палитры",
   "maparthelper.config.paletteGenerator.regenerationWarningLabel": "Внимание: сохранение изменений данной конфигурации автоматически вызовет перегенерацию палитры. Для этого может потребоваться зайти в любой мир или на сервер",
   "maparthelper.config.paletteGenerator.headLabel": "Данный экран конфигурации определяет, какие блоки будут использованы для генерации палитры, на основании которой можно будет удобнее настроить пользовательские пресеты в редакторе",
+  "maparthelper.config.paletteGenerator.onlyVanillaBlocks": "Только ванильные блоки",
+  "maparthelper.config.description.paletteGenerator.onlyVanillaBlocks": "Предотвращает добавление модовых блоков в палитру с целью избежать добавления множества бессмысленных блоков, которые могут быть не обнаружены реализованными фильтрами",
   "maparthelper.config.paletteGenerator.anyBlocks": "§c§nВСЕ§r зарегистрированные блоки",
   "maparthelper.config.description.paletteGenerator.anyBlocks": "§cНе используйте эту настройку для генерации рабочей палитры.§r\nЭта настройка служит сугубо информационной цели. Многие из блоков имеют невозможные или краткосрочные состояния",
   "maparthelper.config.paletteGenerator.onlySolid": "§nТолько§r полные твёрдые блоки",
