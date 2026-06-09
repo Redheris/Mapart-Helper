@@ -151,8 +151,8 @@ tasks {
         filesMatching("*.mixins.json") { expand("java" to mixinJava) }
     }
 
-    // Builds the version into a shared folder in `build/libs/${mod version}/`
     register<Copy>("buildAndCollect") {
+        description = $$"Builds the version into a shared folder in `build/libs/${mod version}/`"
         group = "build"
         from(loomx.modJar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))

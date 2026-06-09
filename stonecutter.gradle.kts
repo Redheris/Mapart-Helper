@@ -2,8 +2,7 @@ import me.modmuss50.mpp.ReleaseType
 
 plugins {
     id("dev.kikugie.stonecutter")
-    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" apply false
-    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
+    id("me.modmuss50.mod-publish-plugin") version "2.0.0"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
 
@@ -33,33 +32,11 @@ publishMods {
     }
 }
 
-val announceVersion = property("publish.announce_for") as String
-
-tasks.register("publishAnnouncementVersion") {
-    group = "publishing"
-    description = "Publishes the version accompanied by a Discord announcement if set"
-
-    if (announceVersion != "none") {
-        val publishTask = stonecutter.tasks.named("publishMods") {
-            metadata.version == announceVersion
-        }
-        dependsOn(publishTask)
-    }
+stonecutter tasks {
+    order("publishModrinth")
+    order("publishCurseforge")
+    order("publishGithub")
 }
-
-tasks.register("publishModsAndAnnounce") {
-    group = "publishing"
-    description = "Publishes all versions from stonecutter and announce in Discord if set"
-
-    dependsOn("publishMods")
-    // This is a lazy collection containing all `publishMods` tasks from registered versions
-    // DO NOT use `.get()` on it!
-    dependsOn(stonecutter.tasks.named("publishMods") {
-        metadata.version != announceVersion
-    })
-    dependsOn("publishAnnouncementVersion")
-}
-
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {
