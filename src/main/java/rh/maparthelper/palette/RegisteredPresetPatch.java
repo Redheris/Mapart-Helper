@@ -17,7 +17,7 @@ public class RegisteredPresetPatch {
 
     private final UUID uuid;
     private final Map<MapColor, Block> colors = new HashMap<>();
-    private String filename;
+    private String shortFilename;
     private String presetName;
 
     public RegisteredPresetPatch() {
@@ -25,15 +25,16 @@ public class RegisteredPresetPatch {
         this.uuid = UUID.randomUUID();
         this.changeState = PatchTypes.CREATED;
         this.presetName = "New empty preset";
-        this.filename = FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, presetName, "json");
+        this.shortFilename = FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, presetName, "json")
+                .replaceAll("\\.json$", "");
     }
 
-    public RegisteredPresetPatch(Map<MapColor, Block> copyFrom, String filename, String presetName) {
+    public RegisteredPresetPatch(Map<MapColor, Block> copyFrom, String shortFilename, String presetName) {
         this.changeState = PatchTypes.CREATED;
         this.origin = null;
         this.uuid = UUID.randomUUID();
         this.colors.putAll(copyFrom);
-        this.filename = filename;
+        this.shortFilename = shortFilename;
         this.presetName = presetName;
     }
 
@@ -42,20 +43,17 @@ public class RegisteredPresetPatch {
         this.origin = origin;
         this.uuid = origin.uuid();
         this.colors.putAll(origin.colors());
-        this.filename = origin.filename();
+        this.shortFilename = origin.filename().replaceAll("\\.json$", "");
         this.presetName = origin.presetName();
     }
 
     public static RegisteredPresetPatch duplicate(RegisteredPresetPatch origin) {
-        var duplicate = new RegisteredPresetPatch(origin.colors, origin.filename, origin.presetName);
-        String simpleFilename = origin.filename.substring(0, origin.filename.length() - 5);
-        duplicate.filename = FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, simpleFilename, "json");
-        return duplicate;
+        return new RegisteredPresetPatch(origin.colors, origin.shortFilename + " (Copy)", origin.presetName + " (Copy)");
     }
 
-    public void setFilename(String fileName) {
+    public void setShortFilename(String fileName) {
         if (toRemove) return;
-        this.filename = fileName;
+        this.shortFilename = fileName;
         updateChangedState(false);
     }
 
@@ -85,8 +83,8 @@ public class RegisteredPresetPatch {
         return presetName;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getShortFilename() {
+        return shortFilename;
     }
 
     public PatchTypes getState() {
@@ -102,6 +100,10 @@ public class RegisteredPresetPatch {
     }
 
     public RegisteredPalettePreset build() {
+        return new RegisteredPalettePreset(uuid, shortFilename + ".json", presetName, colors);
+    }
+
+    public RegisteredPalettePreset build(String filename) {
         return new RegisteredPalettePreset(uuid, filename, presetName, colors);
     }
 
@@ -112,7 +114,7 @@ public class RegisteredPresetPatch {
             this.colorsChanged = !colors.equals(origin.colors());
         }
 
-        if (!filename.equals(origin.filename()) || !presetName.equals(origin.presetName()) || colorsChanged) {
+        if (!shortFilename.equals(origin.filename()) || !presetName.equals(origin.presetName()) || colorsChanged) {
             this.changeState = PatchTypes.CHANGED;
         } else {
             this.changeState = PatchTypes.UNCHANGED;

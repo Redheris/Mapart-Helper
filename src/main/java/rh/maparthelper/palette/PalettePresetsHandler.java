@@ -5,6 +5,8 @@ import rh.maparthelper.util.FileUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class PalettePresetsHandler {
     private UUID selectedPreset;
@@ -54,16 +56,11 @@ public class PalettePresetsHandler {
         );
     }
 
-    private static String makeUniqueFilename(String filename) {
-        String simpleFilename = filename.substring(0, filename.length() - 5);
-        return FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, simpleFilename, "json");
-    }
-
     private void toDefaultState(CompletePalette palette) {
         RegisteredPalettePreset defaultPreset = new RegisteredPalettePreset(
                 UUID.randomUUID(),
-                makeUniqueFilename("New preset.json"),
-                "New preset",
+                FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, "Default preset", "json"),
+                "Default preset",
                 PaletteGenerator.generateDefaultPreset(palette.palette)
         );
         this.presets.clear();
@@ -118,38 +115,78 @@ public class PalettePresetsHandler {
      * @return {@link PaletteDataManager.DataPatchRequest} object containing info about changes to apply them in the {@link PaletteDataManager}
      */
     public PaletteDataManager.DataPatchRequest applyPresetPatches(CompletePalette palette, Collection<RegisteredPresetPatch> presetPatches) {
-        Map<RegisteredPalettePreset, PatchTypes> presetsToUpdate = new HashMap<>();
+        Set<RegisteredPalettePreset> presetsToCreate = new HashSet<>();
+        Set<RegisteredPalettePreset> presetsToUpdate = new HashSet<>();
         Set<String> filesToRemove = new HashSet<>();
-        Map<String, String> fileRenames = new HashMap<>();
 
-        for (RegisteredPresetPatch patch : presetPatches) {
-            switch (patch.getState()) {
-                case CREATED, CHANGED -> {
-                    RegisteredPalettePreset oldPreset = presets.get(patch.getUUID());
-                    boolean filenameChanged = !oldPreset.filename().equals(patch.getFilename());
+        Map<PatchTypes, List<RegisteredPresetPatch>> patchGroups = presetPatches.stream()
+                .collect(Collectors.groupingBy(RegisteredPresetPatch::getState));
 
-                    if (filenameChanged) {
-                        patch.setFilename(makeUniqueFilename(patch.getFilename()));
-                        fileRenames.put(oldPreset.filename(), patch.getFilename());
-                    }
 
-                    RegisteredPalettePreset preset = patch.build();
-                    presets.put(preset.uuid(), preset);
-                    presetsToUpdate.put(preset, patch.getState());
-                }
-                case REMOVED -> {
-                    presets.remove(patch.getUUID());
-                    filesToRemove.add(patch.getFilename());
-                }
-                case UNCHANGED -> {}
-            }
+        Set<String> newFilenames = new HashSet<>();
+        Predicate<String> uniqueFilenamePredicate = name ->
+                !filesToRemove.contains(name) && Files.exists(PaletteDataManager.PRESETS_PATH.resolve(name))
+                        || newFilenames.contains(name);
+
+        if (patchGroups.containsKey(PatchTypes.REMOVED)) {
+            patchGroups.get(PatchTypes.REMOVED).forEach(patch -> {
+                presets.remove(patch.getUUID());
+                filesToRemove.add(patch.getShortFilename() + ".json");
+            });
         }
-        if (validateConfigState(palette) == -1) {
-            presetsToUpdate.put(getSelectedPreset(), PatchTypes.CREATED);
+
+        if (patchGroups.containsKey(PatchTypes.CREATED)) {
+            patchGroups.get(PatchTypes.CREATED).forEach(patch -> {
+                String uniqueFilename = FileUtils.makeUniqueName(
+                        uniqueFilenamePredicate, patch.getShortFilename(), "json", "%s (%d)"
+                );
+                RegisteredPalettePreset preset = patch.build(uniqueFilename);
+                presetsToCreate.add(preset);
+                newFilenames.add(preset.filename());
+                presets.put(preset.uuid(), preset);
+            });
         }
+
+        if (patchGroups.containsKey(PatchTypes.CHANGED)) {
+            patchGroups.get(PatchTypes.CHANGED).forEach(patch -> {
+                RegisteredPalettePreset oldPreset = presets.get(patch.getUUID());
+                RegisteredPalettePreset newPreset;
+                if (!oldPreset.filename().equals(patch.getShortFilename() + ".json")) {
+                    String uniqueFilename = FileUtils.makeUniqueName(
+                            uniqueFilenamePredicate, patch.getShortFilename(), "json", "%s (%d)"
+                    );
+                    newPreset = patch.build(uniqueFilename);
+                    newFilenames.add(newPreset.filename());
+                    filesToRemove.add(oldPreset.filename());
+                } else {
+                    newPreset = patch.build();
+                }
+                presetsToUpdate.add(newPreset);
+                presets.put(newPreset.uuid(), newPreset);
+            });
+        }
+
+        if (presets.isEmpty()) {
+            String uniqueFilename = FileUtils.makeUniqueName(
+                    uniqueFilenamePredicate, "Default preset", "json", "%s (%d)"
+            );
+            RegisteredPalettePreset defaultPreset = new RegisteredPalettePreset(
+                    UUID.randomUUID(),
+                    uniqueFilename,
+                    "Default preset",
+                    PaletteGenerator.generateDefaultPreset(palette.palette)
+            );
+            presetsToCreate.add(defaultPreset);
+            presets.put(defaultPreset.uuid(), defaultPreset);
+            selectedPreset = defaultPreset.uuid();
+        }
+        if (!presets.containsKey(selectedPreset)) {
+            selectedPreset = presets.keySet().iterator().next();
+        }
+
         updatePresetFilenamesMap();
 
-        return new PaletteDataManager.DataPatchRequest(presetsToUpdate, filesToRemove, fileRenames);
+        return new PaletteDataManager.DataPatchRequest(presetsToCreate, presetsToUpdate, filesToRemove);
     }
 
     public boolean removeNonexistent() {

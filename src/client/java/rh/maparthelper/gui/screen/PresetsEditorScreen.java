@@ -3,6 +3,7 @@ package rh.maparthelper.gui.screen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -20,7 +21,6 @@ import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetPatchesListDropdown;
-import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -53,7 +53,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private PresetPatchesListDropdown presetsListDropdownButton;
 
-    private AdjEditBox presetNameField;
+    private EditBox presetNameField;
     private AdjScrollableLayoutWidget colorsEditorScrollable;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, MapartProcessing mapart, int x, int y, int marginRight, int marginBottom) {
@@ -104,11 +104,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         StringWidget presetNameLabel = new StringWidget(Component.translatable("maparthelper.gui.preset"), font);
         presetBarLeft.addChild(presetNameLabel, presetBarLeftPositioner.copy().paddingRight(5));
 
-        presetNameField = new AdjEditBox(
-                font, (int) (boxWidth * 0.3), 20,
-                editingPreset.getPresetName(),
-                "Preset name"
+        presetNameField = new EditBox(font,
+                (int) (boxWidth * 0.3), 20,
+                Component.literal("Preset name")
         );
+        presetNameField.setValue(editingPreset.getPresetName());
         updatePresetNameFieldState();
         presetBarLeft.addChild(presetNameField);
 
@@ -117,7 +117,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarLeft.addChild(presetsListDropdownButton);
 
         presetNameField.setHint(Component.translatable("maparthelper.gui.presets.preset_name").withColor(CommonColors.GRAY));
-        presetNameField.setValueConsumer(presetName -> {
+        presetNameField.setResponder(presetName -> {
             if (!editingPreset.getPresetName().equals(presetName)) {
                 editingPreset.setPresetName(presetName);
                 presetsListDropdownButton.updateNameFor(editingPreset);
@@ -247,10 +247,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private void createNewPreset(boolean createDefault) {
         RegisteredPresetPatch newPreset;
+        List<String> existingPresetNames = patches.values().stream()
+                .map(RegisteredPresetPatch::getPresetName)
+                .toList();
         if (createDefault) {
-            List<String> existingPresetNames = patches.values().stream()
-                    .map(RegisteredPresetPatch::getPresetName)
-                    .toList();
             newPreset = new RegisteredPresetPatch(
                     PaletteGenerator.generateDefaultPreset(paletteDataManager.getCompletePalette().palette),
                     "New default preset",
@@ -263,6 +263,14 @@ public class PresetsEditorScreen extends ScreenAdapted {
             );
         } else {
             newPreset = new RegisteredPresetPatch();
+            newPreset.setPresetName(
+                    FileUtils.makeUniqueName(
+                            existingPresetNames::contains,
+                            "New empty preset",
+                            null,
+                            "%s (%d)"
+                    )
+            );
         }
 
         patches.put(newPreset.getUUID(), newPreset);
@@ -290,10 +298,9 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     private void duplicatePreset() {
         RegisteredPresetPatch newPreset = RegisteredPresetPatch.duplicate(editingPreset);
-        newPreset.setPresetName(editingPreset.getPresetName() + " (Copy)");
         patches.put(newPreset.getUUID(), newPreset);
-        changeEditingPreset(newPreset.getUUID());
         rebuildWidgets();
+        changeEditingPreset(newPreset.getUUID());
     }
 
     private void changeEditingPreset(UUID presetUUID) {

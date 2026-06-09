@@ -20,6 +20,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static rh.maparthelper.MapartHelper.CONFIG_PATH;
 
@@ -229,7 +230,6 @@ public class PaletteDataManager {
 
         int deleted = 0;
         int created = 0;
-        int renamed = 0;
         int updated = 0;
 
         for (String filename : dataPatchRequest.filesToRemove) {
@@ -242,49 +242,41 @@ public class PaletteDataManager {
             }
         }
 
-        for (Map.Entry<String, String> entry : dataPatchRequest.fileRenames.entrySet()) {
-            Path oldFilepath = PRESETS_PATH.resolve(entry.getKey());
-            Path newFilepath = PRESETS_PATH.resolve(entry.getValue());
-            try {
-                Files.move(oldFilepath, newFilepath);
-                renamed++;
-            } catch (IOException e) {
-                MapartHelper.LOGGER.error("Failed to rename preset file from \"{}\" to \"{}\"", oldFilepath, newFilepath, e);
-            }
-        }
+        Iterator<RegisteredPalettePreset> presetsToWrite = Stream.concat(
+                dataPatchRequest.presetsToCreate.stream(), dataPatchRequest.presetsToUpdate.stream()
+        ).iterator();
 
-        for (var entry : dataPatchRequest.presetToUpdate.entrySet()) {
-            RegisteredPalettePreset presetRegistry = entry.getKey();
-            Path presetFilepath = PRESETS_PATH.resolve(presetRegistry.filename());
+        while (presetsToWrite.hasNext()) {
+            RegisteredPalettePreset preset = presetsToWrite.next();
+            Path presetFilepath = PRESETS_PATH.resolve(preset.filename());
             try (FileWriter writer = new FileWriter(presetFilepath.toFile())) {
-                GSON.toJson(presetRegistry.preset(), writer);
-                if (entry.getValue() == PatchTypes.CREATED) {
+                GSON.toJson(preset.preset(), writer);
+                if (dataPatchRequest.presetsToCreate.contains(preset))
                     created++;
-                } else {
+                else
                     updated++;
-                }
             } catch (Exception e) {
                 MapartHelper.LOGGER.error(
                         "Failed to write preset \"{}\"(\"{}\") to the file \"{}\"",
-                        presetRegistry.presetName(), presetRegistry.uuid(), presetRegistry, e
+                        preset.presetName(), preset.uuid(), preset, e
                 );
             }
         }
 
-        if (deleted + renamed + created > 0 || !selectedPreset.equals(presetsHandler.getSelectedPreset().uuid())) {
+        if (deleted + created > 0 || !selectedPreset.equals(presetsHandler.getSelectedPreset().uuid())) {
             presetsHandler.setSelectedPreset(selectedPreset);
             savePresetsConfig();
         }
 
         MapartHelper.LOGGER.info(
-                "Presets updating finished with: {} deleted; {} created; {} renamed; {} updated",
-                deleted, created, renamed, updated
+                "Presets updating finished with: {} deleted; {} created; {} updated",
+                deleted, created, updated
         );
     }
 
     public record DataPatchRequest(
-            Map<RegisteredPalettePreset, PatchTypes> presetToUpdate,
-            Set<String> filesToRemove,
-            Map<String, String> fileRenames
+            Set<RegisteredPalettePreset> presetsToCreate,
+            Set<RegisteredPalettePreset> presetsToUpdate,
+            Set<String> filesToRemove
     ) {}
 }

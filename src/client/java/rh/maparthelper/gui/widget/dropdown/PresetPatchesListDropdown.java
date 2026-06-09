@@ -58,7 +58,7 @@ public class PresetPatchesListDropdown extends DropdownOverlayWidget {
         valueText.withStyle(style -> switch (preset.getState()) {
             case UNCHANGED -> style.withColor(-1).withItalic(false);
             case CREATED -> style.withColor(0xFF_00FF00);
-            case CHANGED -> style.withColor(16755200).withItalic(true);
+            case CHANGED -> style.withColor(0xFF_ffaa00).withItalic(true);
             case REMOVED -> style.withColor(0xFF_ff5151);
         });
         return valueText;
