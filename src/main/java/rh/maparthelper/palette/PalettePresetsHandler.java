@@ -5,19 +5,14 @@ import rh.maparthelper.util.FileUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class PalettePresetsHandler {
     private UUID selectedPreset;
     private final Map<String, UUID> registeredFilenames = new LinkedHashMap<>();
     private transient final Map<UUID, RegisteredPalettePreset> presets = new LinkedHashMap<>();
 
-    public Map<String, UUID> getRegisteredFilenames() {
-        return Map.copyOf(registeredFilenames);
-    }
-
     public Map<UUID, RegisteredPalettePreset> getPresets() {
-        return Map.copyOf(presets); // TODO: check it
+        return Collections.unmodifiableSequencedMap((LinkedHashMap<UUID, RegisteredPalettePreset>) presets);
     }
 
     public boolean unregisterPresetsByFilenames(Set<String> filenames) {
@@ -60,13 +55,14 @@ public class PalettePresetsHandler {
     }
 
     private static String makeUniqueFilename(String filename) {
-        return FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, filename, "json");
+        String simpleFilename = filename.substring(0, filename.length() - 5);
+        return FileUtils.makeUniqueFilename(PaletteDataManager.PRESETS_PATH, simpleFilename, "json");
     }
 
-    private PalettePresetsHandler toDefaultState(CompletePalette palette) {
+    private void toDefaultState(CompletePalette palette) {
         RegisteredPalettePreset defaultPreset = new RegisteredPalettePreset(
                 UUID.randomUUID(),
-                makeUniqueFilename("New preset"),
+                makeUniqueFilename("New preset.json"),
                 "New preset",
                 PaletteGenerator.generateDefaultPreset(palette.palette)
         );
@@ -74,11 +70,6 @@ public class PalettePresetsHandler {
         this.presets.put(defaultPreset.uuid(), defaultPreset);
         this.selectedPreset = defaultPreset.uuid();
         updatePresetFilenamesMap();
-        return this;
-    }
-
-    public static PalettePresetsHandler createDefault(CompletePalette palette) {
-        return new PalettePresetsHandler().toDefaultState(palette);
     }
 
     public boolean shouldConvertWithSelectedPreset() {
@@ -94,19 +85,39 @@ public class PalettePresetsHandler {
         if (presets.containsKey(presetUUID)) selectedPreset = presetUUID;
     }
 
-    public Set<String> getPresetNames() {
-        // TODO: do I need this?
-        return presets.values().stream().map(RegisteredPalettePreset::presetName).collect(Collectors.toSet());
+    public Map<UUID, RegisteredPresetPatch> createPresetPatches() {
+        Map<UUID, RegisteredPresetPatch> patches = new LinkedHashMap<>();
+        presets.forEach(((uuid, preset) ->
+                patches.put(uuid, new RegisteredPresetPatch(preset))
+        ));
+        return patches;
     }
 
     /**
-     * Updates handler's state by applying and registration preset patches
+     * Validates and fixes an incorrect state of the handler
+     *
+     * @return {@code 0} - no changes; {@code -1} - presets map was empty; {@code -2} - unregistered preset was selected
+     */
+    public int validateConfigState(CompletePalette palette) {
+        if (presets.isEmpty()) {
+            this.toDefaultState(palette);
+            return -1;
+        } else if (!presets.containsKey(selectedPreset)) {
+            selectedPreset = presets.keySet().iterator().next();
+            return -2;
+        }
+        return 0;
+    }
+
+    /**
+     * Updates handler's state by applying and registration preset patches. After applying patches validates
+     * the handler's state
      *
      * @param palette       Object of {@link CompletePalette} to be able to create a default preset
      * @param presetPatches Set of patches containing changes to presets: deletions, creations and content changes
-     * @return Record object containing info about deletions and filename changes to apply them in the {@link PaletteDataManager}
+     * @return {@link PaletteDataManager.DataPatchRequest} object containing info about changes to apply them in the {@link PaletteDataManager}
      */
-    public PaletteDataManager.DataPatchRequest patchPresets(CompletePalette palette, Set<RegisteredPresetPatch> presetPatches) {
+    public PaletteDataManager.DataPatchRequest applyPresetPatches(CompletePalette palette, Collection<RegisteredPresetPatch> presetPatches) {
         Map<RegisteredPalettePreset, PatchTypes> presetsToUpdate = new HashMap<>();
         Set<String> filesToRemove = new HashSet<>();
         Map<String, String> fileRenames = new HashMap<>();
@@ -117,8 +128,8 @@ public class PalettePresetsHandler {
                     RegisteredPalettePreset oldPreset = presets.get(patch.getUUID());
                     boolean filenameChanged = !oldPreset.filename().equals(patch.getFilename());
 
-                    patch.filename(makeUniqueFilename(patch.getFilename()));
                     if (filenameChanged) {
+                        patch.setFilename(makeUniqueFilename(patch.getFilename()));
                         fileRenames.put(oldPreset.filename(), patch.getFilename());
                     }
 
@@ -139,22 +150,6 @@ public class PalettePresetsHandler {
         updatePresetFilenamesMap();
 
         return new PaletteDataManager.DataPatchRequest(presetsToUpdate, filesToRemove, fileRenames);
-    }
-
-    /**
-     * Validates and fixes an incorrect state of the handler
-     *
-     * @return {@code 0} - no changes; {@code -1} - presets map was empty; {@code -2} - unregistered preset was selected
-     */
-    public int validateConfigState(CompletePalette palette) {
-        if (presets.isEmpty()) {
-            this.toDefaultState(palette);
-            return -1;
-        } else if (!presets.containsKey(selectedPreset)) {
-            selectedPreset = presets.keySet().iterator().next();
-            return -2;
-        }
-        return 0;
     }
 
     public boolean removeNonexistent() {

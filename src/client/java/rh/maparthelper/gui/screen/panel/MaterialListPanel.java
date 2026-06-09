@@ -21,8 +21,6 @@ import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.UseAuxBlocks;
-import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
@@ -32,6 +30,8 @@ import rh.maparthelper.gui.widget.MapartPreviewWidget;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.RegisteredPalettePreset;
 import rh.maparthelper.util.InventoryItemsCounter;
 import rh.maparthelper.util.RenderUtils;
 
@@ -112,7 +112,7 @@ public class MaterialListPanel extends AbstractLayout {
         if (!CurrentConversionSettings.isMapartConverted() || MapartHelper.conversionConfig().useUnobtainable()) return;
 
         GridLayout.RowHelper materialListAdder = materialListContent.createRowHelper(2);
-        PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
+        RegisteredPalettePreset preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
 
         ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionConfig().getMaterialsCountMode());
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
@@ -131,7 +131,7 @@ public class MaterialListPanel extends AbstractLayout {
                 hasAuxBlockInColors = calculateRemainingCounts(colorCounts);
 
             for (ColorsCounter.MapColorCount colorCount : colorCounts) {
-                addBlockToMaterialList(materialListAdder, palette, colorCount);
+                addBlockToMaterialList(materialListAdder, preset, colorCount);
             }
 
             if (displayRemainingAmount && !hasAuxBlockInColors)
@@ -147,7 +147,7 @@ public class MaterialListPanel extends AbstractLayout {
             calculateRemainingCounts(colorCounts);
 
             for (ColorsCounter.MapColorCount colorCount : colorCounts) {
-                addBlockToMaterialList(materialListAdder, palette, colorCount);
+                addBlockToMaterialList(materialListAdder, preset, colorCount);
             }
         }
 
@@ -161,9 +161,9 @@ public class MaterialListPanel extends AbstractLayout {
         materialListScrollable.visitWidgets(childAdder);
     }
 
-    private void addBlockToMaterialList(GridLayout.RowHelper adder, PalettePresetsConfig palette, ColorsCounter.MapColorCount color) {
+    private void addBlockToMaterialList(GridLayout.RowHelper adder, RegisteredPalettePreset preset, ColorsCounter.MapColorCount color) {
         MapColor mapColor = MapColor.byId(color.id());
-        Block block = palette.getBlockOfMapColor(mapColor);
+        Block block = preset.getBlockOfMapColor(mapColor);
         if (block == null) return;
 
         MaterialListBlockWidget blockItemWidget = new MaterialListBlockWidget(0, 0, 24, block, mapColor);
@@ -187,11 +187,11 @@ public class MaterialListPanel extends AbstractLayout {
         if (player == null) return false;
         boolean hasAuxBlock = false;
 
-        PalettePresetsConfig paletteConfig = PaletteConfigManager.presetsConfig;
+        RegisteredPalettePreset preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
 
         List<Item> countingBlocks = Arrays.stream(colors)
                 .map(c -> {
-                    Block block = paletteConfig.getBlockOfMapColor(MapColor.byId(c.id()));
+                    Block block = preset.getBlockOfMapColor(MapColor.byId(c.id()));
                     if (block instanceof LiquidBlock)
                         return BuiltInRegistries.FLUID.getValue(BuiltInRegistries.BLOCK.getKey(block)).getBucket();
                     return block.asItem();

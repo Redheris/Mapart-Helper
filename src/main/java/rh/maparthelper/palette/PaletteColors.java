@@ -5,7 +5,6 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.DitherEntry;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteConfigManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,6 +13,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PaletteColors {
+    private static final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
+
     private static final Map<Integer, MapColorEntry> argbMapColors = new HashMap<>();
     private static final Map<Integer, DitherEntry> cachedClosestColors = new ConcurrentHashMap<>();
     private static final int[] mapRenderColors = new int[256];
@@ -94,7 +95,8 @@ public class PaletteColors {
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
 
-        for (MapColor mapColor : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
+        RegisteredPalettePreset preset = paletteDataManager.getPresetsHandler().getSelectedPreset();
+        for (MapColor mapColor : preset.getMapColors()) {
             if (excludingColors.contains(mapColor)) continue;
 
             for (int brightness = 0; brightness < 3; brightness++) {
@@ -142,7 +144,8 @@ public class PaletteColors {
         int[] rgbOriginal = ColorUtils.getRGB(argb);
         int[] rgbClosest = new int[0];
 
-        for (MapColor mapColor : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
+        RegisteredPalettePreset preset = paletteDataManager.getPresetsHandler().getSelectedPreset();
+        for (MapColor mapColor : preset.getMapColors()) {
             if (excludingColors.contains(mapColor)) continue;
 
             int brightness = mapColor == MapColor.WATER ? 2 : 1; // Normal brightness for water color is HIGH(2)

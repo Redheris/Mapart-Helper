@@ -15,15 +15,18 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.Shapes;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.UseAuxBlocks;
-import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.config.palette.PaletteGenerator;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
+import rh.maparthelper.palette.PaletteColors;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.PaletteGenerator;
+import rh.maparthelper.palette.RegisteredPalettePreset;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MapartSchematicBuilder {
+    private final RegisteredPalettePreset preset;
+
     private final CompoundTag nbt = new CompoundTag();
     private final ListTag blocks = new ListTag();
     private final int[][] mapColors;
@@ -39,6 +42,7 @@ public class MapartSchematicBuilder {
     private final Block auxBlock = MapartHelper.conversionConfig().getAuxBlock();
 
     public MapartSchematicBuilder(int[] mapColors, int mapsWidth, int mapsHeight) {
+        this.preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
         this.xSize = mapsWidth * 128;
         this.zSize = useAuxBlocks == UseAuxBlocks.TRUST_ME ? mapsHeight * 128 : mapsHeight * 128 + 1;
         this.prevRowSupportBlock = new boolean[xSize];
@@ -82,7 +86,7 @@ public class MapartSchematicBuilder {
     }
 
     private void addColor(MapColor mapColor, int x, int y, int z) {
-        Block block = PaletteConfigManager.presetsConfig.getBlockOfMapColor(mapColor);
+        Block block = preset.getBlockOfMapColor(mapColor);
         addBlock(block, x, y, z);
         if (useAuxBlocks != UseAuxBlocks.NO_AUX)
             addAuxBlocksForColor(block, x, y, z);

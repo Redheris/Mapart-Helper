@@ -1,10 +1,9 @@
 package rh.maparthelper.conversion.dithering;
 
 import net.minecraft.world.level.material.MapColor;
-import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.DitherEntry;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.mapart.ColorsCounter;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;

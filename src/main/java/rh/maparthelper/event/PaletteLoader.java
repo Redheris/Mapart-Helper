@@ -1,49 +1,36 @@
 package rh.maparthelper.event;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
-import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.palette.PaletteDataManager;
 
 public class PaletteLoader {
     public static boolean tagsLoaded = false;
     private static boolean needs_regenerate_palette = false;
 
     public static void load() {
-//        PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
+        PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
 
         CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
             tagsLoaded = true;
             if (!needs_regenerate_palette) return;
 
-            // TODO: Replace old implementation ===========
-            PaletteConfigManager.regenerateCompletePalette();
-            PaletteConfigManager.readPresetsConfigFile();
-            // ============================================
-
-//            paletteDataManager.updatePaletteGameVersion(true);
-//            paletteDataManager.readPresetsConfig();
+            paletteDataManager.updatePaletteGameVersion(true);
+            paletteDataManager.readPresetsConfig();
             needs_regenerate_palette = false;
         });
 
-//        if (paletteDataManager.readCompletePalette()) {
-//            paletteDataManager.readPresetsConfig();
-//        } else {
-//            needs_regenerate_palette = true;
-//        }
-
-        // TODO: Replace old implementation ===========
-        if (PaletteConfigManager.readCompletePalette()) {
-            PaletteConfigManager.readPresetsConfigFile();
-            return;
+        if (paletteDataManager.readCompletePalette()) {
+            paletteDataManager.readPresetsConfig();
+        } else {
+            needs_regenerate_palette = true;
         }
-        needs_regenerate_palette = true;
-        // ============================================
     }
 
     public static void requestRegenerate() {
+        PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
         if (tagsLoaded) {
-            // TODO: Replace old implementation
-            PaletteConfigManager.regenerateCompletePalette();
-            PaletteConfigManager.readPresetsConfigFile();
+            paletteDataManager.updatePaletteGameVersion(true);
+            paletteDataManager.readPresetsConfig();
         } else {
             needs_regenerate_palette = true;
         }

@@ -3,8 +3,8 @@ package rh.maparthelper.conversion;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteColors;
 
 public class CurrentConversionSettings {
     // GUI image

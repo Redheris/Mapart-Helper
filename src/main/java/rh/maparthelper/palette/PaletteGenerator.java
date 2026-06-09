@@ -27,7 +27,7 @@ public class PaletteGenerator {
     private static final Class<?>[] BUILD_DECOR_BLOCKS;
     private static final List<Block> FUNCTIONAL_BLOCKS;
 
-    public static void initColors(Map<Integer, List<Block>> palette) {
+    public static void generatePalette(Map<Integer, List<Block>> palette) {
         palette.clear();
 
         for (Block block : BuiltInRegistries.BLOCK) {

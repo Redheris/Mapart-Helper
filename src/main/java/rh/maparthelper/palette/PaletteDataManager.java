@@ -19,10 +19,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static rh.maparthelper.MapartHelper.CONFIG_PATH;
 
@@ -53,7 +50,7 @@ public class PaletteDataManager {
         return completePalette;
     }
 
-    public boolean isOutdatedPalette() {
+    public boolean isPaletteOutdated() {
         return outdatedPalette;
     }
 
@@ -67,17 +64,11 @@ public class PaletteDataManager {
         saveCompletePalette();
     }
 
-    public void readAll() {
-        if (readCompletePalette()) {
-            readPresetsConfig();
-        }
-    }
-
-    public void updateCompletePalette() {
-        boolean validPaletteFile = readCompletePalette();
-        if (!validPaletteFile) {
+    public void updatePaletteAndPresets() {
+        if (!readCompletePalette()) {
             updatePaletteGameVersion(true);
         }
+        readPresetsConfig();
     }
 
     private void saveCompletePalette() {
@@ -110,6 +101,11 @@ public class PaletteDataManager {
             MapartHelper.LOGGER.error("Failed to read or parse file \"{}\"", completePalettePath, e);
         }
         return false;
+    }
+
+    public void changeSelectedPreset(UUID presetUUID) {
+        presetsHandler.setSelectedPreset(presetUUID);
+        savePresetsConfig();
     }
 
     private void savePresetsConfig() {
@@ -224,11 +220,12 @@ public class PaletteDataManager {
     /**
      * Applies set of preset changes
      *
-     * @param presetPatches Set of patches containing changes to presets: deletions, creations and content changes
+     * @param selectedPreset Preset to select after applying patches
+     * @param presetPatches  Set of patches containing changes to presets: deletions, creations and content changes
      */
-    public void patchPresets(Set<RegisteredPresetPatch> presetPatches) {
+    public void applyPresetPatches(UUID selectedPreset, Collection<RegisteredPresetPatch> presetPatches) {
         MapartHelper.LOGGER.info("Applying changes to palette presets...");
-        DataPatchRequest dataPatchRequest = presetsHandler.patchPresets(completePalette, presetPatches);
+        DataPatchRequest dataPatchRequest = presetsHandler.applyPresetPatches(completePalette, presetPatches);
 
         int deleted = 0;
         int created = 0;
@@ -274,7 +271,8 @@ public class PaletteDataManager {
             }
         }
 
-        if (deleted + renamed + created > 0) {
+        if (deleted + renamed + created > 0 || !selectedPreset.equals(presetsHandler.getSelectedPreset().uuid())) {
+            presetsHandler.setSelectedPreset(selectedPreset);
             savePresetsConfig();
         }
 

@@ -29,8 +29,6 @@ import rh.maparthelper.config.ConfigScreenFactory;
 import rh.maparthelper.config.ConversionConfiguration;
 import rh.maparthelper.config.MaterialsCountModes;
 import rh.maparthelper.config.UseAuxBlocks;
-import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
@@ -52,6 +50,9 @@ import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.mapart.MapartSaver;
+import rh.maparthelper.palette.PaletteColors;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.PalettePresetsHandler;
 import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.util.FileDialogsUtils;
 
@@ -68,7 +69,9 @@ import java.util.Set;
 public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier FULLSCREEN_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/fullscreen.png");
     private static final Identifier SETTINGS_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/settings.png");
-    protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
+    private final MapartProcessing mapart = CurrentConversionSettings.mapart;
+    private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
+    private final PalettePresetsHandler palettePresetsHandler = paletteDataManager.getPresetsHandler();
 
     private LinearLayout settingsLeft;
     private LinearLayout settingsRight;
@@ -220,18 +223,18 @@ public class MapartEditorScreen extends ScreenAdapted {
                 elementWidth, 20,
                 elementWidth, 150,
                 true,
-                Component.nullToEmpty("\"" + PaletteConfigManager.presetsConfig.getCurrentPresetName() + "\""),
-                s -> {
+                Component.nullToEmpty("\"" + palettePresetsHandler.getSelectedPreset().presetName() + "\""),
+                uuid -> {
                     PaletteColors.clearExcludingColors();
                     updateResetExcludedColorsButton(false);
-                    PaletteConfigManager.changeCurrentPreset(s);
+                    paletteDataManager.changeSelectedPreset(uuid);
                     MapColor oldBgColor = MapartHelper.conversionConfig().getBackgroundColor().mapColor();
-                    if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(oldBgColor) == null) {
+                    if (palettePresetsHandler.getSelectedPreset().getBlockOfMapColor(oldBgColor) == null) {
                         MapartHelper.conversionConfig().setBackgroundColor(MapColorEntry.CLEAR);
                     }
                     MapartImageUpdater.updateMapart(mapart);
                 },
-                PaletteConfigManager.presetsConfig.presetFiles
+                palettePresetsHandler.getPresets()
         );
         mapColorPickerDropdownWidget = new MapColorPickerDropdown(
                 this,
@@ -507,7 +510,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     ConversionConfiguration.save();
                     Minecraft.getInstance().setScreen(
-                            new PresetsEditorScreen(this, 45, 30, 45, 30)
+                            new PresetsEditorScreen(this, mapart, 45, 30, 45, 30)
                     );
                 }
         ).size(elementWidth, 20).build();
@@ -577,7 +580,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         // Widget positions adjustments
         resetExcludedColors.setX(width - 5 - resetExcludedColors.getWidth());
 
-        if (PaletteConfigManager.isPaletteOutdated()) {
+        if (paletteDataManager.isPaletteOutdated()) {
             Identifier warningTex = Identifier.parse("textures/gui/sprites/dialog/warning_button.png");
             Identifier warningTexHovered = Identifier.parse("textures/gui/sprites/dialog/warning_button_highlighted.png");
             var regenBtn = new DecorativeButtonWidget.Builder(warningTex, btn -> {

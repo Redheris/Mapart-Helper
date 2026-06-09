@@ -2,7 +2,7 @@ package rh.maparthelper.conversion.staircases;
 
 import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.util.Arrays;
 import java.util.List;

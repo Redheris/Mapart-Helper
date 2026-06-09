@@ -9,10 +9,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.palette.PaletteDataManager;
 import rh.maparthelper.util.RenderUtils;
 
 public class PaletteUpdateSuggestionScreen extends Screen {
+    private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
     private final Screen parent;
     private int boxX;
     private int boxY;
@@ -26,7 +27,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
 
     @Override
     protected void init() {
-        String paletteGameVersion = PaletteConfigManager.completePalette.getGameVersion();
+        String paletteGameVersion = paletteDataManager.getCompletePalette().getGameVersion();
         MutableComponent unknownLabel = Component.translatable("maparthelper.gui.for_unknown_game_version");
         MutableComponent gameVersionName;
         if (paletteGameVersion == null)
@@ -55,7 +56,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         Button deny = Button.builder(
                         keepOption,
                         btn -> {
-                            PaletteConfigManager.bumpPaletteGameVersion();
+                            paletteDataManager.updatePaletteGameVersion(false);
                             Minecraft.getInstance().setScreen(new MapartEditorScreen());
                         }
                 )
@@ -67,7 +68,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         Button update = Button.builder(
                         regenerateOption,
                         btn -> {
-                            PaletteConfigManager.regenerateCompletePalette();
+                            paletteDataManager.updatePaletteGameVersion(true);
                             Minecraft.getInstance().setScreen(new MapartEditorScreen());
                         }
                 )

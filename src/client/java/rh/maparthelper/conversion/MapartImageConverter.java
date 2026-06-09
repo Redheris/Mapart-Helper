@@ -7,12 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.ColorUtils;
-import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.dithering.ColorConverter;
 import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.mapart.AbstractMapart;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteColors;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.PalettePresetsHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -139,6 +140,8 @@ public class MapartImageConverter {
         private final Path newImagePath;
         private final boolean logExecutionTime;
 
+        private final PalettePresetsHandler presetsHandler = PaletteDataManager.getInstance().getPresetsHandler();
+
         private final boolean showOriginalImage = MapartHelper.conversionConfig().isShowOriginalImage();
         private final int bgColor = MapartHelper.conversionConfig().getBackgroundRenderColor();
         private final int bgMapColorId = MapartHelper.conversionConfig().getBackgroundColor().mapColor().id;
@@ -189,7 +192,7 @@ public class MapartImageConverter {
 
                         mapart.clearColorCounters();
                         if (!showOriginalImage) {
-                            if (PaletteConfigManager.presetsConfig.shouldConvertWithCurrentPreset()) {
+                            if (presetsHandler.shouldConvertWithSelectedPreset()) {
                                 processingImage = convertToBlocksPalette(
                                         mapart, processingImage, bgColor, bgMapColorId, use3D,
                                         useUnobtainable, multithreadColorConverting

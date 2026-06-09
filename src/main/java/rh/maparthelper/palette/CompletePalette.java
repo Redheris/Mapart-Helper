@@ -3,7 +3,6 @@ package rh.maparthelper.palette;
 import net.minecraft.SharedConstants;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
-import rh.maparthelper.config.palette.PaletteGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ public class CompletePalette {
 
     static CompletePalette generate() {
         CompletePalette generated = new CompletePalette();
-        PaletteGenerator.initColors(generated.palette);
+        PaletteGenerator.generatePalette(generated.palette);
         generated.bumpGameVersion();
         return generated;
     }

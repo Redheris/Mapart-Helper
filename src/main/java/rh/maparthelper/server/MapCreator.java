@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.util.ArrayList;
 import java.util.List;

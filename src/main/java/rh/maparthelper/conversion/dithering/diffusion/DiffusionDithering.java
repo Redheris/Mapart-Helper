@@ -3,10 +3,10 @@ package rh.maparthelper.conversion.dithering.diffusion;
 import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.DitherEntry;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverter;
 import rh.maparthelper.conversion.dithering.ConversionContext;
 import rh.maparthelper.mapart.ColorsCounter;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;

@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import rh.maparthelper.command.ServerCommands;
 import rh.maparthelper.config.CommonConfiguration;
 import rh.maparthelper.config.ConversionConfiguration;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.event.PaletteLoader;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.nio.file.Path;
 

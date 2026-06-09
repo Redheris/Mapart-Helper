@@ -16,26 +16,30 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2fStack;
-import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
-import rh.maparthelper.gui.widget.dropdown.PresetsListDropdown;
+import rh.maparthelper.gui.widget.dropdown.PresetPatchesListDropdown;
 import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
+import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.*;
+import rh.maparthelper.util.FileUtils;
 import rh.maparthelper.util.RenderUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
 public class PresetsEditorScreen extends ScreenAdapted {
+    private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
+    private PalettePresetsHandler presetsHandler = paletteDataManager.getPresetsHandler();
+
     private final MapartEditorScreen parent;
+    private final MapartProcessing mapart;
+
     private final int boxX;
     private final int boxY;
     private final int marginRight;
@@ -43,20 +47,19 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private int boxWidth;
     private int boxHeight;
 
-    private PalettePresetsConfig.Editable presetsConfig = PaletteConfigManager.presetsConfig.getEditable();
-    private String editingPreset = presetsConfig.getCurrentPresetFilename();
+    private Map<UUID, RegisteredPresetPatch> patches = presetsHandler.createPresetPatches();
+    private UUID editingPresetUUID = presetsHandler.getSelectedPreset().uuid();
+    private RegisteredPresetPatch editingPreset = patches.get(editingPresetUUID);
 
-    private final Set<String> deletedPresets = new HashSet<>();
-    private final Set<String> updatedPresets = new HashSet<>();
-
-    private PresetsListDropdown presetsListDropdownButton;
+    private PresetPatchesListDropdown presetsListDropdownButton;
 
     private AdjEditBox presetNameField;
     private AdjScrollableLayoutWidget colorsEditorScrollable;
 
-    protected PresetsEditorScreen(MapartEditorScreen parent, int x, int y, int marginRight, int marginBottom) {
+    protected PresetsEditorScreen(MapartEditorScreen parent, MapartProcessing mapart, int x, int y, int marginRight, int marginBottom) {
         super(parent, Component.translatable("maparthelper.gui.presets_editor_screen"));
         this.parent = parent;
+        this.mapart = mapart;
         this.boxX = x;
         this.boxY = y;
         this.marginRight = marginRight;
@@ -77,7 +80,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     protected Set<OverlayLayout> initOverlays() {
         Set<OverlayLayout> overlays = new HashSet<>();
 
-        presetsListDropdownButton = new PresetsListDropdown(
+        presetsListDropdownButton = new PresetPatchesListDropdown(
                 this,
                 20, 20,
                 (int) (boxWidth * 0.3) + 20,
@@ -85,7 +88,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 false,
                 Component.nullToEmpty("☰"),
                 this::changeEditingPreset,
-                presetsConfig.presetFiles
+                patches
         );
 
         overlays.add(presetsListDropdownButton.getOverlay());
@@ -103,8 +106,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarLeft.addChild(presetNameLabel, presetBarLeftPositioner.copy().paddingRight(5));
 
         presetNameField = new AdjEditBox(
-                font, (int) (boxWidth * 0.3), 20, presetsConfig.presetFiles.get(editingPreset), "Preset name"
+                font, (int) (boxWidth * 0.3), 20,
+                editingPreset.getPresetName(),
+                "Preset name"
         );
+        updatePresetNameFieldState();
         presetBarLeft.addChild(presetNameField);
 
         presetsListDropdownButton.setOverlayXOffset(-presetNameField.getWidth());
@@ -112,9 +118,11 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarLeft.addChild(presetsListDropdownButton);
 
         presetNameField.setHint(Component.translatable("maparthelper.gui.presets.preset_name").withColor(CommonColors.GRAY));
-        presetNameField.setValueConsumer(value -> {
-            presetsConfig.presetFiles.put(editingPreset, value);
-            presetsListDropdownButton.updateNames(presetsConfig.presetFiles.values());
+        presetNameField.setValueConsumer(presetName -> {
+            if (!editingPreset.getPresetName().equals(presetName)) {
+                editingPreset.setPresetName(presetName);
+                presetsListDropdownButton.updateNameFor(editingPreset);
+            }
         });
 
         Button createEmptyPreset = Button.builder(Component.nullToEmpty("\uD83D\uDDCB"), b -> this.createNewPreset(false))
@@ -196,25 +204,19 @@ public class PresetsEditorScreen extends ScreenAdapted {
             MapColorBlockWidget noneBlock = new MapColorBlockWidget(
                     0, 0, squareSize,
                     Blocks.BARRIER, mapColor,
-                    (mx, my) -> {
-                        presetsConfig.getPreset(editingPreset).removeColor(mapColor);
-                        updatedPresets.add(editingPreset);
-                    }
+                    (mx, my) -> editingPreset.removeColor(mapColor)
             );
             noneBlock.setTooltip(Component.translatable("maparthelper.gui.presets.remove_color"));
 
             blocksListContent.addChild(noneBlock);
 
-            List<Block> blocks = PaletteConfigManager.completePalette.palette.get(mapColor.id);
+            List<Block> blocks = paletteDataManager.getCompletePalette().palette.get(mapColor.id);
             if (blocks != null) {
                 for (Block block : blocks) {
                     MapColorBlockWidget blockWidget = new MapColorBlockWidget(
                             0, 0, squareSize,
                             block, mapColor,
-                            (mx, my) -> {
-                                presetsConfig.getPreset(editingPreset).updateColor(mapColor, block);
-                                updatedPresets.add(editingPreset);
-                            }
+                            (mx, my) -> editingPreset.updateEntry(mapColor, block)
                     );
                     blocksListContent.addChild(blockWidget);
                 }
@@ -245,64 +247,88 @@ public class PresetsEditorScreen extends ScreenAdapted {
     }
 
     private void createNewPreset(boolean createDefault) {
-        String newPreset = presetsConfig.createNewPreset(createDefault, updatedPresets, deletedPresets);
-        changeEditingPreset(newPreset);
+        RegisteredPresetPatch newPreset;
+        if (createDefault) {
+            List<String> existingPresetNames = patches.values().stream()
+                    .map(RegisteredPresetPatch::getPresetName)
+                    .toList();
+            newPreset = new RegisteredPresetPatch(
+                    PaletteGenerator.generateDefaultPreset(paletteDataManager.getCompletePalette().palette),
+                    "New default preset",
+                    FileUtils.makeUniqueName(
+                            existingPresetNames::contains,
+                            "New default preset",
+                            null,
+                            "%s (%d)"
+                    )
+            );
+        } else {
+            newPreset = new RegisteredPresetPatch();
+        }
+
+        patches.put(newPreset.getUUID(), newPreset);
+        changeEditingPreset(newPreset.getUUID());
         rebuildWidgets();
     }
 
     private void deletePreset() {
-        PalettePresetsConfig.Editable updatedConfig = presetsConfig.deletePreset(editingPreset, updatedPresets, deletedPresets);
-        boolean configEmptied = updatedConfig != presetsConfig;
-        if (configEmptied) {
-            presetsConfig = updatedConfig;
+        if (editingPreset.getState() != PatchTypes.CREATED) {
+            editingPreset.toggleToRemove();
+            updatePresetNameFieldState();
+            presetsListDropdownButton.updateNameFor(editingPreset);
         } else {
-            updatedPresets.remove(editingPreset);
+            patches.remove(editingPresetUUID);
+            changeEditingPreset(presetsHandler.getSelectedPreset().uuid());
+            rebuildWidgets();
         }
-        changeEditingPreset(presetsConfig.getCurrentPresetFilename());
-        rebuildWidgets();
+    }
+
+    private void updatePresetNameFieldState() {
+        boolean removed = editingPreset.getState() == PatchTypes.REMOVED;
+        this.presetNameField.active = !removed;
+        this.presetNameField.setTextColor(removed ? CommonColors.GRAY : -1);
     }
 
     private void duplicatePreset() {
-        String newPreset = presetsConfig.duplicatePreset(editingPreset, updatedPresets, deletedPresets);
-        changeEditingPreset(newPreset);
+        RegisteredPresetPatch newPreset = RegisteredPresetPatch.duplicate(editingPreset);
+        newPreset.setPresetName(editingPreset.getPresetName() + " (Copy)");
+        patches.put(newPreset.getUUID(), newPreset);
+        changeEditingPreset(newPreset.getUUID());
         rebuildWidgets();
     }
 
-    private void changeEditingPreset(String presetFile) {
-        this.editingPreset = presetFile;
-        this.presetNameField.setValue(presetsConfig.presetFiles.get(presetFile));
+    private void changeEditingPreset(UUID presetUUID) {
+        this.editingPresetUUID = presetUUID;
+        this.editingPreset = patches.get(editingPresetUUID);
+        this.presetNameField.setValue(editingPreset.getPresetName());
+        updatePresetNameFieldState();
     }
 
     private void updateFiles() {
-        PaletteConfigManager.updateCompletePalette();
-        PaletteConfigManager.readPresetsConfigFile();
+        paletteDataManager.updatePaletteAndPresets();
 
-        this.presetsConfig = PaletteConfigManager.presetsConfig.getEditable();
-        this.editingPreset = presetsConfig.getCurrentPresetFilename();
+        this.presetsHandler = paletteDataManager.getPresetsHandler();
+        this.patches = presetsHandler.createPresetPatches();
+        this.editingPresetUUID = presetsHandler.getSelectedPreset().uuid();
+        this.editingPreset = patches.get(editingPresetUUID);
 
-        this.deletedPresets.clear();
-        this.updatedPresets.clear();
         rebuildWidgets();
     }
 
     private void saveChanges() {
-        boolean updateMapart = !presetsConfig.getCurrentPresetFilename().equals(PaletteConfigManager.presetsConfig.getCurrentPresetFilename());
-        updateMapart |= updatedPresets.contains(presetsConfig.getCurrentPresetFilename());
-        PaletteConfigManager.presetsConfig = presetsConfig;
-        if (!updatedPresets.isEmpty()) {
-            for (String filename : updatedPresets) {
-                PaletteConfigManager.savePresetFile(filename);
-            }
-            updatedPresets.clear();
+        boolean updateMapart = !editingPresetUUID.equals(presetsHandler.getSelectedPreset().uuid());
+        updateMapart |= patches.get(editingPresetUUID).getState() != PatchTypes.UNCHANGED;
+
+        paletteDataManager.applyPresetPatches(editingPresetUUID, patches.values());
+
+        if (updateMapart) {
+            MapartImageUpdater.updateMapart(mapart);
         }
-        if (!deletedPresets.isEmpty()) {
-            for (String filename : deletedPresets) {
-                PaletteConfigManager.deletePresetFile(filename);
-            }
-            deletedPresets.clear();
-        }
-        if (updateMapart) MapartImageUpdater.updateMapart(parent.mapart);
-        PaletteConfigManager.savePresetsConfigFile();
+
+        this.patches = presetsHandler.createPresetPatches();
+        this.editingPresetUUID = presetsHandler.getSelectedPreset().uuid();
+        this.editingPreset = patches.get(editingPresetUUID);
+        rebuildWidgets();
     }
 
     @Override
@@ -354,6 +380,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         @Override
         public void onClick(double mouseX, double mouseY) {
             this.clickAction.click(mouseX, mouseY);
+            presetsListDropdownButton.updateNameFor(editingPreset);
         }
 
         @Override
@@ -367,13 +394,19 @@ public class PresetsEditorScreen extends ScreenAdapted {
         protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(graphics, mouseX, mouseY, partialTick);
 
-            PalettePresetsConfig.PalettePreset preset = presetsConfig.getPreset(editingPreset);
-            Block presetBlock = preset.colors.get(mapColor);
-            boolean flag = presetBlock == null && this.getBlock() == Blocks.BARRIER;
-            flag = flag || (presetBlock != null && presetBlock == this.getBlock());
-            if (flag) {
+            Block selectedBlock = editingPreset.getBlockOfMapColor(mapColor);
+
+            boolean renderingSelected = selectedBlock == null && this.getBlock() == Blocks.BARRIER;
+            renderingSelected |= (selectedBlock != null && selectedBlock == this.getBlock());
+
+            if (renderingSelected) {
                 graphics.guiRenderState.nextStratum();
-                RenderUtils.renderOutline(graphics, this.getX(), this.getY(), this.getWidth(), this.getHeight(), CommonColors.HIGH_CONTRAST_DIAMOND);
+                RenderUtils.renderOutline(
+                        graphics,
+                        this.getX(), this.getY(),
+                        this.getWidth(), this.getHeight(),
+                        CommonColors.HIGH_CONTRAST_DIAMOND
+                );
             }
         }
         //~ !gui_rendering

@@ -11,17 +11,19 @@ import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.colors.MapColors;
-import rh.maparthelper.config.palette.PaletteConfigManager;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.RegisteredPalettePreset;
 import rh.maparthelper.util.RenderUtils;
 
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
 public class MapColorPickerDropdown extends DropdownOverlayWidget {
+    private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
     private final MapartProcessing mapart;
 
     public MapColorPickerDropdown(@NotNull Screen screen, MapartProcessing mapart, int width, int height, int overlayWidth, int overlayHeight) {
@@ -83,7 +85,8 @@ public class MapColorPickerDropdown extends DropdownOverlayWidget {
         protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             super.renderWidget(graphics, mouseX, mouseY, partialTick);
             onlyNormalBrightness = !MapartHelper.conversionConfig().use3D();
-            if (color != MapColor.NONE && PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
+            RegisteredPalettePreset preset = paletteDataManager.getPresetsHandler().getSelectedPreset();
+            if (color != MapColor.NONE && preset.getBlockOfMapColor(color) == null) {
                 setAlpha(0.2f);
                 if (this.isMouseOver(mouseX, mouseY) && graphics.containsPointInScissor(mouseX, mouseY)) {
                     graphics.setTooltipForNextFrame(Component.translatable("maparthelper.gui.color_without_block").withColor(CommonColors.SOFT_RED), mouseX, mouseY);
@@ -102,7 +105,7 @@ public class MapColorPickerDropdown extends DropdownOverlayWidget {
                 setColor(MapColorEntry.CLEAR);
                 return true;
             }
-            if (PaletteConfigManager.presetsConfig.getBlockOfMapColor(color) == null) {
+            if (paletteDataManager.getPresetsHandler().getSelectedPreset().getBlockOfMapColor(color) == null) {
                 return false;
             }
             if (color == MapColor.WATER) {

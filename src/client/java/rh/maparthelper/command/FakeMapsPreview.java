@@ -14,9 +14,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteColors;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {
