@@ -70,10 +70,9 @@ public class PresetsEditorScreen extends ScreenAdapted {
     protected void preInit() {
         parent.width = width;
         parent.height = height;
-        parent.init();
 
-        this.boxWidth = parent.width - boxX - marginRight;
-        this.boxHeight = parent.height - boxY - marginBottom;
+        this.boxWidth = width - boxX - marginRight;
+        this.boxHeight = height - boxY - marginBottom;
     }
 
     @Override
