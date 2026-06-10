@@ -2,6 +2,7 @@ package rh.maparthelper.gui.widget.dropdown;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -20,17 +21,22 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class PresetPatchesListDropdown extends DropdownOverlayWidget {
+    private static final Identifier LIST_ICON = MapartHelper.identifier("textures/gui/icons/list.png");
     private static final Identifier REMOVE_ICON_TEXTURE = MapartHelper.identifier("textures/gui/icons/trash_can.png");
 
     private final Map<UUID, Button> presetButtons;
     private final Consumer<RegisteredPresetPatch> onRemove;
 
     public PresetPatchesListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
-                                     boolean dynamicText, Component initOption,
+                                     boolean dynamicText,
                                      Consumer<UUID> action, Consumer<RegisteredPresetPatch> onRemove,
                                      Map<UUID, RegisteredPresetPatch> presets
     ) {
-        super(screen, null, width, height, initOption);
+        super(screen, null, width, height, false, true,
+                new WidgetSprites(LIST_ICON, LIST_ICON)
+        );
+        this.textureWidth = 16;
+        this.textureHeight = 16;
         this.onRemove = onRemove;
         presetButtons = initOverlay(dynamicText, overlayHeight, overlayWidth, action, presets);
     }

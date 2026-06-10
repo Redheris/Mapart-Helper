@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.screen;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -11,14 +10,17 @@ import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix3x2fStack;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.gui.widget.BlockItemWidget;
+import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetPatchesListDropdown;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
@@ -34,6 +36,11 @@ import java.util.*;
 //import net.minecraft.client.input.MouseButtonEvent;
 
 public class PresetsEditorScreen extends ScreenAdapted {
+    private static final Identifier NEW_PRESET_ICON = MapartHelper.identifier("textures/gui/icons/new_file.png");
+    private static final Identifier NEW_DEFAULT_PRESET_ICON = MapartHelper.identifier("textures/gui/icons/new_default_file.png");
+    private static final Identifier COPY_PRESET_ICON = MapartHelper.identifier("textures/gui/icons/copy_file.png");
+    private static final Identifier UPDATE_ICON = MapartHelper.identifier("textures/gui/icons/reset.png");
+
     private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
     private PalettePresetsHandler presetsHandler = paletteDataManager.getPresetsHandler();
 
@@ -85,7 +92,6 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 (int) (boxWidth * 0.3) + 20,
                 120,
                 false,
-                Component.nullToEmpty("☰"),
                 this::changeEditingPreset,
                 patch -> {
                     if (patch.getState() == PatchTypes.CREATED) {
@@ -114,6 +120,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 (int) (boxWidth * 0.3), 20,
                 Component.literal("Preset name")
         );
+        presetNameField.setMaxLength(100);
         presetNameField.setValue(editingPreset.getPresetName());
         updatePresetNameFieldState();
         presetBarLeft.addChild(presetNameField);
@@ -130,21 +137,24 @@ public class PresetsEditorScreen extends ScreenAdapted {
             }
         });
 
-        Button createEmptyPreset = Button.builder(Component.nullToEmpty("\uD83D\uDDCB"), b -> this.createNewPreset(false))
-                .size(17, 20)
-                .build();
+        DecorativeButtonWidget createEmptyPreset = DecorativeButtonWidget.builderSimpleTexture(
+                NEW_PRESET_ICON,
+                b -> this.createNewPreset(false)
+        ).size(16, 16).build();
         createEmptyPreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.createEmptyPreset_tooltip")));
         presetBarLeft.addChild(createEmptyPreset);
 
-        Button createDefaultPreset = Button.builder(Component.nullToEmpty("➕"), b -> this.createNewPreset(true))
-                .size(17, 20)
-                .build();
+        DecorativeButtonWidget createDefaultPreset = DecorativeButtonWidget.builderSimpleTexture(
+                NEW_DEFAULT_PRESET_ICON,
+                b -> this.createNewPreset(true)
+        ).size(16, 16).build();
         createDefaultPreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.createDefaultPreset_tooltip")));
         presetBarLeft.addChild(createDefaultPreset);
 
-        Button duplicatePreset = Button.builder(Component.nullToEmpty("\uD83D\uDDD0"), b -> this.duplicatePreset())
-                .size(17, 20)
-                .build();
+        DecorativeButtonWidget duplicatePreset = DecorativeButtonWidget.builderSimpleTexture(
+                COPY_PRESET_ICON,
+                b -> this.duplicatePreset()
+        ).size(16, 16).build();
         duplicatePreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.duplicatePreset_tooltip")));
         presetBarLeft.addChild(duplicatePreset);
 
@@ -156,9 +166,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarRight.setPosition(0, boxY + 5);
         presetBarRight.defaultCellSetting().alignVerticallyMiddle().paddingRight(1);
 
-        Button updateFiles = Button.builder(Component.literal("⟲").withStyle(ChatFormatting.BOLD), b -> this.updateFiles())
-                .size(18, 20)
-                .build();
+        DecorativeButtonWidget updateFiles = DecorativeButtonWidget.builderSimpleTexture(
+                UPDATE_ICON,
+                b -> this.updateFiles()
+        ).size(16, 16).build();
         updateFiles.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
         presetBarRight.addChild(updateFiles);
 

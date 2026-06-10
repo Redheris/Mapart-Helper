@@ -14,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 //? if >=1.21.10 {
 /*import net.minecraft.client.input.InputWithModifiers;
- *///?} else
+import net.minecraft.util.CommonColors;
+*///?} else
 import net.minecraft.client.Minecraft;
 
 public class DecorativeButtonWidget extends AbstractButton {
