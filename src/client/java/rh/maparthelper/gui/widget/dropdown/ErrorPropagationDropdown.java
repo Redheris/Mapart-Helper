@@ -1,6 +1,7 @@
 package rh.maparthelper.gui.widget.dropdown;
 
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -19,8 +20,11 @@ public class ErrorPropagationDropdown extends ImageAdjustmentsDropdown {
     private ImageAdjustmentSliderWidget sliderBlue;
 
     public ErrorPropagationDropdown(@NotNull Screen screen, MapartProcessing mapart, int width, int height,
-                                    int overlayWidth, int overlayHeight, Component message) {
-        super(screen, width, height, overlayWidth, overlayHeight, message);
+                                    int textureWidth, int textureHeight,
+                                    int overlayWidth, int overlayHeight, WidgetSprites widgetSprites) {
+        super(screen, width, height, overlayWidth, overlayHeight, widgetSprites);
+        this.textureWidth = textureWidth;
+        this.textureHeight = textureHeight;
         this.mapart = mapart;
     }
 

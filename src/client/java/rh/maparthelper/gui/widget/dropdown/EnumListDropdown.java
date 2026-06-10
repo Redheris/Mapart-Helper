@@ -12,11 +12,11 @@ import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 import java.util.function.Consumer;
 
 public class EnumListDropdown extends DropdownOverlayWidget {
-    private final OnPress modifySwitchButtonOnChange;
+    private final PressAction modifySwitchButtonOnChange;
 
     public EnumListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
                             Component fieldName, Enum<?> initOption, boolean showFieldName, boolean showTooltips,
-                            OnPress modifySwitchButtonOnChange, Consumer<Enum<?>> action, Enum<?>... entries) {
+                            PressAction modifySwitchButtonOnChange, Consumer<Enum<?>> action, Enum<?>... entries) {
         super(screen, null, width, height, constructInitComponent(fieldName, showFieldName, initOption));
 
         this.modifySwitchButtonOnChange = modifySwitchButtonOnChange;

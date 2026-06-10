@@ -38,7 +38,7 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         header.addChild(SpacerElement.height(30));
         header.defaultCellSetting().alignVerticallyMiddle();
 
-        DecorativeButtonWidget resetOffsetBtn = DecorativeButtonWidget.builder(
+        DecorativeButtonWidget resetOffsetBtn = DecorativeButtonWidget.builderSimpleTexture(
                 RESET_OFFSET_TEXTURE,
                 btn -> imageViewWidget.resetScaleAndOffset()
         ).size(16, 16).build();

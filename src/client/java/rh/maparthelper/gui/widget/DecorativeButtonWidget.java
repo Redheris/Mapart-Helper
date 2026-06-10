@@ -4,11 +4,12 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.CommonColors;
+import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 
 //? if >=1.21.10 {
@@ -17,24 +18,51 @@ import org.jetbrains.annotations.NotNull;
 import net.minecraft.client.Minecraft;
 
 public class DecorativeButtonWidget extends AbstractButton {
+    private static final WidgetSprites DEFAULT_SPRITES = new WidgetSprites(
+            Identifier.withDefaultNamespace("widget/button"),
+            Identifier.withDefaultNamespace("widget/button_disabled"),
+            Identifier.withDefaultNamespace("widget/button_highlighted")
+    );
+
     private final PressAction onPress;
-    private final Identifier textureDefault;
-    private final Identifier textureHighlighted;
+    private final WidgetSprites customSprites;
+    private final boolean renderVanillaBackground;
+
+    protected int textureWidth;
+    protected int textureHeight;
+
     private int defaultTextureColor = -1;
     private int hoveredTextureColor = -1;
+    private int textColorActive = -1;
 
-    private DecorativeButtonWidget(int x, int y, int width, int height, Component message, PressAction pressAction) {
+    public DecorativeButtonWidget(boolean vanillaBackground, int textColorActive,
+                                  int x, int y, int width, int height,
+                                  Component message, PressAction pressAction
+    ) {
         super(x, y, width, height, message);
+        this.customSprites = null;
         this.onPress = pressAction;
-        this.textureDefault = null;
-        this.textureHighlighted = null;
+        this.renderVanillaBackground = vanillaBackground;
+        this.textColorActive = textColorActive;
+        this.textureWidth = 16;
+        this.textureHeight = 16;
+
     }
 
-    private DecorativeButtonWidget(int x, int y, int width, int height, Identifier textureDefault, Identifier textureHighlighted, PressAction pressAction) {
+    public DecorativeButtonWidget(boolean vanillaBackground, WidgetSprites widgetSprites,
+                                  int x, int y, int width, int height,
+                                  PressAction pressAction
+    ) {
         super(x, y, width, height, Component.empty());
-        this.textureDefault = textureDefault;
-        this.textureHighlighted = textureHighlighted;
+        this.customSprites = widgetSprites;
         this.onPress = pressAction;
+        this.renderVanillaBackground = vanillaBackground;
+        this.textureWidth = width;
+        this.textureHeight = height;
+    }
+
+    public void setTextColorActive(int color) {
+        this.textColorActive = color;
     }
 
     public void setTextureColor(int color) {
@@ -58,19 +86,29 @@ public class DecorativeButtonWidget extends AbstractButton {
     //~ render_button_contents
     @Override
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        if (textureDefault != null) {
-            Identifier texture = isHovered && textureHighlighted != null ? textureHighlighted : textureDefault;
-            int textureColor = isHovered ? hoveredTextureColor : defaultTextureColor;
+        if (renderVanillaBackground) {
+            graphics.blitSprite(
+                    RenderPipelines.GUI_TEXTURED,
+                    DEFAULT_SPRITES.get(this.active, this.isHoveredOrFocused()),
+                    this.getX(),
+                    this.getY(),
+                    this.getWidth(),
+                    this.getHeight(),
+                    ARGB.white(this.alpha)
+            );
+        }
+        if (customSprites != null) {
             graphics.blit(
                     RenderPipelines.GUI_TEXTURED,
-                    texture,
-                    getX(), getY(),
+                    customSprites.get(this.active, this.isHoveredOrFocused()),
+                    getX() + (width - textureWidth) / 2, getY() + (height - textureHeight) / 2,
                     0, 0,
-                    width, height,
-                    width, height,
-                    textureColor
+                    textureWidth, textureHeight,
+                    textureWidth, textureHeight,
+                    ARGB.color(this.alpha, this.isHoveredOrFocused() ? hoveredTextureColor : defaultTextureColor)
             );
         } else {
+            int textColor = ARGB.color(this.alpha, this.active ? textColorActive : -6250336);
             //? if >=1.21.11 {
             /*//~ if >=26.1 'renderDefaultLabel(' -> 'extractDefaultLabel('
             this.renderDefaultLabel(graphics.textRenderer(
@@ -78,7 +116,7 @@ public class DecorativeButtonWidget extends AbstractButton {
                     style -> style.withColor(CommonColors.LIGHT_GRAY))
             );
             *///?} else <=1.21.8
-            this.renderString(graphics, Minecraft.getInstance().font, CommonColors.LIGHT_GRAY);
+            this.renderString(graphics, Minecraft.getInstance().font, textColor);
         }
     }
     //~ !render_button_contents
@@ -92,35 +130,64 @@ public class DecorativeButtonWidget extends AbstractButton {
         return new DecorativeButtonWidget.Builder(message, onPress);
     }
 
-    public static DecorativeButtonWidget.Builder builder(Identifier texture, PressAction onPress) {
-        return new DecorativeButtonWidget.Builder(texture, onPress);
+    public static DecorativeButtonWidget.Builder builder(WidgetSprites customSprites, PressAction onPress) {
+        return new DecorativeButtonWidget.Builder(customSprites, onPress);
+    }
+
+    public static DecorativeButtonWidget.Builder builder(Identifier defaultTex, Identifier disabledTeX, PressAction onPress) {
+        return new DecorativeButtonWidget.Builder(
+                new WidgetSprites(defaultTex, disabledTeX, defaultTex),
+                onPress
+        );
+    }
+
+    public static DecorativeButtonWidget.Builder builderSimpleTexture(Identifier texture, PressAction onPress) {
+        return builder(
+                new WidgetSprites(texture, texture),
+                onPress
+        );
+    }
+
+    public static DecorativeButtonWidget.Builder builderHighlightable(Identifier defaultTex, Identifier highlightedTex, PressAction onPress) {
+        return builder(
+                new WidgetSprites(defaultTex, defaultTex, highlightedTex),
+                onPress
+        );
+    }
+
+    public static DecorativeButtonWidget.Builder builderWithHoverTexture(WidgetSprites customSprites, PressAction onPress) {
+        return new DecorativeButtonWidget.Builder(customSprites, onPress);
     }
 
     public static class Builder {
         private final Component message;
-        private final Identifier textureDefault;
-        private Identifier textureHighlighted;
+        private final WidgetSprites customSprites;
         private final PressAction onPress;
+        private boolean renderVanillaBackground;
         private int width = 150;
         private int height = 20;
+        private int textureWidth = 16;
+        private int textureHeight = 16;
         private int x = 0;
         private int y = 0;
+        private int textColorActive;
 
         public Builder(Component message, PressAction onPress) {
+            this.renderVanillaBackground = true;
             this.message = message;
-            this.textureDefault = null;
-            this.textureHighlighted = null;
+            this.customSprites = null;
             this.onPress = onPress;
         }
 
-        public Builder(Identifier texture, PressAction onPress) {
+        public Builder(WidgetSprites customSprites, PressAction onPress) {
+            this.renderVanillaBackground = false;
             this.message = null;
-            this.textureDefault = texture;
+            this.customSprites = customSprites;
             this.onPress = onPress;
         }
 
-        public Builder highlightedTexture(Identifier textureHighlighted) {
-            this.textureHighlighted = textureHighlighted;
+        public Builder textColorActive(int color) {
+            this.textColorActive = color;
             return this;
         }
 
@@ -135,6 +202,12 @@ public class DecorativeButtonWidget extends AbstractButton {
             return this;
         }
 
+        public Builder textureSize(int width, int height) {
+            this.textureWidth = width;
+            this.textureHeight = height;
+            return this;
+        }
+
         public Builder position(int x, int y) {
             this.x = x;
             this.y = y;
@@ -145,10 +218,23 @@ public class DecorativeButtonWidget extends AbstractButton {
             return this.position(x, y).size(width, height);
         }
 
+        public Builder vanillaButtonBackground(boolean doRender) {
+            this.renderVanillaBackground = doRender;
+            return this;
+        }
+
         public DecorativeButtonWidget build() {
-            if (message != null)
-                return new DecorativeButtonWidget(x, y, this.width, this.height, this.message, this.onPress);
-            return new DecorativeButtonWidget(x, y, this.width, this.height, this.textureDefault, this.textureHighlighted, this.onPress);
+            if (message != null) {
+                return new DecorativeButtonWidget(
+                        renderVanillaBackground, textColorActive, x, y, width, height, message, onPress
+                );
+            }
+            DecorativeButtonWidget button = new DecorativeButtonWidget(
+                    renderVanillaBackground, customSprites, x, y, width, height, onPress
+            );
+            button.textureWidth = textureWidth;
+            button.textureHeight = textureHeight;
+            return button;
         }
     }
 

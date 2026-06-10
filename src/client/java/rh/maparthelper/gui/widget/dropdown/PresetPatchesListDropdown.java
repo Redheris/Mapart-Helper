@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class PresetPatchesListDropdown extends DropdownOverlayWidget {
-    private static final Identifier REMOVE_ICON_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/trash_can.png");
+    private static final Identifier REMOVE_ICON_TEXTURE = MapartHelper.identifier("textures/gui/icons/trash_can.png");
 
     private final Map<UUID, Button> presetButtons;
     private final Consumer<RegisteredPresetPatch> onRemove;
@@ -63,7 +63,7 @@ public class PresetPatchesListDropdown extends DropdownOverlayWidget {
                     )
                     .size(width - 26, 16)
                     .build();
-            DecorativeButtonWidget removeButton = DecorativeButtonWidget.builder(
+            DecorativeButtonWidget removeButton = DecorativeButtonWidget.builderSimpleTexture(
                     REMOVE_ICON_TEXTURE,
                     btn -> {
                         if (patch.getState() == PatchTypes.CREATED) {

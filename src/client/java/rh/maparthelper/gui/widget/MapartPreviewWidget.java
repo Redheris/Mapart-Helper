@@ -140,7 +140,7 @@ public class MapartPreviewWidget extends AbstractWidget {
             );
         }
 
-        if (CurrentConversionSettings.doShowManualCroppingButtons
+        if (CurrentConversionSettings.doShowCroppingControls
                 && CurrentConversionSettings.guiMapartImage != null
                 && CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
             renderManualCroppingButtons(graphics, mouseX, mouseY);

@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.widget.dropdown;
 
+import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,13 @@ public abstract class ImageAdjustmentsDropdown extends DropdownOverlayWidget {
     public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
                                     int overlayWidth, int overlayHeight, Component message) {
         super(screen, null, width, height, message, true);
+        initOverlay(overlayHeight, overlayWidth);
+        updateStateAndMessage();
+    }
 
+    public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
+                                    int overlayWidth, int overlayHeight, WidgetSprites widgetSprites) {
+        super(screen, null, width, height, true, true, widgetSprites);
         initOverlay(overlayHeight, overlayWidth);
         updateStateAndMessage();
     }
@@ -25,7 +32,8 @@ public abstract class ImageAdjustmentsDropdown extends DropdownOverlayWidget {
 
     protected void updateStateAndMessage() {
         updateDefaultState();
-        this.setMessage(getMessage().plainCopy().withColor(isDefaultState ? -1 : 16755200));
+        this.setMessage(getMessage().plainCopy().withColor(isDefaultState ? -1 : 0xFF_ffaa00));
+        this.setTextureColor(isDefaultState ? -1 : 0xFF_ffaa00);
     }
 
     protected ImageAdjustmentSliderWidget createDecimalSliderSetting(
