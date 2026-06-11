@@ -54,14 +54,14 @@ public class RegisteredPresetPatch {
     }
 
     public void setShortFilename(String fileName) {
-        if (toRemove) return;
+        if (toRemove || fileName.equals(this.shortFilename)) return;
         this.autoFilename = false;
         this.shortFilename = fileName;
         updateChangedState(false);
     }
 
     public void setPresetName(String presetName) {
-        if (toRemove) return;
+        if (toRemove || presetName.equals(this.presetName)) return;
         this.presetName = presetName;
         if (autoFilename) {
             this.shortFilename = presetName.replaceAll("[\\\\/:*?\"<>|]", "");
@@ -70,19 +70,23 @@ public class RegisteredPresetPatch {
     }
 
     public void updateEntry(MapColor mapColor, Block block) {
-        if (toRemove) return;
+        if (toRemove || this.colors.get(mapColor).equals(block)) return;
         this.colors.put(mapColor, block);
         updateChangedState(true);
     }
 
     public void removeColor(MapColor mapColor) {
-        if (toRemove) return;
+        if (toRemove || !this.colors.containsKey(mapColor)) return;
         this.colors.remove(mapColor);
         updateChangedState(true);
     }
 
     public void toggleToRemove() {
         this.toRemove = !toRemove;
+    }
+
+    public boolean isAutoFilename() {
+        return autoFilename;
     }
 
     public String getPresetName() {

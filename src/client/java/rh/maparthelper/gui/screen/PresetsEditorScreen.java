@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.LayoutSettings;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.network.chat.Component;
@@ -23,6 +22,7 @@ import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.MapColorWidget;
 import rh.maparthelper.gui.widget.dropdown.PresetPatchesListDropdown;
+import rh.maparthelper.gui.widget.input.AdjEditBox;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.mapart.MapartProcessing;
@@ -58,10 +58,13 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private UUID editingPresetUUID = presetsHandler.getSelectedPreset().uuid();
     private RegisteredPresetPatch editingPreset = patches.get(editingPresetUUID);
 
+    private LinearLayout header;
     private PresetPatchesListDropdown presetsListDropdownButton;
-
+    private AdjEditBox filenameField;
     private EditBox presetNameField;
     private AdjScrollableLayoutWidget colorsEditorScrollable;
+
+    private int textFieldsWidth;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, MapartProcessing mapart, int x, int y, int marginRight, int marginBottom) {
         super(parent, Component.translatable("maparthelper.gui.presets_editor_screen"));
@@ -80,6 +83,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         this.boxWidth = width - boxX - marginRight;
         this.boxHeight = height - boxY - marginBottom;
+
+        textFieldsWidth = Math.max((int) (boxWidth * 0.25), 150);
     }
 
     @Override
@@ -89,7 +94,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetsListDropdownButton = new PresetPatchesListDropdown(
                 this,
                 20, 20,
-                (int) (boxWidth * 0.3) + 20,
+                textFieldsWidth + 20,
                 120,
                 false,
                 this::changeEditingPreset,
@@ -99,6 +104,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                     }
                     updatePresetNameFieldState();
                 },
+                () -> editingPresetUUID,
                 patches
         );
 
@@ -109,31 +115,78 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
     @Override
     protected void initContent() {
-        LinearLayout presetBarLeft = LinearLayout.horizontal();
-        presetBarLeft.setPosition(boxX + 5, boxY + 5);
-        LayoutSettings presetBarLeftPositioner = presetBarLeft.defaultCellSetting().alignVerticallyMiddle();
+        LinearLayout presetBarRight = LinearLayout.horizontal();
+        presetBarRight.defaultCellSetting().alignVerticallyMiddle().paddingRight(1);
 
-        StringWidget presetNameLabel = new StringWidget(Component.translatable("maparthelper.gui.preset"), font);
-        presetBarLeft.addChild(presetNameLabel, presetBarLeftPositioner.copy().paddingRight(5));
+        DecorativeButtonWidget updateFiles = DecorativeButtonWidget.builderSimpleTexture(
+                UPDATE_ICON,
+                b -> this.updateFiles()
+        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
+        updateFiles.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
+
+        presetBarRight.addChild(updateFiles);
+        presetBarRight.addChild(Button.builder(Component.translatable("maparthelper.gui.save"), b -> saveChanges())
+                .size(60, 20).build());
+        presetBarRight.addChild(Button.builder(Component.nullToEmpty("❌"), b -> this.onClose())
+                .size(20, 20).build());
+
+        presetBarRight.arrangeElements();
+        presetBarRight.setPosition(
+                boxX + boxWidth - presetBarRight.getWidth(),
+                boxY + 5
+        );
+        presetBarRight.visitWidgets(this::addRenderableWidget);
+
+        header = LinearLayout.vertical();
+        header.setPosition(boxX + 5, boxY + 5);
+
+        LinearLayout presetBarTopLeft = LinearLayout.horizontal();
+        presetBarTopLeft.defaultCellSetting().alignVerticallyMiddle();
+
+        addStringWidgetAlignRight(presetBarTopLeft, Component.translatable("maparthelper.gui.filename"));
+
+        filenameField = new AdjEditBox(font,
+                textFieldsWidth, 20,
+                editingPreset.getShortFilename(),
+                false
+        );
+        filenameField.setTextColor(editingPreset.isAutoFilename() ? CommonColors.LIGHT_GRAY : -1);
+        filenameField.setFilter(value -> !value.matches(".*[\\\\/:*?\"<>|].*"));
+        filenameField.setValueConsumer(value -> {
+            if (filenameField.isFocused()) {
+                editingPreset.setShortFilename(value);
+                presetsListDropdownButton.updateNameFor(editingPreset);
+                filenameField.setTextColor(editingPreset.isAutoFilename() ? CommonColors.LIGHT_GRAY : -1);
+            }
+        });
+        presetBarTopLeft.addChild(filenameField);
+
+        LinearLayout presetBarBottomLeft = LinearLayout.horizontal();
+        presetBarBottomLeft.defaultCellSetting().alignVerticallyMiddle();
+
+        addStringWidgetAlignRight(presetBarBottomLeft, Component.translatable("maparthelper.gui.preset"));
 
         presetNameField = new EditBox(font,
-                (int) (boxWidth * 0.3), 20,
+                textFieldsWidth, 20,
                 Component.literal("Preset name")
         );
         presetNameField.setMaxLength(100);
         presetNameField.setValue(editingPreset.getPresetName());
         updatePresetNameFieldState();
-        presetBarLeft.addChild(presetNameField);
+        presetBarBottomLeft.addChild(presetNameField);
 
         presetsListDropdownButton.setOverlayXOffset(-presetNameField.getWidth());
         presetsListDropdownButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.choose_preset")));
-        presetBarLeft.addChild(presetsListDropdownButton);
+        presetBarBottomLeft.addChild(presetsListDropdownButton);
 
         presetNameField.setHint(Component.translatable("maparthelper.gui.presets.preset_name").withColor(CommonColors.GRAY));
         presetNameField.setResponder(presetName -> {
             if (!editingPreset.getPresetName().equals(presetName)) {
                 editingPreset.setPresetName(presetName);
                 presetsListDropdownButton.updateNameFor(editingPreset);
+                if (editingPreset.isAutoFilename()) {
+                    filenameField.setValue(editingPreset.getShortFilename());
+                }
             }
         });
 
@@ -142,50 +195,26 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 b -> this.createNewPreset(false)
         ).size(16, 16).build();
         createEmptyPreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.createEmptyPreset_tooltip")));
-        presetBarLeft.addChild(createEmptyPreset);
+        presetBarBottomLeft.addChild(createEmptyPreset);
 
         DecorativeButtonWidget createDefaultPreset = DecorativeButtonWidget.builderSimpleTexture(
                 NEW_DEFAULT_PRESET_ICON,
                 b -> this.createNewPreset(true)
         ).size(16, 16).build();
         createDefaultPreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.createDefaultPreset_tooltip")));
-        presetBarLeft.addChild(createDefaultPreset);
+        presetBarBottomLeft.addChild(createDefaultPreset);
 
         DecorativeButtonWidget duplicatePreset = DecorativeButtonWidget.builderSimpleTexture(
                 COPY_PRESET_ICON,
                 b -> this.duplicatePreset()
         ).size(16, 16).build();
         duplicatePreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.duplicatePreset_tooltip")));
-        presetBarLeft.addChild(duplicatePreset);
+        presetBarBottomLeft.addChild(duplicatePreset);
 
-        presetBarLeft.arrangeElements();
-        presetBarLeft.visitWidgets(this::addRenderableWidget);
-
-
-        LinearLayout presetBarRight = LinearLayout.horizontal();
-        presetBarRight.setPosition(0, boxY + 5);
-        presetBarRight.defaultCellSetting().alignVerticallyMiddle().paddingRight(1);
-
-        DecorativeButtonWidget updateFiles = DecorativeButtonWidget.builderSimpleTexture(
-                UPDATE_ICON,
-                b -> this.updateFiles()
-        ).size(16, 16).build();
-        updateFiles.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
-        presetBarRight.addChild(updateFiles);
-
-        Button save = Button.builder(Component.translatable("maparthelper.gui.save"), b -> saveChanges())
-                .size(60, 20)
-                .build();
-        presetBarRight.addChild(save);
-
-        Button close = Button.builder(Component.nullToEmpty("❌"), b -> this.onClose())
-                .size(20, 20)
-                .build();
-        presetBarRight.addChild(close);
-
-        presetBarRight.arrangeElements();
-        presetBarRight.setX(boxX + boxWidth - presetBarRight.getWidth());
-        presetBarRight.visitWidgets(this::addRenderableWidget);
+        header.addChild(presetBarTopLeft);
+        header.addChild(presetBarBottomLeft);
+        header.arrangeElements();
+        header.visitWidgets(this::addRenderableWidget);
 
         // =========== Colors editing area ===========
 
@@ -247,10 +276,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
 
         colorsEditorScrollable = new AdjScrollableLayoutWidget(
-                colorsEditorContent, boxHeight - 31
+                colorsEditorContent, boxHeight - header.getHeight() - 9
         );
         colorsEditorScrollable.setWidth(boxWidth);
-        colorsEditorScrollable.setPosition(boxX, boxY + 31);
+        colorsEditorScrollable.setPosition(boxX, boxY + header.getHeight() + 9);
 
         colorsEditorScrollable.arrangeElements();
         colorsEditorScrollable.visitWidgets(this::addRenderableWidget);
@@ -285,8 +314,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         }
 
         patches.put(newPreset.getUUID(), newPreset);
-        changeEditingPreset(newPreset.getUUID());
         rebuildWidgets();
+        changeEditingPreset(newPreset.getUUID());
     }
 
     private void deletePatch(UUID presetUUID) {
@@ -302,6 +331,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         boolean removed = editingPreset.getState() == PatchTypes.REMOVED;
         this.presetNameField.active = !removed;
         this.presetNameField.setTextColor(removed ? CommonColors.GRAY : -1);
+        this.filenameField.active = !removed;
+        this.filenameField.setTextColor(removed ? CommonColors.GRAY : editingPreset.isAutoFilename() ? CommonColors.LIGHT_GRAY : -1);
     }
 
     private void duplicatePreset() {
@@ -315,7 +346,9 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.editingPresetUUID = presetUUID;
         this.editingPreset = patches.get(editingPresetUUID);
         this.presetNameField.setValue(editingPreset.getPresetName());
+        this.filenameField.setValue(editingPreset.getShortFilename());
         updatePresetNameFieldState();
+        presetsListDropdownButton.updateNameFor(editingPreset);
     }
 
     private void updateFiles() {
@@ -368,17 +401,31 @@ public class PresetsEditorScreen extends ScreenAdapted {
         int w = boxWidth;
         int h = boxHeight;
         graphics.fill(boxX, boxY, boxX + w, boxY + h, 0x77000000);
-        graphics.fill(boxX, boxY, boxX + w, boxY + 30, 0x44000000);
+        graphics.fill(boxX, boxY, boxX + w, boxY + header.getHeight() + 8, 0x44000000);
         RenderUtils.renderOutline(graphics, boxX - 1, boxY - 1, w + 2, h + 2, 0x44FFFFFF);
-        graphics.hLine(boxX, boxX + w - 1, boxY + 30, 0x77FFFFFF);
+        graphics.hLine(boxX, boxX + w - 1, boxY + header.getHeight() + 8, 0x77FFFFFF);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-    }
+    public void renderBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {}
     //~ !gui_rendering
+
+    private void addStringWidgetAlignRight(LinearLayout layout, Component value) {
+        //? if <=1.21.8 {
+        StringWidget presetFilenameLabel = new StringWidget(60, 9, value, font);
+        presetFilenameLabel.alignRight();
+        layout.addChild(presetFilenameLabel, layout.newCellSettings().paddingRight(5));
+        //?} else {
+        /*StringWidget presetFilenameLabel = new StringWidget(value, font);
+        int labelWidth = this.font.width(value);
+        layout.addChild(presetFilenameLabel, layout.newCellSettings()
+                .alignHorizontallyRight()
+                .paddingLeft(60 - labelWidth)
+                .paddingRight(5));
+        *///?}
+    }
 
     private class MapColorBlockWidget extends BlockItemWidget {
         private final MapColor mapColor;

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class PresetPatchesListDropdown extends DropdownOverlayWidget {
     private static final Identifier LIST_ICON = MapartHelper.identifier("textures/gui/icons/list.png");
@@ -26,10 +27,12 @@ public class PresetPatchesListDropdown extends DropdownOverlayWidget {
 
     private final Map<UUID, Button> presetButtons;
     private final Consumer<RegisteredPresetPatch> onRemove;
+    private final Supplier<UUID> selectedPresetUUID;
+    private UUID lastSelectedUUID;
 
     public PresetPatchesListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
                                      boolean dynamicText,
-                                     Consumer<UUID> action, Consumer<RegisteredPresetPatch> onRemove,
+                                     Consumer<UUID> action, Consumer<RegisteredPresetPatch> onRemove, Supplier<UUID> selectedPresetUUID,
                                      Map<UUID, RegisteredPresetPatch> presets
     ) {
         super(screen, null, width, height, false, true,
@@ -38,6 +41,8 @@ public class PresetPatchesListDropdown extends DropdownOverlayWidget {
         this.textureWidth = 16;
         this.textureHeight = 16;
         this.onRemove = onRemove;
+        this.selectedPresetUUID = selectedPresetUUID;
+        this.lastSelectedUUID = selectedPresetUUID.get();
         presetButtons = initOverlay(dynamicText, overlayHeight, overlayWidth, action, presets);
     }
 
@@ -109,7 +114,7 @@ public class PresetPatchesListDropdown extends DropdownOverlayWidget {
         return presetWidgets;
     }
 
-    private static @NotNull MutableComponent getValueComponent(RegisteredPresetPatch preset) {
+    private @NotNull MutableComponent getValueComponent(RegisteredPresetPatch preset) {
         MutableComponent valueText = Component.literal("\"" + preset.getPresetName() + "\"");
 
         valueText.withStyle(style -> switch (preset.getState()) {
@@ -118,6 +123,15 @@ public class PresetPatchesListDropdown extends DropdownOverlayWidget {
             case CHANGED -> style.withColor(0xFF_ffaa00).withItalic(true);
             case REMOVED -> style.withColor(0xFF_ff5151);
         });
+
+        UUID currentSelected = selectedPresetUUID.get();
+        if (!currentSelected.equals(lastSelectedUUID)) {
+            Button oldSelected = presetButtons.get(lastSelectedUUID);
+            oldSelected.setMessage(oldSelected.getMessage().copy().withStyle(style -> style.withUnderlined(false)));
+            lastSelectedUUID = currentSelected;
+        }
+        valueText.withStyle(style -> style.withUnderlined(preset.getUUID().equals(currentSelected)));
+
         return valueText;
     }
 

@@ -22,28 +22,30 @@ import net.minecraft.util.StringUtil;
 public class AdjEditBox extends EditBox {
     private Predicate<String> valueValidator;
     private Consumer<String> valueConsumer;
+    private int baseTextColor = -1;
+    private final boolean overrideOnClick;
     //? >=26.1
     //private Predicate<String> filter = Objects::nonNull;
 
-    public AdjEditBox(Font textRenderer, int width, int height, String initialValue, String narrationTitle) {
-        super(textRenderer, width, height, Component.nullToEmpty(narrationTitle));
+    public AdjEditBox(Font textRenderer, int width, int height, String initialValue, boolean overrideOnClick) {
+        super(textRenderer, width, height, Component.empty());
         setValue(initialValue);
+        this.overrideOnClick = overrideOnClick;
+    }
+
+    public AdjEditBox(Font textRenderer, int width, int height, String initialValue) {
+        this(textRenderer, width, height, initialValue, true);
     }
 
     //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!overrideOnClick) return super.mouseClicked(mouseX, mouseY, button);
+
+        //? if <=1.21.8 {
         if (button == 1) {
             this.setValue("");
-            //? if <=1.21.8 {
             return super.mouseClicked(mouseX, mouseY, 0);
-            //?} else {
-            /*var event = new MouseButtonEvent(
-                    mouseX, mouseY,
-                    new MouseButtonInfo(0, mouseEvent.modifiers())
-            );
-            return super.mouseClicked(event, isDoubleClick);
-            *///?}
         }
         if (button == 0 && !isFocused()) {
             super.mouseClicked(mouseX, mouseY, button);
@@ -51,6 +53,8 @@ public class AdjEditBox extends EditBox {
             setHighlightPos(getValue().length());
             return true;
         }
+        //?}
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
     //~ !widget_events
@@ -82,6 +86,12 @@ public class AdjEditBox extends EditBox {
         }
     }
 
+    @Override
+    public void setTextColor(int baseTextColor) {
+        super.setTextColor(baseTextColor);
+        this.baseTextColor = baseTextColor;
+    }
+
     public void setValueValidator(Predicate<String> valueValidator) {
         this.valueValidator = valueValidator;
         updateChangedListener();
@@ -102,7 +112,7 @@ public class AdjEditBox extends EditBox {
 
     private void updateChangedListener() {
         super.setResponder(value -> {
-            setTextColor(CommonColors.WHITE);
+            setTextColor(baseTextColor);
             if (value.isEmpty()) return;
             if (valueValidator != null && !valueValidator.test(value)) setTextColor(CommonColors.SOFT_RED);
             else if (valueConsumer != null) valueConsumer.accept(value);

@@ -403,7 +403,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         LayoutSettings topLabeledPositioner = settingsLeftPositioner.copy().paddingTop(0);
 
         AdjEditBox mapartName = new AdjEditBox(
-                font, elementWidth, 20, mapart.mapartName, "Mapart name"
+                font, elementWidth, 20, mapart.mapartName
         );
         mapartName.setHint(Component.translatable("maparthelper.gui.mapart_name_field").withColor(CommonColors.GRAY));
         mapartName.setValueValidator(s -> !s.isBlank());
@@ -537,7 +537,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 (btn) -> {
                     ConversionConfiguration.save();
                     Minecraft.getInstance().setScreen(
-                            new PresetsEditorScreen(this, mapart, 45, 30, 45, 30)
+                            new PresetsEditorScreen(this, mapart, 45, 20, 45, 20)
                     );
                 }
         ).size(elementWidth, 20).build();
@@ -567,7 +567,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartImageUpdater.revertExcludingColors(mapart);
                     updateResetExcludedColorsButton(false);
                 }
-        ).size(16, 16).build();
+        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
         materialListSettings.addChild(resetExcludedColors);
 
         updateResetExcludedColorsButton(PaletteColors.excludingColorsAmount() > 0);
@@ -635,7 +635,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private @NotNull AdjEditBox createAuxBlockFieldWidget(BlockItemWidget auxBlockPreview, String currentAuxBlock) {
         AdjEditBox auxBlockId = new AdjEditBox(
                 font, currentElementWidth() - auxBlockPreview.getWidth() - 5, 20,
-                currentAuxBlock, "Auxiliary block identifier"
+                currentAuxBlock
         );
         auxBlockId.setValueValidator(TextFieldValidators.auxBlockIdentifier());
         auxBlockId.setValueConsumer(idStr -> {
@@ -692,7 +692,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         GridLayout.RowHelper adder = size.createRowHelper(2);
 
         AdjEditBox widthInput = new AdjEditBox(
-                font, 30, 20, "" + mapart.getWidth(), "Width"
+                font, 30, 20, "" + mapart.getWidth()
         );
         widthInput.setHint(Component.literal("x").withColor(CommonColors.GRAY));
         widthInput.setFilter(TextFieldPredicates.positiveInt());
@@ -705,7 +705,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         });
 
         AdjEditBox heightInput = new AdjEditBox(
-                font, 30, 20, "" + mapart.getHeight(), "Height"
+                font, 30, 20, "" + mapart.getHeight()
         );
         heightInput.setHint(Component.literal("y").withColor(CommonColors.GRAY));
         heightInput.setFilter(TextFieldPredicates.positiveInt());
