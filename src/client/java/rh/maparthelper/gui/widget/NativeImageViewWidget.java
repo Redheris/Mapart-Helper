@@ -1,9 +1,11 @@
 package rh.maparthelper.gui.widget;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
@@ -11,10 +13,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Matrix3x2f;
 import org.joml.Vector2i;
 import org.joml.Vector4i;
+import rh.maparthelper.render.GridMeshRectangleRenderState;
 import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.RenderUtils;
+
+import static rh.maparthelper.MapartHelper.MOD_ID;
 
 //? >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
@@ -67,8 +73,8 @@ public class NativeImageViewWidget extends AbstractWidget {
         this.scaledImageWidth = fittedImageWidth * scale;
         this.scaledImageHeight = fittedImageHeight * scale;
 
-        this.pixelWidth = scaledImageWidth / originalWidth;
-        this.pixelHeight = scaledImageHeight / originalHeight;
+        this.pixelWidth = (int) scaledImageWidth / (float) originalWidth;
+        this.pixelHeight = (int) scaledImageHeight / (float) originalHeight;
 
         this.maxScale = height / (pixelHeight * 6);
     }
@@ -114,6 +120,11 @@ public class NativeImageViewWidget extends AbstractWidget {
         }
 
         return true;
+    }
+
+    @Override
+    public void mouseMoved(double mouseX, double mouseY) {
+        calculatePixelPos(mouseX, mouseY);
     }
 
     //~ widget_events
@@ -173,8 +184,8 @@ public class NativeImageViewWidget extends AbstractWidget {
         this.scaledImageWidth = fittedImageWidth * scale;
         this.scaledImageHeight = fittedImageHeight * scale;
 
-        this.pixelWidth = scaledImageWidth / originalWidth;
-        this.pixelHeight = scaledImageHeight / originalHeight;
+        this.pixelWidth = (int) scaledImageWidth / (float) originalWidth;
+        this.pixelHeight = (int) scaledImageHeight / (float) originalHeight;
 
         setXOffset(anchorX - getInitImageX() - imageLocalX * scale);
         setYOffset(anchorY - getInitImageY() - imageLocalY * scale);
@@ -198,11 +209,12 @@ public class NativeImageViewWidget extends AbstractWidget {
         return pixelPos;
     }
 
-    protected void calculatePixelPos(int mouseX, int mouseY) {
-        double mouseLocalX = mouseX - getInitImageX() - xOffset;
-        double mouseLocalY = mouseY - getInitImageY() - yOffset;
-        int pixelX = (int) (mouseLocalX / pixelWidth);
-        int pixelY = (int) (mouseLocalY / pixelHeight);
+    protected void calculatePixelPos(double mouseX, double mouseY) {
+        double mouseLocalX = mouseX - (getInitImageX() + xOffset);
+        double mouseLocalY = mouseY - (getInitImageY() + yOffset);
+
+        int pixelX = (int) Math.floor(mouseLocalX / pixelWidth);
+        int pixelY = (int) Math.floor(mouseLocalY / pixelHeight);
 
         pixelPos.set(pixelX, pixelY);
     }
@@ -212,8 +224,9 @@ public class NativeImageViewWidget extends AbstractWidget {
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (imageId == null) return;
 
-
-        calculatePixelPos(mouseX, mouseY);
+        if (!Minecraft.getInstance().isWindowActive()) {
+            calculatePixelPos(mouseX, mouseY);
+        }
 
         graphics.enableScissor(getX(), getY(), getRight(), getBottom());
 
@@ -225,6 +238,8 @@ public class NativeImageViewWidget extends AbstractWidget {
                 CommonColors.GRAY
         );
         graphics.disableScissor();
+
+        graphics.fill(mouseX, mouseY, mouseX + 1, mouseY + 1, CommonColors.RED);
     }
 
 
@@ -259,6 +274,27 @@ public class NativeImageViewWidget extends AbstractWidget {
                 (int) (scaledImageWidth), (int) (scaledImageHeight),
                 (int) (scaledImageWidth), (int) (scaledImageHeight)
         );
+
+        int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
+        if (pixelWidth * guiScale > 10 && pixelHeight * guiScale > 10) {
+            graphics.guiRenderState.submitGuiElement(new GridMeshRectangleRenderState(
+                    RenderPipelines.GUI,
+                    TextureSetup.noTexture(),
+                    new Matrix3x2f(graphics.pose()),
+                    (int) (imageX + xOffset),
+                    (int) (imageY + yOffset),
+                    (int) (imageX + xOffset + scaledImageWidth),
+                    (int) (imageY + yOffset + scaledImageHeight),
+                    (int) scaledImageWidth / (float) originalWidth,
+                    (int) scaledImageHeight / (float) originalHeight,
+                    Minecraft.getInstance().getWindow().getGuiScale(),
+                    // TODO: Make it custom values
+                    ARGB.color(0.6f, -1),
+                    ARGB.color(0.6f, 0),
+                    this.getRectangle()
+            ));
+        }
+
     }
     //~ !gui_rendering
 

@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.screen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -64,9 +65,8 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
         super.mouseMoved(mouseX, mouseY);
-        if (pixelPosLabel != null) {
-            pixelPosLabel.setMessage(Component.literal(imageViewWidget.pixelPosString()));
-        }
+        imageViewWidget.mouseMoved(mouseX, mouseY);
+        pixelPosLabel.setMessage(Component.literal(imageViewWidget.pixelPosString()));
     }
 
     //~ widget_events
@@ -79,6 +79,9 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     //~ gui_rendering
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        if (!Minecraft.getInstance().isWindowActive()) {
+            pixelPosLabel.setMessage(Component.literal(imageViewWidget.pixelPosString()));
+        }
         graphics.fill(0, 0, width, 30, ARGB.color(0.7f, 0xFF222222));
         graphics.hLine(0, width, 29, ARGB.color(0.3f, -1));
         super.render(graphics, mouseX, mouseY, partialTick);
