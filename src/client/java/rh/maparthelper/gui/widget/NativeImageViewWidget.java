@@ -1,11 +1,11 @@
 package rh.maparthelper.gui.widget;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
@@ -13,23 +13,20 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Matrix3x2f;
 import org.joml.Vector2i;
 import org.joml.Vector4i;
-import rh.maparthelper.render.GridMeshRectangleRenderState;
+import rh.maparthelper.MapartHelper;
+import rh.maparthelper.render.pipeline.CustomPipelines;
+import rh.maparthelper.render.pipeline.DottedGridUniform;
 import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.RenderUtils;
 
-import static rh.maparthelper.MapartHelper.MOD_ID;
-
 //? >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
-*///?}
-
-import static rh.maparthelper.MapartHelper.MOD_ID;
+ *///?}
 
 public class NativeImageViewWidget extends AbstractWidget {
-    public static final Identifier TRANSPARENT_TEXTURE = Identifier.fromNamespaceAndPath(MOD_ID, "textures/gui/background/transparent.png");
+    public static final Identifier TRANSPARENT_TEXTURE = MapartHelper.identifier("textures/gui/background/transparent.png");
 
     private final Identifier imageId;
 
@@ -75,6 +72,7 @@ public class NativeImageViewWidget extends AbstractWidget {
 
         this.pixelWidth = (int) scaledImageWidth / (float) originalWidth;
         this.pixelHeight = (int) scaledImageHeight / (float) originalHeight;
+        updateGrid();
 
         this.maxScale = height / (pixelHeight * 6);
     }
@@ -136,14 +134,40 @@ public class NativeImageViewWidget extends AbstractWidget {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (imageId == null) return false;
-
-        setXOffset(xOffset + dragX);
-        setYOffset(yOffset + dragY);
+        setOffset(xOffset + dragX, yOffset + dragY);
         return true;
     }
     //~ !widget_events
 
+    private void updateGrid() {
+        int scale = Minecraft.getInstance().getWindow().getGuiScale();
+        DottedGridUniform.set(
+                getRight() * scale, getBottom() * scale,
+                (int) scaledImageWidth * scale, (int) scaledImageHeight * scale,
+                (int) (getInitImageX() + xOffset) * scale, (int) (getInitImageY() + yOffset) * scale,
+                // TODO: Make it custom values?
+                ARGB.color(0.4f, -1),
+                ARGB.color(0.4f, 0)
+        );
+    }
+
+    public void setOffset(double xOffset, double yOffset) {
+        setXOffsetWithoutGridUpdate(xOffset);
+        setYOffsetWithoutGridUpdate(yOffset);
+        updateGrid();
+    }
+
     public void setXOffset(double xOffset) {
+        setXOffsetWithoutGridUpdate(xOffset);
+        updateGrid();
+    }
+
+    public void setYOffset(double yOffset) {
+        setYOffsetWithoutGridUpdate(yOffset);
+        updateGrid();
+    }
+
+    protected void setXOffsetWithoutGridUpdate(double xOffset) {
         double minVisibleWidth = Math.min(scaledImageWidth / 2.0, width / 2.0);
         this.xOffset = Math.clamp(
                 xOffset,
@@ -152,7 +176,7 @@ public class NativeImageViewWidget extends AbstractWidget {
         );
     }
 
-    public void setYOffset(double yOffset) {
+    protected void setYOffsetWithoutGridUpdate(double yOffset) {
         double minVisibleHeight = Math.min(scaledImageHeight / 2.0, height / 2.0);
         this.yOffset = Math.clamp(
                 yOffset,
@@ -187,8 +211,9 @@ public class NativeImageViewWidget extends AbstractWidget {
         this.pixelWidth = (int) scaledImageWidth / (float) originalWidth;
         this.pixelHeight = (int) scaledImageHeight / (float) originalHeight;
 
-        setXOffset(anchorX - getInitImageX() - imageLocalX * scale);
-        setYOffset(anchorY - getInitImageY() - imageLocalY * scale);
+        setOffset(anchorX - getInitImageX() - imageLocalX * scale,
+                anchorY - getInitImageY() - imageLocalY * scale
+        );
     }
 
     public void setScale(double scale) {
@@ -266,34 +291,21 @@ public class NativeImageViewWidget extends AbstractWidget {
         );
         graphics.disableScissor();
 
+        RenderPipeline imagePipeline = RenderPipelines.GUI_TEXTURED;
+
+        int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
+        if (pixelWidth * guiScale > 6 && pixelHeight * guiScale > 6) {
+            imagePipeline = CustomPipelines.DOTTED_GRID;
+        }
+
         graphics.blit(
-                RenderPipelines.GUI_TEXTURED,
+                imagePipeline,
                 imageId,
                 (int) (imageX + xOffset), (int) (imageY + yOffset),
                 0.0F, 0.0F,
                 (int) (scaledImageWidth), (int) (scaledImageHeight),
                 (int) (scaledImageWidth), (int) (scaledImageHeight)
         );
-
-        int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-        if (pixelWidth * guiScale > 10 && pixelHeight * guiScale > 10) {
-            graphics.guiRenderState.submitGuiElement(new GridMeshRectangleRenderState(
-                    RenderPipelines.GUI,
-                    TextureSetup.noTexture(),
-                    new Matrix3x2f(graphics.pose()),
-                    (int) (imageX + xOffset),
-                    (int) (imageY + yOffset),
-                    (int) (imageX + xOffset + scaledImageWidth),
-                    (int) (imageY + yOffset + scaledImageHeight),
-                    (int) scaledImageWidth / (float) originalWidth,
-                    (int) scaledImageHeight / (float) originalHeight,
-                    Minecraft.getInstance().getWindow().getGuiScale(),
-                    // TODO: Make it custom values
-                    ARGB.color(0.6f, -1),
-                    ARGB.color(0.6f, 0),
-                    this.getRectangle()
-            ));
-        }
 
     }
     //~ !gui_rendering

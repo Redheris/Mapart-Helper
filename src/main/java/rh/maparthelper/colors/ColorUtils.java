@@ -1,5 +1,7 @@
 package rh.maparthelper.colors;
 
+import org.joml.Vector4f;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -148,7 +150,7 @@ public class ColorUtils {
             float saturation = hsb[1];
             float brightness = hsb[2];
 
-            saturation = Math.max(0f, Math.min(1f, saturation * saturationFactor));
+            saturation = Math.clamp(saturation * saturationFactor, 0f, 1f);
 
             int rgb = Color.HSBtoRGB(hue, saturation, brightness);
             pixels[pixel] = (argb[0] << 24) | (rgb & 0x00FFFFFF);
@@ -172,5 +174,13 @@ public class ColorUtils {
 
     public static int getARGB(int[] argb) {
         return (argb[0] << 24) | (argb[1] << 16) | (argb[2] << 8) | argb[3];
+    }
+
+    public static Vector4f intToVec4(int colorARGB) {
+        int a = (colorARGB >> 24) & 0xFF;
+        int r = (colorARGB >> 16) & 0xFF;
+        int g = (colorARGB >> 8) & 0xFF;
+        int b = (colorARGB) & 0xFF;
+        return new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
     }
 }
