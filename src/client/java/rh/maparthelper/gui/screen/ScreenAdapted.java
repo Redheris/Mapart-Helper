@@ -85,9 +85,7 @@ public abstract class ScreenAdapted extends Screen {
     @Override
     public void onClose() {
         OverlaysManager.close();
-        //? <=1.21.8
-        if (minecraft == null) return;
-        minecraft.setScreen(parentScreen);
+        Minecraft.getInstance().setScreen(parentScreen);
     }
 
     @Override

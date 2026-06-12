@@ -6,6 +6,7 @@ import rh.maparthelper.util.FileUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class RegisteredPresetPatch {
@@ -70,7 +71,7 @@ public class RegisteredPresetPatch {
     }
 
     public void updateEntry(MapColor mapColor, Block block) {
-        if (toRemove || this.colors.get(mapColor).equals(block)) return;
+        if (toRemove || Objects.equals(this.colors.get(mapColor), block)) return;
         this.colors.put(mapColor, block);
         updateChangedState(true);
     }

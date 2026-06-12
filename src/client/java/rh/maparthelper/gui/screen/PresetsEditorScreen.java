@@ -11,6 +11,7 @@ import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Util;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
@@ -107,6 +108,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
                 () -> editingPresetUUID,
                 patches
         );
+        presetsListDropdownButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.choose_preset")));
 
         overlays.add(presetsListDropdownButton.getOverlay());
 
@@ -124,7 +126,14 @@ public class PresetsEditorScreen extends ScreenAdapted {
         ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
         updateFiles.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
 
+        DecorativeButtonWidget openFolder = DecorativeButtonWidget.builderSimpleTexture(
+                MapartHelper.identifier("textures/gui/icons/open_file.png"),
+                btn -> Util.getPlatform().openPath(PaletteDataManager.PRESETS_PATH)
+        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
+        openFolder.setTooltip(Tooltip.create(Component.literal("Open presets folder")));
+
         presetBarRight.addChild(updateFiles);
+        presetBarRight.addChild(openFolder);
         presetBarRight.addChild(Button.builder(Component.translatable("maparthelper.gui.save"), b -> saveChanges())
                 .size(60, 20).build());
         presetBarRight.addChild(Button.builder(Component.nullToEmpty("❌"), b -> this.onClose())
@@ -162,7 +171,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetBarTopLeft.addChild(filenameField);
 
         LinearLayout presetBarBottomLeft = LinearLayout.horizontal();
-        presetBarBottomLeft.defaultCellSetting().alignVerticallyMiddle();
+        presetBarBottomLeft.defaultCellSetting().alignVerticallyMiddle().paddingRight(1);
 
         addStringWidgetAlignRight(presetBarBottomLeft, Component.translatable("maparthelper.gui.preset"));
 
@@ -174,10 +183,8 @@ public class PresetsEditorScreen extends ScreenAdapted {
         presetNameField.setValue(editingPreset.getPresetName());
         updatePresetNameFieldState();
         presetBarBottomLeft.addChild(presetNameField);
-
-        presetsListDropdownButton.setOverlayXOffset(-presetNameField.getWidth());
-        presetsListDropdownButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.choose_preset")));
         presetBarBottomLeft.addChild(presetsListDropdownButton);
+        presetsListDropdownButton.setOverlayXOffset(-presetNameField.getWidth() - 1);
 
         presetNameField.setHint(Component.translatable("maparthelper.gui.presets.preset_name").withColor(CommonColors.GRAY));
         presetNameField.setResponder(presetName -> {
@@ -193,21 +200,21 @@ public class PresetsEditorScreen extends ScreenAdapted {
         DecorativeButtonWidget createEmptyPreset = DecorativeButtonWidget.builderSimpleTexture(
                 NEW_PRESET_ICON,
                 b -> this.createNewPreset(false)
-        ).size(16, 16).build();
+        ).vanillaButtonBackground(true).size(20, 20).textureSize(16, 16).build();
         createEmptyPreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.createEmptyPreset_tooltip")));
         presetBarBottomLeft.addChild(createEmptyPreset);
 
         DecorativeButtonWidget createDefaultPreset = DecorativeButtonWidget.builderSimpleTexture(
                 NEW_DEFAULT_PRESET_ICON,
                 b -> this.createNewPreset(true)
-        ).size(16, 16).build();
+        ).vanillaButtonBackground(true).size(20, 20).textureSize(16, 16).build();
         createDefaultPreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.createDefaultPreset_tooltip")));
         presetBarBottomLeft.addChild(createDefaultPreset);
 
         DecorativeButtonWidget duplicatePreset = DecorativeButtonWidget.builderSimpleTexture(
                 COPY_PRESET_ICON,
                 b -> this.duplicatePreset()
-        ).size(16, 16).build();
+        ).vanillaButtonBackground(true).size(20, 20).textureSize(16, 16).build();
         duplicatePreset.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.duplicatePreset_tooltip")));
         presetBarBottomLeft.addChild(duplicatePreset);
 
@@ -280,6 +287,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         );
         colorsEditorScrollable.setWidth(boxWidth);
         colorsEditorScrollable.setPosition(boxX, boxY + header.getHeight() + 9);
+        colorsEditorScrollable.setDeltaYPerScroll(25);
 
         colorsEditorScrollable.arrangeElements();
         colorsEditorScrollable.visitWidgets(this::addRenderableWidget);
