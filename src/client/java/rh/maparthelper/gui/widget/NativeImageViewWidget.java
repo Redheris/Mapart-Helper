@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.widget;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,7 +16,7 @@ import org.joml.Vector2i;
 import org.joml.Vector4i;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.render.pipeline.CustomPipelines;
-import rh.maparthelper.render.pipeline.DottedGridUniform;
+import rh.maparthelper.render.pipeline.MapartImageGridUniform;
 import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.RenderUtils;
 
@@ -140,14 +139,18 @@ public class NativeImageViewWidget extends AbstractWidget {
     //~ !widget_events
 
     private void updateGrid() {
-        int scale = Minecraft.getInstance().getWindow().getGuiScale();
-        DottedGridUniform.set(
-                getRight() * scale, getBottom() * scale,
-                (int) scaledImageWidth * scale, (int) scaledImageHeight * scale,
-                (int) (getInitImageX() + xOffset) * scale, (int) (getInitImageY() + yOffset) * scale,
-                // TODO: Make it custom values?
+        int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
+        MapartImageGridUniform.set(
+                getRight() * guiScale, getBottom() * guiScale,
+                (int) scaledImageWidth * guiScale, (int) scaledImageHeight * guiScale,
+                (int) (getInitImageX() + xOffset) * guiScale - 1, (int) (getInitImageY() + yOffset) * guiScale,
+                // TODO: Make colors custom?
                 ARGB.color(0.4f, -1),
-                ARGB.color(0.4f, 0)
+                ARGB.color(0.4f, 0),
+                CommonColors.HIGH_CONTRAST_DIAMOND,
+                // TODO: Make these custom.
+                (pixelWidth * guiScale > 6 && pixelHeight * guiScale > 6),
+                true
         );
     }
 
@@ -263,10 +266,7 @@ public class NativeImageViewWidget extends AbstractWidget {
                 CommonColors.GRAY
         );
         graphics.disableScissor();
-
-        graphics.fill(mouseX, mouseY, mouseX + 1, mouseY + 1, CommonColors.RED);
     }
-
 
     protected void drawMapartImage(@NotNull GuiGraphics graphics) {
         int imageX = getInitImageX();
@@ -291,15 +291,13 @@ public class NativeImageViewWidget extends AbstractWidget {
         );
         graphics.disableScissor();
 
-        RenderPipeline imagePipeline = RenderPipelines.GUI_TEXTURED;
-
-        int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
-        if (pixelWidth * guiScale > 6 && pixelHeight * guiScale > 6) {
-            imagePipeline = CustomPipelines.DOTTED_GRID;
-        }
+//        RenderPipeline imagePipeline = RenderPipelines.GUI_TEXTURED;
+//        if (showMapGrid || showPixelGrid)
+//            imagePipeline = CustomPipelines.MAPART_IMAGE_GRID;
+//        }
 
         graphics.blit(
-                imagePipeline,
+                CustomPipelines.MAPART_IMAGE_GRID,
                 imageId,
                 (int) (imageX + xOffset), (int) (imageY + yOffset),
                 0.0F, 0.0F,

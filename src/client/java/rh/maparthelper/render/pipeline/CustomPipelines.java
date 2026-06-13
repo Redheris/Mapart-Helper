@@ -12,9 +12,9 @@ public class CustomPipelines {
             .withUniform("ColorsHighlight", UniformType.UNIFORM_BUFFER)
             .build();
 
-    public final static RenderPipeline DOTTED_GRID = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
-            .withLocation(MapartHelper.identifier("dotted_grid"))
-            .withFragmentShader(MapartHelper.identifier("core/dotted_grid"))
-            .withUniform("DottedGrid", UniformType.UNIFORM_BUFFER)
+    public final static RenderPipeline MAPART_IMAGE_GRID = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+            .withLocation(MapartHelper.identifier("mapart_image_grid"))
+            .withFragmentShader(MapartHelper.identifier("core/mapart_image_grid"))
+            .withUniform("MapartImageGrid", UniformType.UNIFORM_BUFFER)
             .build();
 }

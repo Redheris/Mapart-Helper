@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
-import rh.maparthelper.render.pipeline.DottedGridUniform;
+import rh.maparthelper.render.pipeline.MapartImageGridUniform;
 
 @Mixin(RenderSystem.class)
 public class CustomUniformsBind {
@@ -15,6 +15,6 @@ public class CustomUniformsBind {
     @Inject(method = "bindDefaultUniforms", at = @At("HEAD"))
     private static void bindDefaultUniforms(RenderPass pass, CallbackInfo ci) {
         pass.setUniform("ColorsHighlight", ColorsHighlightUniform.BUFFER);
-        pass.setUniform("DottedGrid", DottedGridUniform.BUFFER);
+        pass.setUniform("MapartImageGrid", MapartImageGridUniform.BUFFER);
     }
 }
