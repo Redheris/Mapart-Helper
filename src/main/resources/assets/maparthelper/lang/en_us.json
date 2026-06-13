@@ -138,6 +138,7 @@
   "maparthelper.gui.presets.choose_preset": "Presets list",
   "maparthelper.gui.presets.preset_name": "Preset name",
   "maparthelper.gui.presets.updateFiles_tooltip": "Update presets list from files",
+  "maparthelper.gui.presets.open_presets_folder": "Open presets folder",
   "maparthelper.gui.presets.createEmptyPreset_tooltip": "Create empty preset",
   "maparthelper.gui.presets.createDefaultPreset_tooltip": "Create preset with default settings",
   "maparthelper.gui.presets.duplicatePreset_tooltip": "Duplicate selected preset",

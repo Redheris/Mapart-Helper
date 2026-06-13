@@ -138,6 +138,7 @@
   "maparthelper.gui.presets.choose_preset": "Список пресетов",
   "maparthelper.gui.presets.preset_name": "Название пресета",
   "maparthelper.gui.presets.updateFiles_tooltip": "Обновить список пресетов из файлов",
+  "maparthelper.gui.presets.open_presets_folder": "Открыть папку с пресетами",
   "maparthelper.gui.presets.createEmptyPreset_tooltip": "Создать пустой пресет",
   "maparthelper.gui.presets.createDefaultPreset_tooltip": "Создать новый пресет по умолчанию",
   "maparthelper.gui.presets.duplicatePreset_tooltip": "Дублировать выбранный пресет",

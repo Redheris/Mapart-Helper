@@ -40,6 +40,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private static final Identifier NEW_PRESET_ICON = MapartHelper.identifier("textures/gui/icons/new_file.png");
     private static final Identifier NEW_DEFAULT_PRESET_ICON = MapartHelper.identifier("textures/gui/icons/new_default_file.png");
     private static final Identifier COPY_PRESET_ICON = MapartHelper.identifier("textures/gui/icons/copy_file.png");
+    private static final Identifier OPEN_FOLDER_ICON = MapartHelper.identifier("textures/gui/icons/open_file.png");
     private static final Identifier UPDATE_ICON = MapartHelper.identifier("textures/gui/icons/reset.png");
 
     private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
@@ -127,10 +128,10 @@ public class PresetsEditorScreen extends ScreenAdapted {
         updateFiles.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.updateFiles_tooltip")));
 
         DecorativeButtonWidget openFolder = DecorativeButtonWidget.builderSimpleTexture(
-                MapartHelper.identifier("textures/gui/icons/open_file.png"),
+                OPEN_FOLDER_ICON,
                 btn -> Util.getPlatform().openPath(PaletteDataManager.PRESETS_PATH)
         ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
-        openFolder.setTooltip(Tooltip.create(Component.literal("Open presets folder")));
+        openFolder.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.open_presets_folder")));
 
         presetBarRight.addChild(updateFiles);
         presetBarRight.addChild(openFolder);
