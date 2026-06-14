@@ -86,7 +86,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.boxWidth = width - boxX - marginRight;
         this.boxHeight = height - boxY - marginBottom;
 
-        textFieldsWidth = Math.max((int) (boxWidth * 0.25), 150);
+        textFieldsWidth = Math.max((int) (boxWidth * 0.25), 142);
     }
 
     @Override

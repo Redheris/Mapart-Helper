@@ -326,8 +326,8 @@ public class MapartEditorScreen extends ScreenAdapted {
         saveMapartDropdownWidget.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.save_mapart_as")));
         mapartOptions.addChild(saveMapartDropdownWidget);
 
-        DecorativeButtonWidget showGridButton = DecorativeButtonWidget.builder(
-                new WidgetSprites(GRID_ICON, GRID_ICON),
+        DecorativeButtonWidget showGridButton = DecorativeButtonWidget.builderSimpleTexture(
+                GRID_ICON,
                 btn -> {
                     boolean doShowGrid = !CurrentConversionSettings.doShowGrid;
                     CurrentConversionSettings.doShowGrid = doShowGrid;
@@ -567,7 +567,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     MapartImageUpdater.revertExcludingColors(mapart);
                     updateResetExcludedColorsButton(false);
                 }
-        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
+        ).size(18, 18).textureSize(14, 14).vanillaButtonBackground(true).build();
         materialListSettings.addChild(resetExcludedColors);
 
         updateResetExcludedColorsButton(PaletteColors.excludingColorsAmount() > 0);

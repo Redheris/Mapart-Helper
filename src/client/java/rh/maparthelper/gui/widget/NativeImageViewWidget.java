@@ -48,6 +48,9 @@ public class NativeImageViewWidget extends AbstractWidget {
     private double xOffset;
     private double yOffset;
 
+    private boolean showPixelGrid = false;
+    private boolean showMapGrid = false;
+
     public NativeImageViewWidget(DynamicTexture imageTexture, Identifier imageId, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
         if (imageTexture != null && imageTexture.getPixels() != null) {
@@ -138,20 +141,38 @@ public class NativeImageViewWidget extends AbstractWidget {
     }
     //~ !widget_events
 
-    private void updateGrid() {
+    public void updateGrid() {
+        if (!showMapGrid && !showPixelGrid) return;
         int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
         MapartImageGridUniform.set(
                 getRight() * guiScale, getBottom() * guiScale,
                 (int) scaledImageWidth * guiScale, (int) scaledImageHeight * guiScale,
                 (int) (getInitImageX() + xOffset) * guiScale - 1, (int) (getInitImageY() + yOffset) * guiScale,
                 // TODO: Make colors custom?
-                ARGB.color(0.4f, -1),
-                ARGB.color(0.4f, 0),
+                ARGB.color(0.6f, -1),
+                ARGB.color(0.5f, 0),
                 CommonColors.HIGH_CONTRAST_DIAMOND,
-                // TODO: Make these custom.
-                (pixelWidth * guiScale > 6 && pixelHeight * guiScale > 6),
-                true
+                showPixelGrid && (pixelWidth * guiScale > 6 && pixelHeight * guiScale > 6),
+                showMapGrid
         );
+    }
+
+    public boolean isShowPixelGrid() {
+        return showPixelGrid;
+    }
+
+    public void setShowPixelGrid(boolean showPixelGrid) {
+        this.showPixelGrid = showPixelGrid;
+        updateGrid();
+    }
+
+    public boolean isShowMapGrid() {
+        return showMapGrid;
+    }
+
+    public void setShowMapGrid(boolean showMapGrid) {
+        this.showMapGrid = showMapGrid;
+        updateGrid();
     }
 
     public void setOffset(double xOffset, double yOffset) {
@@ -291,13 +312,8 @@ public class NativeImageViewWidget extends AbstractWidget {
         );
         graphics.disableScissor();
 
-//        RenderPipeline imagePipeline = RenderPipelines.GUI_TEXTURED;
-//        if (showMapGrid || showPixelGrid)
-//            imagePipeline = CustomPipelines.MAPART_IMAGE_GRID;
-//        }
-
         graphics.blit(
-                CustomPipelines.MAPART_IMAGE_GRID,
+                showMapGrid || showPixelGrid ? CustomPipelines.MAPART_IMAGE_GRID : RenderPipelines.GUI_TEXTURED,
                 imageId,
                 (int) (imageX + xOffset), (int) (imageY + yOffset),
                 0.0F, 0.0F,

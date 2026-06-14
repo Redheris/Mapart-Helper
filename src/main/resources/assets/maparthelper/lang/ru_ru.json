@@ -105,7 +105,7 @@
   "maparthelper.gui.amount_total": "Количество: Всего",
   "maparthelper.aux_block": "Вспомогательные блоки",
   "maparthelper.gui.use_aux": "Добавлять: ",
-  "maparthelper.gui.showGrid_tooltip": "Переключить отображение сетки",
+  "maparthelper.gui.showGrid_tooltip": "Отображать сетку",
   "maparthelper.gui.showInWorld_tooltip": "Временно отобразить на фейковых картах в мире",
   "maparthelper.gui.mapart_size_label": "Размеры мапарта",
   "maparthelper.gui.brightness":  "Яркость",
@@ -149,6 +149,8 @@
 
   "maparthelper.gui.fullscreen_view.open_view_screen": "Полноэкранный режим просмотра",
   "maparthelper.gui.fullscreen_view.reset_scale_and_offset": "Сбросить масштаб и сдвиг изображения",
+  "maparthelper.gui.fullscreen_view.show_pixel_grid": "Отображать пиксельную сетку",
+  "maparthelper.gui.fullscreen_view.show_map_grid": "Отображать сетку по картам",
 
   "key.maparthelper.openScreen": "Открыть редактор мапартов",
 

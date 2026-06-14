@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.gui.screens.Screen;
@@ -22,7 +23,9 @@ import rh.maparthelper.mapart.MapartProcessing;
 *///?}
 
 public class FullscreenImageViewScreen extends ScreenAdapted {
-    private static final Identifier RESET_OFFSET_TEXTURE = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "textures/gui/icons/fit_image_center.png");
+    private static final Identifier RESET_OFFSET_ICON = MapartHelper.identifier("textures/gui/icons/fit_image_center.png");
+    private static final Identifier MAP_GRID_ICON = MapartHelper.identifier("textures/gui/icons/grid.png");
+    private static final Identifier PIXEL_GRID_ICON = MapartHelper.identifier("textures/gui/icons/fine_grid.png");
 
     protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
 
@@ -35,12 +38,45 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
 
     @Override
     protected void initContent() {
-        LinearLayout header = LinearLayout.horizontal().spacing(2);
-        header.addChild(SpacerElement.height(30));
+        imageViewWidget = new NativeImageViewWidget(
+                CurrentConversionSettings.guiMapartImage, CurrentConversionSettings.guiMapartId,
+                0, 30, width, height - 30
+        );
+        this.addRenderableWidget(imageViewWidget);
+
+        GridLayout header = new GridLayout(0, 0);
+        GridLayout.RowHelper headerAdder = header.createRowHelper(4);
+        headerAdder.addChild(SpacerElement.width(width), 3);
         header.defaultCellSetting().alignVerticallyMiddle();
 
+        LinearLayout headerCenter = LinearLayout.horizontal().spacing(2);
+        headerCenter.addChild(SpacerElement.height(30));
+        headerCenter.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyRight();
+
+        DecorativeButtonWidget showPixelGridBtn = DecorativeButtonWidget.builderSimpleTexture(
+                PIXEL_GRID_ICON,
+                btn -> {
+                    imageViewWidget.setShowPixelGrid(!imageViewWidget.isShowPixelGrid());
+                    btn.setTextureColor(imageViewWidget.isShowPixelGrid() ? 0xFF_55ffff : -1);
+                }
+        ).size(16, 16).build();
+//        showPixelGridBtn.setTextureColor(imageViewWidget.showPixelGrid ? 0xFF_55ffff : -1);
+        showPixelGridBtn.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.show_pixel_grid")));
+        headerCenter.addChild(showPixelGridBtn);
+
+        DecorativeButtonWidget showMapGridBtn = DecorativeButtonWidget.builderSimpleTexture(
+                MAP_GRID_ICON,
+                btn -> {
+                    imageViewWidget.setShowMapGrid(!imageViewWidget.isShowMapGrid());
+                    btn.setTextureColor(imageViewWidget.isShowMapGrid() ? 0xFF_55ffff : -1);
+                }
+        ).size(16, 16).build();
+//        showMapGridBtn.setTextureColor(imageViewWidget.showMapGrid ? 0xFF_55ffff : -1);
+        showMapGridBtn.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.show_map_grid")));
+        headerCenter.addChild(showMapGridBtn);
+
         DecorativeButtonWidget resetOffsetBtn = DecorativeButtonWidget.builderSimpleTexture(
-                RESET_OFFSET_TEXTURE,
+                RESET_OFFSET_ICON,
                 btn -> imageViewWidget.resetScaleAndOffset()
         ).size(16, 16).build();
         resetOffsetBtn.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.reset_scale_and_offset")));
@@ -49,17 +85,12 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         //? <= 1.21.8
         pixelPosLabel.alignLeft();
 
-        header.addChild(resetOffsetBtn);
-        header.addChild(pixelPosLabel);
+        headerCenter.addChild(resetOffsetBtn);
+        headerCenter.addChild(pixelPosLabel);
+
+        headerAdder.addChild(headerCenter, 3, header.newCellSettings().alignHorizontallyCenter());
         header.arrangeElements();
         header.visitWidgets(this::addRenderableWidget);
-
-        imageViewWidget = new NativeImageViewWidget(
-                CurrentConversionSettings.guiMapartImage, CurrentConversionSettings.guiMapartId,
-                0, 30, width, height - 30
-        );
-
-        this.addRenderableWidget(imageViewWidget);
     }
 
     @Override

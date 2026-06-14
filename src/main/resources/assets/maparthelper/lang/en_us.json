@@ -105,7 +105,7 @@
   "maparthelper.gui.amount_total": "Amount of: Total",
   "maparthelper.aux_block": "Auxiliary blocks",
   "maparthelper.gui.use_aux": "Place: ",
-  "maparthelper.gui.showGrid_tooltip": "Toggle grid display",
+  "maparthelper.gui.showGrid_tooltip": "Show grid",
   "maparthelper.gui.showInWorld_tooltip": "Temporarily preview fake maps in the world",
   "maparthelper.gui.mapart_size_label": "Mapart size",
   "maparthelper.gui.brightness":  "Brightness",
@@ -149,6 +149,8 @@
 
   "maparthelper.gui.fullscreen_view.open_view_screen": "Fullscreen view mode",
   "maparthelper.gui.fullscreen_view.reset_scale_and_offset": "Reset image scale and offset",
+  "maparthelper.gui.fullscreen_view.show_pixel_grid": "Show pixel grid",
+  "maparthelper.gui.fullscreen_view.show_map_grid": "Show map grid",
 
   "key.maparthelper.openScreen": "Open mapart editor",
 
