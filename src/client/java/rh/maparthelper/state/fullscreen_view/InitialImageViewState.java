@@ -7,6 +7,8 @@ public record InitialImageViewState(
         @Nullable Identifier imageId,
         int originalWidth,
         int originalHeight,
+        int containerWidth,
+        int containerHeight,
         int fittedImageWidth,
         int fittedImageHeight,
         int fittedImageXOffset,

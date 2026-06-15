@@ -39,6 +39,9 @@
   "maparthelper.gui.mapart_editor_screen": "Mapart Editor",
   "maparthelper.gui.presets_editor_screen": "Presets Editor",
 
+  "maparthelper.gui.close": "Close",
+  "maparthelper.gui.back": "Back",
+
   "maparthelper.gui.option.NO_CROP": "Stretch",
   "maparthelper.gui.option.AUTO_CROP": "Auto",
   "maparthelper.gui.option.USER_CROP": "Manual",
@@ -80,7 +83,7 @@
   "maparthelper.gui.drop_here_mapart": "Drag an image file into the editor window to create a mapart",
   "maparthelper.gui.import_tooltip": "Import an image to create a mapart",
   "maparthelper.gui.shulker_box_abbr": "SB",
-  "maparthelper.gui.toggle_manual_cropping_buttons": "Toggle manual cropping buttons display",
+  "maparthelper.gui.toggle_manual_cropping_buttons": "Show manual cropping buttons",
   "maparthelper.gui.reset_mapart": "Reset mapart",
   "maparthelper.gui.mapart_name_field": "Mapart name",
   "maparthelper.gui.cropMode": "Cropping: ",

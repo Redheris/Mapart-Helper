@@ -13,7 +13,6 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
-import org.joml.Vector4i;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.render.pipeline.MapartImageGridUniform;
@@ -21,8 +20,6 @@ import rh.maparthelper.state.fullscreen_view.InitialImageViewState;
 import rh.maparthelper.state.fullscreen_view.NativeImageViewState;
 import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.RenderUtils;
-
-import java.util.Objects;
 
 //? >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
@@ -49,81 +46,26 @@ public class NativeImageViewWidget extends AbstractWidget {
         super(x, y, width, height, Component.empty());
 
         NativeImage image = imageTexture == null ? null : imageTexture.getPixels();
-        InitialImageViewState savedInitState = state.getInitialState();
 
-        if (savedInitState == null || !Objects.equals(savedInitState.imageId(), imageId)
-                || image != null && (image.getWidth() != savedInitState.originalWidth() || (image.getHeight() != savedInitState.originalHeight()))
-        ) {
-            if (image != null) {
-                this.imageId = imageId;
-                this.originalWidth = image.getWidth();
-                this.originalHeight = image.getHeight();
-            } else {
-                this.imageId = null;
-                this.originalWidth = 128;
-                this.originalHeight = 128;
-            }
-            Vector4i sizeFitted = fitImage();
-            this.fittedImageWidth = sizeFitted.x;
-            this.fittedImageHeight = sizeFitted.y;
-            this.fittedImageXOffset = sizeFitted.z;
-            this.fittedImageYOffset = sizeFitted.w;
-            this.maxScale = height / ((fittedImageHeight / (float) originalHeight) * 6);
-            state.setInitialState(new InitialImageViewState(
-                    this.imageId,
-                    this.originalWidth,
-                    this.originalHeight,
-                    this.fittedImageWidth,
-                    this.fittedImageHeight,
-                    this.fittedImageXOffset,
-                    this.fittedImageYOffset,
-                    this.maxScale
-            ));
-            state.setScale(1);
-            state.setXOffset(0);
-            state.setYOffset(0);
-            state.setScaledImageWidth(fittedImageWidth);
-            state.setScaledImageHeight(fittedImageHeight);
-            state.setPixelWidth(fittedImageWidth / (float) originalWidth);
-            state.setPixelHeight(fittedImageHeight / (float) originalHeight);
+        if (image != null) {
+            state.updateInitialStateIfNeeded(width, height, image.getWidth(), image.getHeight(), imageId);
         } else {
-            this.imageId = savedInitState.imageId();
-            this.originalWidth = savedInitState.originalWidth();
-            this.originalHeight = savedInitState.originalHeight();
-            this.fittedImageWidth = savedInitState.fittedImageWidth();
-            this.fittedImageHeight = savedInitState.fittedImageHeight();
-            this.fittedImageXOffset = savedInitState.fittedImageXOffset();
-            this.fittedImageYOffset = savedInitState.fittedImageYOffset();
-            this.maxScale = savedInitState.maxScale();
+            state.updateInitialStateIfNeeded(width, height, 128, 128, null);
         }
+
+        InitialImageViewState initialState = state.getInitialState();
+        this.imageId = initialState.imageId();
+        this.originalWidth = initialState.originalWidth();
+        this.originalHeight = initialState.originalHeight();
+        this.fittedImageWidth = initialState.fittedImageWidth();
+        this.fittedImageHeight = initialState.fittedImageHeight();
+        this.fittedImageXOffset = initialState.fittedImageXOffset();
+        this.fittedImageYOffset = initialState.fittedImageYOffset();
+        this.maxScale = initialState.maxScale();
         this.pixelPos = state.pixelPos();
+        state.setPixelWidth(fittedImageWidth / (float) originalWidth);
+        state.setPixelHeight(fittedImageHeight / (float) originalHeight);
         updateGrid();
-    }
-
-    private Vector4i fitImage() {
-        if (originalWidth <= 0 || originalHeight <= 0) return new Vector4i(128, 128, 0, 0);
-
-        double aspect = (double) originalWidth / originalHeight;
-        double scaleX = (double) width / originalWidth;
-        double scaleY = (double) height / originalHeight;
-
-        int widthFitted, heightFitted, xFitted, yFitted;
-
-        if (scaleX < scaleY) {
-            // Fit by width
-            widthFitted = (int) (width * 0.85);
-            xFitted = (width - widthFitted) / 2;
-            heightFitted = (int) (widthFitted / aspect);
-            yFitted = (height - heightFitted) / 2;
-        } else {
-            // Fit by height
-            heightFitted = (int) (height * 0.85);
-            yFitted = (height - heightFitted) / 2;
-            widthFitted = (int) (heightFitted * aspect);
-            xFitted = (width - widthFitted) / 2;
-        }
-
-        return new Vector4i(widthFitted, heightFitted, xFitted, yFitted);
     }
 
     @Override
@@ -139,6 +81,7 @@ public class NativeImageViewWidget extends AbstractWidget {
         } else {
             setYOffset(state.yOffset() + Math.signum(scrollY) * 30);
         }
+        calculatePixelPos(mouseX, mouseY);
 
         return true;
     }

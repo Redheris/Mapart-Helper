@@ -39,6 +39,9 @@
   "maparthelper.gui.mapart_editor_screen": "Редактор мапартов",
   "maparthelper.gui.presets_editor_screen": "Редактор пресетов",
 
+  "maparthelper.gui.close": "Закрыть",
+  "maparthelper.gui.back": "Назад",
+
   "maparthelper.gui.option.NO_CROP": "Растянуть",
   "maparthelper.gui.option.AUTO_CROP": "Авто",
   "maparthelper.gui.option.USER_CROP": "Ручное",
@@ -80,7 +83,7 @@
   "maparthelper.gui.drop_here_mapart": "Перетащите файл изображения в окно редактора, чтобы создать мапарт",
   "maparthelper.gui.import_tooltip": "Выбрать изображение для создания мапарта",
   "maparthelper.gui.shulker_box_abbr": "Ш",
-  "maparthelper.gui.toggle_manual_cropping_buttons": "Переключить отображение кнопок для ручного кадрирования",
+  "maparthelper.gui.toggle_manual_cropping_buttons": "Отображать кнопки для ручного кадрирования",
   "maparthelper.gui.reset_mapart": "Сброс мапарта",
   "maparthelper.gui.mapart_name_field": "Название мапарта",
   "maparthelper.gui.cropMode": "Кадрирование: ",

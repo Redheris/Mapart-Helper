@@ -2,6 +2,7 @@ package rh.maparthelper.gui.screen;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
@@ -16,7 +17,6 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.NativeImageViewWidget;
-import rh.maparthelper.mapart.MapartProcessing;
 
 //? >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
@@ -26,8 +26,6 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     private static final Identifier RESET_OFFSET_ICON = MapartHelper.identifier("textures/gui/icons/fit_image_center.png");
     private static final Identifier MAP_GRID_ICON = MapartHelper.identifier("textures/gui/icons/grid.png");
     private static final Identifier PIXEL_GRID_ICON = MapartHelper.identifier("textures/gui/icons/fine_grid.png");
-
-    protected final MapartProcessing mapart = CurrentConversionSettings.mapart;
 
     private NativeImageViewWidget imageViewWidget;
     private StringWidget pixelPosLabel;
@@ -45,9 +43,20 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         this.addRenderableWidget(imageViewWidget);
 
         GridLayout header = new GridLayout(0, 0);
-        GridLayout.RowHelper headerAdder = header.createRowHelper(4);
+        GridLayout.RowHelper headerAdder = header.createRowHelper(3);
         headerAdder.addChild(SpacerElement.width(width), 3);
+        headerAdder.addChild(SpacerElement.width(width / 3));
+        headerAdder.addChild(SpacerElement.width(width / 3));
+        headerAdder.addChild(SpacerElement.width(width / 3));
         header.defaultCellSetting().alignVerticallyMiddle();
+
+        LinearLayout headerLeft = LinearLayout.horizontal().spacing(2);
+        headerLeft.addChild(Button.builder(
+                        Component.translatable("maparthelper.gui.close"),
+                        btn -> Minecraft.getInstance().setScreen(new MapartEditorScreen())
+                ).size(60, 20).build()
+        );
+
 
         LinearLayout headerCenter = LinearLayout.horizontal().spacing(2);
         headerCenter.addChild(SpacerElement.height(30));
@@ -60,7 +69,7 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
                     btn.setTextureColor(imageViewWidget.isShowPixelGrid() ? 0xFF_55ffff : -1);
                 }
         ).size(16, 16).build();
-//        showPixelGridBtn.setTextureColor(imageViewWidget.showPixelGrid ? 0xFF_55ffff : -1);
+        showPixelGridBtn.setTextureColor(imageViewWidget.isShowPixelGrid() ? 0xFF_55ffff : -1);
         showPixelGridBtn.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.show_pixel_grid")));
         headerCenter.addChild(showPixelGridBtn);
 
@@ -71,7 +80,7 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
                     btn.setTextureColor(imageViewWidget.isShowMapGrid() ? 0xFF_55ffff : -1);
                 }
         ).size(16, 16).build();
-//        showMapGridBtn.setTextureColor(imageViewWidget.showMapGrid ? 0xFF_55ffff : -1);
+        showMapGridBtn.setTextureColor(imageViewWidget.isShowMapGrid() ? 0xFF_55ffff : -1);
         showMapGridBtn.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.show_map_grid")));
         headerCenter.addChild(showMapGridBtn);
 
@@ -88,16 +97,28 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         headerCenter.addChild(resetOffsetBtn);
         headerCenter.addChild(pixelPosLabel);
 
-        headerAdder.addChild(headerCenter, 3, header.newCellSettings().alignHorizontallyCenter());
+        headerAdder.addChild(headerLeft, header.newCellSettings().alignHorizontallyLeft());
+        headerAdder.addChild(headerCenter, header.newCellSettings().alignHorizontallyCenter());
         header.arrangeElements();
         header.visitWidgets(this::addRenderableWidget);
+    }
+
+    private void updatePixelPosLabel() {
+        pixelPosLabel.setMessage(Component.literal(imageViewWidget.pixelPosString()));
     }
 
     @Override
     public void mouseMoved(double mouseX, double mouseY) {
         super.mouseMoved(mouseX, mouseY);
         imageViewWidget.mouseMoved(mouseX, mouseY);
-        pixelPosLabel.setMessage(Component.literal(imageViewWidget.pixelPosString()));
+        updatePixelPosLabel();
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        boolean result = super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        updatePixelPosLabel();
+        return result;
     }
 
     //~ widget_events

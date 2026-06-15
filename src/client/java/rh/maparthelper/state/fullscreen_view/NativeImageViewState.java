@@ -1,6 +1,10 @@
 package rh.maparthelper.state.fullscreen_view;
 
+import net.minecraft.resources.Identifier;
 import org.joml.Vector2i;
+import org.joml.Vector4i;
+
+import java.util.Objects;
 
 public class NativeImageViewState {
     private static final NativeImageViewState INSTANCE = new NativeImageViewState();
@@ -28,10 +32,6 @@ public class NativeImageViewState {
 
     public InitialImageViewState getInitialState() {
         return initialState;
-    }
-
-    public void setInitialState(InitialImageViewState initialState) {
-        this.initialState = initialState;
     }
 
     public double scale() {
@@ -112,5 +112,55 @@ public class NativeImageViewState {
 
     public void setShowMapGrid(boolean showMapGrid) {
         this.showMapGrid = showMapGrid;
+    }
+
+    public void updateInitialStateIfNeeded(int containerWidth, int containerHeight, int imageWidth, int imageHeight,
+                                           Identifier imageId
+    ) {
+        if (initialState == null || !Objects.equals(initialState.imageId(), imageId)
+                || imageWidth != initialState.originalWidth() || (imageHeight != initialState.originalHeight())
+                || containerWidth != initialState.containerWidth() || containerHeight != initialState.containerHeight()
+        ) {
+            Vector4i sizeFitted = fitImage(containerWidth, containerHeight, imageWidth, imageHeight);
+            this.initialState = new InitialImageViewState(
+                    imageId,
+                    imageWidth, imageHeight,
+                    containerWidth, containerHeight,
+                    sizeFitted.x, sizeFitted.y,
+                    sizeFitted.z, sizeFitted.w,
+                    containerHeight / ((sizeFitted.y / (float) imageHeight) * 6)
+            );
+            this.scale = 1;
+            this.xOffset = 0;
+            this.yOffset = 0;
+            this.scaledImageWidth = initialState.fittedImageWidth();
+            this.scaledImageHeight = initialState.fittedImageHeight();
+        }
+    }
+
+    public static Vector4i fitImage(int containerWidth, int containerHeight, int imageWidth, int imageHeight) {
+        if (imageWidth <= 0 || imageHeight <= 0) return new Vector4i(128, 128, 0, 0);
+
+        double aspect = (double) imageWidth / imageHeight;
+        double scaleX = (double) containerWidth / imageWidth;
+        double scaleY = (double) containerHeight / imageHeight;
+
+        int widthFitted, heightFitted, xFitted, yFitted;
+
+        if (scaleX < scaleY) {
+            // Fit by width
+            widthFitted = (int) (containerWidth * 0.85);
+            xFitted = (containerWidth - widthFitted) / 2;
+            heightFitted = (int) (widthFitted / aspect);
+            yFitted = (containerHeight - heightFitted) / 2;
+        } else {
+            // Fit by height
+            heightFitted = (int) (containerHeight * 0.85);
+            yFitted = (containerHeight - heightFitted) / 2;
+            widthFitted = (int) (heightFitted * aspect);
+            xFitted = (containerWidth - widthFitted) / 2;
+        }
+
+        return new Vector4i(widthFitted, heightFitted, xFitted, yFitted);
     }
 }

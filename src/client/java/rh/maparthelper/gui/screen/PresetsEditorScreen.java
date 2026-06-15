@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.screen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -76,6 +77,12 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.boxY = y;
         this.marginRight = marginRight;
         this.marginBottom = marginBottom;
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        super.resize(minecraft, width, height);
+        parent.resize(minecraft, width, height);
     }
 
     @Override
