@@ -23,7 +23,7 @@ public class NativeImageViewState {
     private double xOffset;
     private double yOffset;
 
-    private final Vector2i pixelPos = new Vector2i(0, 0);
+    private final Vector2i hoveredPixelPos = new Vector2i(0, 0);
     private double pixelWidth;
     private double pixelHeight;
 
@@ -58,12 +58,12 @@ public class NativeImageViewState {
         this.scaledImageHeight = scaledImageHeight;
     }
 
-    public Vector2i pixelPos() {
-        return pixelPos;
+    public Vector2i hoveredPixelPos() {
+        return hoveredPixelPos;
     }
 
-    public void setPixelPos(int x, int y) {
-        this.pixelPos.set(x, y);
+    public void setHoveredPixelPos(int x, int y) {
+        this.hoveredPixelPos.set(x, y);
     }
 
     public double pixelWidth() {

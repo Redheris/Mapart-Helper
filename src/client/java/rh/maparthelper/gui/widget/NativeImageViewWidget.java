@@ -39,7 +39,7 @@ public class NativeImageViewWidget extends AbstractWidget {
     private final int fittedImageYOffset;
     private final double maxScale;
 
-    private final Vector2i pixelPos;
+    private final Vector2i hoveredPixelPos;
     private final NativeImageViewState state = NativeImageViewState.getInstance();
 
     public NativeImageViewWidget(DynamicTexture imageTexture, Identifier imageId, int x, int y, int width, int height) {
@@ -62,7 +62,7 @@ public class NativeImageViewWidget extends AbstractWidget {
         this.fittedImageXOffset = initialState.fittedImageXOffset();
         this.fittedImageYOffset = initialState.fittedImageYOffset();
         this.maxScale = initialState.maxScale();
-        this.pixelPos = state.pixelPos();
+        this.hoveredPixelPos = state.hoveredPixelPos();
         state.setPixelWidth(fittedImageWidth / (float) originalWidth);
         state.setPixelHeight(fittedImageHeight / (float) originalHeight);
         updateGrid();
@@ -218,11 +218,11 @@ public class NativeImageViewWidget extends AbstractWidget {
     }
 
     public String pixelPosString() {
-        return String.format("(%d, %d)", pixelPos.x, pixelPos.y);
+        return String.format("(%d, %d)", hoveredPixelPos.x, hoveredPixelPos.y);
     }
 
-    public Vector2i getPixelPos() {
-        return pixelPos;
+    public Vector2i getHoveredPixelPos() {
+        return hoveredPixelPos;
     }
 
     protected void calculatePixelPos(double mouseX, double mouseY) {
@@ -232,7 +232,7 @@ public class NativeImageViewWidget extends AbstractWidget {
         int pixelX = (int) Math.floor(mouseLocalX / state.pixelWidth());
         int pixelY = (int) Math.floor(mouseLocalY / state.pixelHeight());
 
-        pixelPos.set(pixelX, pixelY);
+        hoveredPixelPos.set(pixelX, pixelY);
     }
 
     //~ gui_rendering
