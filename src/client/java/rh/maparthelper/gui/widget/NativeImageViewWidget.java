@@ -63,8 +63,8 @@ public class NativeImageViewWidget extends AbstractWidget {
         this.fittedImageYOffset = initialState.fittedImageYOffset();
         this.maxScale = initialState.maxScale();
         this.hoveredPixelPos = state.hoveredPixelPos();
-        state.setPixelWidth(fittedImageWidth / (float) originalWidth);
-        state.setPixelHeight(fittedImageHeight / (float) originalHeight);
+        state.setPixelWidth((int) state.scaledImageWidth() / (float) originalWidth);
+        state.setPixelHeight((int) state.scaledImageHeight() / (float) originalHeight);
         updateGrid();
     }
 

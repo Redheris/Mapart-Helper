@@ -1,6 +1,6 @@
 #version 150
 
-#moj_import < minecraft:dynamictransforms.glsl >
+#moj_import <minecraft:dynamictransforms.glsl>
 
 layout(std140) uniform MapartImageGrid {
     ivec2 ScreenSize;
