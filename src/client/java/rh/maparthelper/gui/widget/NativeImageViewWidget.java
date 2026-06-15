@@ -17,8 +17,12 @@ import org.joml.Vector4i;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.render.pipeline.CustomPipelines;
 import rh.maparthelper.render.pipeline.MapartImageGridUniform;
+import rh.maparthelper.state.fullscreen_view.InitialImageViewState;
+import rh.maparthelper.state.fullscreen_view.NativeImageViewState;
 import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.RenderUtils;
+
+import java.util.Objects;
 
 //? >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
@@ -38,45 +42,62 @@ public class NativeImageViewWidget extends AbstractWidget {
     private final int fittedImageYOffset;
     private final double maxScale;
 
-    protected double scale = 1;
-    protected double scaledImageWidth;
-    protected double scaledImageHeight;
-
-    private final Vector2i pixelPos = new Vector2i(0, 0);
-    private double pixelWidth;
-    private double pixelHeight;
-    private double xOffset;
-    private double yOffset;
-
-    private boolean showPixelGrid = false;
-    private boolean showMapGrid = false;
+    private final Vector2i pixelPos;
+    private final NativeImageViewState state = NativeImageViewState.getInstance();
 
     public NativeImageViewWidget(DynamicTexture imageTexture, Identifier imageId, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
-        if (imageTexture != null && imageTexture.getPixels() != null) {
-            NativeImage nativeImage = imageTexture.getPixels();
-            this.originalWidth = nativeImage.getWidth();
-            this.originalHeight = nativeImage.getHeight();
-            this.imageId = imageId;
+
+        NativeImage image = imageTexture == null ? null : imageTexture.getPixels();
+        InitialImageViewState savedInitState = state.getInitialState();
+
+        if (savedInitState == null || !Objects.equals(savedInitState.imageId(), imageId)
+                || image != null && (image.getWidth() != savedInitState.originalWidth() || (image.getHeight() != savedInitState.originalHeight()))
+        ) {
+            if (image != null) {
+                this.imageId = imageId;
+                this.originalWidth = image.getWidth();
+                this.originalHeight = image.getHeight();
+            } else {
+                this.imageId = null;
+                this.originalWidth = 128;
+                this.originalHeight = 128;
+            }
+            Vector4i sizeFitted = fitImage();
+            this.fittedImageWidth = sizeFitted.x;
+            this.fittedImageHeight = sizeFitted.y;
+            this.fittedImageXOffset = sizeFitted.z;
+            this.fittedImageYOffset = sizeFitted.w;
+            this.maxScale = height / ((fittedImageHeight / (float) originalHeight) * 6);
+            state.setInitialState(new InitialImageViewState(
+                    this.imageId,
+                    this.originalWidth,
+                    this.originalHeight,
+                    this.fittedImageWidth,
+                    this.fittedImageHeight,
+                    this.fittedImageXOffset,
+                    this.fittedImageYOffset,
+                    this.maxScale
+            ));
+            state.setScale(1);
+            state.setXOffset(0);
+            state.setYOffset(0);
+            state.setScaledImageWidth(fittedImageWidth);
+            state.setScaledImageHeight(fittedImageHeight);
+            state.setPixelWidth(fittedImageWidth / (float) originalWidth);
+            state.setPixelHeight(fittedImageHeight / (float) originalHeight);
         } else {
-            this.originalWidth = 128;
-            this.originalHeight = 128;
-            this.imageId = null;
+            this.imageId = savedInitState.imageId();
+            this.originalWidth = savedInitState.originalWidth();
+            this.originalHeight = savedInitState.originalHeight();
+            this.fittedImageWidth = savedInitState.fittedImageWidth();
+            this.fittedImageHeight = savedInitState.fittedImageHeight();
+            this.fittedImageXOffset = savedInitState.fittedImageXOffset();
+            this.fittedImageYOffset = savedInitState.fittedImageYOffset();
+            this.maxScale = savedInitState.maxScale();
         }
-        Vector4i sizeFitted = fitImage();
-        this.fittedImageWidth = sizeFitted.x;
-        this.fittedImageHeight = sizeFitted.y;
-        this.fittedImageXOffset = sizeFitted.z;
-        this.fittedImageYOffset = sizeFitted.w;
-
-        this.scaledImageWidth = fittedImageWidth * scale;
-        this.scaledImageHeight = fittedImageHeight * scale;
-
-        this.pixelWidth = (int) scaledImageWidth / (float) originalWidth;
-        this.pixelHeight = (int) scaledImageHeight / (float) originalHeight;
+        this.pixelPos = state.pixelPos();
         updateGrid();
-
-        this.maxScale = height / (pixelHeight * 6);
     }
 
     private Vector4i fitImage() {
@@ -112,11 +133,11 @@ public class NativeImageViewWidget extends AbstractWidget {
         double scaleMod = scrollY > 0 ? 1.12 : 1 / 1.12;
 
         if (CompatUtils.hasControlDown()) {
-            setScale(scale * scaleMod, mouseX, mouseY);
+            setScale(state.scale() * scaleMod, mouseX, mouseY);
         } else if (CompatUtils.hasShiftDown()) {
-            setXOffset(xOffset + Math.signum(scrollY) * 30);
+            setXOffset(state.xOffset() + Math.signum(scrollY) * 30);
         } else {
-            setYOffset(yOffset + Math.signum(scrollY) * 30);
+            setYOffset(state.yOffset() + Math.signum(scrollY) * 30);
         }
 
         return true;
@@ -136,42 +157,44 @@ public class NativeImageViewWidget extends AbstractWidget {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (imageId == null) return false;
-        setOffset(xOffset + dragX, yOffset + dragY);
+        setOffset(state.xOffset() + dragX, state.yOffset() + dragY);
         return true;
     }
     //~ !widget_events
 
     public void updateGrid() {
-        if (!showMapGrid && !showPixelGrid) return;
+        if (!state.showMapGrid() && !state.showPixelGrid()) return;
         int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
         MapartImageGridUniform.set(
                 getRight() * guiScale, getBottom() * guiScale,
-                (int) scaledImageWidth * guiScale, (int) scaledImageHeight * guiScale,
-                (int) (getInitImageX() + xOffset) * guiScale - 1, (int) (getInitImageY() + yOffset) * guiScale,
+                (int) state.scaledImageWidth() * guiScale,
+                (int) state.scaledImageHeight() * guiScale,
+                (int) (getInitImageX() + state.xOffset()) * guiScale - 1,
+                (int) (getInitImageY() + state.yOffset()) * guiScale,
                 // TODO: Make colors custom?
                 ARGB.color(0.6f, -1),
                 ARGB.color(0.5f, 0),
                 CommonColors.HIGH_CONTRAST_DIAMOND,
-                showPixelGrid && (pixelWidth * guiScale > 6 && pixelHeight * guiScale > 6),
-                showMapGrid
+                isShowPixelGrid() && (state.pixelWidth() * guiScale > 6 && state.pixelHeight() * guiScale > 6),
+                isShowMapGrid()
         );
     }
 
     public boolean isShowPixelGrid() {
-        return showPixelGrid;
+        return state.showPixelGrid();
     }
 
     public void setShowPixelGrid(boolean showPixelGrid) {
-        this.showPixelGrid = showPixelGrid;
+        state.setShowPixelGrid(showPixelGrid);
         updateGrid();
     }
 
     public boolean isShowMapGrid() {
-        return showMapGrid;
+        return state.showMapGrid();
     }
 
     public void setShowMapGrid(boolean showMapGrid) {
-        this.showMapGrid = showMapGrid;
+        state.setShowMapGrid(showMapGrid);
         updateGrid();
     }
 
@@ -192,21 +215,21 @@ public class NativeImageViewWidget extends AbstractWidget {
     }
 
     protected void setXOffsetWithoutGridUpdate(double xOffset) {
-        double minVisibleWidth = Math.min(scaledImageWidth / 2.0, width / 2.0);
-        this.xOffset = Math.clamp(
+        double minVisibleWidth = Math.min(state.scaledImageWidth() / 2.0, width / 2.0);
+        state.setXOffset(Math.clamp(
                 xOffset,
-                -getInitImageX() - scaledImageWidth + minVisibleWidth,
+                -getInitImageX() - state.scaledImageWidth() + minVisibleWidth,
                 width - getInitImageX() - minVisibleWidth
-        );
+        ));
     }
 
     protected void setYOffsetWithoutGridUpdate(double yOffset) {
-        double minVisibleHeight = Math.min(scaledImageHeight / 2.0, height / 2.0);
-        this.yOffset = Math.clamp(
+        double minVisibleHeight = Math.min(state.scaledImageHeight() / 2.0, height / 2.0);
+        state.setYOffset(Math.clamp(
                 yOffset,
-                -getInitImageY() - scaledImageHeight + minVisibleHeight,
+                -getInitImageY() - state.scaledImageHeight() + minVisibleHeight,
                 height - getInitImageY() - minVisibleHeight
-        );
+        ));
     }
 
     public int getInitImageX() {
@@ -221,21 +244,22 @@ public class NativeImageViewWidget extends AbstractWidget {
         if (imageId == null) return;
 
         scale = Math.clamp(scale, 0.5, maxScale);
-        if (scale == this.scale) return;
+        if (scale == state.scale()) return;
 
-        anchorX = Math.clamp(anchorX, getInitImageX() + xOffset, getInitImageX() + xOffset + scaledImageWidth);
-        anchorY = Math.clamp(anchorY, getInitImageY() + yOffset, getInitImageY() + yOffset + scaledImageHeight);
-        double imageLocalX = (anchorX - getInitImageX() - xOffset) / this.scale;
-        double imageLocalY = (anchorY - getInitImageY() - yOffset) / this.scale;
+        anchorX = Math.clamp(anchorX, getInitImageX() + state.xOffset(), getInitImageX() + state.xOffset() + state.scaledImageWidth());
+        anchorY = Math.clamp(anchorY, getInitImageY() + state.yOffset(), getInitImageY() + state.yOffset() + state.scaledImageHeight());
+        double imageLocalX = (anchorX - getInitImageX() - state.xOffset()) / state.scale();
+        double imageLocalY = (anchorY - getInitImageY() - state.yOffset()) / state.scale();
 
-        this.scale = scale;
-        this.scaledImageWidth = fittedImageWidth * scale;
-        this.scaledImageHeight = fittedImageHeight * scale;
+        state.setScale(scale);
+        state.setScaledImageWidth(fittedImageWidth * scale);
+        state.setScaledImageHeight(fittedImageHeight * scale);
 
-        this.pixelWidth = (int) scaledImageWidth / (float) originalWidth;
-        this.pixelHeight = (int) scaledImageHeight / (float) originalHeight;
+        state.setPixelWidth((int) state.scaledImageWidth() / (float) originalWidth);
+        state.setPixelHeight((int) state.scaledImageHeight() / (float) originalHeight);
 
-        setOffset(anchorX - getInitImageX() - imageLocalX * scale,
+        setOffset(
+                anchorX - getInitImageX() - imageLocalX * scale,
                 anchorY - getInitImageY() - imageLocalY * scale
         );
     }
@@ -246,8 +270,8 @@ public class NativeImageViewWidget extends AbstractWidget {
 
     public void resetScaleAndOffset() {
         setScale(1.0);
-        xOffset = 0;
-        yOffset = 0;
+        state.setXOffset(0);
+        state.setYOffset(0);
     }
 
     public String pixelPosString() {
@@ -259,11 +283,11 @@ public class NativeImageViewWidget extends AbstractWidget {
     }
 
     protected void calculatePixelPos(double mouseX, double mouseY) {
-        double mouseLocalX = mouseX - (getInitImageX() + xOffset);
-        double mouseLocalY = mouseY - (getInitImageY() + yOffset);
+        double mouseLocalX = mouseX - (getInitImageX() + state.xOffset());
+        double mouseLocalY = mouseY - (getInitImageY() + state.yOffset());
 
-        int pixelX = (int) Math.floor(mouseLocalX / pixelWidth);
-        int pixelY = (int) Math.floor(mouseLocalY / pixelHeight);
+        int pixelX = (int) Math.floor(mouseLocalX / state.pixelWidth());
+        int pixelY = (int) Math.floor(mouseLocalY / state.pixelHeight());
 
         pixelPos.set(pixelX, pixelY);
     }
@@ -282,8 +306,10 @@ public class NativeImageViewWidget extends AbstractWidget {
         drawMapartImage(graphics);
         RenderUtils.renderOutline(
                 graphics,
-                (int) (getInitImageX() + xOffset - 1), (int) (getInitImageY() + yOffset - 1),
-                (int) (scaledImageWidth + 2), (int) (scaledImageHeight + 2),
+                (int) (getInitImageX() + state.xOffset() - 1),
+                (int) (getInitImageY() + state.yOffset() - 1),
+                (int) (state.scaledImageWidth() + 2),
+                (int) (state.scaledImageHeight() + 2),
                 CommonColors.GRAY
         );
         graphics.disableScissor();
@@ -293,13 +319,13 @@ public class NativeImageViewWidget extends AbstractWidget {
         int imageX = getInitImageX();
         int imageY = getInitImageY();
 
-        int scissorsX = (int) (imageX + xOffset - 1);
-        int scissorsY = (int) (imageY + yOffset - 1);
+        int scissorsX = (int) (imageX + state.xOffset() - 1);
+        int scissorsY = (int) (imageY + state.yOffset() - 1);
         graphics.enableScissor(
                 scissorsX,
                 scissorsY,
-                scissorsX + (int) (scaledImageWidth + 2),
-                scissorsY + (int) (scaledImageHeight + 2)
+                scissorsX + (int) (state.scaledImageWidth() + 2),
+                scissorsY + (int) (state.scaledImageHeight() + 2)
         );
         graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
@@ -313,12 +339,12 @@ public class NativeImageViewWidget extends AbstractWidget {
         graphics.disableScissor();
 
         graphics.blit(
-                showMapGrid || showPixelGrid ? CustomPipelines.MAPART_IMAGE_GRID : RenderPipelines.GUI_TEXTURED,
+                isShowPixelGrid() || isShowMapGrid() ? CustomPipelines.MAPART_IMAGE_GRID : RenderPipelines.GUI_TEXTURED,
                 imageId,
-                (int) (imageX + xOffset), (int) (imageY + yOffset),
+                (int) (imageX + state.xOffset()), (int) (imageY + state.yOffset()),
                 0.0F, 0.0F,
-                (int) (scaledImageWidth), (int) (scaledImageHeight),
-                (int) (scaledImageWidth), (int) (scaledImageHeight)
+                (int) (state.scaledImageWidth()), (int) (state.scaledImageHeight()),
+                (int) (state.scaledImageWidth()), (int) (state.scaledImageHeight())
         );
 
     }
