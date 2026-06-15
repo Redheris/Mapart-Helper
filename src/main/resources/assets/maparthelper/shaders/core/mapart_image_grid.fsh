@@ -1,5 +1,7 @@
 #version 150
 
+#moj_import < minecraft:dynamictransforms.glsl >
+
 layout(std140) uniform MapartImageGrid {
     ivec2 ScreenSize;
     ivec2 ScaledSize;
@@ -14,11 +16,16 @@ layout(std140) uniform MapartImageGrid {
 uniform sampler2D Sampler0;
 
 in vec2 texCoord0;
+in vec4 vertexColor;
+
 out vec4 fragColor;
 
 void main() {
-    vec4 originalColor = texture(Sampler0, texCoord0);
+    vec4 originalColor = texture(Sampler0, texCoord0) * vertexColor;
     ivec2 originalSize = textureSize(Sampler0, 0);
+    if (originalColor.a == 0.0) {
+        discard;
+    }
 
     float texelW = ScaledSize.x / float(originalSize.x);
     float texelH = ScaledSize.y / float(originalSize.y);
@@ -27,16 +34,16 @@ void main() {
     float localY = ScreenSize.y - gl_FragCoord.y - StartPos.y;
 
     if (MapsGrid) {
-        float mapWidth = 128 * ScaledSize.x / originalSize.x;
-        float mapHeight = 128 * ScaledSize.y / originalSize.y;
+        float mapWidth = 128 * ScaledSize.x / float(originalSize.x);
+        float mapHeight = 128 * ScaledSize.y / float(originalSize.y);
 
         bool verticalMapLine = fract(localX / mapWidth) * mapWidth < 2;
         bool horizontalMapLine = fract(localY / mapHeight) * mapHeight < 2;
 
-        bool nonBorderVertical = verticalMapLine && (localX > texelW && localX < ScaledSize.x - texelW);
-        bool nonBorderHorizontal = horizontalMapLine && (localY > texelH && localY < ScaledSize.y - texelH);
+        bool nonBorderVerticalMapLine = verticalMapLine && (localX > mapWidth / 2 && localX < ScaledSize.x - mapWidth / 2);
+        bool nonBorderHorizontalMapLine = horizontalMapLine && (localY > mapHeight / 2 && localY < ScaledSize.y - mapHeight / 2);
 
-        if (nonBorderVertical || nonBorderHorizontal) {
+        if (nonBorderVerticalMapLine || nonBorderHorizontalMapLine) {
             fragColor = mix(originalColor, ColorMap, ColorMap.a);
             return;
         }
@@ -61,5 +68,5 @@ void main() {
         }
     }
 
-    fragColor = originalColor;
+    fragColor = originalColor * ColorModulator;
 }

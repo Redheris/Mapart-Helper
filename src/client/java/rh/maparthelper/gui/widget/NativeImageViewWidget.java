@@ -215,6 +215,7 @@ public class NativeImageViewWidget extends AbstractWidget {
         setScale(1.0);
         state.setXOffset(0);
         state.setYOffset(0);
+        updateGrid();
     }
 
     public String pixelPosString() {
