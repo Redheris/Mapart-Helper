@@ -23,9 +23,6 @@ out vec4 fragColor;
 void main() {
     vec4 originalColor = texture(Sampler0, texCoord0) * vertexColor;
     ivec2 originalSize = textureSize(Sampler0, 0);
-    if (originalColor.a == 0.0) {
-        discard;
-    }
 
     float texelW = ScaledSize.x / float(originalSize.x);
     float texelH = ScaledSize.y / float(originalSize.y);
@@ -34,13 +31,13 @@ void main() {
     float localY = ScreenSize.y - gl_FragCoord.y - StartPos.y;
 
     if (MapsGrid) {
-        float mapWidth = 128 * ScaledSize.x / float(originalSize.x);
+        float mapWidth  = 128 * ScaledSize.x / float(originalSize.x);
         float mapHeight = 128 * ScaledSize.y / float(originalSize.y);
 
-        bool verticalMapLine = fract(localX / mapWidth) * mapWidth < 2;
+        bool verticalMapLine   = fract(localX / mapWidth)  * mapWidth < 2;
         bool horizontalMapLine = fract(localY / mapHeight) * mapHeight < 2;
 
-        bool nonBorderVerticalMapLine = verticalMapLine && (localX > mapWidth / 2 && localX < ScaledSize.x - mapWidth / 2);
+        bool nonBorderVerticalMapLine   = verticalMapLine   && (localX > mapWidth / 2  && localX < ScaledSize.x - mapWidth / 2);
         bool nonBorderHorizontalMapLine = horizontalMapLine && (localY > mapHeight / 2 && localY < ScaledSize.y - mapHeight / 2);
 
         if (nonBorderVerticalMapLine || nonBorderHorizontalMapLine) {
@@ -68,5 +65,8 @@ void main() {
         }
     }
 
+    if (originalColor.a == 0.0) {
+        discard;
+    }
     fragColor = originalColor * ColorModulator;
 }
