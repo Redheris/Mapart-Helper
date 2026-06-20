@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
 import rh.maparthelper.render.pipeline.MapartImageGridUniform;
+import rh.maparthelper.render.pipeline.PainterSelectionUniform;
 
 @Mixin(RenderSystem.class)
 public class CustomUniformsBind {
@@ -16,5 +17,6 @@ public class CustomUniformsBind {
     private static void bindDefaultUniforms(RenderPass pass, CallbackInfo ci) {
         pass.setUniform("ColorsHighlight", ColorsHighlightUniform.BUFFER);
         pass.setUniform("MapartImageGrid", MapartImageGridUniform.BUFFER);
+        pass.setUniform("PainterSelection", PainterSelectionUniform.BUFFER);
     }
 }
