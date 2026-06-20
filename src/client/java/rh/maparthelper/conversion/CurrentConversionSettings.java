@@ -2,6 +2,7 @@ package rh.maparthelper.conversion;
 
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.palette.PaletteColors;
@@ -9,7 +10,7 @@ import rh.maparthelper.palette.PaletteColors;
 public class CurrentConversionSettings {
     // GUI image
     public final static MapartProcessing mapart = new MapartProcessing();
-    public static DynamicTexture guiMapartImage;
+    public static @Nullable DynamicTexture guiMapartImage;
     public final static Identifier guiMapartId = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "mapart_gui_texture");
 
     public static CroppingMode cropMode = CroppingMode.AUTO_CROP;

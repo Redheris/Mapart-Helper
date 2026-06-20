@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.ClickEvent;
@@ -38,14 +39,14 @@ public class MapartToNBT {
     );
 
     private static void saveNBT(boolean asSingleFile, ZipOutputStream zipOut, File zipFile) {
-        NativeImage mapartImage = CurrentConversionSettings.guiMapartImage.getPixels();
-        int mapsWidth = CurrentConversionSettings.getMapartWidth();
-        int mapsHeight = CurrentConversionSettings.getMapartHeight();
-
-        if (mapartImage == null) {
+        DynamicTexture mapartTexture = CurrentConversionSettings.guiMapartImage;
+        NativeImage mapartImage;
+        if (mapartTexture == null || (mapartImage = mapartTexture.getPixels()) == null) {
             MapartHelper.LOGGER.error("Cannot create a schematic for an empty mapart");
             return;
         }
+        int mapsWidth = CurrentConversionSettings.getMapartWidth();
+        int mapsHeight = CurrentConversionSettings.getMapartHeight();
 
         String mapartName = CurrentConversionSettings.mapart.mapartName;
         Path savingPath;
