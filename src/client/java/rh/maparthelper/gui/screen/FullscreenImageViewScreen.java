@@ -34,12 +34,16 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         super(parent, Component.literal("Full size mapart view"));
     }
 
-    @Override
-    protected void initContent() {
-        imageViewWidget = new NativeImageViewWidget(
+    protected NativeImageViewWidget initImageViewWidget() {
+        return new NativeImageViewWidget(
                 CurrentConversionSettings.guiMapartImage, CurrentConversionSettings.guiMapartId,
                 0, 30, width, height - 30
         );
+    }
+
+    @Override
+    protected void initContent() {
+        this.imageViewWidget = initImageViewWidget();
         this.addRenderableWidget(imageViewWidget);
 
         GridLayout header = new GridLayout(0, 0);

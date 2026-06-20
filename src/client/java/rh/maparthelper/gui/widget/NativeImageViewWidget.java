@@ -28,19 +28,20 @@ import rh.maparthelper.util.RenderUtils;
 public class NativeImageViewWidget extends AbstractWidget {
     public static final Identifier TRANSPARENT_TEXTURE = MapartHelper.identifier("textures/gui/background/transparent.png");
 
-    private final Identifier imageId;
+    protected final Identifier imageId;
 
-    private final int originalWidth;
-    private final int originalHeight;
+    protected final int originalWidth;
+    protected final int originalHeight;
 
-    private final int fittedImageWidth;
-    private final int fittedImageHeight;
-    private final int fittedImageXOffset;
-    private final int fittedImageYOffset;
-    private final double maxScale;
+    protected final int fittedImageWidth;
+    protected final int fittedImageHeight;
+    protected final int fittedImageXOffset;
+    protected final int fittedImageYOffset;
+    protected final double maxScale;
 
-    private final Vector2i hoveredPixelPos;
-    private final NativeImageViewState state = NativeImageViewState.getInstance();
+    protected final Vector2i hoveredPixelPos;
+    protected final Vector2i closestHoveredLine;
+    protected final NativeImageViewState state = NativeImageViewState.getInstance();
 
     public NativeImageViewWidget(DynamicTexture imageTexture, Identifier imageId, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
@@ -63,9 +64,10 @@ public class NativeImageViewWidget extends AbstractWidget {
         this.fittedImageYOffset = initialState.fittedImageYOffset();
         this.maxScale = initialState.maxScale();
         this.hoveredPixelPos = state.hoveredPixelPos();
+        this.closestHoveredLine = state.closestHoveredLine();
         state.setPixelWidth((int) state.scaledImageWidth() / (float) originalWidth);
         state.setPixelHeight((int) state.scaledImageHeight() / (float) originalHeight);
-        updateGrid();
+        updateGridUniform();
     }
 
     @Override
@@ -105,7 +107,7 @@ public class NativeImageViewWidget extends AbstractWidget {
     }
     //~ !widget_events
 
-    public void updateGrid() {
+    protected void updateGridUniform() {
         if (!state.showMapGrid() && !state.showPixelGrid()) return;
         int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
         MapartImageGridUniform.set(
@@ -129,7 +131,7 @@ public class NativeImageViewWidget extends AbstractWidget {
 
     public void setShowPixelGrid(boolean showPixelGrid) {
         state.setShowPixelGrid(showPixelGrid);
-        updateGrid();
+        updateGridUniform();
     }
 
     public boolean isShowMapGrid() {
@@ -138,23 +140,23 @@ public class NativeImageViewWidget extends AbstractWidget {
 
     public void setShowMapGrid(boolean showMapGrid) {
         state.setShowMapGrid(showMapGrid);
-        updateGrid();
+        updateGridUniform();
     }
 
     public void setOffset(double xOffset, double yOffset) {
         setXOffsetWithoutGridUpdate(xOffset);
         setYOffsetWithoutGridUpdate(yOffset);
-        updateGrid();
+        updateGridUniform();
     }
 
     public void setXOffset(double xOffset) {
         setXOffsetWithoutGridUpdate(xOffset);
-        updateGrid();
+        updateGridUniform();
     }
 
     public void setYOffset(double yOffset) {
         setYOffsetWithoutGridUpdate(yOffset);
-        updateGrid();
+        updateGridUniform();
     }
 
     protected void setXOffsetWithoutGridUpdate(double xOffset) {
@@ -215,25 +217,22 @@ public class NativeImageViewWidget extends AbstractWidget {
         setScale(1.0);
         state.setXOffset(0);
         state.setYOffset(0);
-        updateGrid();
+        updateGridUniform();
     }
 
     public String pixelPosString() {
         return String.format("(%d, %d)", hoveredPixelPos.x, hoveredPixelPos.y);
     }
 
-    public Vector2i getHoveredPixelPos() {
-        return hoveredPixelPos;
-    }
-
     protected void calculatePixelPos(double mouseX, double mouseY) {
         double mouseLocalX = mouseX - (getInitImageX() + state.xOffset());
         double mouseLocalY = mouseY - (getInitImageY() + state.yOffset());
 
-        int pixelX = (int) Math.floor(mouseLocalX / state.pixelWidth());
-        int pixelY = (int) Math.floor(mouseLocalY / state.pixelHeight());
+        double pixelXDouble = mouseLocalX / state.pixelWidth();
+        double pixelYDouble = mouseLocalY / state.pixelHeight();
 
-        hoveredPixelPos.set(pixelX, pixelY);
+        hoveredPixelPos.set((int) Math.floor(pixelXDouble), (int) Math.floor(pixelYDouble));
+        closestHoveredLine.set((int) Math.round(pixelXDouble), (int) Math.round(pixelYDouble));
     }
 
     //~ gui_rendering
@@ -247,7 +246,9 @@ public class NativeImageViewWidget extends AbstractWidget {
 
         graphics.enableScissor(getX(), getY(), getRight(), getBottom());
 
-        drawMapartImage(graphics);
+        drawTransparencyChessboard(graphics);
+        drawMapartImage(graphics, imageId, 1f);
+
         RenderUtils.renderOutline(
                 graphics,
                 (int) (getInitImageX() + state.xOffset() - 1),
@@ -259,12 +260,9 @@ public class NativeImageViewWidget extends AbstractWidget {
         graphics.disableScissor();
     }
 
-    protected void drawMapartImage(@NotNull GuiGraphics graphics) {
-        int imageX = getInitImageX();
-        int imageY = getInitImageY();
-
-        int scissorsX = (int) (imageX + state.xOffset() - 1);
-        int scissorsY = (int) (imageY + state.yOffset() - 1);
+    protected void drawTransparencyChessboard(@NotNull GuiGraphics graphics) {
+        int scissorsX = (int) (getInitImageX() + state.xOffset() - 1);
+        int scissorsY = (int) (getInitImageY() + state.yOffset() - 1);
         graphics.enableScissor(
                 scissorsX,
                 scissorsY,
@@ -281,21 +279,21 @@ public class NativeImageViewWidget extends AbstractWidget {
                 ARGB.color(0.5f, -1)
         );
         graphics.disableScissor();
+    }
 
+    protected void drawMapartImage(@NotNull GuiGraphics graphics, Identifier texture, float alpha) {
         graphics.blit(
                 isShowPixelGrid() || isShowMapGrid() ? CustomPipelines.MAPART_IMAGE_GRID : RenderPipelines.GUI_TEXTURED,
-                imageId,
-                (int) (imageX + state.xOffset()), (int) (imageY + state.yOffset()),
+                texture,
+                (int) (getInitImageX() + state.xOffset()), (int) (getInitImageY() + state.yOffset()),
                 0.0F, 0.0F,
                 (int) (state.scaledImageWidth()), (int) (state.scaledImageHeight()),
-                (int) (state.scaledImageWidth()), (int) (state.scaledImageHeight())
+                (int) (state.scaledImageWidth()), (int) (state.scaledImageHeight()),
+                ARGB.white(alpha)
         );
-
     }
     //~ !gui_rendering
 
     @Override
-    protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {
-
-    }
+    protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {}
 }

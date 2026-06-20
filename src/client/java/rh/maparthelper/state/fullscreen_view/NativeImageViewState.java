@@ -24,6 +24,7 @@ public class NativeImageViewState {
     private double yOffset;
 
     private final Vector2i hoveredPixelPos = new Vector2i(0, 0);
+    private final Vector2i closestHoveredLine = new Vector2i(0, 0);
     private double pixelWidth;
     private double pixelHeight;
 
@@ -62,8 +63,8 @@ public class NativeImageViewState {
         return hoveredPixelPos;
     }
 
-    public void setHoveredPixelPos(int x, int y) {
-        this.hoveredPixelPos.set(x, y);
+    public Vector2i closestHoveredLine() {
+        return closestHoveredLine;
     }
 
     public double pixelWidth() {
