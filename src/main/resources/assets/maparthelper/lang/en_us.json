@@ -190,7 +190,7 @@
   "maparthelper.config.paletteGenerator.regenerationWarningLabel": "Warning: saving changes to this configuration will automatically trigger palette regeneration. This may require entering any world or server",
   "maparthelper.config.paletteGenerator.headLabel": "This configuration screen determines which blocks will be used to generate the palette, which can then be used to more conveniently configure custom presets in the editor",
   "maparthelper.config.paletteGenerator.onlyVanillaBlocks": "Only vanilla blocks",
-  "maparthelper.config.description.paletteGenerator.onlyVanillaBlocks": "Excludes modded blocks from being added to the palette in order to avoid adding a lot of meaningless blocks that may not be detected by the implemented filters",
+  "maparthelper.config.description.paletteGenerator.onlyVanillaBlocks": "Excludes modded blocks from being added to the palette in order to avoid adding a lot of irrational or inconvenient blocks that may not be detected by the implemented filters",
   "maparthelper.config.paletteGenerator.anyBlocks": "§c§nALL§r registered blocks",
   "maparthelper.config.description.paletteGenerator.anyBlocks": "§cDo not use this setting to generate a working palette.§r\nThis setting is intended purely for informational purposes. Many of the blocks have impossible or short-lived states",
   "maparthelper.config.paletteGenerator.onlySolid": "§nOnly§r full solid blocks",

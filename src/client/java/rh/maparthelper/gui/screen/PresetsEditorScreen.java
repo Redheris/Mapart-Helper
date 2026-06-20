@@ -79,11 +79,19 @@ public class PresetsEditorScreen extends ScreenAdapted {
         this.marginBottom = marginBottom;
     }
 
+    //? if <=1.21.8 {
     @Override
     public void resize(Minecraft minecraft, int width, int height) {
         super.resize(minecraft, width, height);
         parent.resize(minecraft, width, height);
     }
+    //?} else {
+    /*@Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        parent.resize(width, height);
+    }
+    *///?}
 
     @Override
     protected void preInit() {
