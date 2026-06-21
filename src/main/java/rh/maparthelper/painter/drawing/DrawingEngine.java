@@ -18,6 +18,7 @@ public class DrawingEngine<T extends PixelSurface> {
     private int secondaryColor;
 
     private boolean isProcessing;
+    private boolean isInversedColors;
 
     public DrawingEngine(LayerManager<T, ? extends Layer<T>> layerManager, HistoryManager historyManager) {
         this.layerManager = layerManager;
@@ -46,9 +47,14 @@ public class DrawingEngine<T extends PixelSurface> {
         return isProcessing;
     }
 
+    public boolean isInversedColors() {
+        return isInversedColors;
+    }
+
     public void start(int x, int y, int lineX, int lineY, boolean inverseColors) {
         if (isProcessing) return;
         isProcessing = true;
+        isInversedColors = inverseColors;
         if (inverseColors)
             selectedTool.start(x, y, lineX, lineY, secondaryColor, mainColor);
         else
@@ -65,5 +71,6 @@ public class DrawingEngine<T extends PixelSurface> {
     public void submit() {
         isProcessing = false;
         historyManager.saveAction(selectedTool.submit());
+        isInversedColors = false;
     }
 }

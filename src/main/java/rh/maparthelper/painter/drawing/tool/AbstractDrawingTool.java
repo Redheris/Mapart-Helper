@@ -13,7 +13,7 @@ import java.awt.*;
 
 public abstract class AbstractDrawingTool<T extends PixelSurface> implements PainterTool {
     private final Rectangle affectedArea;
-    private final LayerManager<T, ? extends Layer<T>> layerManager;
+    protected final LayerManager<T, ? extends Layer<T>> layerManager;
     protected final Selection selection;
     protected final Int2IntMap changedPixelsBefore;
     protected final Rectangle changedAreaStepBuffer;

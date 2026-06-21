@@ -91,7 +91,7 @@ public class Rasterizer {
         int evenLenError = diameter % 2 == 0 ? 1 : 0;
 
         if (dy == 0) {
-            drawPixel(selection, surface, changedPixels, x0, y0, color);
+            setPixel(selection, surface, changedPixels, x0, y0, color);
             changedArea.setBounds(x0, y0, 1, 1);
             return;
         }
@@ -117,15 +117,15 @@ public class Rasterizer {
     private static void drawCircleFragment(Selection selection, PixelSurface surface, Int2IntMap changedPixels,
                                            int x0, int y0, int dx, int dy, int color
     ) {
-        drawPixel(selection, surface, changedPixels, x0 + dx, y0 + dy, color);
-        drawPixel(selection, surface, changedPixels, x0 + dx, y0 - dy, color);
-        drawPixel(selection, surface, changedPixels, x0 - dx, y0 + dy, color);
-        drawPixel(selection, surface, changedPixels, x0 - dx, y0 - dy, color);
+        setPixel(selection, surface, changedPixels, x0 + dx, y0 + dy, color);
+        setPixel(selection, surface, changedPixels, x0 + dx, y0 - dy, color);
+        setPixel(selection, surface, changedPixels, x0 - dx, y0 + dy, color);
+        setPixel(selection, surface, changedPixels, x0 - dx, y0 - dy, color);
     }
 
 
-    private static void drawPixel(Selection selection, PixelSurface surface, Int2IntMap changedPixels,
-                                  int x, int y, int color
+    public static void setPixel(Selection selection, PixelSurface surface, Int2IntMap changedPixels,
+                                int x, int y, int color
     ) {
         if (!selection.allows(x, y) || changedPixels.containsKey(x + y * surface.getWidth()))
             return;
@@ -141,7 +141,7 @@ public class Rasterizer {
     ) {
         for (int x = x0; x <= x1; x++) {
             for (int y = y0; y <= y1; y++) {
-                drawPixel(selection, surface, changedPixels, x, y, color);
+                setPixel(selection, surface, changedPixels, x, y, color);
             }
         }
     }

@@ -8,10 +8,9 @@ import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.PixelSurface;
 
 public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> {
+    protected final BrushToolSettings settings;
     private int lastX;
     private int lastY;
-
-    private final BrushToolSettings settings;
 
     public BrushTool(BrushToolSettings settings, LayerManager<T, ? extends Layer<T>> layerManager, Selection selection) {
         super(layerManager, selection);
@@ -31,7 +30,7 @@ public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> {
     }
 
     @Override
-    public void processDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    protected void processDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         int xCenter = x;
         int yCenter = y;
         if (settings.getThickness() % 2 == 0) {

@@ -13,6 +13,9 @@ import static java.lang.Math.clamp;
 public class ColorUtils {
     private final static Map<Integer, int[]> rgb2LabCache = new ConcurrentHashMap<>();
 
+    private final static double CIE_EPSILON = 0.008856;
+    private final static double CIE_KAPPA = 903.3;
+
     public static void clearRgb2LabCache() {
         rgb2LabCache.clear();
     }
@@ -55,6 +58,34 @@ public class ColorUtils {
         return lab;
     }
 
+    // RGB -> XYZ -> CIE Lab conversion based on the articles by Bruce Lindbloom:
+    // http://www.brucelindbloom.com/
+    public static double[] rgbToXyzToLab(int argb) {
+        double R = ((argb >> 16) & 0xFF) / 255.0;
+        double G = ((argb >> 8) & 0xFF) / 255.0;
+        double B = (argb & 0xFF) / 255.0;
+
+        double X = 0.7161046 * R + 0.1009296 * G + 0.1471858 * B;
+        double Y = 0.2581874 * R + 0.7249378 * G + 0.0168748 * B;
+        double Z = 0.0000000 * R + 0.0517813 * G + 0.7734287 * B;
+
+        double Xr = 95.047;
+        double Yr = 100.0;
+        double Zr = 108.883;
+        double xr = X / Xr;
+        double yr = Y / Yr;
+        double zr = Z / Zr;
+
+        double fx = xr > CIE_EPSILON ? Math.cbrt(xr) : (CIE_KAPPA * xr + 16) / 116;
+        double fy = xr > CIE_EPSILON ? Math.cbrt(yr) : (CIE_KAPPA * yr + 16) / 116;
+        double fz = xr > CIE_EPSILON ? Math.cbrt(zr) : (CIE_KAPPA * zr + 16) / 116;
+
+        return new double[] {
+                116 * fy - 16,
+                500 * (fx - fy),
+                200 * (fy - fz),
+        };
+    }
 
     public static double colorDistanceARGB_noSqrt(int argb1, int argb2) {
         int[] rgb1 = getRGB(argb1);
@@ -67,7 +98,7 @@ public class ColorUtils {
         return dr * dr + dg * dg + db * db;
     }
 
-    public static double colorDistanceLAB_noSqrt(int[] lab1, int[] lab2) {
+    public static int colorDistanceLAB_noSqrt(int[] lab1, int[] lab2) {
         int L1 = lab1[0];
         int a1 = lab1[1];
         int b1 = lab1[2];
@@ -90,6 +121,19 @@ public class ColorUtils {
             return colorDistanceLAB_noSqrt(lab1, lab2);
         }
         return colorDistanceARGB_noSqrt(argb1, argb2);
+    }
+
+    public static boolean matches(int argb1, int argb2, double tolerance) {
+        tolerance = Math.clamp(tolerance, 0.0, 1.0);
+
+        if (tolerance == 0.0) return argb1 == argb2;
+        if (tolerance == 1.0) return true;
+
+        double distanceSquared = colorDistance(argb1, argb2, false);
+
+        double maxDistanceSquared = 255.0 * 255.0 * 3.0;
+        double thresholdSquared = tolerance * tolerance * maxDistanceSquared;
+        return distanceSquared <= thresholdSquared;
     }
 
     public static BufferedImage preprocessImage(BufferedImage image, float brightnessFactor, float contrastLevel, float saturationFactor) {

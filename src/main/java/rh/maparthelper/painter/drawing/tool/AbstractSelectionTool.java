@@ -1,6 +1,5 @@
 package rh.maparthelper.painter.drawing.tool;
 
-import rh.maparthelper.painter.util.BitSetUtils;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
 import rh.maparthelper.painter.history.action.HistoryAction;
@@ -8,28 +7,28 @@ import rh.maparthelper.painter.history.action.SelectionHistoryAction;
 
 import java.util.BitSet;
 
-public class SelectionTool implements PainterTool {
-    private final Selection selection;
-    private final BitSet newPart;
-    private final int maxWidth;
-    private final int maxHeight;
+public abstract class AbstractSelectionTool implements PainterTool {
+    protected final Selection selection;
+    protected final BitSet newPart;
+    protected final int maxWidth;
+    protected final int maxHeight;
     private boolean isSelecting;
     private BitSet before;
-    private int startX;
-    private int startY;
+    protected int startX;
+    protected int startY;
 
     private final SelectionToolSettings settings;
 
-    public SelectionTool(SelectionToolSettings settings, Selection selection) {
-        this.selection = selection;
+    public AbstractSelectionTool(SelectionToolSettings settings, Selection selection) {
         this.settings = settings;
+        this.selection = selection;
         this.maxWidth = selection.getWidth();
         this.maxHeight = selection.getHeight();
         this.newPart = new BitSet(maxWidth * maxHeight);
     }
 
     @Override
-    public void start(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    public final void start(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         isSelecting = true;
         before = selection.getSelectionMask();
         newPart.clear();
@@ -38,12 +37,13 @@ public class SelectionTool implements PainterTool {
         }
         startX = x;
         startY = y;
+        startSelecting(x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override
-    public void process(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    public final void process(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         if (!isSelecting) return;
-        BitSetUtils.clearAndFill(newPart, maxWidth, maxHeight, startX, startY, x, y);
+        processSelection(x, y, lineX, lineY, firstColor, secondColor);
         BitSet result = (BitSet) before.clone();
 
         switch (settings.getMode()) {
@@ -58,6 +58,10 @@ public class SelectionTool implements PainterTool {
         }
         selection.setSelectionMask(result);
     }
+
+    protected abstract void startSelecting(int x, int y, int lineX, int lineY, int firstColor, int secondColor);
+
+    protected abstract void processSelection(int x, int y, int lineX, int lineY, int firstColor, int secondColor);
 
     @Override
     public HistoryAction submit() {
@@ -78,6 +82,6 @@ public class SelectionTool implements PainterTool {
 
     @Override
     public boolean isDrawing() {
-        return false;
+        return isSelecting;
     }
 }
