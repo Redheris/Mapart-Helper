@@ -204,7 +204,7 @@ public class AdjScrollableLayoutWidget implements Layout {
                         graphics,
                         getX() - 1, getY() - 1,
                         this.width + 2, this.height + 2,
-                        ARGB.color(0.47f * alpha, 0)
+                        ARGB.color(0.47f * alpha, outlineColor)
                 );
             }
             this.renderScrollbar(graphics/*? if >=1.21.10 {*//*, mouseX, mouseY *//*?}*/);
