@@ -43,6 +43,14 @@ public class DrawingEngine<T extends PixelSurface> {
         this.secondaryColor = secondaryColor;
     }
 
+    public int getMainColor() {
+        return mainColor;
+    }
+
+    public int getSecondaryColor() {
+        return secondaryColor;
+    }
+
     public boolean isProcessing() {
         return isProcessing;
     }
