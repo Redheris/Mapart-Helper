@@ -258,9 +258,6 @@ public class MapartEditorScreen extends ScreenAdapted {
                 elementWidth, 160
         );
         OverlayLayout saveMapartDropdownOverlay = saveMapartDropdownWidget.getOverlay();
-        LinearLayout propagationContent = LinearLayout.vertical();
-        propagationContent.addChild(SpacerElement.width(40));
-        propagationContent.addChild(SpacerElement.height(40));
 
         rgbPropagationDropdownWidget = new ErrorPropagationDropdown(
                 this, mapart,

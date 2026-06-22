@@ -18,21 +18,21 @@ import java.util.Set;
 
 public abstract class ScreenAdapted extends Screen {
     protected final Screen parentScreen;
+    private Set<OverlayLayout> overlays;
 
     protected ScreenAdapted(Screen parentScreen, Component title) {
         super(title);
         this.parentScreen = parentScreen;
     }
 
-    protected void preInit() {
-    }
+    protected void preInit() {}
 
     @Override
     protected final void init() {
         preInit();
 
-        OverlaysManager.close();
-        Set<OverlayLayout> overlays = initOverlays();
+        OverlaysManager.close(null);
+        overlays = initOverlays();
         for (OverlayLayout overlay : overlays) {
             overlay.arrangeElements();
             overlay.visitWidgets(this::addRenderableWidget);
@@ -57,7 +57,7 @@ public abstract class ScreenAdapted extends Screen {
         if (this.getFocused() == null || !this.getFocused().isMouseOver(mouseX, mouseY))
             this.setFocused(null);
 
-        OverlaysManager.handleMouseClick(mouseX, mouseY);
+        OverlaysManager.handleMouseClick(overlays, mouseX, mouseY);
         return super.mouseClicked(mouseX, mouseY, button);
     }
     //~ !widget_events
@@ -66,9 +66,9 @@ public abstract class ScreenAdapted extends Screen {
     @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         for (Renderable renderable : this.renderables) {
-            if (OverlaysManager.isVisibleOneContent(renderable)) continue;
+            if (OverlaysManager.isVisibleOverlayContent(overlays, renderable)) continue;
             //~ if >=26.1 '.render(' -> '.extractRenderState(' {
-            if (OverlaysManager.isMouseOverVisibleLayout(mouseX, mouseY)) {
+            if (OverlaysManager.isMouseOverVisibleLayout(overlays, mouseX, mouseY)) {
                 renderable.render(graphics, -1, -1, partialTick);
             } else {
                 renderable.render(graphics, mouseX, mouseY, partialTick);
@@ -77,14 +77,14 @@ public abstract class ScreenAdapted extends Screen {
         }
 
         if (Minecraft.getInstance().screen == this) {
-            OverlaysManager.renderVisibleOne(graphics, mouseX, mouseY, partialTick);
+            OverlaysManager.renderOverlays(overlays, graphics, mouseX, mouseY, partialTick);
         }
     }
     //~ !gui_rendering
 
     @Override
     public void onClose() {
-        OverlaysManager.close();
+        OverlaysManager.close(null);
         Minecraft.getInstance().setScreen(parentScreen);
     }
 

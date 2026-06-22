@@ -2,6 +2,7 @@ package rh.maparthelper.gui.widget.layout;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.AbstractLayout;
@@ -13,14 +14,20 @@ import java.util.function.Consumer;
 @Environment(EnvType.CLIENT)
 public class OverlayLayout extends AbstractLayout {
     private final AdjScrollableLayoutWidget layout;
-    private boolean visible;
+    protected boolean visible;
+    private boolean autoCloseable;
     private AbstractWidget switchWidget;
 
-    public OverlayLayout(AdjScrollableLayoutWidget layout) {
+    public OverlayLayout(AdjScrollableLayoutWidget layout, boolean autoCloseable) {
         super(layout.getX(), layout.getY(), layout.getWidth(), layout.getHeight());
         this.layout = layout;
         this.visible = false;
+        this.autoCloseable = autoCloseable;
         layout.visitWidgets(w -> w.visible = this.visible);
+    }
+
+    public OverlayLayout(AdjScrollableLayoutWidget layout) {
+        this(layout, true);
     }
 
     @Override
@@ -43,7 +50,16 @@ public class OverlayLayout extends AbstractLayout {
     }
 
     public void setAlpha(float alpha) {
+        // FIXME: It makes all translucent widgets opaque
         visitWidgets(w -> w.setAlpha(alpha));
+    }
+
+    public boolean isAutoCloseable() {
+        return autoCloseable;
+    }
+
+    public void setAutoCloseable(boolean lockVisible) {
+        this.autoCloseable = lockVisible;
     }
 
     public boolean isVisible() {
@@ -53,9 +69,9 @@ public class OverlayLayout extends AbstractLayout {
     public void setVisible(boolean visible) {
         this.visible = visible;
         if (visible)
-            OverlaysManager.setVisibleOne(this);
+            OverlaysManager.setActiveOverlay(this);
         else
-            OverlaysManager.close();
+            OverlaysManager.close(this);
 
         layout.visitWidgets(w -> w.visible = visible);
     }
@@ -73,5 +89,12 @@ public class OverlayLayout extends AbstractLayout {
 
     public void setSwitchWidget(AbstractWidget switchWidget) {
         this.switchWidget = switchWidget;
+    }
+
+    public void renderOverlay(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        if (visible) {
+            //~ if >=26.1 '.render(' -> '.extractRenderState('
+            visitWidgets(w -> w.render(graphics, mouseX, mouseY, partialTick));
+        }
     }
 }
