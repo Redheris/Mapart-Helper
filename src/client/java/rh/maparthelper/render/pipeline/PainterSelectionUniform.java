@@ -18,11 +18,29 @@ public class PainterSelectionUniform {
             .get();
     public static final GpuBuffer BUFFER = RenderSystem.getDevice().createBuffer(() -> "PainterSelection", 136, SIZE);
 
+    private static int lastScaledWidth;
+    private static int lastScaledHeight;
+    private static int lastSelectionFillColor;
+
     public static void set(int scaledWidth, int scaledHeight, int selectionFillColor, boolean fillSelection) {
         try (MemoryStack memoryStack = MemoryStack.stackPush()) {
+            lastScaledWidth = scaledWidth;
+            lastScaledHeight = scaledHeight;
+            lastSelectionFillColor = selectionFillColor;
             ByteBuffer byteBuffer = Std140Builder.onStack(memoryStack, SIZE)
-                    .putIVec2(scaledWidth, scaledHeight)
-                    .putVec4(intToVec4(selectionFillColor))
+                    .putIVec2(lastScaledWidth, lastScaledHeight)
+                    .putVec4(intToVec4(lastSelectionFillColor))
+                    .putInt(fillSelection ? 1 : 0)
+                    .get();
+            RenderSystem.getDevice().createCommandEncoder().writeToBuffer(BUFFER.slice(), byteBuffer);
+        }
+    }
+
+    public static void set(boolean fillSelection) {
+        try (MemoryStack memoryStack = MemoryStack.stackPush()) {
+            ByteBuffer byteBuffer = Std140Builder.onStack(memoryStack, SIZE)
+                    .putIVec2(lastScaledWidth, lastScaledHeight)
+                    .putVec4(intToVec4(lastSelectionFillColor))
                     .putInt(fillSelection ? 1 : 0)
                     .get();
             RenderSystem.getDevice().createCommandEncoder().writeToBuffer(BUFFER.slice(), byteBuffer);
