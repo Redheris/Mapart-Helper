@@ -38,12 +38,12 @@ public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> {
             yCenter = lineY;
         }
         Rasterizer.drawLine(
-                selection, editingLayer.getSurface(), changedAreaStepBuffer, changedPixelsBefore,
+                Rasterizer.drawingPixelConsumer(selection, editingLayer.getSurface(), changedPixelsBefore, firstColor),
+                changedAreaStepBuffer,
                 settings.isCircleShape(),
                 settings.getThickness(),
                 lastX, lastY,
-                xCenter, yCenter,
-                firstColor
+                xCenter, yCenter
         );
         lastX = xCenter;
         lastY = yCenter;
