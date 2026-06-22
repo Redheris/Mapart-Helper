@@ -14,13 +14,20 @@ public class NativeImageUtils {
 
     public static void updateMapartImageTexture(NativeImage image) {
         synchronized (mapartTextureUploadLock) {
-            DynamicTexture backedTexture = new DynamicTexture(
-                    CurrentConversionSettings.guiMapartId::getPath,
-                    image
-            );
-            TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-            textureManager.register(CurrentConversionSettings.guiMapartId, backedTexture);
-            CurrentConversionSettings.guiMapartImage = backedTexture;
+            DynamicTexture texture = CurrentConversionSettings.guiMapartImage;
+            NativeImage currentImage = texture == null ? null : texture.getPixels();
+            if (texture == null || currentImage == null || currentImage.getWidth() != image.getWidth() || currentImage.getHeight() != image.getHeight()) {
+                texture = new DynamicTexture(
+                        CurrentConversionSettings.guiMapartId::getPath,
+                        image
+                );
+                TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+                textureManager.register(CurrentConversionSettings.guiMapartId, texture);
+                CurrentConversionSettings.guiMapartImage = texture;
+            } else {
+                texture.setPixels(image);
+                texture.upload();
+            }
         }
     }
 

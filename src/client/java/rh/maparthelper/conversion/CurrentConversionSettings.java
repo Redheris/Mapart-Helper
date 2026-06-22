@@ -11,7 +11,7 @@ public class CurrentConversionSettings {
     // GUI image
     public final static MapartProcessing mapart = new MapartProcessing();
     public static @Nullable DynamicTexture guiMapartImage;
-    public final static Identifier guiMapartId = Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "mapart_gui_texture");
+    public final static Identifier guiMapartId = MapartHelper.identifier("mapart_gui_texture");
 
     public static CroppingMode cropMode = CroppingMode.AUTO_CROP;
     public static boolean doShowGrid = false;
