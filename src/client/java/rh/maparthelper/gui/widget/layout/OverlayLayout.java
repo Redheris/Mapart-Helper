@@ -2,32 +2,67 @@ package rh.maparthelper.gui.widget.layout;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.AbstractLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 @Environment(EnvType.CLIENT)
 public class OverlayLayout extends AbstractLayout {
-    private final AdjScrollableLayoutWidget layout;
+    private AdjScrollableLayoutWidget layout;
     protected boolean visible;
     private boolean autoCloseable;
     private AbstractWidget switchWidget;
 
-    public OverlayLayout(AdjScrollableLayoutWidget layout, boolean autoCloseable) {
+    public OverlayLayout(AdjScrollableLayoutWidget layout, boolean visible, boolean autoCloseable) {
         super(layout.getX(), layout.getY(), layout.getWidth(), layout.getHeight());
         this.layout = layout;
-        this.visible = false;
+        this.visible = visible;
         this.autoCloseable = autoCloseable;
         layout.visitWidgets(w -> w.visible = this.visible);
     }
 
+    protected OverlayLayout(boolean visible, boolean autoCloseable) {
+        super(0, 0, 0, 0);
+        this.visible = visible;
+        this.autoCloseable = autoCloseable;
+    }
+
+    protected void lazyInitLayout(AdjScrollableLayoutWidget layout) {
+        if (this.layout == null) {
+            this.layout = layout;
+        }
+    }
+
+    protected void replaceLayout(Screen screen, AdjScrollableLayoutWidget newLayout) {
+        List<AbstractWidget> screenWidgets = null;
+        if (screen != null) {
+            screenWidgets = Screens.getButtons(screen);
+        }
+
+        if (screenWidgets != null && this.layout != null) {
+            this.layout.visitWidgets(screenWidgets::remove);
+        }
+        this.layout = newLayout;
+        layout.setPosition(getX(), getY());
+        this.width = layout.getWidth();
+        this.height = layout.getHeight();
+        arrangeElements();
+
+        if (screenWidgets != null) {
+            this.layout.visitWidgets(screenWidgets::addFirst);
+        }
+    }
+
     public OverlayLayout(AdjScrollableLayoutWidget layout) {
-        this(layout, true);
+        this(layout, false, true);
     }
 
     @Override
