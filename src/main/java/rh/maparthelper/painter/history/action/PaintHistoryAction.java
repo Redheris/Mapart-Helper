@@ -29,6 +29,11 @@ public class PaintHistoryAction<T extends PixelSurface> implements HistoryAction
     }
 
     @Override
+    public HistoryActionType type() {
+        return HistoryActionType.DRAWING;
+    }
+
+    @Override
     public void undo() {
         apply(before);
     }

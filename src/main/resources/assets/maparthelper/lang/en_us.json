@@ -155,6 +155,11 @@
   "maparthelper.gui.fullscreen_view.show_pixel_grid": "Show pixel grid",
   "maparthelper.gui.fullscreen_view.show_map_grid": "Show map grid",
 
+
+  "maparthelper.gui.mapart_painter.layer": "Layer",
+  "maparthelper.gui.mapart_painter.background": "Background",
+
+
   "key.maparthelper.openScreen": "Open mapart editor",
 
 

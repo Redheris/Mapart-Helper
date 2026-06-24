@@ -155,6 +155,11 @@
   "maparthelper.gui.fullscreen_view.show_pixel_grid": "Отображать пиксельную сетку",
   "maparthelper.gui.fullscreen_view.show_map_grid": "Отображать сетку по картам",
 
+
+  "maparthelper.gui.mapart_painter.layer": "Слой",
+  "maparthelper.gui.mapart_painter.background": "Фон",
+
+
   "key.maparthelper.openScreen": "Открыть редактор мапартов",
 
 

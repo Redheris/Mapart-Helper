@@ -1,7 +1,9 @@
 package rh.maparthelper.painter.layer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.painter.surface.NativeImageSurface;
@@ -9,7 +11,7 @@ import rh.maparthelper.painter.surface.NativeImageSurface;
 import java.awt.*;
 
 public class DynamicTextureLayer extends Layer<NativeImageSurface> {
-    private final DynamicTexture texture;
+    final DynamicTexture texture;
     private final Identifier textureId;
 
     public DynamicTextureLayer(@NotNull DynamicTexture texture, @NotNull Identifier textureId) {
@@ -47,5 +49,11 @@ public class DynamicTextureLayer extends Layer<NativeImageSurface> {
                     dirtyArea.y
             );
         }
+    }
+
+    @Override
+    public void dispose() {
+        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+        textureManager.release(textureId);
     }
 }

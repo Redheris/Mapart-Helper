@@ -6,19 +6,29 @@ import rh.maparthelper.painter.surface.PixelSurface;
 import java.awt.*;
 
 public abstract class Layer<T extends PixelSurface> {
-    private final PixelSurface surface;
+    private final T surface;
     private final Rectangle surfaceArea;
     private boolean dirty;
     private Rectangle dirtyArea;
 
+    private String name;
     private float alpha;
     private boolean visible;
 
     public Layer(@NotNull T surface) {
         this.surface = surface;
         this.surfaceArea = new Rectangle(0, 0, surface.getWidth(), surface.getHeight());
+        this.name = "Layer";
         this.alpha = 1.0f;
         this.visible = true;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public float getAlpha() {
@@ -37,7 +47,7 @@ public abstract class Layer<T extends PixelSurface> {
         this.visible = visible;
     }
 
-    public PixelSurface getSurface() {
+    public T getSurface() {
         return surface;
     }
 
@@ -68,4 +78,6 @@ public abstract class Layer<T extends PixelSurface> {
     }
 
     protected abstract void uploadDirtyArea(Rectangle dirtyArea);
+
+    public abstract void dispose();
 }

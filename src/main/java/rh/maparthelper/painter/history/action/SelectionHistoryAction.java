@@ -16,6 +16,11 @@ public class SelectionHistoryAction implements HistoryAction {
     }
 
     @Override
+    public HistoryActionType type() {
+        return HistoryActionType.SELECTION;
+    }
+
+    @Override
     public void undo() {
         selection.setSelectionMask(before);
     }
