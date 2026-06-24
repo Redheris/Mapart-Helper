@@ -70,6 +70,7 @@ public class DrawingEngine<T extends PixelSurface> {
     }
 
     public void process(int x, int y, int lineX, int lineY, boolean inverseColors) {
+        if (!isProcessing) return;
         if (inverseColors)
             selectedTool.process(x, y, lineX, lineY, secondaryColor, mainColor);
         else
@@ -78,7 +79,13 @@ public class DrawingEngine<T extends PixelSurface> {
 
     public void submit() {
         isProcessing = false;
+        isInversedColors = false;
         historyManager.saveAction(selectedTool.submit());
+    }
+
+    public void cancel() {
+        selectedTool.cancel();
+        isProcessing = false;
         isInversedColors = false;
     }
 }
