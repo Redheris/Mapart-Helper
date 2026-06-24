@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.layer;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
@@ -32,8 +33,16 @@ public class DynamicTextureLayerFactory implements LayerFactory<NativeImageSurfa
     public DynamicTextureLayer copy(DynamicTextureLayer origin) {
         String layerUUID = UUID.randomUUID().toString();
 
+        NativeImage originImage = origin.texture.getPixels();
+        if (originImage == null) throw new IllegalStateException("Native image must not be null");
+        int width = originImage.getWidth();
+        int height = originImage.getHeight();
+
+        NativeImage newImage = new NativeImage(width, height, true);
+        newImage.copyFrom(originImage);
+
         Identifier textureId = MapartHelper.identifier("painter_layer_" + layerUUID);
-        DynamicTexture texture = new DynamicTexture(textureId::getPath, origin.texture.getPixels());
+        DynamicTexture texture = new DynamicTexture(textureId::getPath, newImage);
         Minecraft.getInstance().getTextureManager().register(textureId, texture);
 
         DynamicTextureLayer newLayer = new DynamicTextureLayer(texture, textureId);
