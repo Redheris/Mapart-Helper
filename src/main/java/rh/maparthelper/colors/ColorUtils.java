@@ -124,9 +124,11 @@ public class ColorUtils {
     }
 
     public static boolean matches(int argb1, int argb2, double tolerance) {
+        if (argb1 == argb2) return true;
+
         tolerance = Math.clamp(tolerance, 0.0, 1.0);
 
-        if (tolerance == 0.0) return argb1 == argb2;
+        if (tolerance == 0.0) return false;
         if (tolerance == 1.0) return true;
 
         double distanceSquared = colorDistance(argb1, argb2, false);
