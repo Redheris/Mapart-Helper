@@ -21,21 +21,23 @@ void main() {
         discard;
     }
 
-    float left  = texture(Sampler0, texCoord0 + vec2(-texel.x, 0.0)).r;
-    float right = texture(Sampler0, texCoord0 + vec2( texel.x, 0.0)).r;
-    float up    = texture(Sampler0, texCoord0 + vec2(0.0, -texel.y)).r;
-    float down  = texture(Sampler0, texCoord0 + vec2(0.0,  texel.y)).r;
+    ivec2 pixel = ivec2(texCoord0 * ScaledSize);
 
-    if (left < 0.5 || right < 0.5 || up < 0.5 || down < 0.5) {
+    bool left  = pixel.x == 0                || texture(Sampler0, texCoord0 + vec2(-texel.x, 0.0)).r < 0.5;
+    bool right = pixel.x == ScaledSize.x - 1 || texture(Sampler0, texCoord0 + vec2( texel.x, 0.0)).r < 0.5;
+    bool up    = pixel.y == 0                || texture(Sampler0, texCoord0 + vec2(0.0, -texel.y)).r < 0.5;
+    bool down  = pixel.y == ScaledSize.y - 1 || texture(Sampler0, texCoord0 + vec2(0.0,  texel.y)).r < 0.5;
+
+    if (left || right || up || down) {
         float t = floor(GameTime * 20000);
         vec2 p = texCoord0 / texel;
 
         float coord;
-        if (left < 0.5)
+        if (left)
             coord = p.y;
-        else if (right < 0.5)
+        else if (right)
             coord = -p.y;
-        else if (down < 0.5)
+        else if (down)
             coord = p.x;
         else
             coord = -p.x;
