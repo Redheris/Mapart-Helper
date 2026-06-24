@@ -36,7 +36,12 @@ public class SelectionBrushTool extends AbstractSelectionTool {
             yCenter = lineY;
         }
         Rasterizer.drawLine(
-                (x0, y0) -> newPart.set(x0 + y0 * maxWidth),
+                (x0, y0) -> {
+                    int id = x0 + y0 * maxWidth;
+                    if (x0 >= 0 && y0 >= 0 && x0 < maxWidth && y0 < maxHeight) {
+                        newPart.set(id);
+                    }
+                },
                 null,
                 brushSettings.isCircleShape(),
                 brushSettings.getThickness(),
