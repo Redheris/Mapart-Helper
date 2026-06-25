@@ -7,24 +7,35 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 public class OverlaysManager {
     @Nullable
     private static OverlayLayout activeOverlay;
 
-    public static void handleMouseClick(Set<OverlayLayout> overlays, double x, double y) {
+    //~ widget_events
+    public static boolean handleMouseClick(Set<OverlayLayout> overlays, double mouseX, double mouseY, int button) {
         if (activeOverlay != null && activeOverlay.isAutoCloseable()) {
-            if (!activeOverlay.isMouseOverSwitch(x, y) && !activeOverlay.isMouseOverLayout(x, y)) {
+            if (!activeOverlay.isMouseOverSwitch(mouseX, mouseY) && !activeOverlay.isMouseOverLayout(mouseX, mouseY)) {
                 activeOverlay.setVisible(false);
             }
         }
+        if (activeOverlay != null && activeOverlay.isMouseOverLayout(mouseX, mouseY)) {
+            activeOverlay.mouseClicked(mouseX, mouseY, button);
+            return true;
+        }
         for (OverlayLayout overlay : overlays) {
             if (!overlay.isVisible()) continue;
-            if (overlay.isMouseOverLayout(x, y)) {
+            if (overlay.isMouseOverLayout(mouseX, mouseY)) {
                 setActiveOverlay(overlay);
-                break;
+                overlay.mouseClicked(mouseX, mouseY, button);
+                return true;
             }
         }
+        return false;
     }
+    //~ !widget_events
 
     public static boolean isVisibleOverlayContent(Set<OverlayLayout> overlays, Renderable renderable) {
         for (OverlayLayout overlay : overlays) {
@@ -49,16 +60,25 @@ public class OverlaysManager {
     public static void renderOverlays(Set<OverlayLayout> overlays, @NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         boolean activeOverlayHovered = false;
         if (activeOverlay != null) {
-            activeOverlay.renderOverlay(graphics, mouseX, mouseY, partialTick);
             activeOverlayHovered = activeOverlay.isMouseOverLayout(mouseX, mouseY);
         }
+        OverlayLayout nextActiveOverlay = null;
         for (OverlayLayout overlay : overlays) {
             if (overlay == activeOverlay || !overlay.isVisible()) continue;
             if (activeOverlayHovered && overlay.isMouseOverLayout(mouseX, mouseY)) {
                 overlay.renderOverlay(graphics, -1, -1, partialTick);
             } else {
+                if (overlay.isMouseOverLayout(mouseX, mouseY)) {
+                    nextActiveOverlay = overlay;
+                }
                 overlay.renderOverlay(graphics, mouseX, mouseY, partialTick);
             }
+        }
+        if (activeOverlay != null) {
+            activeOverlay.renderOverlay(graphics, mouseX, mouseY, partialTick);
+        }
+        if (nextActiveOverlay != null) {
+            activeOverlay = nextActiveOverlay;
         }
     }
 
@@ -80,9 +100,5 @@ public class OverlaysManager {
         if (activeOverlay != null) {
             activeOverlay.setVisible(true);
         }
-    }
-
-    public static boolean isActiveOverlay(OverlayLayout overlayLayout) {
-        return activeOverlay == overlayLayout;
     }
 }

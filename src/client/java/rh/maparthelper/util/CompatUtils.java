@@ -39,5 +39,9 @@ public class CompatUtils {
         return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 342)
                 || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), 346);
     }
+
+    public static boolean isKeyDown(int key) {
+        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key);
+    }
     //~}
 }

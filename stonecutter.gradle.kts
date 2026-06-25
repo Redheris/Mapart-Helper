@@ -61,6 +61,7 @@ stonecutter parameters {
             replace("net.minecraft.client.gui.render.state.", "net.minecraft.client.renderer.state.gui.")
             replace(".command.v2.ClientCommandManager", ".command.v2.ClientCommands")
             replace("SpecialGuiElementRegistry", "PictureInPictureRendererRegistry")
+            replace("Screens.getButtons(", "Screens.getWidgets(")
         }
 
         string(current.parsed >= "1.21.10", "widget_events") {
@@ -85,8 +86,8 @@ stonecutter parameters {
                 "updateScrolling(@NotNull MouseButtonEvent mouseEvent)"
             )
             replace(
-                "(double mouseX, double mouseY, int button)",
-                "(@NotNull MouseButtonEvent mouseEvent, boolean isDoubleClick)"
+                "double mouseX, double mouseY, int button)",
+                "@NotNull MouseButtonEvent mouseEvent, boolean isDoubleClick)"
             )
             replace("mouseClicked(mouseX, mouseY, button)", "mouseClicked(mouseEvent, isDoubleClick)")
             replace("mouseReleased(mouseX, mouseY, button)", "mouseReleased(mouseEvent)")

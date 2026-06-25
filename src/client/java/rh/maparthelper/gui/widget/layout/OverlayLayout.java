@@ -14,6 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
+
 @Environment(EnvType.CLIENT)
 public class OverlayLayout extends AbstractLayout {
     private AdjScrollableLayoutWidget layout;
@@ -38,6 +41,8 @@ public class OverlayLayout extends AbstractLayout {
     protected void lazyInitLayout(AdjScrollableLayoutWidget layout) {
         if (this.layout == null) {
             this.layout = layout;
+            this.width = layout.getWidth();
+            this.height = layout.getHeight();
         }
     }
 
@@ -132,4 +137,11 @@ public class OverlayLayout extends AbstractLayout {
             visitWidgets(w -> w.render(graphics, mouseX, mouseY, partialTick));
         }
     }
+
+    //~ widget_events
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!visible) return false;
+        return layout.container.mouseClicked(mouseX, mouseY, button);
+    }
+    //~ !widget_events
 }
