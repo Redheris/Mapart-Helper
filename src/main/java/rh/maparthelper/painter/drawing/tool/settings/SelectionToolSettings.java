@@ -11,6 +11,10 @@ public class SelectionToolSettings {
         this.mode = mode;
     }
 
+    public void update(SelectionToolSettings settings) {
+        this.mode = settings.mode;
+    }
+
     public enum SelectionMode {
         REPLACE,
         CONCAT,

@@ -9,8 +9,8 @@ import rh.maparthelper.painter.surface.PixelSurface;
 
 public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> {
     protected final BrushToolSettings settings;
-    private int lastX;
-    private int lastY;
+    protected int lastX;
+    protected int lastY;
 
     public BrushTool(BrushToolSettings settings, LayerManager<T, ? extends Layer<T>> layerManager, Selection selection) {
         super(layerManager, selection);

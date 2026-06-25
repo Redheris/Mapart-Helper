@@ -19,4 +19,9 @@ public class FloodFillSettings {
     public void setGlobalFill(boolean globalFill) {
         this.globalFill = globalFill;
     }
+
+    public void update(FloodFillSettings settings) {
+        this.tolerance = settings.tolerance;
+        this.globalFill = settings.globalFill;
+    }
 }

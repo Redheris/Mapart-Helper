@@ -19,4 +19,9 @@ public class BrushToolSettings {
     public void setCircleShape(boolean circleShape) {
         this.circleShape = circleShape;
     }
+
+    public void update(BrushToolSettings settings) {
+        this.thickness = settings.thickness;
+        this.circleShape = settings.circleShape;
+    }
 }
