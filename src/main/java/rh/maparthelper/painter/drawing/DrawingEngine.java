@@ -1,9 +1,8 @@
 package rh.maparthelper.painter.drawing;
 
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.painter.drawing.tool.BrushTool;
+import rh.maparthelper.painter.drawing.tool.HandTool;
 import rh.maparthelper.painter.drawing.tool.PainterTool;
-import rh.maparthelper.painter.drawing.tool.settings.BrushToolSettings;
 import rh.maparthelper.painter.history.HistoryManager;
 import rh.maparthelper.painter.layer.Layer;
 import rh.maparthelper.painter.layer.LayerManager;
@@ -24,7 +23,7 @@ public class DrawingEngine<T extends PixelSurface> {
         this.layerManager = layerManager;
         this.historyManager = historyManager;
         this.selection = new Selection();
-        this.selectedTool = new BrushTool<>(new BrushToolSettings(), layerManager, selection);
+        this.selectedTool = new HandTool();
     }
 
     public void setSelectedTool(@NotNull PainterTool selectedTool) {
@@ -78,6 +77,7 @@ public class DrawingEngine<T extends PixelSurface> {
     }
 
     public void submit() {
+        if (!isProcessing) return;
         isProcessing = false;
         isInversedColors = false;
         historyManager.saveAction(selectedTool.submit());

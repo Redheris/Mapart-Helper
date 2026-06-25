@@ -25,6 +25,7 @@ public class SelectionBrushTool extends AbstractSelectionTool {
         }
         lastX = xCenter;
         lastY = yCenter;
+        process(x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override

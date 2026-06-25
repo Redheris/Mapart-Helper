@@ -65,6 +65,7 @@ public abstract class AbstractSelectionTool implements PainterTool {
 
     @Override
     public HistoryAction submit() {
+        if (!isSelecting) return HistoryAction.EMPTY;
         this.isSelecting = false;
         BitSet after = selection.getSelectionMask();
         selection.setActive(!after.isEmpty());
