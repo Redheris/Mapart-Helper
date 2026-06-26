@@ -12,6 +12,8 @@ public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> {
     private final PatternSettings pattern;
     private int startX;
     private int startY;
+    private int startLineX;
+    private int startLineY;
 
     public PatternBrushTool(PatternSettings pattern, BrushToolSettings brushSettings,
                             LayerManager<T, ? extends Layer<T>> layerManager, Selection selection
@@ -24,23 +26,29 @@ public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> {
     protected void startDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         this.startX = x;
         this.startY = y;
+        this.startLineX = lineX;
+        this.startLineY = lineY;
         super.startDrawing(x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override
     protected void processDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
-        int xCenter;
-        int yCenter;
+        int xCenter, yCenter;
+        int patternPivotX, patternPivotY;
         if (settings.getThickness() % 2 == 0) {
             xCenter = lineX;
             yCenter = lineY;
+            patternPivotX = startLineX;
+            patternPivotY = startLineY;
         } else {
             xCenter = x;
             yCenter = y;
+            patternPivotX = startX;
+            patternPivotY = startY;
         }
         Rasterizer.drawLine(
                 (x0, y0) -> {
-                    int color = pattern.getPatternPixel(x0 + startX, y0 + startY);
+                    int color = pattern.getPatternPixel(x0 - patternPivotX + settings.getThickness() / 2, y0 - patternPivotY + settings.getThickness() / 2);
                     if (!pattern.isPlaceTransparent() && color == 0) return;
                     Rasterizer.setPixel(
                             selection, editingLayer.getSurface(), changedPixelsBefore,

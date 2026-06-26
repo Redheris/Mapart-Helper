@@ -34,7 +34,7 @@ public class PatternSettings {
     }
 
     public int getPatternPixel(int x, int y) {
-        return this.pattern.get(Math.abs(x) % width + Math.abs(y) % height * width);
+        return this.pattern.get(Math.floorMod(x, width) + Math.floorMod(y, height) * width);
     }
 
     public void setPatternPixel(int x, int y, int color) {
