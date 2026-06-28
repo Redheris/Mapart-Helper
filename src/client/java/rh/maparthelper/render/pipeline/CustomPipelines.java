@@ -26,4 +26,11 @@ public class CustomPipelines {
             .withFragmentShader(MapartHelper.identifier("core/painter_selection"))
             .withUniform("PainterSelection", UniformType.UNIFORM_BUFFER)
             .build();
+
+    public final static RenderPipeline PAINTER_TOOL_AREA = RenderPipeline
+            .builder(RenderPipelines.GUI_TEXTURED_SNIPPET, RenderPipelines.GLOBALS_SNIPPET)
+            .withLocation(MapartHelper.identifier("pipeline/painter_tool_area"))
+            .withFragmentShader(MapartHelper.identifier("core/painter_tool_area"))
+            .withUniform("PainterToolArea", UniformType.UNIFORM_BUFFER)
+            .build();
 }
