@@ -62,11 +62,11 @@ public class Rasterizer {
         }
     }
 
-    private static void drawFigureFromCenter(BiConsumer<Integer, Integer> pixelConsumer,
-                                             @Nullable Rectangle changedArea,
-                                             boolean circleShape,
-                                             int thickness,
-                                             int xCenter, int yCenter
+    public static void drawFigureFromCenter(BiConsumer<Integer, Integer> pixelConsumer,
+                                            @Nullable Rectangle changedArea,
+                                            boolean circleShape,
+                                            int thickness,
+                                            int xCenter, int yCenter
     ) {
         if (circleShape)
             drawCircle(pixelConsumer, changedArea, xCenter, yCenter, thickness, true);
