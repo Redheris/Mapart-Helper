@@ -240,7 +240,8 @@ public class NativeImageViewWidget extends AbstractWidget {
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (imageId == null) return;
 
-        if (!Minecraft.getInstance().isWindowActive()) {
+        if (!Minecraft.getInstance().isWindowActive() && !Minecraft.getInstance().getWindow().isMinimized()
+                && mouseX != -1 && mouseY != -1) {
             calculatePixelPos(mouseX, mouseY);
         }
 
@@ -276,7 +277,7 @@ public class NativeImageViewWidget extends AbstractWidget {
                 0.0F, 0.0F,
                 width, height,
                 48, 48,
-                ARGB.color(0.5f, -1)
+                ARGB.white(0.5f)
         );
         graphics.disableScissor();
     }
