@@ -5,11 +5,11 @@ import rh.maparthelper.painter.history.action.HistoryAction;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.PixelSurface;
 
-public class PipetteTool implements PainterTool {
+public class EyedropperTool implements PainterTool {
     private final LayerManager<?, ?> layerManager;
     private final DrawingEngine<?> drawingEngine;
 
-    public PipetteTool(LayerManager<?, ?> layerManager, DrawingEngine<?> drawingEngine) {
+    public EyedropperTool(LayerManager<?, ?> layerManager, DrawingEngine<?> drawingEngine) {
         this.layerManager = layerManager;
         this.drawingEngine = drawingEngine;
     }
