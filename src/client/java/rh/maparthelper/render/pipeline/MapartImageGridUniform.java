@@ -12,30 +12,26 @@ import static rh.maparthelper.colors.ColorUtils.intToVec4;
 
 public class MapartImageGridUniform {
     public static final int SIZE = new Std140SizeCalculator()
-            .putIVec2()
-            .putIVec2()
-            .putIVec2()
-            .putVec4()
-            .putVec4()
-            .putVec4()
-            .putInt()
-            .putInt()
+            .putIVec2() // ScreenSize
+            .putVec2()  // ScaledSize
+            .putVec2()  // StartPos
+            .putVec4()  // ColorMapGridLine
+            .putInt()   // PixelsGrid
+            .putInt()   // MapsGrid
             .get();
     public static final GpuBuffer BUFFER = RenderSystem.getDevice().createBuffer(() -> "MapartImageGrid", 136, SIZE);
 
     public static void set(int screenWidth, int screenHeight,
-                           int scaledWidth, int scaledHeight,
-                           int x0, int y0,
-                           int colorPixel1, int colorPixel2, int colorMap,
+                           float scaledWidth, float scaledHeight,
+                           float x0, float y0,
+                           int colorMap,
                            boolean showPixelGrid, boolean showMapGrid
     ) {
         try (MemoryStack memoryStack = MemoryStack.stackPush()) {
             ByteBuffer byteBuffer = Std140Builder.onStack(memoryStack, SIZE)
                     .putIVec2(screenWidth, screenHeight)
-                    .putIVec2(scaledWidth, scaledHeight)
-                    .putIVec2(x0, y0)
-                    .putVec4(intToVec4(colorPixel1))
-                    .putVec4(intToVec4(colorPixel2))
+                    .putVec2(scaledWidth, scaledHeight)
+                    .putVec2(x0, y0)
                     .putVec4(intToVec4(colorMap))
                     .putInt(showPixelGrid ? 1 : 0)
                     .putInt(showMapGrid ? 1 : 0)

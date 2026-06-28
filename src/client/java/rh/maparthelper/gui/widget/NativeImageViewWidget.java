@@ -116,9 +116,6 @@ public class NativeImageViewWidget extends AbstractWidget {
                 (int) state.scaledImageHeight() * guiScale,
                 (int) (getInitImageX() + state.xOffset()) * guiScale - 1,
                 (int) (getInitImageY() + state.yOffset()) * guiScale,
-                // TODO: Make colors custom?
-                ARGB.color(0.6f, -1),
-                ARGB.color(0.5f, 0),
                 CommonColors.HIGH_CONTRAST_DIAMOND,
                 isShowPixelGrid() && (state.pixelWidth() * guiScale > 6 && state.pixelHeight() * guiScale > 6),
                 isShowMapGrid()

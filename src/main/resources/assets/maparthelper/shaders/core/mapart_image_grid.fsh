@@ -4,11 +4,9 @@
 
 layout(std140) uniform MapartImageGrid {
     ivec2 ScreenSize;
-    ivec2 ScaledSize;
-    ivec2 StartPos;
-    vec4 ColorPixel1;
-    vec4 ColorPixel2;
-    vec4 ColorMap;
+    vec2 ScaledSize;
+    vec2 StartPos;
+    vec4 ColorMapGridLine;
     bool PixelsGrid;
     bool MapsGrid;
 };
@@ -41,7 +39,7 @@ void main() {
         bool nonBorderHorizontalMapLine = horizontalMapLine && (localY > mapHeight / 2 && localY < ScaledSize.y - mapHeight / 2);
 
         if (nonBorderVerticalMapLine || nonBorderHorizontalMapLine) {
-            fragColor = mix(originalColor, ColorMap, ColorMap.a);
+            fragColor = mix(originalColor, ColorMapGridLine, ColorMapGridLine.a);
             return;
         }
     }
@@ -56,9 +54,9 @@ void main() {
 
         if ((!raceCheckX && distToLineX < 1 || !raceCheckY && distToLineY < 1)) {
             if (mod(localX + localY, 2) < 1) {
-                fragColor = mix(originalColor, ColorPixel1, ColorPixel1.a);
+                fragColor = mix(originalColor, vec4(1.0, 1.0, 1.0, 0.6), 0.6);
             } else {
-                fragColor = mix(originalColor, ColorPixel2, ColorPixel2.a);
+                fragColor = mix(originalColor, vec4(0.0, 0.0, 0.0, 0.5), 0.5);
             }
             fragColor.a = 1;
             return;
