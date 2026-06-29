@@ -1,10 +1,10 @@
 mod.id = "maparthelper"
 mod.name = "Mapart Helper"
 mod.group = "rh.maparthelper"
-mod.version = "0.14.0-alpha.8"
+mod.version = "0.14.0-alpha.9"
 mod.version_type = "ALPHA"
 mod.fabric_loader = "0.18.4"
-loomx.loom_version = "1.16-SNAPSHOT"
+loomx.loom_version = "1.17-SNAPSHOT"
 
 publish.modrinth = "qRKpqkGI"
 publish.curseforge_id = "1343604"
