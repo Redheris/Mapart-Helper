@@ -23,6 +23,7 @@ public class OverlayLayout extends AbstractLayout {
     protected boolean visible;
     private boolean autoCloseable;
     private AbstractWidget switchWidget;
+    private float alpha = 1.0f;
 
     public OverlayLayout(AdjScrollableLayoutWidget layout, boolean visible, boolean autoCloseable) {
         super(layout.getX(), layout.getY(), layout.getWidth(), layout.getHeight());
@@ -47,10 +48,7 @@ public class OverlayLayout extends AbstractLayout {
     }
 
     protected void replaceLayout(Screen screen, AdjScrollableLayoutWidget newLayout) {
-        List<AbstractWidget> screenWidgets = null;
-        if (screen != null) {
-            screenWidgets = Screens.getButtons(screen);
-        }
+        List<AbstractWidget> screenWidgets = screen == null ? null : Screens.getButtons(screen);
 
         if (screenWidgets != null && this.layout != null) {
             this.layout.visitWidgets(screenWidgets::remove);
@@ -62,7 +60,10 @@ public class OverlayLayout extends AbstractLayout {
         arrangeElements();
 
         if (screenWidgets != null) {
-            this.layout.visitWidgets(screenWidgets::addFirst);
+            this.layout.visitWidgets(widget -> {
+                widget.setAlpha(alpha);
+                screenWidgets.addFirst(widget);
+            });
         }
     }
 
@@ -90,8 +91,9 @@ public class OverlayLayout extends AbstractLayout {
     }
 
     public void setAlpha(float alpha) {
+        this.alpha = Math.clamp(alpha, 0.0f, 1.0f);
         // FIXME: It makes all translucent widgets opaque
-        visitWidgets(w -> w.setAlpha(alpha));
+        visitWidgets(w -> w.setAlpha(this.alpha));
     }
 
     public boolean isAutoCloseable() {
