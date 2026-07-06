@@ -172,8 +172,6 @@
   "maparthelper.config.common.description.mapSelectionColor": "Used for particles in /mart save selection and for beams in /mart beams",
   "maparthelper.config.common.previewHighlightingColor": "Mapart preview highlight color",
   "maparthelper.config.common.description.previewHighlightingColor": "Used in the mapart preview to highlight colors matching the one selected in the material list",
-  "maparthelper.config.common.createDirsForSchematic": "Create subfolders for schematic files",
-  "maparthelper.config.common.description.createDirsForSchematic": "If disabled, all .nbt files will be created directly in the 'schematics/' folder",
   "maparthelper.config.common.fakeItemFramesLiveTime": "Fake item frames display duration (in ticks)",
   "maparthelper.config.common.group.conversionSettings": "Conversion Settings",
   "maparthelper.config.common.logConversionTime": "Log processing duration",
@@ -182,6 +180,13 @@
   "maparthelper.config.common.description.previewHighlightOnHover": "If disabled, colors on the preview will only be highlighted when selected in the material list",
   "maparthelper.config.common.colorsCacheLiveTimeMs": "Nearest colors cache lifetime (ms)",
   "maparthelper.config.common.description.colorsCacheLiveTimeMs": "The cache is used to speed up color adaptation. The lifetime allows the cache to be reused across multiple image update iterations.\n§cDo not set this value too high, or it will waste memory",
+
+  "maparthelper.config.common.group.schematicSettings": "Schematic Settings",
+  "maparthelper.config.common.createDirsForSchematic": "Create subfolders for schematic files",
+  "maparthelper.config.common.description.createDirsForSchematic": "If disabled, all .nbt files will be created directly in the 'schematics/' folder",
+  "maparthelper.config.common.addPlatformLayerAuxBlocks": "Add platform-layer auxiliary blocks",
+  "maparthelper.config.common.description.addPlatformLayerAuxBlocks": "If you are building on the platform, you should keep it disabled. If enabled, schematic file will have auxiliary supporting blocks that should be placed at the platform layer, and the schematic itself will be one block higher",
+
   "maparthelper.config.common.group.elementsDisplaySettings": "Element Display Settings",
   "maparthelper.config.common.showImageImportButton": "Image file selection button",
   "maparthelper.config.common.displayUnobtainableMode": "Unobtainable staircase mode",

@@ -172,9 +172,8 @@
   "maparthelper.config.common.description.mapSelectionColor": "Используется для частиц в /mart save selection и для лучей в /mart beams",
   "maparthelper.config.common.previewHighlightingColor": "Цвет выделения на превью мапарта",
   "maparthelper.config.common.description.previewHighlightingColor": "Используется на превью мапарта для выделения цветов, соответствующих выбранному в списке материалов",
-  "maparthelper.config.common.createDirsForSchematic": "Создавать подпапки для файлов схематики",
-  "maparthelper.config.common.description.createDirsForSchematic": "Если выключено, то все файлы .nbt будут создаваться прямо в папке 'schematics/'",
   "maparthelper.config.common.fakeItemFramesLiveTime": "Длительность показа фейковых рамок (в тиках)",
+
   "maparthelper.config.common.group.conversionSettings": "Настройки конвертации",
   "maparthelper.config.common.logConversionTime": "Логировать длительность обработки",
   "maparthelper.config.common.description.logConversionTime": "Каждый раз печатает в log-файл, сколько секунд длилась полная обработка изображения.\n§cНе рекомендуется включать на длительное время во избежание излишнего спама",
@@ -182,6 +181,13 @@
   "maparthelper.config.common.description.previewHighlightOnHover": "Если выключено, то цвета на превью будут выделяться только при выборе в списке материалов",
   "maparthelper.config.common.colorsCacheLiveTimeMs": "Время жизни кэша ближайших цветов (в мс)",
   "maparthelper.config.common.description.colorsCacheLiveTimeMs": "Кэш нужен для ускорения адаптации цветов. Время жизни позволяет переиспользовать кэш в нескольких итерациях обновления изображения.\n§cНе выставляйте слишком высокое значение, чтобы не засорять память",
+
+  "maparthelper.config.common.group.schematicSettings": "Настройки схематики",
+  "maparthelper.config.common.createDirsForSchematic": "Создавать подпапки для файлов схематики",
+  "maparthelper.config.common.description.createDirsForSchematic": "Если выключено, то все файлы .nbt будут создаваться прямо в папке 'schematics/'",
+  "maparthelper.config.common.addPlatformLayerAuxBlocks": "Добавлять вспомогательные блоки на уровне платформы",
+  "maparthelper.config.common.description.addPlatformLayerAuxBlocks": "Если строите на готовой платформе, лучше оставить выключенным. Если включено, в файл схематики будут добавлены вспомогательные опорные блоки на уровне платформы, а сама схематика будет на один блок выше",
+
   "maparthelper.config.common.group.elementsDisplaySettings": "Настройки отображения элементов",
   "maparthelper.config.common.showImageImportButton": "Кнопка выбора файла изображения",
   "maparthelper.config.common.displayUnobtainableMode": "Режим недостижимой ступенчатости",

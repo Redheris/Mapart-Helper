@@ -18,5 +18,6 @@ and easy to share as possible.
 - Replace almost all emoji-buttons with icon-buttons
 - By default, palette will be generating only from vanilla (`minecraft:*`) blocks.
   This can be changed in the config;
+- Add config option to allow adding auxiliary blocks at the platform layer to the schematic;
 
 </details>

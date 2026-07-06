@@ -51,17 +51,6 @@ public class ConfigScreenFactory {
                                         value -> config.previewHighlightingColor = value
                                 )
                                 .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatable("maparthelper.config.common.createDirsForSchematic"))
-                                .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.createDirsForSchematic")))
-                                .customController(TickBoxController::new)
-                                .binding(
-                                        defaults.createDirsForSchematic,
-                                        () -> config.createDirsForSchematic,
-                                        value -> config.createDirsForSchematic = value
-                                )
-                                .build())
-
                         .option(Option.<Integer>createBuilder()
                                 .name(Component.translatable("maparthelper.config.common.fakeItemFramesLiveTime"))
                                 .customController(IntegerFieldController::new)
@@ -115,6 +104,29 @@ public class ConfigScreenFactory {
                                                 defaults.multithreadColorConversion,
                                                 () -> config.multithreadColorConversion,
                                                 value -> config.multithreadColorConversion = value
+                                        )
+                                        .build())
+                                .build())
+                        .group(OptionGroup.createBuilder()
+                                .name(Component.translatable("maparthelper.config.common.group.schematicSettings"))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.common.createDirsForSchematic"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.createDirsForSchematic")))
+                                        .customController(TickBoxController::new)
+                                        .binding(
+                                                defaults.createDirsForSchematic,
+                                                () -> config.createDirsForSchematic,
+                                                value -> config.createDirsForSchematic = value
+                                        )
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.common.addPlatformLayerAuxBlocks"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.addPlatformLayerAuxBlocks")))
+                                        .customController(TickBoxController::new)
+                                        .binding(
+                                                defaults.addPlatformLayerAuxBlocks,
+                                                () -> config.addPlatformLayerAuxBlocks,
+                                                value -> config.addPlatformLayerAuxBlocks = value
                                         )
                                         .build())
                                 .build())

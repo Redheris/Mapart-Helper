@@ -33,8 +33,6 @@ public class CommonConfiguration {
     public Color previewHighlightingColor = new Color(0xFF9900ff, true);
 
     @SerialEntry
-    public boolean createDirsForSchematic = true;
-    @SerialEntry
     public boolean logConversionTime = false;
     @SerialEntry
     public int fakeItemFramesLiveTime = 100;
@@ -44,6 +42,13 @@ public class CommonConfiguration {
     public int colorsCacheLiveTimeMs = 5000;
     @SerialEntry("multithreadColorConversion_experimental")
     public boolean multithreadColorConversion = false;
+
+    // Schematic Settings
+
+    @SerialEntry
+    public boolean createDirsForSchematic = true;
+    @SerialEntry
+    public boolean addPlatformLayerAuxBlocks = false;
 
     // Elements display settings
 

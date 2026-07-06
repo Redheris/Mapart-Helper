@@ -31,17 +31,18 @@ public class MapartSchematicBuilder {
     private final ListTag blocks = new ListTag();
     private final int[][] mapColors;
     private final int xSize;
-    private int ySize = 1;
+    private int ySize;
     private final int zSize;
+    private final int lowestBlockLayer; // 0 as default, 1 for placing aux blocks at the platform layer height
     private final List<Block> blocks_palette = new ArrayList<>();
     private final boolean[] prevRowSupportBlock;
-    private List<List<Integer>> heightsZX;
+    private final List<List<Integer>> heightsZX;
 
     private final StaircaseStyles staircaseStyle = MapartHelper.conversionConfig().getStaircaseStyle();
     private final UseAuxBlocks useAuxBlocks = MapartHelper.conversionConfig().getUseAuxBlocks();
     private final Block auxBlock = MapartHelper.conversionConfig().getAuxBlock();
 
-    public MapartSchematicBuilder(int[] mapColors, int mapsWidth, int mapsHeight) {
+    public MapartSchematicBuilder(int[] mapColors, int mapsWidth, int mapsHeight, boolean addPlatformLayerAuxBlocks) {
         this.preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
         this.xSize = mapsWidth * 128;
         this.zSize = useAuxBlocks == UseAuxBlocks.TRUST_ME ? mapsHeight * 128 : mapsHeight * 128 + 1;
@@ -51,15 +52,19 @@ public class MapartSchematicBuilder {
         for (int z = 0; z < colorsHeight; z++) {
             System.arraycopy(mapColors, z * xSize, this.mapColors[z], 0, xSize);
         }
+        if (staircaseStyle != StaircaseStyles.FLAT_2D)
+            heightsZX = staircaseStyle.getStaircase(this.mapColors);
+        else
+            heightsZX = null;
+        this.lowestBlockLayer = addPlatformLayerAuxBlocks ? 1 : 0;
+        ySize = lowestBlockLayer + 1;
         addBaseMetadata();
     }
 
     public CompoundTag build() {
-        if (staircaseStyle != StaircaseStyles.FLAT_2D)
-            heightsZX = staircaseStyle.getStaircase(mapColors);
         for (int z = 0; z < zSize; z++) {
             for (int x = 0; x < xSize; x++) {
-                int y = staircaseStyle == StaircaseStyles.FLAT_2D ? 0 : heightsZX.get(z).get(x);
+                int y = getBlockHeight(x, z);
                 if (useAuxBlocks == UseAuxBlocks.TRUST_ME) {
                     MapColor mapColor = PaletteColors.getMapColorEntryByARGB(mapColors[z][x]).mapColor();
                     if (mapColor != MapColor.NONE)
@@ -100,20 +105,20 @@ public class MapartSchematicBuilder {
             addBlock(auxBlock, colorX, colorY - 1, colorZ);
 
         if (useAuxBlocks == UseAuxBlocks.ALL && staircaseStyle != StaircaseStyles.FLAT_2D) {
-            int yDiff = heightsZX.get(colorZ - 1).get(colorX) - colorY;
+            int yDiff = getBlockHeight(colorX, colorZ - 1) - colorY;
             if (yDiff == 1) {
                 if (needsSupport && colorY > 0)
                     addBlock(auxBlock, colorX, colorY - 1, colorZ - 1);
                 if (!prevRowSupportBlock[colorX])
                     addBlock(auxBlock, colorX, colorY, colorZ - 1);
             } else if (yDiff == -1) {
-                if (!needsSupport && colorY > 0)
+                if (!needsSupport && colorY > lowestBlockLayer)
                     addBlock(auxBlock, colorX, colorY - 1, colorZ);
                 if (prevRowSupportBlock[colorX] && colorY > 1)
                     addBlock(auxBlock, colorX, colorY - 2, colorZ);
-            } else if (yDiff == 0 && colorY > 0) {
+            } else if (yDiff == 0 && colorY > lowestBlockLayer) {
                 if (needsSupport) {
-                    if (!prevRowSupportBlock[colorX] && (colorZ == 1 || heightsZX.get(colorZ - 2).get(colorX) - colorY != -1))
+                    if (!prevRowSupportBlock[colorX] && (colorZ == 1 || getBlockHeight(colorX, colorZ - 2) - colorY != -1))
                         addBlock(auxBlock, colorX, colorY - 1, colorZ - 1);
                 } else if (prevRowSupportBlock[colorX])
                     addBlock(auxBlock, colorX, colorY - 1, colorZ);
@@ -158,6 +163,11 @@ public class MapartSchematicBuilder {
         String author = Minecraft.getInstance().getUser().getName() + " // using Mapart Helper";
         nbt.putString("author", author);
         NbtUtils.addCurrentDataVersion(nbt);
+    }
+
+    private int getBlockHeight(int x, int z) {
+        if (staircaseStyle == StaircaseStyles.FLAT_2D) return lowestBlockLayer;
+        return heightsZX.get(z).get(x) + lowestBlockLayer;
     }
 
     public static boolean shouldPlaceAuxBlock(Block block) {

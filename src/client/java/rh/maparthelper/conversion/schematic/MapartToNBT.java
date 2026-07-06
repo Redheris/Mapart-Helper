@@ -47,6 +47,7 @@ public class MapartToNBT {
         }
         int mapsWidth = CurrentConversionSettings.getMapartWidth();
         int mapsHeight = CurrentConversionSettings.getMapartHeight();
+        boolean addPlatformLayerAuxBlocks = MapartHelper.commonConfig().addPlatformLayerAuxBlocks;
 
         String mapartName = CurrentConversionSettings.mapart.mapartName;
         Path savingPath;
@@ -75,9 +76,9 @@ public class MapartToNBT {
 
             CompoundTag mapartNbt;
             if (asSingleFile)
-                mapartNbt = new MapartSchematicBuilder(maps[0], mapsWidth, mapsHeight).build();
+                mapartNbt = new MapartSchematicBuilder(maps[0], mapsWidth, mapsHeight, addPlatformLayerAuxBlocks).build();
             else {
-                mapartNbt = new MapartSchematicBuilder(maps[i], 1, 1).build();
+                mapartNbt = new MapartSchematicBuilder(maps[i], 1, 1, addPlatformLayerAuxBlocks).build();
                 filename += " (" + (i % mapsWidth) + "_" + (i / mapsWidth) + ")";
             }
 
