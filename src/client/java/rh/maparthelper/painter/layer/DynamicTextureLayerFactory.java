@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.painter.surface.NativeImageSurface;
 
@@ -29,8 +30,24 @@ public class DynamicTextureLayerFactory implements LayerFactory<NativeImageSurfa
         return newLayer;
     }
 
+    public DynamicTextureLayer createFromImage(@NotNull NativeImage nativeImage, String layerName) {
+        String layerUUID = UUID.randomUUID().toString();
+
+        NativeImage layerImage = new NativeImage(nativeImage.getWidth(), nativeImage.getHeight(), true);
+        layerImage.copyFrom(nativeImage);
+
+        Identifier textureId = MapartHelper.identifier("painter_layer_" + layerUUID);
+        DynamicTexture texture = new DynamicTexture(textureId::getPath, layerImage);
+        Minecraft.getInstance().getTextureManager().register(textureId, texture);
+
+        DynamicTextureLayer layer = new DynamicTextureLayer(texture, textureId);
+        layer.setName(layerName);
+
+        return layer;
+    }
+
     @Override
-    public DynamicTextureLayer copy(DynamicTextureLayer origin) {
+    public DynamicTextureLayer copy(@NotNull DynamicTextureLayer origin) {
         String layerUUID = UUID.randomUUID().toString();
 
         NativeImage originImage = origin.texture.getPixels();
@@ -54,7 +71,7 @@ public class DynamicTextureLayerFactory implements LayerFactory<NativeImageSurfa
     }
 
     @Override
-    public DynamicTextureLayer merge(DynamicTextureLayer layerAbove, DynamicTextureLayer layerBelow) {
+    public DynamicTextureLayer merge(@NotNull DynamicTextureLayer layerAbove, DynamicTextureLayer layerBelow) {
         DynamicTextureLayer layerMerged = copy(layerBelow);
         NativeImageSurface surfaceMerged = layerMerged.getSurface();
         NativeImageSurface surfaceAbove = layerAbove.getSurface();
