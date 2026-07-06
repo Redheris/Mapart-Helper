@@ -3,12 +3,13 @@ package rh.maparthelper.painter.drawing.tool;
 import rh.maparthelper.painter.drawing.Rasterizer;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.BrushToolSettings;
+import rh.maparthelper.painter.drawing.tool.settings.PatternBehavior;
 import rh.maparthelper.painter.drawing.tool.settings.PatternSettings;
 import rh.maparthelper.painter.layer.Layer;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.PixelSurface;
 
-public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> {
+public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> implements PatternBehavior {
     private final PatternSettings pattern;
     private int startX;
     private int startY;
@@ -20,6 +21,11 @@ public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> {
     ) {
         super(brushSettings, layerManager, selection);
         this.pattern = pattern;
+    }
+
+    @Override
+    public PatternSettings patternSettings() {
+        return pattern;
     }
 
     @Override

@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.painter.drawing.Rasterizer;
 import rh.maparthelper.painter.drawing.Selection;
+import rh.maparthelper.painter.drawing.tool.settings.FloodFillBehavior;
 import rh.maparthelper.painter.drawing.tool.settings.FloodFillSettings;
 import rh.maparthelper.painter.layer.Layer;
 import rh.maparthelper.painter.layer.LayerManager;
@@ -14,7 +15,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-public class FloodFillTool<T extends PixelSurface> extends AbstractDrawingTool<T> {
+public class FloodFillTool<T extends PixelSurface> extends AbstractDrawingTool<T> implements FloodFillBehavior {
     private final FloodFillSettings settings;
 
     protected final int maxWidth;
@@ -30,6 +31,11 @@ public class FloodFillTool<T extends PixelSurface> extends AbstractDrawingTool<T
         this.settings = settings;
         this.maxWidth = selection.getWidth();
         this.maxHeight = selection.getHeight();
+    }
+
+    @Override
+    public FloodFillSettings floodFillSettings() {
+        return settings;
     }
 
     @Override

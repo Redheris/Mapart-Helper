@@ -1,13 +1,14 @@
 package rh.maparthelper.painter.drawing.tool;
 
 import rh.maparthelper.painter.drawing.Selection;
+import rh.maparthelper.painter.drawing.tool.settings.SelectionBehavior;
 import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
 import rh.maparthelper.painter.history.action.HistoryAction;
 import rh.maparthelper.painter.history.action.SelectionHistoryAction;
 
 import java.util.BitSet;
 
-public abstract class AbstractSelectionTool implements PainterTool {
+public abstract class AbstractSelectionTool implements PainterTool, SelectionBehavior {
     protected final Selection selection;
     protected final BitSet newPart;
     protected final int maxWidth;
@@ -25,6 +26,11 @@ public abstract class AbstractSelectionTool implements PainterTool {
         this.maxWidth = selection.getWidth();
         this.maxHeight = selection.getHeight();
         this.newPart = new BitSet(maxWidth * maxHeight);
+    }
+
+    @Override
+    public SelectionToolSettings selectionToolSettings() {
+        return settings;
     }
 
     @Override

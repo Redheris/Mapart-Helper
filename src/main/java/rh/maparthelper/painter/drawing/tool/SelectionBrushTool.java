@@ -2,10 +2,11 @@ package rh.maparthelper.painter.drawing.tool;
 
 import rh.maparthelper.painter.drawing.Rasterizer;
 import rh.maparthelper.painter.drawing.Selection;
+import rh.maparthelper.painter.drawing.tool.settings.BrushBehavior;
 import rh.maparthelper.painter.drawing.tool.settings.BrushToolSettings;
 import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
 
-public class SelectionBrushTool extends AbstractSelectionTool {
+public class SelectionBrushTool extends AbstractSelectionTool implements BrushBehavior {
     private final BrushToolSettings brushSettings;
     private int lastX;
     private int lastY;
@@ -13,6 +14,11 @@ public class SelectionBrushTool extends AbstractSelectionTool {
     public SelectionBrushTool(BrushToolSettings brushSettings, SelectionToolSettings settings, Selection selection) {
         super(settings, selection);
         this.brushSettings = brushSettings;
+    }
+
+    @Override
+    public BrushToolSettings brushToolSettings() {
+        return brushSettings;
     }
 
     @Override

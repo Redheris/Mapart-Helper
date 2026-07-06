@@ -2,6 +2,7 @@ package rh.maparthelper.painter.drawing.tool;
 
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.painter.drawing.Selection;
+import rh.maparthelper.painter.drawing.tool.settings.FloodFillBehavior;
 import rh.maparthelper.painter.drawing.tool.settings.FloodFillSettings;
 import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
 import rh.maparthelper.painter.history.action.HistoryAction;
@@ -14,7 +15,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
 
-public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool {
+public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool implements FloodFillBehavior {
     private final FloodFillSettings floodSettings;
     private final LayerManager<T, ? extends Layer<T>> layerManager;
     private int startedWithColor;
@@ -27,6 +28,11 @@ public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool
 
         this.floodSettings = floodSettings;
         this.layerManager = layerManager;
+    }
+
+    @Override
+    public FloodFillSettings floodFillSettings() {
+        return floodSettings;
     }
 
     @Override
