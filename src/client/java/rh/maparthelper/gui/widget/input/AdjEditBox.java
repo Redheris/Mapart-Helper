@@ -37,6 +37,11 @@ public class AdjEditBox extends EditBox {
         this(textRenderer, width, height, initialValue, true);
     }
 
+    public AdjEditBox(Font textRenderer, int width, int height, boolean overrideOnClick) {
+        super(textRenderer, width, height, Component.empty());
+        this.overrideOnClick = overrideOnClick;
+    }
+
     //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
