@@ -1,10 +1,7 @@
 package rh.maparthelper.state.fullscreen_view;
 
-import net.minecraft.resources.Identifier;
 import org.joml.Vector2i;
 import org.joml.Vector4i;
-
-import java.util.Objects;
 
 public class NativeImageViewState {
     private static final NativeImageViewState INSTANCE = new NativeImageViewState();
@@ -115,16 +112,13 @@ public class NativeImageViewState {
         this.showMapGrid = showMapGrid;
     }
 
-    public void updateInitialStateIfNeeded(int containerWidth, int containerHeight, int imageWidth, int imageHeight,
-                                           Identifier imageId
-    ) {
-        if (initialState == null || !Objects.equals(initialState.imageId(), imageId)
+    public void updateInitialStateIfNeeded(int containerWidth, int containerHeight, int imageWidth, int imageHeight) {
+        if (initialState == null
                 || imageWidth != initialState.originalWidth() || (imageHeight != initialState.originalHeight())
                 || containerWidth != initialState.containerWidth() || containerHeight != initialState.containerHeight()
         ) {
             Vector4i sizeFitted = fitImage(containerWidth, containerHeight, imageWidth, imageHeight);
             this.initialState = new InitialImageViewState(
-                    imageId,
                     imageWidth, imageHeight,
                     containerWidth, containerHeight,
                     sizeFitted.x, sizeFitted.y,

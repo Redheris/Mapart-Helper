@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.widget;
 
-import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -43,19 +42,13 @@ public class NativeImageViewWidget extends AbstractWidget {
     protected final Vector2i closestHoveredLine;
     protected final NativeImageViewState state = NativeImageViewState.getInstance();
 
-    public NativeImageViewWidget(DynamicTexture imageTexture, Identifier imageId, int x, int y, int width, int height) {
+    public NativeImageViewWidget(Identifier imageId, int imageWidth, int imageHeight, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
 
-        NativeImage image = imageTexture == null ? null : imageTexture.getPixels();
-
-        if (image != null) {
-            state.updateInitialStateIfNeeded(width, height, image.getWidth(), image.getHeight(), imageId);
-        } else {
-            state.updateInitialStateIfNeeded(width, height, 128, 128, null);
-        }
+        state.updateInitialStateIfNeeded(width, height, imageWidth, imageHeight);
 
         InitialImageViewState initialState = state.getInitialState();
-        this.imageId = initialState.imageId();
+        this.imageId = imageId;
         this.originalWidth = initialState.originalWidth();
         this.originalHeight = initialState.originalHeight();
         this.fittedImageWidth = initialState.fittedImageWidth();
@@ -68,6 +61,20 @@ public class NativeImageViewWidget extends AbstractWidget {
         state.setPixelWidth((int) state.scaledImageWidth() / (float) originalWidth);
         state.setPixelHeight((int) state.scaledImageHeight() / (float) originalHeight);
         updateGridUniform();
+    }
+
+    public NativeImageViewWidget(DynamicTexture texture, Identifier imageId, int x, int y, int width, int height) {
+        this(imageId, getWidth(texture), getHeight(texture), x, y, width, height);
+    }
+
+    private static int getWidth(DynamicTexture texture) {
+        if (texture == null || texture.getPixels() == null) return 128;
+        return texture.getPixels().getWidth();
+    }
+
+    private static int getHeight(DynamicTexture texture) {
+        if (texture == null || texture.getPixels() == null) return 128;
+        return texture.getPixels().getHeight();
     }
 
     @Override
