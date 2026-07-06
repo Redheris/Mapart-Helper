@@ -7,12 +7,12 @@ import rh.maparthelper.painter.layer.LayerFactory;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.PixelSurface;
 
-public class ImageDocument<T extends PixelSurface, E extends Layer<T>> implements AutoCloseable {
+public class PainterProject<T extends PixelSurface, E extends Layer<T>> implements AutoCloseable {
     private final DrawingEngine<T> drawingEngine;
     private final LayerManager<T, E> layerManager;
     private final HistoryManager historyManager;
 
-    public ImageDocument(E mainLayer, LayerFactory<T, E> layerFactory) {
+    public PainterProject(E mainLayer, LayerFactory<T, E> layerFactory) {
         this.historyManager = new HistoryManager();
         this.layerManager = new LayerManager<>(historyManager, mainLayer, layerFactory);
         this.drawingEngine = new DrawingEngine<>(layerManager, historyManager);
