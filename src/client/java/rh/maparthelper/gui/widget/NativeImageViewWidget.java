@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
@@ -301,4 +302,13 @@ public class NativeImageViewWidget extends AbstractWidget {
 
     @Override
     protected void updateWidgetNarration(@NotNull NarrationElementOutput narrationElementOutput) {}
+
+    public ScreenRectangle getImageRectangle() {
+        return new ScreenRectangle(
+                (int) (getInitImageX() + state.xOffset()),
+                (int) (getInitImageY() + state.yOffset()),
+                (int) (state.scaledImageWidth()),
+                (int) (state.scaledImageHeight())
+        );
+    }
 }

@@ -20,6 +20,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rh.maparthelper.mixin.AbstractWidgetAccessor;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.ArrayList;
@@ -194,8 +195,11 @@ public class AdjScrollableLayoutWidget implements Layout {
                 );
             }
 
-            for (AbstractWidget clickableWidget : this.children) {
-                clickableWidget.render(graphics, mouseX, mouseY, deltaTicks);
+            for (AbstractWidget childWidget : this.children) {
+                float childAlpha = ((AbstractWidgetAccessor)childWidget).getAlpha();
+                childWidget.setAlpha(alpha * childAlpha);
+                childWidget.render(graphics, mouseX, mouseY, deltaTicks);
+                childWidget.setAlpha(childAlpha);
             }
 
             graphics.disableScissor();
@@ -262,12 +266,6 @@ public class AdjScrollableLayoutWidget implements Layout {
                     this.setScrollAmount(this.scrollAmount() + bottomDelta + 14.0);
                 }
             }
-        }
-
-        @Override
-        public void setAlpha(float alpha) {
-            super.setAlpha(alpha);
-            children.forEach(w -> w.setAlpha(alpha));
         }
 
         private void refreshChildrenX() {
