@@ -8,7 +8,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.layouts.SpacerElement;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -30,8 +29,9 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     private NativeImageViewWidget imageViewWidget;
     private StringWidget pixelPosLabel;
 
-    protected FullscreenImageViewScreen(Screen parent) {
-        super(parent, Component.literal("Full size mapart view"));
+    public FullscreenImageViewScreen() {
+        super(null, Component.literal("Full size mapart view"));
+        ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.FULLSCREEN_VIEW);
     }
 
     protected NativeImageViewWidget initImageViewWidget() {

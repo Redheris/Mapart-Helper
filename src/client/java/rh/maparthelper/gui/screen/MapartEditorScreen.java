@@ -370,7 +370,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
         DecorativeButtonWidget fullscreenButton = DecorativeButtonWidget.builderSimpleTexture(
                 FULLSCREEN_ICON,
-                btn -> Minecraft.getInstance().setScreen(new FullscreenImageViewScreen(this))
+                btn -> Minecraft.getInstance().setScreen(new FullscreenImageViewScreen())
         ).size(16, 16).build();
         fullscreenButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.open_view_screen")));
         mapartOptions.addChild(fullscreenButton);
