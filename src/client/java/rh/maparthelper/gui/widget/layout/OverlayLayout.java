@@ -140,4 +140,9 @@ public class OverlayLayout extends AbstractLayout {
         return layout.container.mouseClicked(mouseX, mouseY, button);
     }
     //~ !widget_events
+
+
+    AdjScrollableLayoutWidget getLayout() {
+        return layout;
+    }
 }

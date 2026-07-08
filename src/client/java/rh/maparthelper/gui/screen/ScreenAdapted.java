@@ -58,7 +58,7 @@ public abstract class ScreenAdapted extends Screen {
             this.setFocused(null);
 
         //~ if >=1.21.10 'mouseX, mouseY, button' -> 'mouseEvent, isDoubleClick'
-        if (OverlaysManager.handleMouseClick(overlays, mouseX, mouseY, button)) {
+        if (OverlaysManager.handleMouseClick(this, overlays, mouseX, mouseY, button)) {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);

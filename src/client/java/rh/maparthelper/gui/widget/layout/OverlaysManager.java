@@ -2,6 +2,7 @@ package rh.maparthelper.gui.widget.layout;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,22 +16,31 @@ public class OverlaysManager {
     private static OverlayLayout activeOverlay;
 
     //~ widget_events
-    public static boolean handleMouseClick(Set<OverlayLayout> overlays, double mouseX, double mouseY, int button) {
+    public static boolean handleMouseClick(Screen screen, Set<OverlayLayout> overlays, double mouseX, double mouseY, int button) {
         if (activeOverlay != null && activeOverlay.isAutoCloseable()) {
             if (!activeOverlay.isMouseOverSwitch(mouseX, mouseY) && !activeOverlay.isMouseOverLayout(mouseX, mouseY)) {
                 activeOverlay.setVisible(false);
             }
         }
         if (activeOverlay != null && activeOverlay.isMouseOverLayout(mouseX, mouseY)) {
-            activeOverlay.mouseClicked(mouseX, mouseY, button);
-            return true;
+            var container = activeOverlay.getLayout().container;
+            boolean clickResult = activeOverlay.mouseClicked(mouseX, mouseY, button);
+            if (clickResult) {
+                screen.setFocused(container);
+                if (button == 0) screen.setDragging(true);
+            }
+            return clickResult;
         }
         for (OverlayLayout overlay : overlays) {
             if (!overlay.isVisible()) continue;
             if (overlay.isMouseOverLayout(mouseX, mouseY)) {
                 setActiveOverlay(overlay);
-                overlay.mouseClicked(mouseX, mouseY, button);
-                return true;
+                boolean clickResult = overlay.mouseClicked(mouseX, mouseY, button);
+                if (clickResult) {
+                    screen.setFocused(overlay.getLayout().container);
+                    if (button == 0) screen.setDragging(true);
+                }
+                return clickResult;
             }
         }
         return false;
