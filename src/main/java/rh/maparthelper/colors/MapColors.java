@@ -79,4 +79,13 @@ public enum MapColors {
         }
         return CLEAR;
     }
+
+    public static MapColor[] mapColors() {
+        MapColors[] values = values();
+        MapColor[] mapColors = new MapColor[values.length];
+        for (int i = 0; i < values.length; i++) {
+            mapColors[i] = values[i].color;
+        }
+        return mapColors;
+    }
 }
