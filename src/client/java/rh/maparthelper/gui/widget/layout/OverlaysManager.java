@@ -88,7 +88,7 @@ public class OverlaysManager {
             activeOverlay.renderOverlay(graphics, mouseX, mouseY, partialTick);
         }
         if (nextActiveOverlay != null) {
-            activeOverlay = nextActiveOverlay;
+            setActiveOverlay(nextActiveOverlay);
         }
     }
 
