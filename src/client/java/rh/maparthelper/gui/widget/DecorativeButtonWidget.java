@@ -26,7 +26,7 @@ public class DecorativeButtonWidget extends AbstractButton {
     );
 
     private final PressAction onPress;
-    private final WidgetSprites customSprites;
+    private WidgetSprites customSprites;
     private final boolean renderVanillaBackground;
 
     protected int textureWidth;
@@ -47,7 +47,6 @@ public class DecorativeButtonWidget extends AbstractButton {
         this.textColorActive = textColorActive;
         this.textureWidth = 16;
         this.textureHeight = 16;
-
     }
 
     public DecorativeButtonWidget(boolean vanillaBackground, WidgetSprites widgetSprites,
@@ -60,6 +59,10 @@ public class DecorativeButtonWidget extends AbstractButton {
         this.renderVanillaBackground = vanillaBackground;
         this.textureWidth = width;
         this.textureHeight = height;
+    }
+
+    public void setCustomSprites(WidgetSprites customSprites) {
+        this.customSprites = customSprites;
     }
 
     public void setTextColorActive(int color) {
@@ -106,7 +109,7 @@ public class DecorativeButtonWidget extends AbstractButton {
                     0, 0,
                     textureWidth, textureHeight,
                     textureWidth, textureHeight,
-                    ARGB.color(this.alpha, this.isHoveredOrFocused() ? hoveredTextureColor : defaultTextureColor)
+                    ARGB.color(this.alpha, this.isHovered() ? hoveredTextureColor : defaultTextureColor)
             );
         } else {
             int textColor = ARGB.color(this.alpha, this.active ? textColorActive : -6250336);
@@ -154,10 +157,6 @@ public class DecorativeButtonWidget extends AbstractButton {
                 new WidgetSprites(defaultTex, defaultTex, highlightedTex),
                 onPress
         );
-    }
-
-    public static DecorativeButtonWidget.Builder builderWithHoverTexture(WidgetSprites customSprites, PressAction onPress) {
-        return new DecorativeButtonWidget.Builder(customSprites, onPress);
     }
 
     public static class Builder {

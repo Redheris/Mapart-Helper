@@ -54,6 +54,18 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         headerAdder.addChild(SpacerElement.width(width / 3));
         header.defaultCellSetting().alignVerticallyMiddle();
 
+        LinearLayout headerLeft = headerLeft();
+        LinearLayout headerCenter = headerCenter();
+        LinearLayout headerRight = headerRight();
+
+        headerAdder.addChild(headerLeft, header.newCellSettings().alignHorizontallyLeft());
+        headerAdder.addChild(headerCenter, header.newCellSettings().alignHorizontallyCenter());
+        headerAdder.addChild(headerRight, header.newCellSettings().alignHorizontallyRight());
+        header.arrangeElements();
+        header.visitWidgets(this::addRenderableWidget);
+    }
+
+    protected LinearLayout headerLeft() {
         LinearLayout headerLeft = LinearLayout.horizontal().spacing(2);
         headerLeft.addChild(Button.builder(
                         Component.translatable("maparthelper.gui.close"),
@@ -61,7 +73,10 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
                 ).size(60, 20).build()
         );
 
+        return headerLeft;
+    }
 
+    protected LinearLayout headerCenter() {
         LinearLayout headerCenter = LinearLayout.horizontal().spacing(2);
         headerCenter.addChild(SpacerElement.height(30));
         headerCenter.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyRight();
@@ -101,10 +116,14 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
         headerCenter.addChild(resetOffsetBtn);
         headerCenter.addChild(pixelPosLabel);
 
-        headerAdder.addChild(headerLeft, header.newCellSettings().alignHorizontallyLeft());
-        headerAdder.addChild(headerCenter, header.newCellSettings().alignHorizontallyCenter());
-        header.arrangeElements();
-        header.visitWidgets(this::addRenderableWidget);
+        return headerCenter;
+    }
+
+    protected LinearLayout headerRight() {
+        LinearLayout headerRight = LinearLayout.horizontal().spacing(2);
+        headerRight.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyRight();
+
+        return headerRight;
     }
 
     private void updatePixelPosLabel() {
