@@ -23,10 +23,12 @@ public class DrawingEngine<T extends PixelSurface> {
         this.layerManager = layerManager;
         this.historyManager = historyManager;
         this.selection = new Selection();
+        selection.setSize(layerManager.getSelectedLayer().getSurface());
         this.selectedTool = new HandTool();
     }
 
     public void setSelectedTool(@NotNull PainterTool selectedTool) {
+        this.submit();
         this.selectedTool = selectedTool;
     }
 
