@@ -45,9 +45,8 @@ public class AdjEditBox extends EditBox {
     //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!overrideOnClick) return super.mouseClicked(mouseX, mouseY, button);
-
         //? if <=1.21.8 {
+        if (!overrideOnClick) return super.mouseClicked(mouseX, mouseY, button);
         if (button == 1) {
             this.setValue("");
             return super.mouseClicked(mouseX, mouseY, 0);
@@ -112,8 +111,7 @@ public class AdjEditBox extends EditBox {
      */
     @Deprecated
     @Override
-    public void setResponder(@NotNull Consumer<String> changedListener) {
-    }
+    public void setResponder(@NotNull Consumer<String> changedListener) {}
 
     private void updateChangedListener() {
         super.setResponder(value -> {

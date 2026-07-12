@@ -31,7 +31,7 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
 
     public FullscreenImageViewScreen() {
         super(null, Component.literal("Full size mapart view"));
-        ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.FULLSCREEN_VIEW);
+//        ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.FULLSCREEN_VIEW);
     }
 
     protected NativeImageViewWidget initImageViewWidget() {

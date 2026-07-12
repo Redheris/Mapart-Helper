@@ -4,3 +4,4 @@ accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/
 accessible field net/minecraft/client/gui/components/AbstractScrollArea scrolling Z
 extendable method net/minecraft/client/gui/components/EditBox onValueChange (Ljava/lang/String;)V
 accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
+extendable method net/minecraft/client/gui/components/AbstractSliderButton setValue (D)V

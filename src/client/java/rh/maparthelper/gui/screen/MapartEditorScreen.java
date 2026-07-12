@@ -47,6 +47,7 @@ import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
 import rh.maparthelper.gui.widget.dropdown.*;
 import rh.maparthelper.gui.widget.input.AdjEditBox;
+import rh.maparthelper.gui.widget.input.IntegerFieldWidget;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
@@ -409,7 +410,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsLeft.addChild(new StringWidget(Component.translatable("maparthelper.gui.mapart_name_field"), font));
         settingsLeft.addChild(mapartName, topLabeledPositioner);
 
-        GridLayout size = createSizeSettingsGrid();
+        LinearLayout size = createSizeSettingsGrid();
         settingsLeft.addChild(size);
 
         settingsLeft.arrangeElements();
@@ -684,41 +685,43 @@ public class MapartEditorScreen extends ScreenAdapted {
         readImage(paths.getFirst());
     }
 
-    private GridLayout createSizeSettingsGrid() {
-        GridLayout size = new GridLayout().spacing(10).rowSpacing(1);
-        GridLayout.RowHelper adder = size.createRowHelper(2);
+    private LinearLayout createSizeSettingsGrid() {
+        LinearLayout sizeLayout = LinearLayout.vertical().spacing(1);
+        LinearLayout inputFieldsLayout = LinearLayout.horizontal().spacing(1);
+        inputFieldsLayout.defaultCellSetting().alignVerticallyMiddle();
 
-        AdjEditBox widthInput = new AdjEditBox(
-                font, 30, 20, "" + mapart.getWidth()
+        // TODO: Configurable max value
+
+        IntegerFieldWidget xSizeField = new IntegerFieldWidget(
+                font, 30, 20, mapart.getWidth(), 1, 50
         );
-        widthInput.setHint(Component.literal("x").withColor(CommonColors.GRAY));
-        widthInput.setFilter(TextFieldPredicates.positiveInt());
-        widthInput.setValueConsumer(s -> {
-            int value = Integer.parseInt(s);
+        xSizeField.setIntegerValueConsumer(value -> {
             if (value != mapart.getWidth()) {
                 CurrentConversionSettings.guiMapartImage = null;
                 MapartImageUpdater.resizeMapartImage(mapart, value, mapart.getHeight());
             }
         });
 
-        AdjEditBox heightInput = new AdjEditBox(
-                font, 30, 20, "" + mapart.getHeight()
+        IntegerFieldWidget ySizeField = new IntegerFieldWidget(
+                font, 30, 20, mapart.getHeight(), 1, 50
         );
-        heightInput.setHint(Component.literal("y").withColor(CommonColors.GRAY));
-        heightInput.setFilter(TextFieldPredicates.positiveInt());
-        heightInput.setValueConsumer(s -> {
-            int value = Integer.parseInt(s);
+        ySizeField.setIntegerValueConsumer(value -> {
             if (value != mapart.getHeight()) {
                 CurrentConversionSettings.guiMapartImage = null;
                 MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), value);
             }
         });
 
-        adder.addChild(new StringWidget(Component.translatable("maparthelper.gui.mapart_size_label"), font), 2);
-        adder.addChild(widthInput);
-        adder.addChild(heightInput);
+        inputFieldsLayout.addChild(new StringWidget(Component.literal("x:"), font));
+        inputFieldsLayout.addChild(xSizeField, inputFieldsLayout.newCellSettings().paddingRight(10));
+        inputFieldsLayout.addChild(new StringWidget(Component.literal("y:"), font));
+        inputFieldsLayout.addChild(ySizeField);
 
-        return size;
+
+        sizeLayout.addChild(new StringWidget(Component.translatable("maparthelper.gui.mapart_size_label"), font));
+        sizeLayout.addChild(inputFieldsLayout);
+
+        return sizeLayout;
     }
 
     private OverlayLayout createSaveMapartDropdown() {

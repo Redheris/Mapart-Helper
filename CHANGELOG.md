@@ -1,6 +1,6 @@
-This update will remove all your preset names. It will not remove any other data, but
-any presets you already have will become "Unnamed" and should be renamed. It's done to make presets as stable
-and easy to share as possible.
+This update will remove all your preset **names**. It will not remove any other data, but
+any presets you already have will become "Unnamed" and should be renamed manually.
+It's done to make presets as stable and easy to share as possible.
 
 ### Changes and new features
 
@@ -19,5 +19,6 @@ and easy to share as possible.
 - By default, palette will be generating only from vanilla (`minecraft:*`) blocks.
   This can be changed in the config;
 - Add config option to allow adding auxiliary blocks at the platform layer to the schematic;
+- All integer input fields got maximum value limit and mouse scrolling behavior;
 
 </details>
