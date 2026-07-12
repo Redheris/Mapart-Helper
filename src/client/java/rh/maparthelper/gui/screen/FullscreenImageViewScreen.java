@@ -35,8 +35,9 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     }
 
     protected NativeImageViewWidget initImageViewWidget() {
+        Identifier textureId = CurrentConversionSettings.guiMapartImage == null ? null : CurrentConversionSettings.guiMapartId;
         return new NativeImageViewWidget(
-                CurrentConversionSettings.guiMapartImage, CurrentConversionSettings.guiMapartId,
+                CurrentConversionSettings.guiMapartImage, textureId,
                 0, 30, width, height - 30
         );
     }

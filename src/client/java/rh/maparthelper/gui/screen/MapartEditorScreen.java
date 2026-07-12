@@ -79,6 +79,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier RESET_ICON = MapartHelper.identifier("textures/gui/icons/reset.png");
     private static final Identifier RESET_DISABLED_ICON = MapartHelper.identifier("textures/gui/icons/reset_disabled.png");
     private static final Identifier FULLSCREEN_ICON = MapartHelper.identifier("textures/gui/icons/fullscreen.png");
+    private static final Identifier FULLSCREEN_DISABLED_ICON = MapartHelper.identifier("textures/gui/icons/fullscreen_disabled.png");
     private static final Identifier SETTINGS_ICON = MapartHelper.identifier("textures/gui/icons/settings.png");
 
     private final MapartProcessing mapart = CurrentConversionSettings.mapart;
@@ -107,6 +108,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private Button saveZipNBT;
     private Button getMapItemsButton;
     private DecorativeButtonWidget showInWorldButton;
+    private DecorativeButtonWidget fullscreenButton;
     private DecorativeButtonWidget resetExcludedColors;
     private DecorativeButtonWidget toggleCroppingControlsButton;
 
@@ -369,11 +371,11 @@ public class MapartEditorScreen extends ScreenAdapted {
         toggleCroppingControlsButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.toggle_manual_cropping_buttons")));
         mapartOptions.addChild(toggleCroppingControlsButton);
 
-        DecorativeButtonWidget fullscreenButton = DecorativeButtonWidget.builderSimpleTexture(
+        fullscreenButton = DecorativeButtonWidget.builder(
                 FULLSCREEN_ICON,
+                FULLSCREEN_DISABLED_ICON,
                 btn -> Minecraft.getInstance().setScreen(new FullscreenImageViewScreen())
         ).size(16, 16).build();
-        fullscreenButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.open_view_screen")));
         mapartOptions.addChild(fullscreenButton);
 
         DecorativeButtonWidget resetMapartButton = DecorativeButtonWidget.builderSimpleTexture(
@@ -803,6 +805,14 @@ public class MapartEditorScreen extends ScreenAdapted {
             if (getMapItemsButton != null)
                 getMapItemsButton.setTooltip(disabled);
             showInWorldButton.setTooltip(disabled);
+        }
+
+        if (CurrentConversionSettings.guiMapartImage != null && CurrentConversionSettings.guiMapartImage.getPixels() != null) {
+            fullscreenButton.active = true;
+            fullscreenButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.open_view_screen")));
+        } else {
+            fullscreenButton.active = false;
+            fullscreenButton.setTooltip(Tooltip.create(Component.literal("Current mapart doesn't have an image")));
         }
     }
 
