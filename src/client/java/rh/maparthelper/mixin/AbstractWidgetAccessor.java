@@ -6,6 +6,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(AbstractWidget.class)
 public interface AbstractWidgetAccessor {
-    @Accessor
-    float getAlpha();
+    @Accessor("alpha")
+    float maparthelper$getAlpha();
 }

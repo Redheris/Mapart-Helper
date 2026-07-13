@@ -6,7 +6,8 @@
   "mixins": [],
   "client": [
     "AbstractWidgetAccessor",
-    "CustomUniformsBind"
+    "CustomUniformsBind",
+    "NativeImageAccessor"
   ],
   "server": [],
   "injectors": {

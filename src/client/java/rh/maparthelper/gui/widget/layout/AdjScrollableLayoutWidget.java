@@ -196,7 +196,7 @@ public class AdjScrollableLayoutWidget implements Layout {
             }
 
             for (AbstractWidget childWidget : this.children) {
-                float childAlpha = ((AbstractWidgetAccessor)childWidget).getAlpha();
+                float childAlpha = ((AbstractWidgetAccessor)childWidget).maparthelper$getAlpha();
                 childWidget.setAlpha(alpha * childAlpha);
                 childWidget.render(graphics, mouseX, mouseY, deltaTicks);
                 childWidget.setAlpha(childAlpha);
