@@ -120,6 +120,12 @@ public class LayerManager<T extends PixelSurface, E extends Layer<T>> {
         ));
     }
 
+    public E flattenLayers() {
+        if (layers.size() == 1)
+            return layerFactory.copy(selectedLayer);
+        return layerFactory.flattenLayers(layers);
+    }
+
     public boolean isTopLayer(E layer) {
         return Objects.equals(layers.getLast(), layer);
     }

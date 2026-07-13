@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.painter.surface.NativeImageSurface;
 
+import java.util.List;
 import java.util.UUID;
 
 public class DynamicTextureLayerFactory implements LayerFactory<NativeImageSurface, DynamicTextureLayer> {
@@ -50,7 +51,7 @@ public class DynamicTextureLayerFactory implements LayerFactory<NativeImageSurfa
     public DynamicTextureLayer copy(@NotNull DynamicTextureLayer origin) {
         String layerUUID = UUID.randomUUID().toString();
 
-        NativeImage originImage = origin.texture.getPixels();
+        NativeImage originImage = origin.getTexture().getPixels();
         if (originImage == null) throw new IllegalStateException("Native image must not be null");
         int width = originImage.getWidth();
         int height = originImage.getHeight();
@@ -72,22 +73,33 @@ public class DynamicTextureLayerFactory implements LayerFactory<NativeImageSurfa
 
     @Override
     public DynamicTextureLayer merge(@NotNull DynamicTextureLayer layerAbove, DynamicTextureLayer layerBelow) {
-        DynamicTextureLayer layerMerged = copy(layerBelow);
-        NativeImageSurface surfaceMerged = layerMerged.getSurface();
-        NativeImageSurface surfaceAbove = layerAbove.getSurface();
+        DynamicTextureLayer layerMerged = copy(layerAbove);
+        mergeLayerDown(layerMerged, layerBelow);
+        layerMerged.getTexture().upload();
+        return layerMerged;
+    }
 
-        int width = surfaceMerged.getWidth();
-        int height = surfaceMerged.getHeight();
+    @Override
+    public DynamicTextureLayer flattenLayers(@NotNull List<DynamicTextureLayer> layers) {
+        DynamicTextureLayer layerMerged = copy(layers.getLast());
+        for (int i = layers.size() - 1; i >= 0; i--) {
+            mergeLayerDown(layerMerged, layers.get(i));
+        }
+        layerMerged.getTexture().upload();
+        return layerMerged;
+    }
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+    private void mergeLayerDown(@NotNull DynamicTextureLayer layer, @NotNull DynamicTextureLayer layerBelow) {
+        NativeImageSurface surfaceAbove = layer.getSurface();
+        NativeImageSurface surfaceBelow = layerBelow.getSurface();
+
+        for (int x = 0; x < surfaceAbove.getWidth(); x++) {
+            for (int y = 0; y < surfaceAbove.getHeight(); y++) {
                 int colorAbove = surfaceAbove.getPixel(x, y);
-                if (colorAbove == 0) continue;
-                surfaceMerged.setPixel(x, y, colorAbove);
+                if (colorAbove == 0) {
+                    surfaceAbove.setPixel(x, y, surfaceBelow.getPixel(x, y));
+                }
             }
         }
-        layerMerged.texture.upload();
-
-        return layerMerged;
     }
 }

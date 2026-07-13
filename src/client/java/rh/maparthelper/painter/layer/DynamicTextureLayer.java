@@ -11,7 +11,9 @@ import rh.maparthelper.painter.surface.NativeImageSurface;
 import java.awt.*;
 
 public class DynamicTextureLayer extends Layer<NativeImageSurface> {
-    final DynamicTexture texture;
+    @NotNull
+    private final DynamicTexture texture;
+    @NotNull
     private final Identifier textureId;
 
     public DynamicTextureLayer(@NotNull DynamicTexture texture, @NotNull Identifier textureId) {
@@ -20,7 +22,11 @@ public class DynamicTextureLayer extends Layer<NativeImageSurface> {
         this.textureId = textureId;
     }
 
-    public Identifier getTextureId() {
+    public @NotNull DynamicTexture getTexture() {
+        return texture;
+    }
+
+    public @NotNull Identifier getTextureId() {
         return textureId;
     }
 
