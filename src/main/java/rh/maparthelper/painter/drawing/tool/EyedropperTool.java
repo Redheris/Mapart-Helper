@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import rh.maparthelper.painter.drawing.DrawingContext;
 import rh.maparthelper.painter.drawing.DrawingEngine;
 import rh.maparthelper.painter.history.action.HistoryAction;
 import rh.maparthelper.painter.layer.LayerManager;
@@ -15,12 +16,12 @@ public class EyedropperTool implements PainterTool {
     }
 
     @Override
-    public void start(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
-        process(x, y, lineX, lineY, firstColor, secondColor);
+    public void start(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+        process(drawingContext, x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override
-    public void process(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    public void process(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         PixelSurface surface = layerManager.getSelectedLayer().getSurface();
         if (!surface.containsPixel(x, y)) return;
 

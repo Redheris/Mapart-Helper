@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import rh.maparthelper.painter.drawing.DrawingContext;
 import rh.maparthelper.painter.drawing.Rasterizer;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.BrushToolSettings;
@@ -29,16 +30,16 @@ public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> imple
     }
 
     @Override
-    protected void startDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    protected void startDrawing(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         this.startX = x;
         this.startY = y;
         this.startLineX = lineX;
         this.startLineY = lineY;
-        super.startDrawing(x, y, lineX, lineY, firstColor, secondColor);
+        super.startDrawing(drawingContext, x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override
-    protected void processDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    protected void processDrawing(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         int xCenter, yCenter;
         int patternPivotX, patternPivotY;
         if (settings.getThickness() % 2 == 0) {
@@ -57,7 +58,7 @@ public class PatternBrushTool<T extends PixelSurface> extends BrushTool<T> imple
                     int color = pattern.getPatternPixel(x0 - patternPivotX + settings.getThickness() / 2, y0 - patternPivotY + settings.getThickness() / 2);
                     if (!pattern.isPlaceTransparent() && color == 0) return;
                     Rasterizer.setPixel(
-                            selection, editingLayer.getSurface(), changedPixelsBefore,
+                            drawingContext, selection, editingLayer.getSurface(), paintedPixelsState,
                             x0, y0,
                             color
                     );

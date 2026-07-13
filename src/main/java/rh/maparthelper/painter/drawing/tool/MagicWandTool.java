@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.FloodFillBehavior;
@@ -10,10 +11,6 @@ import rh.maparthelper.painter.layer.Layer;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.PixelSurface;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
 
 public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool implements FloodFillBehavior {
     private final FloodFillSettings floodSettings;
@@ -39,7 +36,7 @@ public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool
     protected void startSelecting(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         selected = false;
         startedWithColor = layerManager.getSelectedLayer().getSurface().getPixel(startX, startY);
-        process(x, y, lineX, lineY, firstColor, secondColor);
+        process(null, x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override
@@ -65,15 +62,15 @@ public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool
         if (!selected || color != startedWithColor) {
             newPart.clear();
             startedWithColor = color;
-            Queue<Integer> unchecked = new ArrayDeque<>();
-            Set<Integer> checked = new HashSet<>();
+            IntArrayFIFOQueue unchecked = new IntArrayFIFOQueue();
+            boolean[] checked = new boolean[maxWidth * maxHeight];
             int id = x + y * maxWidth;
 
             while (true) {
                 int x0 = id % maxWidth;
                 int y0 = id / maxWidth;
 
-                if (!checked.contains(id)) {
+                if (!checked[id]) {
                     boolean closeEnough = ColorUtils.matches(
                             surface.getPixel(x0, y0), startedWithColor,
                             floodSettings.getTolerance()
@@ -83,9 +80,9 @@ public class MagicWandTool<T extends PixelSurface> extends AbstractSelectionTool
                         FloodFillTool.floodFillScanStep(null, unchecked, id, x0, y0, maxWidth, maxHeight);
                     }
                 }
-                checked.add(id);
+                checked[id] = true;
                 if (unchecked.isEmpty()) break;
-                id = unchecked.poll();
+                id = unchecked.dequeueInt();
             }
         }
     }

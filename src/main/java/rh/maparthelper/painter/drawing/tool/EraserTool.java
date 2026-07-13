@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import rh.maparthelper.painter.drawing.DrawingContext;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.BrushToolSettings;
 import rh.maparthelper.painter.layer.Layer;
@@ -12,7 +13,7 @@ public class EraserTool<T extends PixelSurface> extends BrushTool<T> {
     }
 
     @Override
-    protected void processDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
-        super.processDrawing(x, y, lineX, lineY, 0, 0);
+    protected void processDrawing(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+        super.processDrawing(drawingContext, x, y, lineX, lineY, 0, 0);
     }
 }

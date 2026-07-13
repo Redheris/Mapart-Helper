@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import rh.maparthelper.painter.drawing.DrawingContext;
 import rh.maparthelper.painter.history.action.HistoryAction;
 
 public interface PainterTool {
@@ -7,29 +8,32 @@ public interface PainterTool {
     /**
      * Starts drawing process. Used to initialize tool's state and start collecting data to save to the action history
      *
-     * @param x           Surface's {@code x} coordinate
-     * @param y           Surface's {@code y} coordinate
-     * @param lineX       Closest vertical line (for even shapes)
-     * @param lineY       Closest horizontal line (for even shapes)
-     * @param firstColor  Main ARGB color
-     * @param secondColor Secondary ARGB color
+     * @param drawingContext Context containing data for drawing, such as visited pixels
+     * @param x              Surface's {@code x} coordinate
+     * @param y              Surface's {@code y} coordinate
+     * @param lineX          Closest vertical line (for even shapes)
+     * @param lineY          Closest horizontal line (for even shapes)
+     * @param firstColor     Main ARGB color
+     * @param secondColor    Secondary ARGB color
      */
-    void start(int x, int y, int lineX, int lineY, int firstColor, int secondColor);
+    void start(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor);
 
     /**
      * Processes drawing. If isDrawing(), makes changes to the surface and collects data to save to the action history if needed
      *
-     * @param x           Surface's {@code x} coordinate
-     * @param y           Surface's {@code y} coordinate
-     * @param lineX       Closest vertical line (for even shapes)
-     * @param lineY       Closest horizontal line (for even shapes)
-     * @param firstColor  Main ARGB color
-     * @param secondColor Secondary ARGB color
+     * @param drawingContext Context containing data for drawing, such as visited pixels
+     * @param x              Surface's {@code x} coordinate
+     * @param y              Surface's {@code y} coordinate
+     * @param lineX          Closest vertical line (for even shapes)
+     * @param lineY          Closest horizontal line (for even shapes)
+     * @param firstColor     Main ARGB color
+     * @param secondColor    Secondary ARGB color
      */
-    void process(int x, int y, int lineX, int lineY, int firstColor, int secondColor);
+    void process(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor);
 
     /**
      * Finishes drawing process with further saving to the action history
+     *
      * @return Specific implementation of the {@link HistoryAction}
      */
     HistoryAction submit();

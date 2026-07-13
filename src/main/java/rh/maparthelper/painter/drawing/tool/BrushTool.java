@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import rh.maparthelper.painter.drawing.DrawingContext;
 import rh.maparthelper.painter.drawing.Rasterizer;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.BrushBehavior;
@@ -24,7 +25,7 @@ public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> im
     }
 
     @Override
-    protected void startDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    protected void startDrawing(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         int xCenter = x;
         int yCenter = y;
         if (settings.getThickness() % 2 == 0) {
@@ -36,7 +37,7 @@ public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> im
     }
 
     @Override
-    protected void processDrawing(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    protected void processDrawing(DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         int xCenter = x;
         int yCenter = y;
         if (settings.getThickness() % 2 == 0) {
@@ -44,7 +45,7 @@ public class BrushTool<T extends PixelSurface> extends AbstractDrawingTool<T> im
             yCenter = lineY;
         }
         Rasterizer.drawLine(
-                Rasterizer.drawingPixelConsumer(selection, editingLayer.getSurface(), changedPixelsBefore, firstColor),
+                Rasterizer.drawingPixelConsumer(drawingContext, selection, editingLayer.getSurface(), paintedPixelsState, firstColor),
                 changedAreaStepBuffer,
                 settings.isCircleShape(),
                 settings.getThickness(),

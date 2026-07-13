@@ -1,32 +1,35 @@
 package rh.maparthelper.painter.drawing;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import org.jetbrains.annotations.Nullable;
+import rh.maparthelper.painter.history.action.PaintedPixelsState;
 import rh.maparthelper.painter.surface.PixelSurface;
 
 import java.awt.*;
-import java.util.function.BiConsumer;
 
 public class Rasterizer {
 
-    public static BiConsumer<Integer, Integer> drawingPixelConsumer(Selection selection, PixelSurface surface, Int2IntMap changedPixels, int color) {
-        return (x, y) -> setPixel(selection, surface, changedPixels, x, y, color);
+    public static PixelConsumer drawingPixelConsumer(DrawingContext drawingContext, Selection selection,
+                                                     PixelSurface surface, PaintedPixelsState paintedPixelsState, int color
+    ) {
+        return (x, y) -> setPixel(drawingContext, selection, surface, paintedPixelsState, x, y, color);
     }
 
-    public static void setPixel(Selection selection, PixelSurface surface, Int2IntMap changedPixels,
-                                int x, int y, int color
+    public static void setPixel(DrawingContext drawingContext, Selection selection, PixelSurface surface,
+                                PaintedPixelsState paintedPixelsState, int x, int y, int color
     ) {
-        if (!selection.allows(x, y) || changedPixels.containsKey(x + y * surface.getWidth()))
-            return;
+        if (!selection.allows(x, y)) return;
 
-        int oldColor = surface.getPixel(x, y);
-        if (surface.setPixel(x, y, color)) {
-            changedPixels.putIfAbsent(x + y * surface.getWidth(), oldColor);
+        int index = x + y * surface.getWidth();
+        int prevColor = surface.getPixel(x, y);
+        if (drawingContext.visitPixel(index) && surface.setPixel(x, y, color)) {
+            paintedPixelsState.indices().add(index);
+            paintedPixelsState.before().add(prevColor);
+            paintedPixelsState.after().add(color);
         }
     }
 
 
-    public static void drawLine(BiConsumer<Integer, Integer> pixelConsumer,
+    public static void drawLine(PixelConsumer pixelConsumer,
                                 @Nullable Rectangle changedArea,
                                 boolean circleShape,
                                 int thickness,
@@ -58,11 +61,11 @@ public class Rasterizer {
             }
         }
         if (changedArea != null) {
-            changedArea.setBounds(minX - thickness, minY - thickness, width + thickness * 2, height + thickness * 2);
+            changedArea.setBounds(minX - thickness / 2, minY - thickness / 2, width + thickness, height + thickness);
         }
     }
 
-    public static void drawFigureFromCenter(BiConsumer<Integer, Integer> pixelConsumer,
+    public static void drawFigureFromCenter(PixelConsumer pixelConsumer,
                                             @Nullable Rectangle changedArea,
                                             boolean circleShape,
                                             int thickness,
@@ -82,7 +85,7 @@ public class Rasterizer {
         }
     }
 
-    public static void drawRect(BiConsumer<Integer, Integer> pixelConsumer, @Nullable Rectangle changedArea,
+    public static void drawRect(PixelConsumer pixelConsumer, @Nullable Rectangle changedArea,
                                 int x0, int y0, int x1, int y1, boolean fill
     ) {
         int minX = Math.min(x0, x1);
@@ -104,7 +107,7 @@ public class Rasterizer {
         }
     }
 
-    public static void drawCircle(BiConsumer<Integer, Integer> pixelConsumer, @Nullable Rectangle changedArea,
+    public static void drawCircle(PixelConsumer pixelConsumer, @Nullable Rectangle changedArea,
                                   int x0, int y0, int diameter, boolean fill
     ) {
         int dx = 0;
@@ -139,7 +142,7 @@ public class Rasterizer {
         }
     }
 
-    private static void drawCircleFragment(BiConsumer<Integer, Integer> pixelConsumer,
+    private static void drawCircleFragment(PixelConsumer pixelConsumer,
                                            int x0, int y0, int dx, int dy
     ) {
         pixelConsumer.accept(x0 + dx, y0 + dy);
@@ -148,7 +151,7 @@ public class Rasterizer {
         pixelConsumer.accept(x0 - dx, y0 - dy);
     }
 
-    private static void fillRectByCoords(BiConsumer<Integer, Integer> pixelConsumer, int x0, int y0, int x1, int y1) {
+    private static void fillRectByCoords(PixelConsumer pixelConsumer, int x0, int y0, int x1, int y1) {
         for (int x = x0; x <= x1; x++) {
             for (int y = y0; y <= y1; y++) {
                 pixelConsumer.accept(x, y);
@@ -156,7 +159,12 @@ public class Rasterizer {
         }
     }
 
-    private static void fillRectBySize(BiConsumer<Integer, Integer> pixelConsumer, int x, int y, int width, int height) {
+    private static void fillRectBySize(PixelConsumer pixelConsumer, int x, int y, int width, int height) {
         fillRectByCoords(pixelConsumer, x, y, x + width - 1, y + height - 1);
+    }
+
+    @FunctionalInterface
+    public interface PixelConsumer {
+        void accept(int a, int b);
     }
 }

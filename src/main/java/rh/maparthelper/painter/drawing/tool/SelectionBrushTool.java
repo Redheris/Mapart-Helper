@@ -31,7 +31,7 @@ public class SelectionBrushTool extends AbstractSelectionTool implements BrushBe
         }
         lastX = xCenter;
         lastY = yCenter;
-        process(x, y, lineX, lineY, firstColor, secondColor);
+        process(null, x, y, lineX, lineY, firstColor, secondColor);
     }
 
     @Override

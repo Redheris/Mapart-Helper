@@ -1,5 +1,7 @@
 package rh.maparthelper.painter.drawing.tool;
 
+import org.jetbrains.annotations.Nullable;
+import rh.maparthelper.painter.drawing.DrawingContext;
 import rh.maparthelper.painter.drawing.Selection;
 import rh.maparthelper.painter.drawing.tool.settings.SelectionBehavior;
 import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
@@ -34,7 +36,7 @@ public abstract class AbstractSelectionTool implements PainterTool, SelectionBeh
     }
 
     @Override
-    public final void start(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    public final void start(@Nullable DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         isSelecting = true;
         before = selection.getSelectionMask();
         newPart.clear();
@@ -47,7 +49,7 @@ public abstract class AbstractSelectionTool implements PainterTool, SelectionBeh
     }
 
     @Override
-    public final void process(int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
+    public final void process(@Nullable DrawingContext drawingContext, int x, int y, int lineX, int lineY, int firstColor, int secondColor) {
         if (!isSelecting) return;
         processSelection(x, y, lineX, lineY, firstColor, secondColor);
         BitSet result = (BitSet) before.clone();

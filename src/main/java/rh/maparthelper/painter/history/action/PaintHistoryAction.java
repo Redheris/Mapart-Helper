@@ -1,7 +1,6 @@
 package rh.maparthelper.painter.history.action;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import rh.maparthelper.painter.layer.Layer;
 import rh.maparthelper.painter.surface.PixelSurface;
 
@@ -11,21 +10,13 @@ public class PaintHistoryAction<T extends PixelSurface> implements HistoryAction
     private final Layer<T> layer;
     private final PixelSurface surface;
     private final Rectangle affectedArea;
-    private final Int2IntMap before;
-    private final Int2IntMap after;
+    private final PaintedPixelsState paintedPixels;
 
-    public PaintHistoryAction(Layer<T> layer, Rectangle affectedArea, Int2IntMap changedPixelsBefore) {
+    public PaintHistoryAction(Layer<T> layer, Rectangle affectedArea, PaintedPixelsState paintedPixels) {
         this.layer = layer;
         this.surface = layer.getSurface();
         this.affectedArea = affectedArea.getBounds();
-        this.before = new Int2IntOpenHashMap(changedPixelsBefore);
-        this.after = new Int2IntOpenHashMap(changedPixelsBefore.size());
-
-        before.forEach((pixelId, oldColor) -> {
-            int pixelX = pixelId % surface.getWidth();
-            int pixelY = pixelId / surface.getWidth();
-            after.put((int) pixelId, surface.getPixel(pixelX, pixelY));
-        });
+        this.paintedPixels = paintedPixels;
     }
 
     @Override
@@ -35,24 +26,23 @@ public class PaintHistoryAction<T extends PixelSurface> implements HistoryAction
 
     @Override
     public void undo() {
-        apply(before);
+        apply(paintedPixels.before());
     }
 
     @Override
     public void redo() {
-        apply(after);
+        apply(paintedPixels.after());
     }
 
-    private void apply(Int2IntMap pixels) {
+    private void apply(IntArrayList pixels) {
         int width = surface.getWidth();
 
-        pixels.forEach((id, color) -> {
-            int pixelId = id;
+        for (int i = 0; i < paintedPixels.indices().size(); i++) {
+            int pixelId = paintedPixels.indices().getInt(i);
             int pixelX = pixelId % width;
             int pixelY = pixelId / width;
-            surface.setPixel(pixelX, pixelY, color);
-        });
-
+            surface.setPixel(pixelX, pixelY, pixels.getInt(i));
+        }
         layer.markDirty(affectedArea);
     }
 }

@@ -12,6 +12,7 @@ public class DrawingEngine<T extends PixelSurface> {
     protected final LayerManager<T, ? extends Layer<T>> layerManager;
     private final HistoryManager historyManager;
     public final Selection selection;
+    public final DrawingContext drawingContext;
     private @NotNull PainterTool selectedTool;
     private int mainColor;
     private int secondaryColor;
@@ -24,6 +25,7 @@ public class DrawingEngine<T extends PixelSurface> {
         this.historyManager = historyManager;
         this.selection = new Selection();
         selection.setSize(layerManager.getSelectedLayer().getSurface());
+        this.drawingContext = new DrawingContext(layerManager.getWidth(), layerManager.getHeight());
         this.selectedTool = new HandTool();
     }
 
@@ -62,20 +64,21 @@ public class DrawingEngine<T extends PixelSurface> {
 
     public void start(int x, int y, int lineX, int lineY, boolean inverseColors) {
         if (isProcessing) return;
+        drawingContext.beginStamp();
         isProcessing = true;
         isInversedColors = inverseColors;
         if (inverseColors)
-            selectedTool.start(x, y, lineX, lineY, secondaryColor, mainColor);
+            selectedTool.start(drawingContext, x, y, lineX, lineY, secondaryColor, mainColor);
         else
-            selectedTool.start(x, y, lineX, lineY, mainColor, secondaryColor);
+            selectedTool.start(drawingContext, x, y, lineX, lineY, mainColor, secondaryColor);
     }
 
     public void process(int x, int y, int lineX, int lineY, boolean inverseColors) {
         if (!isProcessing) return;
         if (inverseColors)
-            selectedTool.process(x, y, lineX, lineY, secondaryColor, mainColor);
+            selectedTool.process(drawingContext,x, y, lineX, lineY, secondaryColor, mainColor);
         else
-            selectedTool.process(x, y, lineX, lineY, mainColor, secondaryColor);
+            selectedTool.process(drawingContext,x, y, lineX, lineY, mainColor, secondaryColor);
     }
 
     public void submit() {
