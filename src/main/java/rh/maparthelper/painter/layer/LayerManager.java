@@ -1,5 +1,6 @@
 package rh.maparthelper.painter.layer;
 
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.painter.history.HistoryManager;
 import rh.maparthelper.painter.history.action.LayerAddHistoryAction;
 import rh.maparthelper.painter.history.action.LayerMergeHistoryAction;
@@ -19,14 +20,26 @@ public class LayerManager<T extends PixelSurface, E extends Layer<T>> {
     private final HistoryManager historyManager;
     private final List<E> layers;
     private final LayerFactory<T, E> layerFactory;
+    private final int width;
+    private final int height;
     private E selectedLayer;
 
-    public LayerManager(HistoryManager historyManager, E mainLayer, LayerFactory<T, E> layerFactory) {
+    public LayerManager(@NotNull HistoryManager historyManager, @NotNull E mainLayer, @NotNull LayerFactory<T, E> layerFactory) {
         this.historyManager = historyManager;
         this.layers = new ArrayList<>();
         layers.add(mainLayer);
+        this.width = mainLayer.getSurface().getWidth();
+        this.height = mainLayer.getSurface().getHeight();
         this.selectedLayer = mainLayer;
         this.layerFactory = layerFactory;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public E getSelectedLayer() {

@@ -1,5 +1,6 @@
 package rh.maparthelper.painter;
 
+import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.painter.drawing.DrawingEngine;
 import rh.maparthelper.painter.history.HistoryManager;
 import rh.maparthelper.painter.layer.Layer;
@@ -12,7 +13,7 @@ public class PainterProject<T extends PixelSurface, E extends Layer<T>> implemen
     private final LayerManager<T, E> layerManager;
     private final HistoryManager historyManager;
 
-    public PainterProject(E mainLayer, LayerFactory<T, E> layerFactory) {
+    public PainterProject(@NotNull E mainLayer, @NotNull LayerFactory<T, E> layerFactory) {
         this.historyManager = new HistoryManager();
         this.layerManager = new LayerManager<>(historyManager, mainLayer, layerFactory);
         this.drawingEngine = new DrawingEngine<>(layerManager, historyManager);
