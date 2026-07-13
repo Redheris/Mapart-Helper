@@ -7,6 +7,8 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
+import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.util.CompatUtils;
@@ -31,9 +33,8 @@ public class MapartSaver {
         return true;
     }
 
-    public static @Nullable Path saveMapartImage(String mapartName, DynamicTexture mapartTexture, Path savingDir, @Nullable Player player) {
-        String filename = FileUtils.makeUniqueFilename(savingDir, mapartName, "png");
-        Path filepath = savingDir.resolve(filename);
+    public static void saveMapartImage(@NotNull Path filepath, DynamicTexture mapartTexture, @Nullable Player player) {
+        String filename = FilenameUtils.getBaseName(filepath.getFileName().toString());
         try {
             if (saveMapartImage(mapartTexture, filepath) && player != null) {
                 Component mapartFile = Component.literal(filename)
@@ -46,7 +47,6 @@ public class MapartSaver {
 
                 CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
             }
-            return filepath;
         } catch (InvalidPathException e) {
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());
             if (player != null) {
@@ -58,7 +58,13 @@ public class MapartSaver {
                 CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_error").withStyle(ChatFormatting.RED), false);
             }
         }
-        return null;
+    }
+
+    public static void saveMapartImage(String mapartName, DynamicTexture mapartTexture, Path savingDir, @Nullable Player player) {
+        String filename = FileUtils.makeUniqueFilename(savingDir, mapartName, "png");
+        Path imageFilepath = savingDir.resolve(filename);
+
+        saveMapartImage(imageFilepath, mapartTexture, player);
     }
 
     public static void saveMapartImage(String mapartName, DynamicTexture mapartTexture, @Nullable Player player) {
