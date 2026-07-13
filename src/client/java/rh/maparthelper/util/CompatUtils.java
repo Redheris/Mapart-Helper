@@ -5,11 +5,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class CompatUtils {
     public static final boolean ON_OSX = Util.getPlatform() == Util.OS.OSX;
 
-    public static void sendMessage(Player player, Component message, boolean overlay) {
+    public static void sendMessage(@NotNull Player player, Component message, boolean overlay) {
         Minecraft.getInstance().execute(() -> {
             //? if >=26.1 {
             /*if (overlay)
