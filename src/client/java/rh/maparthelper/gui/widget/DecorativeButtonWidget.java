@@ -170,7 +170,7 @@ public class DecorativeButtonWidget extends AbstractButton {
         private int textureHeight = 16;
         private int x = 0;
         private int y = 0;
-        private int textColorActive;
+        private int textColorActive = -1;
 
         public Builder(Component message, PressAction onPress) {
             this.renderVanillaBackground = true;

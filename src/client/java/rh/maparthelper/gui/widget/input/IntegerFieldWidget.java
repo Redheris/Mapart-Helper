@@ -24,7 +24,7 @@ public class IntegerFieldWidget extends AdjEditBox {
         this.intValue = initialValue;
         this.min = min;
         this.max = max;
-        setFilter(TextFieldPredicates.rangeInt(min, max));
+        setFilter(TextFieldPredicates.integer(null, null));
         setIntValue(initialValue);
     }
 
