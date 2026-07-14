@@ -4,12 +4,17 @@ import org.joml.Vector2i;
 import org.joml.Vector4i;
 
 public class NativeImageViewState {
-    private static final NativeImageViewState INSTANCE = new NativeImageViewState();
+    private static final NativeImageViewState FULLSCREEN_VIEW_STATE_INSTANCE = new NativeImageViewState();
+    private static final NativeImageViewState PAINTER_STATE_INSTANCE = new NativeImageViewState();
 
     private NativeImageViewState() {}
 
-    public static NativeImageViewState getInstance() {
-        return INSTANCE;
+    public static NativeImageViewState getFullscreenViewInstance() {
+        return FULLSCREEN_VIEW_STATE_INSTANCE;
+    }
+
+    public static NativeImageViewState getPainterInstance() {
+        return PAINTER_STATE_INSTANCE;
     }
 
     private InitialImageViewState initialState;

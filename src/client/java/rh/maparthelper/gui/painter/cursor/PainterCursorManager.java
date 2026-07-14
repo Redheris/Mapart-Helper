@@ -45,13 +45,17 @@ public final class PainterCursorManager {
     }
 
     public void updateCursorAreaUniform() {
-        NativeImageViewState imageState = NativeImageViewState.getInstance();
+        NativeImageViewState imageState = NativeImageViewState.getPainterInstance();
         int guiScale = Minecraft.getInstance().getWindow().getGuiScale();
         PainterToolAreaUniform.set(
                 (float) ((int) (areaSideSize * imageState.pixelWidth()) * guiScale),
                 (float) ((int) (areaSideSize * imageState.pixelHeight()) * guiScale),
                 lastTool instanceof AbstractSelectionTool
         );
+    }
+
+    public void resetState() {
+        this.lastTool = null;
     }
 
     public boolean updateCursor(DrawingEngine<?> drawingEngine) {
@@ -118,7 +122,7 @@ public final class PainterCursorManager {
             yCenter = closestYLine;
         }
 
-        NativeImageViewState imageState = NativeImageViewState.getInstance();
+        NativeImageViewState imageState = NativeImageViewState.getPainterInstance();
         float x = (int) (imageViewWidget.getInitImageX() + imageState.xOffset()) + xCenter * (float) imageState.pixelWidth();
         float y = (int) (imageViewWidget.getInitImageY() + imageState.yOffset()) + yCenter * (float) imageState.pixelHeight();
 

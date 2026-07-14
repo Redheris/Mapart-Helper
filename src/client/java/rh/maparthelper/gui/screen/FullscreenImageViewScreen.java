@@ -16,6 +16,7 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.NativeImageViewWidget;
+import rh.maparthelper.state.fullscreen_view.NativeImageViewState;
 
 //? >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
@@ -37,6 +38,7 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     protected NativeImageViewWidget initImageViewWidget() {
         Identifier textureId = CurrentConversionSettings.guiMapartImage == null ? null : CurrentConversionSettings.guiMapartId;
         return new NativeImageViewWidget(
+                NativeImageViewState.getFullscreenViewInstance(),
                 CurrentConversionSettings.guiMapartImage, textureId,
                 0, 30, width, height - 30
         );

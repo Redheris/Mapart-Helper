@@ -41,10 +41,11 @@ public class NativeImageViewWidget extends AbstractWidget {
 
     protected final Vector2i hoveredPixelPos;
     protected final Vector2i closestHoveredLine;
-    protected final NativeImageViewState state = NativeImageViewState.getInstance();
+    protected final NativeImageViewState state;
 
-    public NativeImageViewWidget(Identifier imageId, int imageWidth, int imageHeight, int x, int y, int width, int height) {
+    public NativeImageViewWidget(NativeImageViewState imageViewState, Identifier imageId, int imageWidth, int imageHeight, int x, int y, int width, int height) {
         super(x, y, width, height, Component.empty());
+        this.state = imageViewState;
 
         state.updateInitialStateIfNeeded(width, height, imageWidth, imageHeight);
 
@@ -64,8 +65,8 @@ public class NativeImageViewWidget extends AbstractWidget {
         updateGridUniform();
     }
 
-    public NativeImageViewWidget(DynamicTexture texture, Identifier imageId, int x, int y, int width, int height) {
-        this(imageId, getWidth(texture), getHeight(texture), x, y, width, height);
+    public NativeImageViewWidget(NativeImageViewState imageViewState, DynamicTexture texture, Identifier imageId, int x, int y, int width, int height) {
+        this(imageViewState, imageId, getWidth(texture), getHeight(texture), x, y, width, height);
     }
 
     private static int getWidth(DynamicTexture texture) {
