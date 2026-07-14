@@ -1,6 +1,7 @@
 package rh.maparthelper.painter.surface;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.util.ARGB;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.MemoryUtil;
 import rh.maparthelper.mixin.NativeImageAccessor;
@@ -36,14 +37,14 @@ public class NativeImageSurface extends AbstractSurface {
 
     @Override
     public int getPixelUnsafe(int x, int y) {
-        return buffer.get(x + y * getWidth());
+        return ARGB.fromABGR(buffer.get(x + y * getWidth()));
     }
 
     @Override
     public boolean setPixelUnsafe(int x, int y, int color) {
         if (getPixelUnsafe(x, y) == color) return false;
 
-        buffer.put(x + y * getWidth(), color);
+        buffer.put(x + y * getWidth(), ARGB.toABGR(color));
 
         return true;
     }
