@@ -7,7 +7,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.world.entity.player.Player;
-import org.apache.commons.io.FilenameUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.MapartHelper;
@@ -20,7 +19,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 public class MapartSaver {
-    public final static Path SAVED_MAPS_DIR = FabricLoader.getInstance().getGameDir().resolve("saved_maps");
+    private final static Path GAME_DIR = FabricLoader.getInstance().getGameDir();
+    public final static Path SAVED_MAPS_DIR = GAME_DIR.resolve("saved_maps");
 
     private static boolean saveMapartImage(DynamicTexture mapartTexture, Path imagePath) throws IOException {
         if (mapartTexture == null) return false;
@@ -34,18 +34,22 @@ public class MapartSaver {
     }
 
     public static void saveMapartImage(@NotNull Path filepath, DynamicTexture mapartTexture, @Nullable Player player) {
-        String filename = FilenameUtils.getBaseName(filepath.getFileName().toString());
         try {
             if (saveMapartImage(mapartTexture, filepath) && player != null) {
-                Component mapartFile = Component.literal(filename)
+                Component mapartFile = Component.literal(filepath.getFileName().toString())
                         .withStyle(style -> style
                                 .withColor(ChatFormatting.GREEN)
                                 .withClickEvent(new ClickEvent.OpenFile(filepath.toFile()))
                                 .withHoverEvent(new HoverEvent.ShowText(Component.translatable("maparthelper.open_image_file")))
                                 .withUnderlined(true)
                         );
-
-                CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", mapartFile).withStyle(ChatFormatting.GREEN), false);
+                String folder = GAME_DIR.relativize(filepath.getParent()).toString();
+                CompatUtils.sendMessage(
+                        player,
+                        Component.translatable("maparthelper.mapart_saved", folder, mapartFile)
+                                .withStyle(ChatFormatting.GREEN),
+                        false
+                );
             }
         } catch (InvalidPathException e) {
             MapartHelper.LOGGER.error("Invalid path for saving the map:\n{}", e.toString());

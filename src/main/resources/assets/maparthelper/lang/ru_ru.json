@@ -19,7 +19,8 @@
   "map_frames_selection.selection_has_empty_places": "Некоторые рамки в выделении отсутствуют или без карты",
   "map_frames_selection.too_many_maps": "Слишком большая область. Максимальный размер - 1500 блоков",
 
-  "maparthelper.mapart_saved": "Мапарт успешно сохранён в папку saved_maps как \"%s\"",
+  "maparthelper.file_saved": "Файл успешно сохранён в папку \"%s\" как \"%s\"",
+  "maparthelper.mapart_saved": "Мапарт успешно сохранён в папку \"%s\" как \"%s\"",
   "maparthelper.open_file": "[Нажмите, чтобы открыть файл]",
   "maparthelper.open_folder": "[Нажмите, чтобы открыть папку]",
   "maparthelper.open_image_file": "[Нажмите, чтобы открыть изображение]",

@@ -19,7 +19,8 @@
   "map_frames_selection.selection_has_empty_places": "Some item frames in the selection are absent or without a filled map",
   "map_frames_selection.too_many_maps": "The area is too large. Maximum size is 1500 blocks",
 
-  "maparthelper.mapart_saved": "The mapart successfully saved to the \"saved_maps\" folder as \"%s\"",
+  "maparthelper.file_saved": "File successfully saved to the \"%s\" folder as \"%s\"",
+  "maparthelper.mapart_saved": "The mapart successfully saved to the \"%s\" folder as \"%s\"",
   "maparthelper.open_file": "[Click to open the file]",
   "maparthelper.open_folder": "[Click to open the folder]",
   "maparthelper.open_image_file": "[Click to open the image]",
@@ -173,6 +174,7 @@
   "maparthelper.config.common.previewHighlightingColor": "Mapart preview highlight color",
   "maparthelper.config.common.description.previewHighlightingColor": "Used in the mapart preview to highlight colors matching the one selected in the material list",
   "maparthelper.config.common.fakeItemFramesLiveTime": "Fake item frames display duration (in ticks)",
+
   "maparthelper.config.common.group.conversionSettings": "Conversion Settings",
   "maparthelper.config.common.logConversionTime": "Log processing duration",
   "maparthelper.config.common.description.logConversionTime": "Every time it prints to the log file how many seconds the full image processing took.\n§cIt is not recommended to leave this enabled for a long time to avoid excessive spam",
