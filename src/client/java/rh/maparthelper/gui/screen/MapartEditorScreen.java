@@ -57,6 +57,7 @@ import rh.maparthelper.palette.PaletteColors;
 import rh.maparthelper.palette.PaletteDataManager;
 import rh.maparthelper.palette.PalettePresetsHandler;
 import rh.maparthelper.server.MapCreator;
+import rh.maparthelper.state.ActiveModScreenManager;
 import rh.maparthelper.util.FileDialogsUtils;
 
 import java.nio.file.Path;
@@ -116,6 +117,7 @@ public class MapartEditorScreen extends ScreenAdapted {
 
     public MapartEditorScreen() {
         super(null, Component.translatable("maparthelper.gui.mapart_editor_screen"));
+        ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.MAPART_EDITOR);
     }
 
     public void setHighlightingColor(MapColor color) {

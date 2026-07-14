@@ -16,6 +16,7 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.NativeImageViewWidget;
+import rh.maparthelper.state.ActiveModScreenManager;
 import rh.maparthelper.state.fullscreen_view.NativeImageViewState;
 
 //? >=1.21.10 {
@@ -32,7 +33,7 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
 
     public FullscreenImageViewScreen() {
         super(null, Component.literal("Full size mapart view"));
-//        ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.FULLSCREEN_VIEW);
+        ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.FULLSCREEN_VIEW);
     }
 
     protected NativeImageViewWidget initImageViewWidget() {
