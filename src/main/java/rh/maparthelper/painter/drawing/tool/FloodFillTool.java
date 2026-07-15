@@ -64,7 +64,7 @@ public class FloodFillTool<T extends PixelSurface> extends AbstractDrawingTool<T
         boolean[] checked = new boolean[maxWidth * maxHeight];
         int id = x + y * maxWidth;
 
-        do {
+        while (true) {
             int x0 = id % maxWidth;
             int y0 = id / maxWidth;
 
@@ -86,7 +86,7 @@ public class FloodFillTool<T extends PixelSurface> extends AbstractDrawingTool<T
             checked[id] = true;
             if (unchecked.isEmpty()) break;
             id = unchecked.dequeueInt();
-        } while (!unchecked.isEmpty());
+        }
     }
 
     private void globalFill(DrawingContext drawingContext, int x, int y, int color) {
