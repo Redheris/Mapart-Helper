@@ -41,6 +41,8 @@ import rh.maparthelper.conversion.schematic.MapartToNBT;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.input.TextFieldPredicates;
 import rh.maparthelper.gui.input.TextFieldValidators;
+import rh.maparthelper.gui.painter.CreateNewProjectScreen;
+import rh.maparthelper.gui.painter.PainterScreen;
 import rh.maparthelper.gui.screen.panel.MaterialListPanel;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
@@ -58,6 +60,7 @@ import rh.maparthelper.palette.PaletteDataManager;
 import rh.maparthelper.palette.PalettePresetsHandler;
 import rh.maparthelper.server.MapCreator;
 import rh.maparthelper.state.ActiveModScreenManager;
+import rh.maparthelper.state.painter.MapartPainterState;
 import rh.maparthelper.util.FileDialogsUtils;
 
 import java.nio.file.Path;
@@ -81,6 +84,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private static final Identifier RESET_DISABLED_ICON = MapartHelper.identifier("textures/gui/icons/reset_disabled.png");
     private static final Identifier FULLSCREEN_ICON = MapartHelper.identifier("textures/gui/icons/fullscreen.png");
     private static final Identifier FULLSCREEN_DISABLED_ICON = MapartHelper.identifier("textures/gui/icons/fullscreen_disabled.png");
+    private static final Identifier PAINTER_SCREEN_ICON = MapartHelper.identifier("textures/gui/icons/painter_screen.png");
     private static final Identifier SETTINGS_ICON = MapartHelper.identifier("textures/gui/icons/settings.png");
 
     private final MapartProcessing mapart = CurrentConversionSettings.mapart;
@@ -379,6 +383,20 @@ public class MapartEditorScreen extends ScreenAdapted {
                 btn -> Minecraft.getInstance().setScreen(new FullscreenImageViewScreen())
         ).size(16, 16).build();
         mapartOptions.addChild(fullscreenButton);
+
+        DecorativeButtonWidget painterButton = DecorativeButtonWidget.builderSimpleTexture(
+                PAINTER_SCREEN_ICON,
+                btn -> {
+                    if (MapartPainterState.getInstance().painterProjectExists()) {
+                        Minecraft.getInstance().setScreen(new PainterScreen());
+                    } else {
+                        Minecraft.getInstance().setScreen(new CreateNewProjectScreen(this));
+                    }
+                }
+        ).size(16, 16).build();
+        // TODO: Localize
+        painterButton.setTooltip(Tooltip.create(Component.literal("Open Mapart Painter")));
+        mapartOptions.addChild(painterButton);
 
         DecorativeButtonWidget resetMapartButton = DecorativeButtonWidget.builderSimpleTexture(
                 RESET_ICON,

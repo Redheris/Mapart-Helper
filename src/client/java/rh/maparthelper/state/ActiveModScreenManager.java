@@ -2,7 +2,7 @@ package rh.maparthelper.state;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-//import rh.maparthelper.gui.painter.PainterScreen;
+import rh.maparthelper.gui.painter.PainterScreen;
 import rh.maparthelper.gui.screen.FullscreenImageViewScreen;
 import rh.maparthelper.gui.screen.MapartEditorScreen;
 
@@ -20,7 +20,7 @@ public class ActiveModScreenManager {
         Screen screen = switch (activeModScreen) {
             case MAPART_EDITOR -> new MapartEditorScreen();
             case FULLSCREEN_VIEW -> new FullscreenImageViewScreen();
-//            case MAPART_PAINTER -> new PainterScreen();
+            case MAPART_PAINTER -> new PainterScreen();
         };
         Minecraft.getInstance().setScreen(screen);
     }
@@ -31,7 +31,7 @@ public class ActiveModScreenManager {
 
     public enum ModScreen {
         MAPART_EDITOR,
-        FULLSCREEN_VIEW
-//        MAPART_PAINTER
+        FULLSCREEN_VIEW,
+        MAPART_PAINTER
     }
 }
