@@ -15,11 +15,14 @@ import rh.maparthelper.painter.drawing.DrawingEngine;
 import rh.maparthelper.painter.layer.DynamicTextureLayer;
 import rh.maparthelper.painter.layer.DynamicTextureLayerFactory;
 import rh.maparthelper.painter.surface.NativeImageSurface;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.RegisteredPalettePreset;
 import rh.maparthelper.util.FileUtils;
 
 import java.io.FileOutputStream;
 import java.nio.channels.Channels;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -69,8 +72,19 @@ public class MapartPainterState {
     }
 
     private void defaultDrawingColors(DrawingEngine<?> drawingEngine) {
-        drawingEngine.setMainColor(MapColor.COLOR_BLACK.calculateARGBColor(MapColor.Brightness.NORMAL));
-        drawingEngine.setSecondaryColor(MapColor.SNOW.calculateARGBColor(MapColor.Brightness.NORMAL));
+        RegisteredPalettePreset preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
+        MapColor mainColor;
+        MapColor secondaryColor;
+        if (preset == null) {
+            mainColor = MapColor.COLOR_BLACK;
+            secondaryColor = MapColor.SNOW;
+        } else {
+            Iterator<MapColor> presetColors = preset.getMapColors().iterator();
+            mainColor = presetColors.next();
+            secondaryColor = presetColors.next();
+        }
+        drawingEngine.setMainColor(mainColor.calculateARGBColor(MapColor.Brightness.NORMAL));
+        drawingEngine.setSecondaryColor(secondaryColor.calculateARGBColor(MapColor.Brightness.NORMAL));
     }
 
     private void closeCurrentProject() {
