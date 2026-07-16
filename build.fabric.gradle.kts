@@ -54,7 +54,8 @@ repositories {
     maven("https://maven.isxander.dev/releases") {
         name = "Xander Maven"
     }
-    maven("https://maven.terraformersmc.com/releases/")
+    // Terraformers' maven feels bad ("Premature end of chunk coded message body: closing chunk expected")
+    //maven("https://maven.terraformersmc.com/releases/")
 }
 
 dependencies {
@@ -73,7 +74,10 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
 
     modImplementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
-    modApi("com.terraformersmc:modmenu:${property("modmenu")}")
+    // Terraformers' maven feels bad
+//    modApi("com.terraformersmc:modmenu:${property("modmenu")}")
+    modApi("maven.modrinth:mOgUt4GM:${property("modmenu")}")
+
 }
 
 loom {
