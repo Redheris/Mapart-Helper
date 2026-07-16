@@ -5,3 +5,5 @@ accessible field net/minecraft/client/gui/components/AbstractScrollArea scrollin
 extendable method net/minecraft/client/gui/components/EditBox onValueChange (Ljava/lang/String;)V
 accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
 extendable method net/minecraft/client/gui/components/AbstractSliderButton setValue (D)V
+extendable method net/minecraft/client/gui/components/Tooltip <init> (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
+accessible field net/minecraft/client/gui/components/Tooltip cachedTooltip Ljava/util/List;

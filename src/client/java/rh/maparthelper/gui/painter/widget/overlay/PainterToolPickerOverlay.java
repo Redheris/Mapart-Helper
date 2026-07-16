@@ -1,16 +1,17 @@
 package rh.maparthelper.gui.painter.widget.overlay;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.painter.PainterScreen;
 import rh.maparthelper.gui.painter.cursor.PainterCursorManager;
+import rh.maparthelper.gui.tooltip.MultilineTooltip;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
@@ -21,6 +22,8 @@ import rh.maparthelper.painter.layer.DynamicTextureLayer;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.NativeImageSurface;
 import rh.maparthelper.render.pipeline.PainterSelectionUniform;
+
+import java.time.Duration;
 
 public class PainterToolPickerOverlay extends OverlayLayout {
     private final PainterScreen screen;
@@ -40,88 +43,112 @@ public class PainterToolPickerOverlay extends OverlayLayout {
         GridLayout toolsGrid = new GridLayout().spacing(-2);
         toolsGrid.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyCenter().padding(2);
 
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new RectangleSelectionTool(settingsProvider.SELECTION, drawingEngine.selection),
-                        MapartHelper.identifier("textures/gui/icons/painter/selection_rectangle.png"),
-                        Component.literal("Rectangle selection")
-                ),
-                0, 0
+        ToolButton rectangleSelectionTool = createToolSelectWidget(
+                drawingEngine,
+                new RectangleSelectionTool(settingsProvider.SELECTION, drawingEngine.selection),
+                MapartHelper.identifier("textures/gui/icons/painter/selection_rectangle.png")
         );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new MagicWandTool<>(
-                                settingsProvider.FLOOD_FILL, settingsProvider.SELECTION,
-                                drawingEngine.selection, layerManager
-                        ),
-                        MapartHelper.identifier("textures/gui/icons/painter/selection_magic_wand.png"),
-                        Component.literal("Magic wand")
+        ToolButton magicWandToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new MagicWandTool<>(
+                        settingsProvider.FLOOD_FILL, settingsProvider.SELECTION,
+                        drawingEngine.selection, layerManager
                 ),
-                1, 0
+                MapartHelper.identifier("textures/gui/icons/painter/selection_magic_wand.png")
         );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new SelectionBrushTool(
-                                settingsProvider.BRUSH, settingsProvider.SELECTION,
-                                drawingEngine.selection
-                        ),
-                        MapartHelper.identifier("textures/gui/icons/painter/selection_brush.png"),
-                        Component.literal("Selection brush")
+        ToolButton selectionBrushToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new SelectionBrushTool(
+                        settingsProvider.BRUSH, settingsProvider.SELECTION,
+                        drawingEngine.selection
                 ),
-                2, 0
+                MapartHelper.identifier("textures/gui/icons/painter/selection_brush.png")
         );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new EyedropperTool(layerManager, drawingEngine),
-                        MapartHelper.identifier("textures/gui/icons/painter/eyedropper.png"),
-                        Component.literal("Eyedropper")
+        ToolButton eyedropperToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new EyedropperTool(layerManager, drawingEngine),
+                MapartHelper.identifier("textures/gui/icons/painter/eyedropper.png")
+        );
+        ToolButton handToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new HandTool(),
+                MapartHelper.identifier("textures/gui/icons/painter/hand.png")
+        );
+        ToolButton floodFillToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new FloodFillTool<>(settingsProvider.FLOOD_FILL, layerManager, drawingEngine.selection),
+                MapartHelper.identifier("textures/gui/icons/painter/flood_fill.png")
+        );
+        ToolButton brushToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new BrushTool<>(
+                        settingsProvider.BRUSH, layerManager, drawingEngine.selection
                 ),
-                3, 0
+                MapartHelper.identifier("textures/gui/icons/painter/brush.png")
         );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new HandTool(),
-                        MapartHelper.identifier("textures/gui/icons/painter/hand.png"),
-                        Component.literal("Hand")
+        ToolButton eraserToolBtn = createToolSelectWidget(
+                drawingEngine,
+                new EraserTool<>(
+                        settingsProvider.BRUSH, layerManager, drawingEngine.selection
                 ),
-                0, 1
+                MapartHelper.identifier("textures/gui/icons/painter/eraser.png")
         );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new FloodFillTool<>(settingsProvider.FLOOD_FILL, layerManager, drawingEngine.selection),
-                        MapartHelper.identifier("textures/gui/icons/painter/flood_fill.png"),
-                        Component.literal("Flood fill")
-                ),
-                1, 1
-        );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new BrushTool<>(
-                                settingsProvider.BRUSH, layerManager, drawingEngine.selection
-                        ),
-                        MapartHelper.identifier("textures/gui/icons/painter/brush.png"),
-                        Component.literal("Brush")
-                ),
-                2, 1
-        );
-        toolsGrid.addChild(
-                createToolSelectWidget(
-                        drawingEngine,
-                        new EraserTool<>(
-                                settingsProvider.BRUSH, layerManager, drawingEngine.selection
-                        ),
-                        MapartHelper.identifier("textures/gui/icons/painter/eraser.png"),
-                        Component.literal("Eraser")
-                ),
-                3, 1
-        );
+
+        // TODO: Localize
+        Component shortcutKeyLabel = Component.literal("Shortcut key: ").withColor(CommonColors.LIGHT_GRAY);
+        Component quickToolLabel = Component.literal("Quick tool key: ").withColor(CommonColors.LIGHT_GRAY);
+
+        rectangleSelectionTool.setTooltipDelay(Duration.ofMillis(500));
+        rectangleSelectionTool.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Rectangle selection"),
+                shortcutKeyLabel.copy().append(whiteComponent("S"))
+        ));
+        magicWandToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        magicWandToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Magic wand"),
+                shortcutKeyLabel.copy().append(whiteComponent("W"))
+        ));
+        selectionBrushToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        selectionBrushToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Selection brush"),
+                shortcutKeyLabel.copy().append(whiteComponent("A"))
+        ));
+        eyedropperToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        eyedropperToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Eyedropper"),
+                shortcutKeyLabel.copy().append(whiteComponent("Q")),
+                quickToolLabel.copy().append(whiteComponent("Alt"))
+        ));
+        handToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        handToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Hand"),
+                shortcutKeyLabel.copy().append(whiteComponent("H")),
+                quickToolLabel.copy().append(whiteComponent("Space"))
+        ));
+        floodFillToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        floodFillToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Flood fill"),
+                shortcutKeyLabel.copy().append(whiteComponent("F"))
+        ));
+        brushToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        brushToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Brush"),
+                shortcutKeyLabel.copy().append(whiteComponent("B"))
+        ));
+        eraserToolBtn.setTooltipDelay(Duration.ofMillis(500));
+        eraserToolBtn.setTooltip(MultilineTooltip.createMultiline(
+                Component.literal("Eraser"),
+                shortcutKeyLabel.copy().append(whiteComponent("E"))
+        ));
+
+        toolsGrid.addChild(rectangleSelectionTool, 0, 0);
+        toolsGrid.addChild(magicWandToolBtn, 1, 0);
+        toolsGrid.addChild(selectionBrushToolBtn, 2, 0);
+        toolsGrid.addChild(eyedropperToolBtn, 3, 0);
+        toolsGrid.addChild(handToolBtn, 0, 1);
+        toolsGrid.addChild(floodFillToolBtn, 1, 1);
+        toolsGrid.addChild(brushToolBtn, 2, 1);
+        toolsGrid.addChild(eraserToolBtn, 3, 1);
         //TODO: Temporarily disabled because pattern setting is postponed for now
 //        toolsGrid.addChild(
 //                createToolSelectWidget(
@@ -145,12 +172,12 @@ public class PainterToolPickerOverlay extends OverlayLayout {
         return scrollable;
     }
 
-    private DecorativeButtonWidget createToolSelectWidget(
-            DrawingEngine<?> drawingEngine, PainterTool tool, Identifier icon, Component tooltip
-    ) {
-        var widget = new ToolButton(drawingEngine, tool, icon);
-        widget.setTooltip(Tooltip.create(tooltip));
-        return widget;
+    private Component whiteComponent(String text) {
+        return Component.literal(text).withColor(-1);
+    }
+
+    private ToolButton createToolSelectWidget(DrawingEngine<?> drawingEngine, PainterTool tool, Identifier icon) {
+        return new ToolButton(drawingEngine, tool, icon);
     }
 
     private class ToolButton extends DecorativeButtonWidget {

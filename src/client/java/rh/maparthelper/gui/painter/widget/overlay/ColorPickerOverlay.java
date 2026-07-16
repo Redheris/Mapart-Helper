@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -30,6 +31,7 @@ import rh.maparthelper.state.painter.MapartPainterState;
 import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.RenderUtils;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 
@@ -68,19 +70,27 @@ public class ColorPickerOverlay extends OverlayLayout {
 
         LinearLayout mainButtons = LinearLayout.vertical().spacing(10);
         mainButtons.addChild(new SelectedColorsView(painterProject.getDrawingEngine(), 30, 30));
-        mainButtons.addChild(Button.builder(
+        var modeSwitchButton = Button.builder(
                 paletteStateComponent(colorPickerState),
                 btn -> {
                     var states = MapartPainterState.ColorPickerState.values();
                     int unobtainableId = MapartPainterState.ColorPickerState.UNOBTAINABLE_4COLORS.ordinal();
-                    int nextId = Math.floorMod(colorPickerState.ordinal() + (CompatUtils.hasShiftDown() ? -1 : 1), states.length);
+                    boolean backward = CompatUtils.hasShiftDown();
+                    int nextId = Math.floorMod(colorPickerState.ordinal() + (backward ? -1 : 1), states.length);
                     if (!MapartHelper.commonConfig().displayUnobtainableMode && nextId == unobtainableId) {
-                        nextId = 0;
+                        nextId = backward ? states.length - 2 : 0;
                     }
                     MapartPainterState.getInstance().setColorPickerState(states[nextId]);
                     this.replaceLayout(screen, initContent(painterProject));
                 }
-        ).size(50, 20).build());
+        ).size(50, 20).build();
+        if (colorPickerState == MapartPainterState.ColorPickerState.PRESET) {
+            modeSwitchButton.setTooltipDelay(Duration.ofMillis(400));
+            modeSwitchButton.setTooltip(Tooltip.create(
+                    Component.literal("Palette is based on your selected preset and staircase style")
+            ));
+        }
+        mainButtons.addChild(modeSwitchButton);
 
         colorPickerPaletteState = paletteState(colorPickerState);
         int huesCount = colorPickerPaletteState.huesCount;
