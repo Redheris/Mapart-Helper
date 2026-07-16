@@ -41,7 +41,7 @@ public class SelectionModesDropdown extends DropdownOverlayWidget {
             "textures/gui/icons/painter/selection_xor.png"
     );
 
-    private final SelectionToolSettings selectionSettings = ToolSettingsProvider.getInstance().SELECTION_TOOL;
+    private final SelectionToolSettings selectionSettings = ToolSettingsProvider.getInstance().SELECTION;
 
     // TODO: Localize
     private final Component label = Component.literal("Selection mode: ").withColor(CommonColors.LIGHT_GRAY);

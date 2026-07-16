@@ -104,14 +104,14 @@ public class ToolSettingsLayoutBuilder {
     }
 
     private List<AbstractWidget> initSelectionSettingsWidgets(Screen screen) {
-        SelectionToolSettings selectionSettings = settingsProvider.SELECTION_TOOL;
+        SelectionToolSettings selectionSettings = settingsProvider.SELECTION;
         selectionModesDropdown = new SelectionModesDropdown(screen, selectionSettings.getMode());
         return List.of(selectionModesDropdown);
     }
 
     // TODO: Localize
     private List<AbstractWidget> initBrushSettingsWidgets() {
-        BrushToolSettings brushSettings = settingsProvider.BRUSH_TOOL;
+        BrushToolSettings brushSettings = settingsProvider.BRUSH;
 
         Component brushModeLabel = Component.literal("Brush mode: ").withColor(CommonColors.LIGHT_GRAY);
 

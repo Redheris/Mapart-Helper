@@ -11,12 +11,11 @@ public class QuickSelectionModeSelector {
         this.settings = settings;
     }
 
-    public boolean apply(SelectionToolSettings.SelectionMode mode) {
-        if (applied) return false;
+    public void apply(SelectionToolSettings.SelectionMode mode) {
+        if (applied) return;
         this.applied = true;
         this.originalMode = settings.getMode();
         settings.setMode(mode);
-        return true;
     }
 
     public boolean release() {
@@ -24,5 +23,9 @@ public class QuickSelectionModeSelector {
         this.settings.setMode(originalMode);
         this.applied = false;
         return true;
+    }
+
+    public boolean isApplied() {
+        return applied;
     }
 }

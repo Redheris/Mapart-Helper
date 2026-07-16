@@ -23,4 +23,8 @@ public class QuickToolSelector {
         this.drawingEngine.setSelectedTool(mainPainterTool);
         this.inUse = false;
     }
+
+    public boolean isInUse() {
+        return inUse;
+    }
 }

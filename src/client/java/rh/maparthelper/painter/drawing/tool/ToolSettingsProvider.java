@@ -8,8 +8,8 @@ import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
 public class ToolSettingsProvider {
     private final static ToolSettingsProvider INSTANCE = new ToolSettingsProvider();
 
-    public final BrushToolSettings BRUSH_TOOL = new BrushToolSettings();
-    public final SelectionToolSettings SELECTION_TOOL = new SelectionToolSettings();
+    public final BrushToolSettings BRUSH = new BrushToolSettings();
+    public final SelectionToolSettings SELECTION = new SelectionToolSettings();
     public final FloodFillSettings FLOOD_FILL = new FloodFillSettings();
     public final PatternSettings PATTERN = new PatternSettings();
 
@@ -20,8 +20,8 @@ public class ToolSettingsProvider {
     }
 
     public static void patchInstance(ToolSettingsProvider patch) {
-        INSTANCE.BRUSH_TOOL.update(patch.BRUSH_TOOL);
-        INSTANCE.SELECTION_TOOL.update(patch.SELECTION_TOOL);
+        INSTANCE.BRUSH.update(patch.BRUSH);
+        INSTANCE.SELECTION.update(patch.SELECTION);
         INSTANCE.FLOOD_FILL.update(patch.FLOOD_FILL);
         INSTANCE.PATTERN.update(patch.PATTERN);
     }

@@ -43,7 +43,7 @@ public class PainterToolPickerOverlay extends OverlayLayout {
         toolsGrid.addChild(
                 createToolSelectWidget(
                         drawingEngine,
-                        new RectangleSelectionTool(settingsProvider.SELECTION_TOOL, drawingEngine.selection),
+                        new RectangleSelectionTool(settingsProvider.SELECTION, drawingEngine.selection),
                         MapartHelper.identifier("textures/gui/icons/painter/selection_rectangle.png"),
                         Component.literal("Rectangle selection")
                 ),
@@ -53,7 +53,7 @@ public class PainterToolPickerOverlay extends OverlayLayout {
                 createToolSelectWidget(
                         drawingEngine,
                         new MagicWandTool<>(
-                                settingsProvider.FLOOD_FILL, settingsProvider.SELECTION_TOOL,
+                                settingsProvider.FLOOD_FILL, settingsProvider.SELECTION,
                                 drawingEngine.selection, layerManager
                         ),
                         MapartHelper.identifier("textures/gui/icons/painter/selection_magic_wand.png"),
@@ -65,7 +65,7 @@ public class PainterToolPickerOverlay extends OverlayLayout {
                 createToolSelectWidget(
                         drawingEngine,
                         new SelectionBrushTool(
-                                settingsProvider.BRUSH_TOOL, settingsProvider.SELECTION_TOOL,
+                                settingsProvider.BRUSH, settingsProvider.SELECTION,
                                 drawingEngine.selection
                         ),
                         MapartHelper.identifier("textures/gui/icons/painter/selection_brush.png"),
@@ -104,7 +104,7 @@ public class PainterToolPickerOverlay extends OverlayLayout {
                 createToolSelectWidget(
                         drawingEngine,
                         new BrushTool<>(
-                                settingsProvider.BRUSH_TOOL, layerManager, drawingEngine.selection
+                                settingsProvider.BRUSH, layerManager, drawingEngine.selection
                         ),
                         MapartHelper.identifier("textures/gui/icons/painter/brush.png"),
                         Component.literal("Brush")
@@ -115,7 +115,7 @@ public class PainterToolPickerOverlay extends OverlayLayout {
                 createToolSelectWidget(
                         drawingEngine,
                         new EraserTool<>(
-                                settingsProvider.BRUSH_TOOL, layerManager, drawingEngine.selection
+                                settingsProvider.BRUSH, layerManager, drawingEngine.selection
                         ),
                         MapartHelper.identifier("textures/gui/icons/painter/eraser.png"),
                         Component.literal("Eraser")

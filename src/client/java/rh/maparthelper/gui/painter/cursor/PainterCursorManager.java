@@ -71,7 +71,7 @@ public final class PainterCursorManager {
 
         if (selectedTool instanceof BrushTool<?> || selectedTool instanceof SelectionBrushTool) {
             isDefaultArea = false;
-            var brushSettings = toolSettingsProvider.BRUSH_TOOL;
+            var brushSettings = toolSettingsProvider.BRUSH;
             int thickness = brushSettings.getThickness();
 
             if (selectedTool == lastTool && thickness == areaSideSize && brushSettings.isCircleShape() == brushCircleShape) {

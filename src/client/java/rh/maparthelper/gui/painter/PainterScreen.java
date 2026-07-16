@@ -9,8 +9,10 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
+import rh.maparthelper.gui.painter.cursor.PainterCursorManager;
+import rh.maparthelper.gui.painter.hotkey.HotkeyActionType;
+import rh.maparthelper.gui.painter.hotkey.ShortcutKeysHandler;
 import rh.maparthelper.gui.painter.widget.ToolSettingsLayoutBuilder;
 import rh.maparthelper.gui.painter.widget.overlay.*;
 import rh.maparthelper.gui.screen.FullscreenImageViewScreen;
@@ -19,16 +21,15 @@ import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.painter.PainterProject;
 import rh.maparthelper.painter.drawing.DrawingEngine;
-import rh.maparthelper.painter.drawing.tool.*;
-import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
+import rh.maparthelper.painter.drawing.tool.AbstractSelectionTool;
 import rh.maparthelper.painter.history.HistoryManager;
 import rh.maparthelper.painter.history.action.HistoryActionType;
 import rh.maparthelper.painter.layer.DynamicTextureLayer;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.NativeImageSurface;
+import rh.maparthelper.render.pipeline.PainterSelectionUniform;
 import rh.maparthelper.state.ActiveModScreenManager;
 import rh.maparthelper.state.painter.MapartPainterState;
-import rh.maparthelper.util.CompatUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -59,8 +60,7 @@ public class PainterScreen extends FullscreenImageViewScreen {
     private final DrawingEngine<NativeImageSurface> drawingEngine;
     private final LayerManager<NativeImageSurface, DynamicTextureLayer> layerManager;
     private final HistoryManager historyManager;
-    private final QuickToolSelector quickToolSelector;
-    private final QuickSelectionModeSelector quickSelectionModeSelector;
+    private final ShortcutKeysHandler shortcutKeysHandler;
 
     private PainterViewWidget painterViewWidget;
     private ToolSettingsLayoutBuilder toolSettingsLayoutBuilder;
@@ -85,8 +85,7 @@ public class PainterScreen extends FullscreenImageViewScreen {
         this.drawingEngine = painterProject.getDrawingEngine();
         this.layerManager = painterProject.getLayerManager();
         this.historyManager = painterProject.getHistoryManager();
-        quickToolSelector = new QuickToolSelector(painterProject.getDrawingEngine());
-        quickSelectionModeSelector = new QuickSelectionModeSelector(ToolSettingsProvider.getInstance().SELECTION_TOOL);
+        this.shortcutKeysHandler = new ShortcutKeysHandler(painterProject, this::undo, this::redo);
         ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.MAPART_PAINTER);
     }
 
@@ -215,53 +214,26 @@ public class PainterScreen extends FullscreenImageViewScreen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (CompatUtils.hasControlDown()) {
-            if (keyCode == GLFW.GLFW_KEY_Z) {
-                if (CompatUtils.hasShiftDown()) {
-                    this.redo();
-                } else {
-                    this.undo();
-                }
-                painterViewWidget.updateSelectionMaskTexture();
-                painterViewWidget.updateSelectionUniform();
-                return true;
-            }
+        HotkeyActionType hotkeyActionType = shortcutKeysHandler.keyPressed(keyCode, scanCode, modifiers);
+        if (hotkeyActionType == HotkeyActionType.HISTORY) {
+            painterViewWidget.updateSelectionMaskTexture();
+            painterViewWidget.updateSelectionUniform();
         }
-        if (CompatUtils.isKeyDown(GLFW.GLFW_KEY_SPACE)) {
-            quickToolSelector.use(new HandTool());
-            return true;
+        if (hotkeyActionType == HotkeyActionType.QUICK_SELECTION_MODE) {
+            selectionModesDropdown.updateDropdownButtonState();
         }
-        if (drawingEngine.getSelectedTool() instanceof AbstractSelectionTool) {
-            SelectionToolSettings.SelectionMode quickSelectionMode = null;
-            if (CompatUtils.hasAltDown()) {
-                quickSelectionMode = SelectionToolSettings.SelectionMode.SUBTRACT;
-            } else if (CompatUtils.hasControlDown()) {
-                quickSelectionMode = SelectionToolSettings.SelectionMode.CONCAT;
-            }
-            if (quickSelectionMode != null && quickSelectionModeSelector.apply(quickSelectionMode)) {
-                selectionModesDropdown.updateDropdownButtonState();
-                return true;
-            }
-        } else {
-            if (CompatUtils.hasAltDown()) {
-                quickToolSelector.use(new EyedropperTool(layerManager, drawingEngine));
-                return true;
-            }
+        if (hotkeyActionType == HotkeyActionType.TOOL_CHANGE) {
+            PainterSelectionUniform.set(drawingEngine.getSelectedTool() instanceof AbstractSelectionTool);
+            PainterCursorManager.getInstance().updateCursorAreaUniform();
+            rebuildToolSettingsLayout();
         }
-        if (keyCode == GLFW.GLFW_KEY_B) {
-            quickToolSelector.use(new BrushTool<>(
-                    ToolSettingsProvider.getInstance().BRUSH_TOOL,
-                    layerManager, drawingEngine.selection
-            ));
-            return true;
-        }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+
+        return hotkeyActionType != HotkeyActionType.NONE || super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        quickToolSelector.release();
-        if (quickSelectionModeSelector.release()) {
+        if (shortcutKeysHandler.keyReleased(keyCode, scanCode, modifiers)) {
             selectionModesDropdown.updateDropdownButtonState();
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
