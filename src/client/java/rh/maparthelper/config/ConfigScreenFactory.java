@@ -53,7 +53,7 @@ public class ConfigScreenFactory {
                                 .build())
                         .option(Option.<Integer>createBuilder()
                                 .name(Component.translatable("maparthelper.config.common.fakeItemFramesLiveTime"))
-                                .customController(IntegerFieldController::new)
+                                .customController(opt -> new IntegerFieldController(opt, 0, 1200))
                                 .binding(
                                         defaults.fakeItemFramesLiveTime,
                                         () -> config.fakeItemFramesLiveTime,
@@ -62,6 +62,16 @@ public class ConfigScreenFactory {
                                 .build())
                         .group(OptionGroup.createBuilder()
                                 .name(Component.translatable("maparthelper.config.common.group.conversionSettings"))
+                                .option(Option.<Integer>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.common.maxMapartSize"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.maxMapartSize")))
+                                        .customController(opt -> new IntegerFieldController(opt, 1, 10000))
+                                        .binding(
+                                                defaults.maxMapartSize,
+                                                () -> config.maxMapartSize,
+                                                value -> config.maxMapartSize = value
+                                        )
+                                        .build())
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Component.translatable("maparthelper.config.common.logConversionTime"))
                                         .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.logConversionTime")))

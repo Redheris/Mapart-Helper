@@ -176,6 +176,8 @@
   "maparthelper.config.common.fakeItemFramesLiveTime": "Длительность показа фейковых рамок (в тиках)",
 
   "maparthelper.config.common.group.conversionSettings": "Настройки конвертации",
+  "maparthelper.config.common.maxMapartSize": "Максимальный размер стороны мапарта",
+  "maparthelper.config.common.description.maxMapartSize": "Ограничивает поля ввода размера мапарта заданным максимальным значением. Это должно предотвратить случайные попытки создания огромных изображения",
   "maparthelper.config.common.logConversionTime": "Логировать длительность обработки",
   "maparthelper.config.common.description.logConversionTime": "Каждый раз печатает в log-файл, сколько секунд длилась полная обработка изображения.\n§cНе рекомендуется включать на длительное время во избежание излишнего спама",
   "maparthelper.config.common.previewHighlightOnHover": "Выделять цвета на превью при наведении",

@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.gui.widget.input.IntegerFieldWidget;
 import rh.maparthelper.state.painter.MapartPainterState;
@@ -42,6 +43,8 @@ public class CreateNewProjectScreen extends Screen {
         content = LinearLayout.vertical().spacing(-4);
         content.defaultCellSetting().padding(4);
 
+        final int maxSize = MapartHelper.commonConfig().maxMapartSize;
+
         // TODO: Localize
         LinearLayout createTypeLayout = LinearLayout.horizontal();
         createTypeLayout.defaultCellSetting().alignVerticallyMiddle();
@@ -62,7 +65,7 @@ public class CreateNewProjectScreen extends Screen {
         xSizeField = new IntegerFieldWidget(
                 font, 40, 20,
                 Math.max(1, CurrentConversionSettings.getMapartWidth()),
-                1, 100
+                1, maxSize
         );
         xSizeLayout.addChild(xSizeField);
 
@@ -72,7 +75,7 @@ public class CreateNewProjectScreen extends Screen {
         ySizeField = new IntegerFieldWidget(
                 font, 40, 20,
                 Math.max(1, CurrentConversionSettings.getMapartHeight()),
-                1, 100
+                1, maxSize
         );
         ySizeLayout.addChild(ySizeField);
 

@@ -31,6 +31,10 @@ public class CommonConfiguration {
     @SerialEntry
     public Color previewHighlightingColor = new Color(0xFF9900ff, true);
 
+    // Conversion settings
+
+    @SerialEntry
+    public int maxMapartSize = 30;
     @SerialEntry
     public boolean logConversionTime = false;
     @SerialEntry

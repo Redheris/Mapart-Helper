@@ -712,10 +712,10 @@ public class MapartEditorScreen extends ScreenAdapted {
         LinearLayout inputFieldsLayout = LinearLayout.horizontal().spacing(1);
         inputFieldsLayout.defaultCellSetting().alignVerticallyMiddle();
 
-        // TODO: Configurable max value
+        final int maxSize = MapartHelper.commonConfig().maxMapartSize;
 
         IntegerFieldWidget xSizeField = new IntegerFieldWidget(
-                font, 30, 20, mapart.getWidth(), 1, 50
+                font, 30, 20, mapart.getWidth(), 1, maxSize
         );
         xSizeField.setIntegerValueConsumer(value -> {
             if (value != mapart.getWidth()) {
@@ -725,7 +725,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         });
 
         IntegerFieldWidget ySizeField = new IntegerFieldWidget(
-                font, 30, 20, mapart.getHeight(), 1, 50
+                font, 30, 20, mapart.getHeight(), 1, maxSize
         );
         ySizeField.setIntegerValueConsumer(value -> {
             if (value != mapart.getHeight()) {
@@ -733,6 +733,10 @@ public class MapartEditorScreen extends ScreenAdapted {
                 MapartImageUpdater.resizeMapartImage(mapart, mapart.getWidth(), value);
             }
         });
+        if (xSizeField.getIntValue() != mapart.getWidth() || ySizeField.getIntValue() != mapart.getHeight()) {
+            CurrentConversionSettings.guiMapartImage = null;
+            MapartImageUpdater.resizeMapartImage(mapart, xSizeField.getIntValue(), ySizeField.getIntValue());
+        }
 
         inputFieldsLayout.addChild(new StringWidget(Component.literal("x:"), font));
         inputFieldsLayout.addChild(xSizeField, inputFieldsLayout.newCellSettings().paddingRight(10));

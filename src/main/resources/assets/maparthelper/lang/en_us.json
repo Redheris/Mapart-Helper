@@ -176,6 +176,8 @@
   "maparthelper.config.common.fakeItemFramesLiveTime": "Fake item frames display duration (in ticks)",
 
   "maparthelper.config.common.group.conversionSettings": "Conversion Settings",
+  "maparthelper.config.common.maxMapartSize": "Maximum mapart side size",
+  "maparthelper.config.common.description.maxMapartSize": "Limits mapart size input fields with the given maximum value. It should prevent accidental attempts to create very huge images",
   "maparthelper.config.common.logConversionTime": "Log processing duration",
   "maparthelper.config.common.description.logConversionTime": "Every time it prints to the log file how many seconds the full image processing took.\n§cIt is not recommended to leave this enabled for a long time to avoid excessive spam",
   "maparthelper.config.common.previewHighlightOnHover": "Highlight colors on preview when hovering",

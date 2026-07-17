@@ -20,5 +20,6 @@ It's done to make presets as stable and easy to share as possible.
   This can be changed in the config;
 - Added config option to allow adding auxiliary blocks at the platform layer to the schematic;
 - All integer input fields got maximum value limit and mouse scrolling behavior;
+- Added configurable maximum value to mapart size fields;
 
 </details>
