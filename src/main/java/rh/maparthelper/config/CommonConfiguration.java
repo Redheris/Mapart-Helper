@@ -4,7 +4,6 @@ import com.google.gson.FieldNamingPolicy;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
@@ -16,7 +15,7 @@ import java.awt.*;
 public class CommonConfiguration {
     public static ConfigClassHandler<CommonConfiguration> HANDLER =
             ConfigClassHandler.createBuilder(CommonConfiguration.class)
-                    .id(Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "yacl_try"))
+                    .id(MapartHelper.identifier("yacl_config_screen"))
                     .serializer(config ->
                             GsonConfigSerializerBuilder.create(config)
                                     .setPath(MapartHelper.CONFIG_PATH.resolve("mapart-helper.json"))
