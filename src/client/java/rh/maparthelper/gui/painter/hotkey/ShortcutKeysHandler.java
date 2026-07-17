@@ -63,6 +63,11 @@ public class ShortcutKeysHandler {
             return HotkeyActionType.HISTORY;
         }
 
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE && drawingEngine.selection.isActive()) {
+            drawingEngine.clearSelection();
+            return HotkeyActionType.SELECTION_CHANGE;
+        }
+
         if (keyCode == GLFW.GLFW_KEY_SPACE) {
             quickToolSelector.use(handTool);
             return HotkeyActionType.QUICK_TOOL;

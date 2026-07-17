@@ -4,6 +4,7 @@ public enum HotkeyActionType {
     NONE,
     HISTORY,
     TOOL_CHANGE,
+    SELECTION_CHANGE,
     QUICK_TOOL,
     QUICK_SELECTION_MODE
 }

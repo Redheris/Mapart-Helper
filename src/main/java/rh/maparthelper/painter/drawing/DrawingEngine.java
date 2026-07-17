@@ -4,9 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.painter.drawing.tool.HandTool;
 import rh.maparthelper.painter.drawing.tool.PainterTool;
 import rh.maparthelper.painter.history.HistoryManager;
+import rh.maparthelper.painter.history.action.SelectionHistoryAction;
 import rh.maparthelper.painter.layer.Layer;
 import rh.maparthelper.painter.layer.LayerManager;
 import rh.maparthelper.painter.surface.PixelSurface;
+
+import java.util.BitSet;
 
 public class DrawingEngine<T extends PixelSurface> {
     protected final LayerManager<T, ? extends Layer<T>> layerManager;
@@ -92,5 +95,13 @@ public class DrawingEngine<T extends PixelSurface> {
         selectedTool.cancel();
         isProcessing = false;
         isInversedColors = false;
+    }
+
+    public void clearSelection() {
+        if (!selection.isActive()) return;
+        BitSet filled = selection.getSelectionMask();
+        selection.clear();
+        BitSet clear = selection.getSelectionMask();
+        historyManager.saveAction(new SelectionHistoryAction(selection, filled, clear));
     }
 }

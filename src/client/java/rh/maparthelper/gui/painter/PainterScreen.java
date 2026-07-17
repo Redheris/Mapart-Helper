@@ -227,6 +227,9 @@ public class PainterScreen extends FullscreenImageViewScreen {
             PainterCursorManager.getInstance().updateCursorAreaUniform();
             rebuildToolSettingsLayout();
         }
+        if (hotkeyActionType == HotkeyActionType.SELECTION_CHANGE) {
+            painterViewWidget.updateSelectionMaskTexture();
+        }
 
         return hotkeyActionType != HotkeyActionType.NONE || super.keyPressed(keyCode, scanCode, modifiers);
     }
