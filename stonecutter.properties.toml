@@ -24,7 +24,7 @@ mc_targets = "1.21.8"
 # Dependencies
 fabric_api = "0.136.1+1.21.8"
 yacl = "3.8.2+1.21.6-fabric"
-modmenu = "ku5NivOP" # "15.0.2"
+modmenu = "15.0.2"
 # Mappings
 parchment = "1.21.8:2025.09.14"
 mojbackward = "1.21.8+build.3"
@@ -36,7 +36,7 @@ mc_targets = "1.21.11"
 # Dependencies
 fabric_api = "0.141.3+1.21.11"
 yacl = "3.8.2+1.21.11-fabric"
-modmenu = "Tyk71iSw" # "17.0.0"
+modmenu = "17.0.0"
 # Mappings
 parchment = "1.21.11:2025.12.20"
 
@@ -48,4 +48,4 @@ mc_targets = "26.1"
 # Dependencies
 fabric_api = "0.145.1+26.1"
 yacl = "3.9.1+26.1-fabric"
-modmenu = "3rsoV1bk" # "18.0.0"
+modmenu = "18.0.0"

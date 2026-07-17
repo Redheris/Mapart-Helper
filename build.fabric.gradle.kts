@@ -54,8 +54,9 @@ repositories {
     maven("https://maven.isxander.dev/releases") {
         name = "Xander Maven"
     }
-    // Terraformers' maven feels bad ("Premature end of chunk coded message body: closing chunk expected")
-    //maven("https://maven.terraformersmc.com/releases/")
+    maven("https://maven.gnomecraft.net/releases") {
+        name = "GniftyGnome"
+    }
 }
 
 dependencies {
@@ -75,8 +76,7 @@ dependencies {
 
     modImplementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
     // Terraformers' maven feels bad
-//    modApi("com.terraformersmc:modmenu:${property("modmenu")}")
-    modApi("maven.modrinth:mOgUt4GM:${property("modmenu")}")
+    modApi("com.terraformersmc:modmenu:${property("modmenu")}")
 
 }
 
