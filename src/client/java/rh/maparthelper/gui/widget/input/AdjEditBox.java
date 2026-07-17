@@ -117,7 +117,7 @@ public class AdjEditBox extends EditBox {
         super.setResponder(value -> {
             setTextColor(baseTextColor);
             if (value.isEmpty()) return;
-            if (valueValidator != null && !valueValidator.test(value)) setTextColor(CommonColors.SOFT_RED);
+            if (valueValidator != null && !valueValidator.test(value)) super.setTextColor(CommonColors.SOFT_RED);
             else if (valueConsumer != null) valueConsumer.accept(value);
         });
     }
