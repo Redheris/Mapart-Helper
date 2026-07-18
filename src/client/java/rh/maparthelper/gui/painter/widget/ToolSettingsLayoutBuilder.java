@@ -174,7 +174,7 @@ public class ToolSettingsLayoutBuilder {
         );
 
         var toleranceSlider = new SliderOption(
-                100, 16,
+                130, 16,
                 Component.translatable("maparthelper.gui.mapart_painter.tools_settings.tolerance"),
                 floodFillSettings.getTolerance(),
                 d -> floodFillSettings.setTolerance(d.floatValue())

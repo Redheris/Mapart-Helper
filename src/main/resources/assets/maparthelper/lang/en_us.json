@@ -206,9 +206,9 @@
   "maparthelper.gui.mapart_painter.tools_settings.fill_mode.local": "Local",
   "maparthelper.gui.mapart_painter.tools_settings.fill_mode.global": "Global",
   "maparthelper.gui.mapart_painter.tools_settings.tolerance": "Tolerance",
-  "maparthelper.gui.mapart_painter.project.save_as_one_png": "Save as PNG",
-  "maparthelper.gui.mapart_painter.project.save_layers_in_zip": "Save every layer as PNG",
-  "maparthelper.gui.mapart_painter.project.save_and_use_as_mapart": "Save and set as mapart",
+  "maparthelper.gui.mapart_painter.project.save_as_one_png": "Single PNG",
+  "maparthelper.gui.mapart_painter.project.save_layers_in_zip": "All layers in ZIP",
+  "maparthelper.gui.mapart_painter.project.save_and_use_as_mapart": "Single PNG and set as mapart",
   "maparthelper.gui.mapart_painter.project.label_create": "Create:",
   "maparthelper.gui.mapart_painter.project.empty_projectoption": "Empty project",
   "maparthelper.gui.mapart_painter.project.with_current_mapartoption": "With current mapart",
@@ -220,6 +220,7 @@
   "maparthelper.gui.mapart_painter.undo": "Undo",
   "maparthelper.gui.mapart_painter.redo": "Redo",
   "maparthelper.gui.mapart_painter.new_project": "New project",
+  "maparthelper.gui.mapart_painter.save_project": "Save as",
 
 
   "key.maparthelper.openScreen": "Open mapart editor",

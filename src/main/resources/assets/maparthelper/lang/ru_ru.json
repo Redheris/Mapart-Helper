@@ -206,9 +206,9 @@
   "maparthelper.gui.mapart_painter.tools_settings.fill_mode.local": "Локальная",
   "maparthelper.gui.mapart_painter.tools_settings.fill_mode.global": "Глобальная",
   "maparthelper.gui.mapart_painter.tools_settings.tolerance": "Чувствительность",
-  "maparthelper.gui.mapart_painter.project.save_as_one_png": "Сохранить как PNG",
-  "maparthelper.gui.mapart_painter.project.save_layers_in_zip": "Сохранить каждый слой как PNG",
-  "maparthelper.gui.mapart_painter.project.save_and_use_as_mapart": "Сохранить и открыть редактор мапарта",
+  "maparthelper.gui.mapart_painter.project.save_as_one_png": "Один PNG",
+  "maparthelper.gui.mapart_painter.project.save_layers_in_zip": "Все слои в ZIP",
+  "maparthelper.gui.mapart_painter.project.save_and_use_as_mapart": "Один PNG и создать мапарт",
   "maparthelper.gui.mapart_painter.project.label_create": "Создать:",
   "maparthelper.gui.mapart_painter.project.empty_projectoption": "Пустой проект",
   "maparthelper.gui.mapart_painter.project.with_current_mapartoption": "С текущим мапартом",
@@ -220,6 +220,7 @@
   "maparthelper.gui.mapart_painter.undo": "Отменить",
   "maparthelper.gui.mapart_painter.redo": "Вернуть",
   "maparthelper.gui.mapart_painter.new_project": "Новый проект",
+  "maparthelper.gui.mapart_painter.save_project": "Сохранить как",
 
 
   "key.maparthelper.openScreen": "Открыть редактор мапартов",

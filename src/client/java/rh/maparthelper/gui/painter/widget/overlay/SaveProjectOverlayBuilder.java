@@ -26,11 +26,12 @@ public class SaveProjectOverlayBuilder {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_hh.mm.ss");
 
         MapartPainterState painterState = MapartPainterState.getInstance();
+        int overlayWidth = 180;
 
         Button savePNG = Button.builder(
                 Component.translatable("maparthelper.gui.mapart_painter.project.save_as_one_png"),
                 btn -> painterState.saveProjectAsPNG(LocalDateTime.now().format(formatter))
-        ).size(140, 20).build();
+        ).size(overlayWidth - 10, 20).build();
 
         Button saveZip = Button.builder(
                 Component.translatable("maparthelper.gui.mapart_painter.project.save_layers_in_zip"),
@@ -51,7 +52,7 @@ public class SaveProjectOverlayBuilder {
                                 false);
                     }
                 }
-        ).size(140, 20).build();
+        ).size(overlayWidth - 10, 20).build();
 
         Button passToMapartEditor = Button.builder(
                 Component.translatable("maparthelper.gui.mapart_painter.project.save_and_use_as_mapart"),
@@ -69,10 +70,10 @@ public class SaveProjectOverlayBuilder {
                         Minecraft.getInstance().setScreen(new MapartEditorScreen());
                     }
                 }
-        ).size(140, 20).build();
+        ).size(overlayWidth - 10, 20).build();
 
         return OverlayLayoutFactory.listMenu(
-                80, 150,
+                80, overlayWidth,
                 savePNG,
                 saveZip,
                 passToMapartEditor

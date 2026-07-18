@@ -187,7 +187,8 @@ public class PainterScreen extends FullscreenImageViewScreen {
         ).size(80, 20).build());
 
         headerRight.addChild(new DropdownOverlayButton(
-                this, saveProjectOverlay, 60, 20, Component.translatable("maparthelper.gui.save")
+                this, saveProjectOverlay, 82, 20,
+                Component.translatable("maparthelper.gui.mapart_painter.save_project")
         ));
 
         return headerRight;
