@@ -11,7 +11,7 @@ import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
 
 import java.util.function.Consumer;
 
-public class EnumListDropdown extends DropdownOverlayWidget {
+public class EnumListDropdown extends DropdownOverlayButton {
     private final PressAction modifySwitchButtonOnChange;
 
     public EnumListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,

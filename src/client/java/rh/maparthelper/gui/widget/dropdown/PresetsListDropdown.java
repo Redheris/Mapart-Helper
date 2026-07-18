@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class PresetsListDropdown extends DropdownOverlayWidget {
+public class PresetsListDropdown extends DropdownOverlayButton {
 
     public PresetsListDropdown(@NotNull Screen screen, int width, int height, int overlayWidth, int overlayHeight,
                                boolean dynamicText, Component initOption,

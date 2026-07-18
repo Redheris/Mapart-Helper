@@ -21,7 +21,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class PresetPatchesListDropdown extends DropdownOverlayWidget {
+public class PresetPatchesListDropdown extends DropdownOverlayButton {
     private static final Identifier LIST_ICON = MapartHelper.identifier("textures/gui/icons/list.png");
     private static final Identifier REMOVE_ICON_TEXTURE = MapartHelper.identifier("textures/gui/icons/trash_can.png");
 

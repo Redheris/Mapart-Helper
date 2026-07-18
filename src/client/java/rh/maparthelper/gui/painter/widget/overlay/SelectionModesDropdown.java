@@ -15,7 +15,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
-import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
+import rh.maparthelper.gui.widget.dropdown.DropdownOverlayButton;
 import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.painter.drawing.tool.ToolSettingsProvider;
@@ -24,7 +24,7 @@ import rh.maparthelper.painter.drawing.tool.settings.SelectionToolSettings;
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
-public class SelectionModesDropdown extends DropdownOverlayWidget {
+public class SelectionModesDropdown extends DropdownOverlayButton {
     private final static Identifier replaceIconId = MapartHelper.identifier(
             "textures/gui/icons/painter/selection_rectangle.png"
     );

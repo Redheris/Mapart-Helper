@@ -10,7 +10,7 @@ import rh.maparthelper.gui.widget.layout.OverlayLayout;
 //? if >=1.21.10
 //import net.minecraft.client.input.InputWithModifiers;
 
-public class DropdownOverlayWidget extends DecorativeButtonWidget {
+public class DropdownOverlayButton extends DecorativeButtonWidget {
     private final Screen screen;
     private OverlayLayout overlay;
     private int overlayXOffset = 0;
@@ -18,7 +18,7 @@ public class DropdownOverlayWidget extends DecorativeButtonWidget {
     /// If the overlay can be placed with its full height either downward or upward - it will be prioritized
     private final boolean keepMaxOverlayHeight;
 
-    public DropdownOverlayWidget(@NotNull Screen screen, OverlayLayout overlay, int x, int y, int width, int height,
+    public DropdownOverlayButton(@NotNull Screen screen, OverlayLayout overlay, int x, int y, int width, int height,
                                  Component message, boolean keepMaxOverlayHeight
     ) {
         super(true, -1, x, y, width, height, message, btn -> {});
@@ -27,16 +27,16 @@ public class DropdownOverlayWidget extends DecorativeButtonWidget {
         this.setOverlay(overlay);
     }
 
-    public DropdownOverlayWidget(@NotNull Screen screen, OverlayLayout overlay, int width, int height, Component message,
+    public DropdownOverlayButton(@NotNull Screen screen, OverlayLayout overlay, int width, int height, Component message,
                                  boolean keepMaxOverlayHeight) {
         this(screen, overlay, 0, 0, width, height, message, keepMaxOverlayHeight);
     }
 
-    public DropdownOverlayWidget(@NotNull Screen screen, OverlayLayout overlay, int width, int height, Component message) {
+    public DropdownOverlayButton(@NotNull Screen screen, OverlayLayout overlay, int width, int height, Component message) {
         this(screen, overlay, width, height, message, false);
     }
 
-    public DropdownOverlayWidget(@NotNull Screen screen, OverlayLayout overlay, int x, int y, int width, int height,
+    public DropdownOverlayButton(@NotNull Screen screen, OverlayLayout overlay, int x, int y, int width, int height,
                                  boolean keepMaxOverlayHeight, boolean renderVanillaBackground, WidgetSprites customSprites
     ) {
         super(renderVanillaBackground, customSprites, x, y, width, height, btn -> {});
@@ -45,7 +45,7 @@ public class DropdownOverlayWidget extends DecorativeButtonWidget {
         this.setOverlay(overlay);
     }
 
-    public DropdownOverlayWidget(@NotNull Screen screen, OverlayLayout overlay, int width, int height,
+    public DropdownOverlayButton(@NotNull Screen screen, OverlayLayout overlay, int width, int height,
                                  boolean keepMaxOverlayHeight, boolean renderVanillaBackground, WidgetSprites customSprites
     ) {
         this(screen, overlay, 0, 0, width, height, keepMaxOverlayHeight, renderVanillaBackground, customSprites);

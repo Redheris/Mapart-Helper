@@ -22,7 +22,7 @@ import rh.maparthelper.util.RenderUtils;
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
-public class MapColorPickerDropdown extends DropdownOverlayWidget {
+public class MapColorPickerDropdown extends DropdownOverlayButton {
     private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
     private final MapartProcessing mapart;
 

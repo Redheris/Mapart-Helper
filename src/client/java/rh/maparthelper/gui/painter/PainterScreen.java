@@ -17,7 +17,7 @@ import rh.maparthelper.gui.painter.widget.ToolSettingsLayoutBuilder;
 import rh.maparthelper.gui.painter.widget.overlay.*;
 import rh.maparthelper.gui.screen.FullscreenImageViewScreen;
 import rh.maparthelper.gui.widget.DecorativeButtonWidget;
-import rh.maparthelper.gui.widget.dropdown.DropdownOverlayWidget;
+import rh.maparthelper.gui.widget.dropdown.DropdownOverlayButton;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.painter.PainterProject;
 import rh.maparthelper.painter.drawing.DrawingEngine;
@@ -186,7 +186,7 @@ public class PainterScreen extends FullscreenImageViewScreen {
                 btn -> Minecraft.getInstance().setScreen(new CreateNewProjectScreen(this))
         ).size(80, 20).build());
 
-        headerRight.addChild(new DropdownOverlayWidget(
+        headerRight.addChild(new DropdownOverlayButton(
                 this, saveProjectOverlay, 60, 20, Component.translatable("maparthelper.gui.save")
         ));
 

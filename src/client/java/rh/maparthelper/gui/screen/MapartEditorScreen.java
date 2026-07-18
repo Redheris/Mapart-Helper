@@ -104,8 +104,8 @@ public class MapartEditorScreen extends ScreenAdapted {
     private EnumListDropdown useAuxBlocksDropdownButton;
     private PresetsListDropdown presetsListDropdownButton;
     private MapColorPickerDropdown mapColorPickerDropdownWidget;
-    private DropdownOverlayWidget saveMapartDropdownWidget;
-    private DropdownOverlayWidget rgbPropagationDropdownWidget;
+    private DropdownOverlayButton saveMapartDropdownWidget;
+    private DropdownOverlayButton rgbPropagationDropdownWidget;
     private ImagePreprocessingDropdown preprocessingDropdownWidget;
 
     private Button saveNBT;
@@ -322,7 +322,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             mapartOptions.addChild(importButton);
         }
 
-        saveMapartDropdownWidget = new DropdownOverlayWidget(
+        saveMapartDropdownWidget = new DropdownOverlayButton(
                 this, createSaveMapartDropdown(),
                 16, 16,
                 false,

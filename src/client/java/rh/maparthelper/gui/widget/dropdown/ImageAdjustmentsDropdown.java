@@ -9,7 +9,7 @@ import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public abstract class ImageAdjustmentsDropdown extends DropdownOverlayWidget {
+public abstract class ImageAdjustmentsDropdown extends DropdownOverlayButton {
     protected boolean isDefaultState = true;
 
     public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
