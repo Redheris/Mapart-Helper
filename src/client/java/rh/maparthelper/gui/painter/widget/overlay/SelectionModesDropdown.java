@@ -43,15 +43,17 @@ public class SelectionModesDropdown extends DropdownOverlayWidget {
 
     private final SelectionToolSettings selectionSettings = ToolSettingsProvider.getInstance().SELECTION;
 
-    // TODO: Localize
-    private final Component label = Component.literal("Selection mode: ").withColor(CommonColors.LIGHT_GRAY);
+    private final Component label = Component.translatable("maparthelper.gui.mapart_painter.tools.selection_modes")
+            .withColor(CommonColors.LIGHT_GRAY);
 
     public SelectionModesDropdown(@NotNull Screen screen, SelectionToolSettings.SelectionMode selectionMode) {
         super(screen, null, 16, 16, false, false, null);
         Identifier icon = getModeIcon(selectionMode);
         this.setCustomSprites(new WidgetSprites(icon, icon));
         initOverlay();
-        this.setTooltip(Tooltip.create(label.copy().append(Component.literal(selectionMode.toString()).withColor(-1))));
+        this.setTooltip(Tooltip.create(label.copy().append(
+                Component.translatable("maparthelper.gui.mapart_painter.tools.selection_modes." + selectionMode).withColor(-1))
+        ));
     }
 
     private void initOverlay() {
@@ -76,7 +78,8 @@ public class SelectionModesDropdown extends DropdownOverlayWidget {
         SelectionToolSettings.SelectionMode mode = selectionSettings.getMode();
         Identifier icon = getModeIcon(mode);
         setCustomSprites(new WidgetSprites(icon, icon));
-        Component modeName = Component.literal(mode.toString()).withColor(-1);
+        Component modeName = Component.translatable("maparthelper.gui.mapart_painter.tools.selection_modes." + mode)
+                .withColor(-1);
         SelectionModesDropdown.this.setTooltip(Tooltip.create(label.copy().append(modeName)));
     }
 
@@ -99,7 +102,8 @@ public class SelectionModesDropdown extends DropdownOverlayWidget {
             super(0, 0, 120, 16, Component.empty());
             this.icon = getModeIcon(mode);
             this.mode = mode;
-            this.modeName = Component.literal(mode.toString()).withColor(-1);
+            this.modeName = Component.translatable("maparthelper.gui.mapart_painter.tools.selection_modes." + mode)
+                    .withColor(-1);
             this.setTooltip(Tooltip.create(label.copy().append(modeName)));
         }
 
@@ -108,6 +112,13 @@ public class SelectionModesDropdown extends DropdownOverlayWidget {
         protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             //? >=1.21.11
             //this.handleCursor(graphics);
+            if (mode == selectionSettings.getMode()) {
+                graphics.fill(
+                        getX(), getY(),
+                        getRight(), getBottom(),
+                        ARGB.color(0.5f, 0x6666ff)
+                );
+            }
             graphics.blit(
                     RenderPipelines.GUI_TEXTURED,
                     icon,

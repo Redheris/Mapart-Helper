@@ -31,9 +31,13 @@ public class FullscreenImageViewScreen extends ScreenAdapted {
     private NativeImageViewWidget imageViewWidget;
     private StringWidget pixelPosLabel;
 
-    public FullscreenImageViewScreen() {
-        super(null, Component.literal("Full size mapart view"));
+    public FullscreenImageViewScreen(Component title) {
+        super(null, title);
         ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.FULLSCREEN_VIEW);
+    }
+
+    public FullscreenImageViewScreen() {
+        this(Component.translatable("maparthelper.gui.screen.fullscreen_mapart_view"));
     }
 
     protected NativeImageViewWidget initImageViewWidget() {

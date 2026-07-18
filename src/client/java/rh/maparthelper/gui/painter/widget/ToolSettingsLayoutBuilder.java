@@ -109,18 +109,25 @@ public class ToolSettingsLayoutBuilder {
         return List.of(selectionModesDropdown);
     }
 
-    // TODO: Localize
     private List<AbstractWidget> initBrushSettingsWidgets() {
         BrushToolSettings brushSettings = settingsProvider.BRUSH;
 
-        Component brushModeLabel = Component.literal("Brush mode: ").withColor(CommonColors.LIGHT_GRAY);
+        Component brushShapeLabel = Component.translatable("maparthelper.gui.mapart_painter.tools_settings.brush_shape")
+                .withColor(CommonColors.LIGHT_GRAY);
 
-        StringWidget thicknessLabel = new StringWidget(Component.literal("Thickness:"), Minecraft.getInstance().font);
+        StringWidget thicknessLabel = new StringWidget(
+                Component.translatable("maparthelper.gui.mapart_painter.tools_settings.brush_thickness"),
+                Minecraft.getInstance().font
+        );
         var thicknessField = new IntegerFieldWidget(
                 Minecraft.getInstance().font, 35, 16, brushSettings.getThickness(), 1, 100
         );
         thicknessField.setIntegerValueConsumer(brushSettings::setThickness);
 
+        Component circleShape = Component.translatable("maparthelper.gui.mapart_painter.tools_settings.brush_shape.circle")
+                .withColor(-1);
+        Component rectangleShape = Component.translatable("maparthelper.gui.mapart_painter.tools_settings.brush_shape.square")
+                .withColor(-1);
         var brushShapeBtn = DecorativeButtonWidget.builderSimpleTexture(
                 brushSettings.isCircleShape() ? FIGURE_CIRCLE_ICON : FIGURE_RECTANGLE_ICON,
                 btn -> {
@@ -128,23 +135,27 @@ public class ToolSettingsLayoutBuilder {
                     Identifier icon = brushSettings.isCircleShape() ? FIGURE_CIRCLE_ICON : FIGURE_RECTANGLE_ICON;
                     btn.setCustomSprites(new WidgetSprites(icon, icon));
                     btn.setTooltip(Tooltip.create(
-                            brushModeLabel.copy().append(Component.literal(brushSettings.isCircleShape() ? "Circle" : "Rectangle").withColor(-1)))
+                            brushShapeLabel.copy().append(brushSettings.isCircleShape() ? circleShape : rectangleShape))
                     );
                 }
         ).size(16, 16).textColorActive(-1).build();
         brushShapeBtn.setTooltip(Tooltip.create(
-                brushModeLabel.copy().append(Component.literal(brushSettings.isCircleShape() ? "Circle" : "Rectangle").withColor(-1)))
+                brushShapeLabel.copy().append(brushSettings.isCircleShape() ? circleShape : rectangleShape))
         );
 
         return List.of(thicknessLabel, thicknessField, brushShapeBtn);
     }
 
-    // TODO: Localize
     private List<AbstractWidget> initFloodFillSettingsWidgets() {
         FloodFillSettings floodFillSettings = settingsProvider.FLOOD_FILL;
 
-        Component fillModeLabel = Component.literal("Fill mode: ").withColor(CommonColors.LIGHT_GRAY);
+        Component fillModeLabel = Component.translatable("maparthelper.gui.mapart_painter.tools_settings.fill_mode")
+                .withColor(CommonColors.LIGHT_GRAY);
 
+        Component localMode = Component.translatable("maparthelper.gui.mapart_painter.tools_settings.fill_mode.local")
+                .withColor(-1);
+        Component globalMode = Component.translatable("maparthelper.gui.mapart_painter.tools_settings.fill_mode.global")
+                .withColor(-1);
         var globalFillBtn = DecorativeButtonWidget.builderSimpleTexture(
                 floodFillSettings.isGlobalFill() ? GLOBAL_FILL_ICON : LOCAL_FILL_ICON,
                 btn -> {
@@ -152,17 +163,17 @@ public class ToolSettingsLayoutBuilder {
                     Identifier icon = floodFillSettings.isGlobalFill() ? GLOBAL_FILL_ICON : LOCAL_FILL_ICON;
                     btn.setCustomSprites(new WidgetSprites(icon, icon));
                     btn.setTooltip(Tooltip.create(
-                            fillModeLabel.copy().append(Component.literal(floodFillSettings.isGlobalFill() ? "Global" : "Local").withColor(-1)))
+                            fillModeLabel.copy().append(floodFillSettings.isGlobalFill() ? globalMode : localMode))
                     );
                 }
         ).size(16, 16).textColorActive(-1).build();
         globalFillBtn.setTooltip(Tooltip.create(
-                fillModeLabel.copy().append(Component.literal(floodFillSettings.isGlobalFill() ? "Global" : "Local").withColor(-1)))
+                fillModeLabel.copy().append(floodFillSettings.isGlobalFill() ? globalMode : localMode))
         );
 
         var toleranceSlider = new SliderOption(
                 100, 16,
-                Component.literal("Tolerance"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools_settings.tolerance"),
                 floodFillSettings.getTolerance(),
                 d -> floodFillSettings.setTolerance(d.floatValue())
         );

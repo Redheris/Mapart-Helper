@@ -94,50 +94,54 @@ public class PainterToolPickerOverlay extends OverlayLayout {
                 MapartHelper.identifier("textures/gui/icons/painter/eraser.png")
         );
 
-        // TODO: Localize
-        Component shortcutKeyLabel = Component.literal("Shortcut key: ").withColor(CommonColors.LIGHT_GRAY);
-        Component quickToolLabel = Component.literal("Quick tool key: ").withColor(CommonColors.LIGHT_GRAY);
+        Component shortcutKeyLabel = Component.translatable("maparthelper.gui.mapart_painter.tools.shortcut_key").withColor(CommonColors.LIGHT_GRAY);
+        Component quickToolLabel = Component.translatable("maparthelper.gui.mapart_painter.tools.quick_tool_key").withColor(CommonColors.LIGHT_GRAY);
+        Component selectionFunctional = Component.translatable("maparthelper.gui.mapart_painter.tools.selection_functional")
+                .withStyle(style -> style.withItalic(true).withColor(CommonColors.GRAY));
 
         rectangleSelectionTool.setTooltipDelay(Duration.ofMillis(500));
         rectangleSelectionTool.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Rectangle selection"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.rectangle_selection"),
+                selectionFunctional,
                 shortcutKeyLabel.copy().append(whiteComponent("S"))
         ));
         magicWandToolBtn.setTooltipDelay(Duration.ofMillis(500));
         magicWandToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Magic wand"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.magic_wand"),
+                selectionFunctional,
                 shortcutKeyLabel.copy().append(whiteComponent("W"))
         ));
         selectionBrushToolBtn.setTooltipDelay(Duration.ofMillis(500));
         selectionBrushToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Selection brush"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.selection_brush"),
+                selectionFunctional,
                 shortcutKeyLabel.copy().append(whiteComponent("A"))
         ));
         eyedropperToolBtn.setTooltipDelay(Duration.ofMillis(500));
         eyedropperToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Eyedropper"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.eyedropper"),
                 shortcutKeyLabel.copy().append(whiteComponent("Q")),
                 quickToolLabel.copy().append(whiteComponent("Alt"))
         ));
         handToolBtn.setTooltipDelay(Duration.ofMillis(500));
         handToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Hand"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.hand"),
                 shortcutKeyLabel.copy().append(whiteComponent("H")),
                 quickToolLabel.copy().append(whiteComponent("Space"))
         ));
         floodFillToolBtn.setTooltipDelay(Duration.ofMillis(500));
         floodFillToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Flood fill"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.flood_fill"),
                 shortcutKeyLabel.copy().append(whiteComponent("F"))
         ));
         brushToolBtn.setTooltipDelay(Duration.ofMillis(500));
         brushToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Brush"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.brush"),
                 shortcutKeyLabel.copy().append(whiteComponent("B"))
         ));
         eraserToolBtn.setTooltipDelay(Duration.ofMillis(500));
         eraserToolBtn.setTooltip(MultilineTooltip.createMultiline(
-                Component.literal("Eraser"),
+                Component.translatable("maparthelper.gui.mapart_painter.tools.eraser"),
                 shortcutKeyLabel.copy().append(whiteComponent("E"))
         ));
 

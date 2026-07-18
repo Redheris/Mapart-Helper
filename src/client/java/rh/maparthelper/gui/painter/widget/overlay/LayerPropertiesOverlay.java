@@ -50,15 +50,14 @@ public class LayerPropertiesOverlay extends OverlayLayout {
     }
 
     private AdjScrollableLayoutWidget initContent() {
-        // TODO: Localize
         LinearLayout content = LinearLayout.vertical().spacing(-8);
         content.defaultCellSetting().padding(4);
         content.addChild(labelWidget(
-                        Component.literal("Layer properties").withColor(CommonColors.LIGHTER_GRAY)),
+                        Component.translatable("maparthelper.gui.mapart_painter.layers.properties").withColor(CommonColors.LIGHTER_GRAY)),
                 content.newCellSettings().paddingBottom(10)
         );
 
-        content.addChild(labelWidget(Component.literal("Name:")));
+        content.addChild(labelWidget(Component.translatable("maparthelper.gui.mapart_painter.layers.name")));
         labelNameField = new AdjEditBox(
                 screen.getFont(),
                 100, 16,
@@ -67,7 +66,7 @@ public class LayerPropertiesOverlay extends OverlayLayout {
         labelNameField.setValueConsumer(name -> layer.setName(name));
         content.addChild(labelNameField, content.newCellSettings().paddingBottom(8));
 
-        content.addChild(labelWidget(Component.literal("Opacity:")));
+        content.addChild(labelWidget(Component.translatable("maparthelper.gui.mapart_painter.layers.opacity")));
         opacitySlider = new SliderOption(
                 100, 16,
                 layer.getAlpha(),
@@ -77,7 +76,7 @@ public class LayerPropertiesOverlay extends OverlayLayout {
         LinearLayout visibilitySetting = LinearLayout.horizontal().spacing(2);
         visibilitySetting.defaultCellSetting().alignVerticallyMiddle();
         visibilitySetting.addChild(labelWidget(
-                Component.literal("Visible:")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.visible")
         ));
         visibilitySetting.addChild(new TickBoxOption(
                 () -> layer.isVisible(),

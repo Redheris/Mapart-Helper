@@ -70,7 +70,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
     private int textFieldsWidth;
 
     protected PresetsEditorScreen(MapartEditorScreen parent, MapartProcessing mapart, int x, int y, int marginRight, int marginBottom) {
-        super(parent, Component.translatable("maparthelper.gui.presets_editor_screen"));
+        super(parent, Component.translatable("maparthelper.gui.screen.presets_editor"));
         this.parent = parent;
         this.mapart = mapart;
         this.boxX = x;

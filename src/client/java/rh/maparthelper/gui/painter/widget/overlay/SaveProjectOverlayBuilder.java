@@ -22,19 +22,18 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class SaveProjectOverlayBuilder {
-    // TODO: Localize
     public static OverlayLayout create(LayerManager<NativeImageSurface, DynamicTextureLayer> layerManager) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_hh.mm.ss");
 
         MapartPainterState painterState = MapartPainterState.getInstance();
 
         Button savePNG = Button.builder(
-                Component.literal("Save as PNG"),
+                Component.translatable("maparthelper.gui.mapart_painter.project.save_as_one_png"),
                 btn -> painterState.saveProjectAsPNG(LocalDateTime.now().format(formatter))
         ).size(140, 20).build();
 
         Button saveZip = Button.builder(
-                Component.literal("Save every layer as PNG"),
+                Component.translatable("maparthelper.gui.mapart_painter.project.save_layers_in_zip"),
                 btn -> {
                     Path filepath = painterState.saveLayersAsPNGsZip(LocalDateTime.now().format(formatter));
                     if (filepath != null && Minecraft.getInstance().player != null) {
@@ -55,7 +54,7 @@ public class SaveProjectOverlayBuilder {
         ).size(140, 20).build();
 
         Button passToMapartEditor = Button.builder(
-                Component.literal("Save and set as mapart"),
+                Component.translatable("maparthelper.gui.mapart_painter.project.save_and_use_as_mapart"),
                 btn -> {
                     Path filepath = painterState.saveProjectAsPNG(LocalDateTime.now().format(formatter));
                     if (filepath != null) {

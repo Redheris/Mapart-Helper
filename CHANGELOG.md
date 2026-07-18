@@ -7,19 +7,18 @@ It's done to make presets as stable and easy to share as possible.
 - Mapart Painter: a simple image editor to edit your image or to paint a completely new one;
 - Fullscreen image view mode: scroll, move and look at every pixel up close;
 - Added error propagation weights setting for error diffusion dithering;
-
-
+- Updated Presets Editor screen and rewritten palette presets handling to improve reliability of presets
+  editing and transferring;
 - Rewritten dropdown overlays and scrollable layouts to make them more stable and clean;
-- Rewritten palette presets handling to improve reliability of presets editing and transferring;
 
 <details>
 <summary>Fixes and minor changes</summary>
 
+- Added config option to allow adding auxiliary blocks at the platform layer to the schematic;
+- Added configurable maximum value to mapart size fields;
+- All integer input fields got maximum value limit and mouse scrolling behavior;
 - Replace almost all emoji-buttons with icon-buttons
 - By default, palette will be generating only from vanilla (`minecraft:*`) blocks.
   This can be changed in the config;
-- Added config option to allow adding auxiliary blocks at the platform layer to the schematic;
-- All integer input fields got maximum value limit and mouse scrolling behavior;
-- Added configurable maximum value to mapart size fields;
 
 </details>

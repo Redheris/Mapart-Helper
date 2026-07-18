@@ -87,7 +87,12 @@ public class ColorPickerOverlay extends OverlayLayout {
         if (colorPickerState == MapartPainterState.ColorPickerState.PRESET) {
             modeSwitchButton.setTooltipDelay(Duration.ofMillis(400));
             modeSwitchButton.setTooltip(Tooltip.create(
-                    Component.literal("Palette is based on your selected preset and staircase style")
+                    Component.translatable("maparthelper.gui.mapart_painter.color_picker.preset.tooltip")
+            ));
+        } else if (colorPickerState == MapartPainterState.ColorPickerState.UNOBTAINABLE_4COLORS) {
+            modeSwitchButton.setTooltipDelay(Duration.ofMillis(400));
+            modeSwitchButton.setTooltip(Tooltip.create(
+                    Component.translatable("maparthelper.gui.mapart_painter.color_picker.full.tooltip")
             ));
         }
         mainButtons.addChild(modeSwitchButton);
@@ -117,12 +122,11 @@ public class ColorPickerOverlay extends OverlayLayout {
     }
 
     private static Component paletteStateComponent(MapartPainterState.ColorPickerState colorPickerState) {
-        // TODO: Localize
         return switch (colorPickerState) {
-            case PRESET -> Component.literal("Preset");
-            case FLAT_1COLOR -> Component.literal("2D");
-            case STAIRCASE_3COLORS -> Component.literal("3D");
-            case UNOBTAINABLE_4COLORS -> Component.literal("Full").withStyle(ChatFormatting.GOLD);
+            case PRESET -> Component.translatable("maparthelper.gui.mapart_painter.color_picker.preset");
+            case FLAT_1COLOR -> Component.translatable("maparthelper.gui.mapart_painter.color_picker.2d");
+            case STAIRCASE_3COLORS -> Component.translatable("maparthelper.gui.mapart_painter.color_picker.3d");
+            case UNOBTAINABLE_4COLORS -> Component.translatable("maparthelper.gui.mapart_painter.color_picker.full").withStyle(ChatFormatting.GOLD);
         };
     }
 
@@ -194,8 +198,7 @@ public class ColorPickerOverlay extends OverlayLayout {
         }
         if (hoveredColorEntry != null) {
             Block block = preset.getBlockOfMapColor(hoveredColorEntry.mapColor);
-            // TODO: Localize
-            Component text = block != null ? block.getName() : Component.literal("Not in the preset");
+            Component text = block != null ? block.getName() : Component.translatable("maparthelper.gui.mapart_painter.color_picker.color_not_in_the_preset");
 
             int xOffset = block == null ? 0 : 16;
             int width = xOffset + screen.getFont().width(text);

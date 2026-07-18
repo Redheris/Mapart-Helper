@@ -120,7 +120,7 @@ public class MapartEditorScreen extends ScreenAdapted {
     private final MaterialListPanel materialList = new MaterialListPanel(this, mapart, 0, 0, 0, 0);
 
     public MapartEditorScreen() {
-        super(null, Component.translatable("maparthelper.gui.mapart_editor_screen"));
+        super(null, Component.translatable("maparthelper.gui.screen.mapart_editor"));
         ActiveModScreenManager.getInstance().setActiveModScreen(ActiveModScreenManager.ModScreen.MAPART_EDITOR);
     }
 
@@ -279,7 +279,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                 )
         );
 
-        rgbPropagationDropdownWidget.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.errorPropagation")));
+        rgbPropagationDropdownWidget.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.error_propagation")));
         rgbPropagationDropdownWidget.visible = false;
         rgbPropagationDropdownWidget.setOverlayXOffset(-rgbPropagationDropdownWidget.getOverlay().getWidth());
 
@@ -394,8 +394,7 @@ public class MapartEditorScreen extends ScreenAdapted {
                     }
                 }
         ).size(16, 16).build();
-        // TODO: Localize
-        painterButton.setTooltip(Tooltip.create(Component.literal("Open Mapart Painter")));
+        painterButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.open_mapart_painter")));
         mapartOptions.addChild(painterButton);
 
         DecorativeButtonWidget resetMapartButton = DecorativeButtonWidget.builderSimpleTexture(
@@ -553,7 +552,7 @@ public class MapartEditorScreen extends ScreenAdapted {
         settingsRight.addChild(presetsListDropdownButton, settingsRightPositioner.copy().paddingTop(0));
 
         Button presetsEditor = Button.builder(
-                Component.translatable("maparthelper.gui.presets_editor_screen"),
+                Component.translatable("maparthelper.gui.screen.presets_editor"),
                 (btn) -> {
                     ConversionConfiguration.save();
                     Minecraft.getInstance().setScreen(
@@ -822,7 +821,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             }
             showInWorldButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.showInWorld_tooltip")));
         } else {
-            Tooltip disabled = Tooltip.create(Component.translatable("maparthelper.gui.enableColorAdaptation"));
+            Tooltip disabled = Tooltip.create(Component.translatable("maparthelper.gui.mapart_has_no_converted_image"));
             saveNBT.setTooltip(disabled);
             saveSplitNBT.setTooltip(disabled);
             saveZipNBT.setTooltip(disabled);
@@ -836,7 +835,7 @@ public class MapartEditorScreen extends ScreenAdapted {
             fullscreenButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.fullscreen_view.open_view_screen")));
         } else {
             fullscreenButton.active = false;
-            fullscreenButton.setTooltip(Tooltip.create(Component.literal("Current mapart doesn't have an image")));
+            fullscreenButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.empty_mapart_image")));
         }
     }
 

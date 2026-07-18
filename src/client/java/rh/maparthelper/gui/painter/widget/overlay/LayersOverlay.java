@@ -237,27 +237,26 @@ public class LayersOverlay extends OverlayLayout {
                 }
         ).size(16, 16).build();
 
-        // TODO: Localize
         createNewLayerBtn.setTooltip(Tooltip.create(
-                Component.literal("Create new layer")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.create_new")
         ));
         removeLayerBtn.setTooltip(Tooltip.create(
-                Component.literal("Remove layer")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.remove")
         ));
         duplicateLayerBtn.setTooltip(Tooltip.create(
-                Component.literal("Duplicate layer")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.duplicate")
         ));
         mergeLayerDownBtn.setTooltip(Tooltip.create(
-                Component.literal("Merge layer down")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.merge_down")
         ));
         moveLayerUpBtn.setTooltip(Tooltip.create(
-                Component.literal("Move layer up")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.move_up")
         ));
         moveLayerDownBtn.setTooltip(Tooltip.create(
-                Component.literal("Move layer down")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.move_down")
         ));
         layerPropertiesBtn.setTooltip(Tooltip.create(
-                Component.literal("Layer properties")
+                Component.translatable("maparthelper.gui.mapart_painter.layers.properties")
         ));
 
         buttons.addChild(createNewLayerBtn);

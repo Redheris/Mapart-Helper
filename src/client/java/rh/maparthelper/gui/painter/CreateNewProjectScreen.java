@@ -31,7 +31,7 @@ public class CreateNewProjectScreen extends Screen {
     private boolean createEmptyProject;
 
     public CreateNewProjectScreen(Screen parent) {
-        super(Component.literal("Create New Painter Project"));
+        super(Component.translatable("maparthelper.gui.screen.create_new_painter_project"));
         this.parent = parent;
         DynamicTexture mapartTexture = CurrentConversionSettings.guiMapartImage;
         this.currentMapartImage = mapartTexture == null ? null : mapartTexture.getPixels();
@@ -45,15 +45,17 @@ public class CreateNewProjectScreen extends Screen {
 
         final int maxSize = MapartHelper.commonConfig().maxMapartSize;
 
-        // TODO: Localize
         LinearLayout createTypeLayout = LinearLayout.horizontal();
         createTypeLayout.defaultCellSetting().alignVerticallyMiddle();
-        createTypeLayout.addChild(labelWidget(Component.literal("Create:")));
+
+        Component emptyProjectOption = Component.translatable("maparthelper.gui.mapart_painter.project.empty_projectoption");
+        Component withCurrentMapartOption = Component.translatable("maparthelper.gui.mapart_painter.project.with_current_mapartoption");
+        createTypeLayout.addChild(labelWidget(Component.translatable("maparthelper.gui.mapart_painter.project.label_create")));
         Button createTypeOption = Button.builder(
-                Component.literal(createEmptyProject ? "Empty project" : "With current mapart"),
+                createEmptyProject ? emptyProjectOption : withCurrentMapartOption,
                 btn -> {
                     createEmptyProject = !createEmptyProject;
-                    btn.setMessage(Component.literal(createEmptyProject ? "Empty project" : "With current mapart"));
+                    btn.setMessage(createEmptyProject ? emptyProjectOption : withCurrentMapartOption);
                     updateFieldsState();
                 }
         ).size(160, 20).build();
@@ -80,7 +82,7 @@ public class CreateNewProjectScreen extends Screen {
         ySizeLayout.addChild(ySizeField);
 
         content.addChild(createTypeLayout, content.newCellSettings().paddingBottom(16));
-        content.addChild(labelWidget(Component.literal("Size in maps:")));
+        content.addChild(labelWidget(Component.translatable("maparthelper.gui.mapart_painter.project.size_in_maps")));
         content.addChild(xSizeLayout);
         content.addChild(ySizeLayout);
         content.arrangeElements();
@@ -97,7 +99,6 @@ public class CreateNewProjectScreen extends Screen {
         );
     }
 
-    // TODO: Localize
     private GridLayout createSubmitButtonsLayout(int width) {
         GridLayout submitButtons = new GridLayout().columnSpacing(4);
         submitButtons.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyCenter();
@@ -105,11 +106,11 @@ public class CreateNewProjectScreen extends Screen {
         buttonsAdder.addChild(SpacerElement.width(width), 2);
 
         Button cancelBtn = Button.builder(
-                Component.literal("Cancel"),
+                Component.translatable("maparthelper.gui.mapart_painter.project.cancel"),
                 btn -> Minecraft.getInstance().setScreen(parent)
         ).size(60, 20).build();
         createProjectBtn = Button.builder(
-                Component.literal("Create project"),
+                Component.translatable("maparthelper.gui.mapart_painter.project.create_project"),
                 btn -> {
                     if (createEmptyProject) {
                         MapartPainterState.getInstance().newPainterProject(
@@ -128,7 +129,6 @@ public class CreateNewProjectScreen extends Screen {
         return submitButtons;
     }
 
-    // TODO: Localize
     private void updateFieldsState() {
         if (createEmptyProject) {
             xSizeField.active = true;
@@ -147,7 +147,7 @@ public class CreateNewProjectScreen extends Screen {
         } else {
             xSizeField.active = false;
             ySizeField.active = false;
-            Tooltip tooltip = Tooltip.create(Component.literal("Size equals to the current mapart size"));
+            Tooltip tooltip = Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.project.size_is_locked_to_mapart"));
             xSizeField.setTooltip(tooltip);
             ySizeField.setTooltip(tooltip);
             xSizeField.setIntValue(Math.max(1, CurrentConversionSettings.getMapartWidth()));
@@ -157,10 +157,15 @@ public class CreateNewProjectScreen extends Screen {
 
             createProjectBtn.active = currentMapartImage != null;
             if (!createProjectBtn.active) {
-                createProjectBtn.setTooltip(Tooltip.create(Component.literal(
-                        "Current mapart doesn't have an image or color adaptation is disabled"
-                )));
+                createProjectBtn.setTooltip(Tooltip.create(
+                        Component.translatable("maparthelper.gui.mapart_has_no_converted_image")
+                ));
             }
+        }
+        if (createProjectBtn.active && MapartPainterState.getInstance().painterProjectExists()) {
+            createProjectBtn.setTooltip(Tooltip.create(
+                    Component.translatable("maparthelper.gui.mapart_painter.project.create_project.tooltip")
+            ));
         }
     }
 

@@ -77,6 +77,7 @@ public class PainterScreen extends FullscreenImageViewScreen {
     private DecorativeButtonWidget redoButton;
 
     public PainterScreen() {
+        super(Component.translatable("maparthelper.gui.screen.mapart_painter"));
         MapartPainterState painterState = MapartPainterState.getInstance();
         this.painterProject = painterState.getPainterProject();
         if (painterProject == null) {
@@ -164,9 +165,8 @@ public class PainterScreen extends FullscreenImageViewScreen {
                 btn -> this.redo()
         ).size(16, 16).build();
 
-        // TODO: Localize
-        undoButton.setTooltip(Tooltip.create(Component.literal("Undo")));
-        redoButton.setTooltip(Tooltip.create(Component.literal("Redo")));
+        undoButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.undo")));
+        redoButton.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.redo")));
 
         headerLeft.addChild(undoButton);
         headerLeft.addChild(redoButton);
@@ -181,9 +181,8 @@ public class PainterScreen extends FullscreenImageViewScreen {
         LinearLayout headerRight = LinearLayout.horizontal().spacing(2);
         headerRight.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyRight();
 
-        // TODO: Localize
         headerRight.addChild(Button.builder(
-                Component.literal("New project"),
+                Component.translatable("maparthelper.gui.mapart_painter.new_project"),
                 btn -> Minecraft.getInstance().setScreen(new CreateNewProjectScreen(this))
         ).size(80, 20).build());
 

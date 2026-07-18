@@ -21,7 +21,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
     private final int boxHeight = 100;
 
     public PaletteUpdateSuggestionScreen(Screen parent) {
-        super(Component.nullToEmpty("Palette update suggestion"));
+        super(Component.translatable("maparthelper.gui.screen.palette_update_suggestion"));
         this.parent = parent;
     }
 
