@@ -14,6 +14,7 @@ public class DropdownOverlayButton extends DecorativeButtonWidget {
     private final Screen screen;
     private OverlayLayout overlay;
     private int overlayXOffset = 0;
+    private int overlayYOffset = 0;
     private int maxOverlayHeight;
     /// If the overlay can be placed with its full height either downward or upward - it will be prioritized
     private final boolean keepMaxOverlayHeight;
@@ -67,6 +68,10 @@ public class DropdownOverlayButton extends DecorativeButtonWidget {
         this.overlayXOffset = overlayXOffset;
     }
 
+    public void setOverlayYOffset(int overlayYOffset) {
+        this.overlayYOffset = overlayYOffset;
+    }
+
     private void updateOverlayPosition() {
         int minX = Math.max(2, getX() + overlayXOffset);
         overlay.setX(Math.min(minX, screen.width - overlay.getWidth() - 2));
@@ -78,10 +83,10 @@ public class DropdownOverlayButton extends DecorativeButtonWidget {
         if (downwardHeight >= upwardHeight
                 || keepMaxOverlayHeight && maxDownwardHeight >= maxOverlayHeight
                 || !keepMaxOverlayHeight && maxDownwardHeight > maxOverlayHeight / 2) {
-            overlay.setY(getBottom());
+            overlay.setY(getBottom() + overlayYOffset);
             overlay.setHeight(downwardHeight);
         } else {
-            overlay.setY(Math.max(0, getY() - upwardHeight));
+            overlay.setY(Math.max(0, getY() - overlayYOffset - upwardHeight));
             overlay.setHeight(upwardHeight);
         }
     }

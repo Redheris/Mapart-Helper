@@ -106,6 +106,8 @@ public class ToolSettingsLayoutBuilder {
     private List<AbstractWidget> initSelectionSettingsWidgets(Screen screen) {
         SelectionToolSettings selectionSettings = settingsProvider.SELECTION;
         selectionModesDropdown = new SelectionModesDropdown(screen, selectionSettings.getMode());
+        selectionModesDropdown.setOverlayXOffset(-1);
+        selectionModesDropdown.setOverlayYOffset(3);
         return List.of(selectionModesDropdown);
     }
 
