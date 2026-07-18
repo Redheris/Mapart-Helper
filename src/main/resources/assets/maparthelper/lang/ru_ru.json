@@ -162,6 +162,7 @@
   "maparthelper.gui.fullscreen_view.show_map_grid": "Отображать сетку по картам",
 
   "maparthelper.gui.mapart_painter.open_mapart_painter": "Открыть Mapart Painter",
+  "maparthelper.gui.mapart_painter.open_painter_folder": "Открыть папку экспорта",
   "maparthelper.gui.mapart_painter.layer": "Слой",
   "maparthelper.gui.mapart_painter.background": "Фон",
   "maparthelper.gui.mapart_painter.color_picker.preset": "Пресет",

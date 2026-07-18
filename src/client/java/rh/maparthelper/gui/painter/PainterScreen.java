@@ -2,12 +2,12 @@ package rh.maparthelper.gui.painter;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.painter.cursor.PainterCursorManager;
@@ -40,6 +40,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 *///?}
 
 public class PainterScreen extends FullscreenImageViewScreen {
+    private static final Identifier OPEN_FOLDER_ICON = MapartHelper.identifier("textures/gui/icons/open_file.png");
+    private static final Identifier NEW_PROJECT_ICON = MapartHelper.identifier("textures/gui/icons/new_file.png");
     private static final Identifier UNDO_ICON = MapartHelper.identifier(
             "textures/gui/icons/painter/undo.png"
     );
@@ -178,13 +180,22 @@ public class PainterScreen extends FullscreenImageViewScreen {
 
     @Override
     protected LinearLayout headerRight() {
-        LinearLayout headerRight = LinearLayout.horizontal().spacing(2);
+        LinearLayout headerRight = LinearLayout.horizontal().spacing(1);
         headerRight.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyRight();
 
-        headerRight.addChild(Button.builder(
-                Component.translatable("maparthelper.gui.mapart_painter.new_project"),
+        DecorativeButtonWidget newProject = DecorativeButtonWidget.builderSimpleTexture(
+                NEW_PROJECT_ICON,
                 btn -> Minecraft.getInstance().setScreen(new CreateNewProjectScreen(this))
-        ).size(80, 20).build());
+        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
+        newProject.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.new_project")));
+        headerRight.addChild(newProject);
+
+        DecorativeButtonWidget openFolder = DecorativeButtonWidget.builderSimpleTexture(
+                OPEN_FOLDER_ICON,
+                btn -> Util.getPlatform().openPath(MapartPainterState.PAINTER_PNG_OUTPUT_DIR)
+        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
+        openFolder.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.open_painter_folder")));
+        headerRight.addChild(openFolder);
 
         headerRight.addChild(new DropdownOverlayButton(
                 this, saveProjectOverlay, 82, 20,

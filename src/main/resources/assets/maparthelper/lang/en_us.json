@@ -162,6 +162,7 @@
   "maparthelper.gui.fullscreen_view.show_map_grid": "Show map grid",
 
   "maparthelper.gui.mapart_painter.open_mapart_painter": "Open Mapart Painter",
+  "maparthelper.gui.mapart_painter.open_painter_folder": "Open exports folder",
   "maparthelper.gui.mapart_painter.layer": "Layer",
   "maparthelper.gui.mapart_painter.background": "Background",
   "maparthelper.gui.mapart_painter.color_picker.preset": "Preset",
