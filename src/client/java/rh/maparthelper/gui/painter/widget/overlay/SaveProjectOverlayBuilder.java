@@ -6,8 +6,10 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
+import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
+import rh.maparthelper.conversion.staircases.StaircaseStyles;
 import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.gui.widget.layout.OverlayLayoutFactory;
@@ -59,14 +61,15 @@ public class SaveProjectOverlayBuilder {
                 btn -> {
                     Path filepath = painterState.saveProjectAsPNG(LocalDateTime.now().format(formatter));
                     if (filepath != null) {
+                        CurrentConversionSettings.resetMapart();
                         CurrentConversionSettings.mapart.setMapartSize(
                                 layerManager.getWidth() / 128,
                                 layerManager.getHeight() / 128
                         );
-                        MapartImageUpdater.readAndUpdateMapartImage(
-                                CurrentConversionSettings.mapart,
-                                filepath
-                        );
+                        StaircaseStyles staircaseStyle = getStaircaseStyle(painterState);
+                        MapartHelper.conversionConfig().setStaircaseStyle(staircaseStyle);
+
+                        MapartImageUpdater.readAndUpdateMapartImage(CurrentConversionSettings.mapart, filepath);
                         Minecraft.getInstance().setScreen(new MapartEditorScreen());
                     }
                 }
@@ -78,5 +81,15 @@ public class SaveProjectOverlayBuilder {
                 saveZip,
                 passToMapartEditor
         );
+    }
+
+    private static StaircaseStyles getStaircaseStyle(MapartPainterState painterState) {
+        MapartPainterState.ColorPickerState paletteState = painterState.getColorPickerState();
+        return switch (paletteState) {
+            case FLAT_1COLOR -> StaircaseStyles.FLAT_2D;
+            case STAIRCASE_3COLORS -> StaircaseStyles.VALLEY_3D;
+            case UNOBTAINABLE_4COLORS -> StaircaseStyles.UNOBTAINABLE;
+            case PRESET -> MapartHelper.conversionConfig().getStaircaseStyle();
+        };
     }
 }
