@@ -2,6 +2,7 @@ package rh.maparthelper.gui.painter;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -41,7 +42,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 
 public class PainterScreen extends FullscreenImageViewScreen {
     private static final Identifier OPEN_FOLDER_ICON = MapartHelper.identifier("textures/gui/icons/open_file.png");
-    private static final Identifier NEW_PROJECT_ICON = MapartHelper.identifier("textures/gui/icons/new_file.png");
     private static final Identifier UNDO_ICON = MapartHelper.identifier(
             "textures/gui/icons/painter/undo.png"
     );
@@ -183,13 +183,6 @@ public class PainterScreen extends FullscreenImageViewScreen {
         LinearLayout headerRight = LinearLayout.horizontal().spacing(1);
         headerRight.defaultCellSetting().alignVerticallyMiddle().alignHorizontallyRight();
 
-        DecorativeButtonWidget newProject = DecorativeButtonWidget.builderSimpleTexture(
-                NEW_PROJECT_ICON,
-                btn -> Minecraft.getInstance().setScreen(new CreateNewProjectScreen(this))
-        ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
-        newProject.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.new_project")));
-        headerRight.addChild(newProject);
-
         DecorativeButtonWidget openFolder = DecorativeButtonWidget.builderSimpleTexture(
                 OPEN_FOLDER_ICON,
                 btn -> {
@@ -200,8 +193,17 @@ public class PainterScreen extends FullscreenImageViewScreen {
         openFolder.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.open_painter_folder")));
         headerRight.addChild(openFolder);
 
+        Button newProject = Button.builder(
+                Component.translatable("maparthelper.gui.mapart_painter.new_project"),
+                btn -> Minecraft.getInstance().setScreen(new CreateNewProjectScreen(this))
+        ).size(80, 20).build();
+        headerRight.addChild(newProject);
+
+        Component saveProjectText = Component.translatable("maparthelper.gui.mapart_painter.save_project");
+        int saveProjectBtnWidth = font.width(saveProjectText);
         headerRight.addChild(new DropdownOverlayButton(
-                this, saveProjectOverlay, 82, 20,
+                this, saveProjectOverlay,
+                saveProjectBtnWidth + 8, 20,
                 Component.translatable("maparthelper.gui.mapart_painter.save_project")
         ));
 

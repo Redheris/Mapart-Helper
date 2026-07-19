@@ -2,6 +2,7 @@ package rh.maparthelper.gui.painter.widget.overlay;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -28,15 +29,24 @@ public class SaveProjectOverlayBuilder {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_hh.mm.ss");
 
         MapartPainterState painterState = MapartPainterState.getInstance();
-        int overlayWidth = 180;
+
+        Component saveSinglePNG = Component.translatable("maparthelper.gui.mapart_painter.project.save_as_one_png");
+        Component saveAllLayersZip = Component.translatable("maparthelper.gui.mapart_painter.project.save_layers_in_zip");
+        Component saveAndSetMapart = Component.translatable("maparthelper.gui.mapart_painter.project.save_and_use_as_mapart");
+
+        Font font = Minecraft.getInstance().font;
+        int entryWidth = 8 + Math.max(
+                font.width(saveSinglePNG),
+                Math.max(font.width(saveAllLayersZip), font.width(saveAndSetMapart))
+        );
 
         Button savePNG = Button.builder(
-                Component.translatable("maparthelper.gui.mapart_painter.project.save_as_one_png"),
+                saveSinglePNG,
                 btn -> painterState.saveProjectAsPNG(LocalDateTime.now().format(formatter))
-        ).size(overlayWidth - 10, 20).build();
+        ).size(entryWidth, 20).build();
 
         Button saveZip = Button.builder(
-                Component.translatable("maparthelper.gui.mapart_painter.project.save_layers_in_zip"),
+                saveAllLayersZip,
                 btn -> {
                     Path filepath = painterState.saveLayersAsPNGsZip(LocalDateTime.now().format(formatter));
                     if (filepath != null && Minecraft.getInstance().player != null) {
@@ -54,10 +64,10 @@ public class SaveProjectOverlayBuilder {
                                 false);
                     }
                 }
-        ).size(overlayWidth - 10, 20).build();
+        ).size(entryWidth, 20).build();
 
         Button passToMapartEditor = Button.builder(
-                Component.translatable("maparthelper.gui.mapart_painter.project.save_and_use_as_mapart"),
+                saveAndSetMapart,
                 btn -> {
                     Path filepath = painterState.saveProjectAsPNG(LocalDateTime.now().format(formatter));
                     if (filepath != null) {
@@ -73,10 +83,10 @@ public class SaveProjectOverlayBuilder {
                         Minecraft.getInstance().setScreen(new MapartEditorScreen());
                     }
                 }
-        ).size(overlayWidth - 10, 20).build();
+        ).size(entryWidth, 20).build();
 
         return OverlayLayoutFactory.listMenu(
-                80, overlayWidth,
+                80, entryWidth + 10,
                 savePNG,
                 saveZip,
                 passToMapartEditor

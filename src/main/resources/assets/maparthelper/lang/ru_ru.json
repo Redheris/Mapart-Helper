@@ -208,7 +208,7 @@
   "maparthelper.gui.mapart_painter.tools_settings.fill_mode.global": "Глобальная",
   "maparthelper.gui.mapart_painter.tools_settings.tolerance": "Чувствительность",
   "maparthelper.gui.mapart_painter.project.save_as_one_png": "Один PNG",
-  "maparthelper.gui.mapart_painter.project.save_layers_in_zip": "Все слои в ZIP",
+  "maparthelper.gui.mapart_painter.project.save_layers_in_zip": "ZIP со всеми слоями",
   "maparthelper.gui.mapart_painter.project.save_and_use_as_mapart": "Один PNG и создать мапарт",
   "maparthelper.gui.mapart_painter.project.label_create": "Создать:",
   "maparthelper.gui.mapart_painter.project.empty_projectoption": "Пустой проект",
