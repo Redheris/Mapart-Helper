@@ -28,10 +28,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-//? if >=1.21.10 {
-/*import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.gui.components.AbstractScrollArea;
-*///?}
+//? >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
 
 @Environment(EnvType.CLIENT)
 public class AdjScrollableLayoutWidget implements Layout {
@@ -83,6 +81,14 @@ public class AdjScrollableLayoutWidget implements Layout {
     public void visitChildren(Consumer<LayoutElement> consumer) {
         consumer.accept(this.container);
     }
+
+    //? if >=26.2 {
+    /*@Override
+    public void removeChildren() {
+        layout.removeChildren();
+        container.children.clear();
+    }
+    *///?}
 
     @Override
     public void setX(int x) {

@@ -19,9 +19,8 @@ public class MapartHelperClient implements ClientModInitializer {
         SpecialGuiElementRegistry.register(ctx -> new ScaledItemGuiElementRenderer(
                 //? if <26.1 {
                 ctx.vertexConsumers()
-                //?} else {
-                /*ctx.bufferSource()
-                *///?}
+                //?} else if 26.1
+                //ctx.bufferSource()
         ));
     }
 }

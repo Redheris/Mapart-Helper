@@ -64,6 +64,12 @@ stonecutter parameters {
             replace("Screens.getButtons(", "Screens.getWidgets(")
         }
 
+        string(current.parsed >= "26.2") {
+            replace("Minecraft.getInstance().screen", "Minecraft.getInstance().gui.screen()")
+            replace("Minecraft.getInstance().setScreen(", "Minecraft.getInstance().gui.setScreen(")
+            replace("client.setScreen(", "client.gui.setScreen(")
+        }
+
         string(current.parsed >= "1.21.10", "widget_events") {
             replace(
                 "mouseReleased(double mouseX, double mouseY, int button)",

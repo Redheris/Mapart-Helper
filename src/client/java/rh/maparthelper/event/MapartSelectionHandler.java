@@ -55,7 +55,7 @@ public class MapartSelectionHandler {
                 return InteractionResult.PASS;
 
             // Offset from center to the item frame's box
-            Vec3 currentPos = pos.getCenter().relative(direction, 0.53);
+            Vec3 currentPos = Vec3.atCenterOf(pos).relative(direction, 0.53);
             selectPosition(selectionState, player, currentPos, direction, false);
             return InteractionResult.FAIL;
         });
@@ -65,7 +65,7 @@ public class MapartSelectionHandler {
 
             if (entity instanceof ItemFrame mapFrame) {
                 BlockPos blockPos = mapFrame.blockPosition().relative(mapFrame.getNearestViewDirection().getOpposite());
-                Vec3 currentPos = blockPos.getCenter().relative(mapFrame.getNearestViewDirection(), 0.53);
+                Vec3 currentPos = Vec3.atCenterOf(blockPos).relative(mapFrame.getNearestViewDirection(), 0.53);
                 selectPosition(selectionState, player, currentPos, mapFrame.getNearestViewDirection(), false);
             }
 
@@ -76,7 +76,7 @@ public class MapartSelectionHandler {
             if (selectionState.isNotSelectingFramesArea() || !level.isClientSide())
                 return InteractionResult.PASS;
 
-            Vec3 currentPos = hitResult.getBlockPos().getCenter().relative(hitResult.getDirection(), 0.53);
+            Vec3 currentPos = Vec3.atCenterOf(hitResult.getBlockPos()).relative(hitResult.getDirection(), 0.53);
             selectPosition(selectionState, player, currentPos, hitResult.getDirection(), true);
 
             return InteractionResult.FAIL;
@@ -87,7 +87,7 @@ public class MapartSelectionHandler {
 
             if (entity instanceof ItemFrame itemFrame) {
                 BlockPos blockPos = itemFrame.blockPosition().relative(itemFrame.getNearestViewDirection().getOpposite());
-                Vec3 currentPos = blockPos.getCenter().relative(itemFrame.getNearestViewDirection(), 0.53);
+                Vec3 currentPos = Vec3.atCenterOf(blockPos).relative(itemFrame.getNearestViewDirection(), 0.53);
                 selectPosition(selectionState, player, currentPos, itemFrame.getNearestViewDirection(), true);
             }
 

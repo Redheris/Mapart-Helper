@@ -81,6 +81,13 @@ public class OverlayLayout extends AbstractLayout {
         layout.arrangeElements();
     }
 
+    //? if >=26.2 {
+    /*@Override
+    public void removeChildren() {
+        layout.removeChildren();
+    }
+    *///?}
+
     public void setHeight(int height) {
         this.height = height;
         layout.setHeight(height);

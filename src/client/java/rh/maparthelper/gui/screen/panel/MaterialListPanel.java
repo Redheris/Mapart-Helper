@@ -80,6 +80,13 @@ public class MaterialListPanel extends AbstractLayout {
             consumer.accept(materialListScrollable);
     }
 
+    //? if >=26.2 {
+    /*@Override
+    public void removeChildren() {
+        materialListScrollable.removeChildren();
+    }
+    *///?}
+
     public boolean isMaterialsAscendingOrder() {
         return materialsAscendingOrder;
     }

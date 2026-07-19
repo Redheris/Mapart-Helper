@@ -46,6 +46,7 @@ public class MapCreator {
             //? >= 26.1
             //player.addItem(mapItems.getFirst().create());
         } else {
+            //~ if >=26.2 'YELLOW_BUNDLE' -> 'DYED_BUNDLE.yellow()'
             ItemStack bundleItem = new ItemStack(Items.YELLOW_BUNDLE);
             BundleContents bundleContent = new BundleContents(mapItems);
             bundleItem.set(DataComponents.BUNDLE_CONTENTS, bundleContent);

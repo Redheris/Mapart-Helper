@@ -63,7 +63,7 @@ public class MapartToFile {
                                     .withUnderlined(true)
                             );
 
-                    CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", mapartFile)
+                    CompatUtils.sendMessage(player, Component.translatable("maparthelper.mapart_saved", SAVED_MAPS_DIR, mapartFile)
                             .withStyle(ChatFormatting.GREEN), false);
                 } catch (InvalidPathException e) {
                     CompatUtils.sendMessage(player, Component.translatable("maparthelper.saving_path_error").withStyle(ChatFormatting.RED), false);

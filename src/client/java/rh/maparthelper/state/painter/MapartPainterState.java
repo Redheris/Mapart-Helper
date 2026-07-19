@@ -77,7 +77,7 @@ public class MapartPainterState {
         RegisteredPalettePreset preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
         MapColor mainColor;
         MapColor secondaryColor;
-        if (preset == null) {
+        if (preset == null || preset.getMapColors().size() < 2) {
             mainColor = MapColor.COLOR_BLACK;
             secondaryColor = MapColor.SNOW;
         } else {

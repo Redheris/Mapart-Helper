@@ -54,6 +54,8 @@ public class FakeMapsPreview {
         mapItem.set(DataComponents.MAP_ID, mapId);
 
         ItemFrame itemFrame = new ItemFrame(clientLevel, player.blockPosition(), player.getMotionDirection().getOpposite());
+        //? >=26.2
+        //itemFrame.setId(mapId.id());
         itemFrame.setItem(mapItem);
         itemFrame.setInvisible(true);
 
