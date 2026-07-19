@@ -20,5 +20,6 @@ It's done to make presets as stable and easy to share as possible.
 - Replace almost all emoji-buttons with icon-buttons
 - By default, palette will be generating only from vanilla (`minecraft:*`) blocks.
   This can be changed in the config;
+- Added potent sulfur to the default generated palette (it was not added automatically because it is block entity);
 
 </details>
