@@ -120,7 +120,8 @@ public class PaletteGenerator {
         else if (block instanceof FallingBlock) typePenalty += 1.5f;
         else if (blockState.is(BlockTags.PRESSURE_PLATES)) typePenalty += 0.3f;
         else if (blockState.is(BlockTags.SLABS)) typePenalty += 2.0f;
-        else if (FUNCTIONAL_BLOCKS.contains(block) || block instanceof EntityBlock) typePenalty += 4.0f;
+        else if (FUNCTIONAL_BLOCKS.contains(block) || block instanceof EntityBlock /*? if >=26.2 {*//*&& !(block instanceof PotentSulfurBlock)*//*?}*/)
+            typePenalty += 4.0f;
 
         return breakTime + typePenalty;
     }
