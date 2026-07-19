@@ -77,7 +77,6 @@ public class MapColorPickerDropdown extends DropdownOverlayButton {
         //~ gui_rendering
         @Override
         protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(graphics, mouseX, mouseY, partialTick);
             onlyNormalBrightness = !MapartHelper.conversionConfig().use3D();
             RegisteredPalettePreset preset = paletteDataManager.getPresetsHandler().getSelectedPreset();
             if (color != MapColor.NONE && preset.getBlockOfMapColor(color) == null) {
@@ -88,6 +87,7 @@ public class MapColorPickerDropdown extends DropdownOverlayButton {
             } else {
                 setAlpha(1.0f);
             }
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
         }
         //~ !gui_rendering
 
