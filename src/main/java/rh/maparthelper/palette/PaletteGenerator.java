@@ -84,7 +84,8 @@ public class PaletteGenerator {
 
         // Filters
         if (block instanceof CandleBlock) return useInPalette.candles;
-        if (block instanceof EntityBlock && !(block instanceof PotentSulfurBlock)) return useInPalette.entityBlocks;
+        if (block instanceof EntityBlock /*? if >=26.2 {*//*&& !(block instanceof PotentSulfurBlock)*//*?}*/)
+            return useInPalette.entityBlocks;
         if (matchesAny(block, BUILD_DECOR_BLOCKS)) return useInPalette.buildDecorBlocks;
         if (matchesAny(block, CREATIVE_BLOCKS)) return useInPalette.creativeBlocks;
         if (matchesAny(block, GROWABLE_BLOCKS)) return useInPalette.growableBlocks;
