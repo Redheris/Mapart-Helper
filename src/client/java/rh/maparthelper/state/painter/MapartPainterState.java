@@ -20,7 +20,9 @@ import rh.maparthelper.palette.RegisteredPalettePreset;
 import rh.maparthelper.util.FileUtils;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.channels.Channels;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
@@ -144,6 +146,16 @@ public class MapartPainterState {
 
     public void setColorPickerState(ColorPickerState colorPickerState) {
         this.colorPickerState = colorPickerState;
+    }
+
+    public void initOutputFolder() {
+        try {
+            if (!Files.exists(PAINTER_PNG_OUTPUT_DIR)) {
+                Files.createDirectories(PAINTER_PNG_OUTPUT_DIR);
+            }
+        } catch (IOException e) {
+            MapartHelper.LOGGER.error("Error occurred while creating directories \"{}\"", PAINTER_PNG_OUTPUT_DIR, e);
+        }
     }
 
     public enum ColorPickerState {

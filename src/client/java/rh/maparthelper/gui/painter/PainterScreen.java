@@ -192,7 +192,10 @@ public class PainterScreen extends FullscreenImageViewScreen {
 
         DecorativeButtonWidget openFolder = DecorativeButtonWidget.builderSimpleTexture(
                 OPEN_FOLDER_ICON,
-                btn -> Util.getPlatform().openPath(MapartPainterState.PAINTER_PNG_OUTPUT_DIR)
+                btn -> {
+                    MapartPainterState.getInstance().initOutputFolder();
+                    Util.getPlatform().openPath(MapartPainterState.PAINTER_PNG_OUTPUT_DIR);
+                }
         ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
         openFolder.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.open_painter_folder")));
         headerRight.addChild(openFolder);
