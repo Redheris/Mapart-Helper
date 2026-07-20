@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.BundleContents;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,7 @@ public class MapCreator {
             //? >= 26.1
             //player.addItem(mapItems.getFirst().create());
         } else {
+            //~ if >=26.2 'YELLOW_BUNDLE' -> 'DYED_BUNDLE.yellow()'
             ItemStack bundleItem = new ItemStack(Items.YELLOW_BUNDLE);
             BundleContents bundleContent = new BundleContents(mapItems);
             bundleItem.set(DataComponents.BUNDLE_CONTENTS, bundleContent);
@@ -78,7 +79,9 @@ public class MapCreator {
         mapState.colors = new byte[colors.length];
         for (int i = 0; i < colors.length; i++) {
             MapColorEntry color = PaletteColors.getMapColorEntryByARGB(colors[i]);
-            assert color != null;
+            if (color == null) {
+                throw new IllegalArgumentException("Color " + colors[i] + " is not a vanilla map color");
+            }
             mapState.colors[i] = color.mapColor().getPackedId(color.brightness());
         }
         MapId mapIdComponent = world.getFreeMapId();

@@ -28,6 +28,7 @@
 	"mixins": [
 		"maparthelper.mixins.json"
 	],
+	"accessWidener": "${id}.classtweaker",
 	"depends": {
 		"fabricloader": ">=${fabric_loader}",
 		"minecraft": "${minecraft}",

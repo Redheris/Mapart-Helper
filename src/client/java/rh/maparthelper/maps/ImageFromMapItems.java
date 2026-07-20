@@ -3,7 +3,6 @@ package rh.maparthelper.maps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MapItem;
@@ -16,6 +15,11 @@ import rh.maparthelper.state.FramesAreaSelectionState;
 
 import java.util.Comparator;
 import java.util.List;
+
+//? <26.2
+import net.minecraft.world.entity.EntityType;
+//? >=26.2
+//import net.minecraft.world.entity.EntityTypes;
 
 public class ImageFromMapItems {
     public static MapartImageData getMapartFromItem(ItemStack itemStack, Level level) {
@@ -46,9 +50,11 @@ public class ImageFromMapItems {
         Vec3 pos1 = selectionState.getSelectedPos1();
         Vec3 pos2 = selectionState.getSelectedPos2();
 
+        //~ if >=26.2 'EntityType' -> 'EntityTypes' {
         AABB area = new AABB(pos1, pos2);
         List<ItemFrame> itemFrames = level.getEntities(EntityType.ITEM_FRAME, area, ItemFrame::hasFramedMap);
         itemFrames.addAll(level.getEntities(EntityType.GLOW_ITEM_FRAME, area, ItemFrame::hasFramedMap));
+        //~}
 
         if (itemFrames.isEmpty()) {
             throw new SelectionIsEmptyException();

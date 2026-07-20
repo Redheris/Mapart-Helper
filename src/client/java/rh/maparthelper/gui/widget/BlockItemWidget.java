@@ -68,22 +68,22 @@ public class BlockItemWidget extends AbstractWidget {
 
     @Override
     //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
 
         ItemStack blockItem = this.blockItem.getDefaultInstance();
         //? <26.1
-        RenderUtils.renderItemStack(context, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
+        RenderUtils.renderItemStack(graphics, blockItem, blockItem.getItem().getName().toString(), x, y, width, height);
         //? >=26.1
-        //RenderUtils.renderItemStack(context, blockItem, "", x, y, width, height);
+        //RenderUtils.renderItemStack(graphics, blockItem, "", x, y, width, height);
 
         boolean isMouseOverBlock = mouseX >= x
                 && mouseX < x + width
                 && mouseY >= y
                 && mouseY < y + height;
-        if (context.containsPointInScissor(mouseX, mouseY) && isMouseOverBlock) {
-            context.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
+        if (RenderUtils.pointInCurrentScissor(graphics, mouseX, mouseY) && isMouseOverBlock) {
+            graphics.setTooltipForNextFrame(this.tooltip, mouseX, mouseY);
         }
     }
 

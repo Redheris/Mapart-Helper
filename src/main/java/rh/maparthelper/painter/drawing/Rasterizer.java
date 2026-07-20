@@ -1,0 +1,170 @@
+package rh.maparthelper.painter.drawing;
+
+import org.jetbrains.annotations.Nullable;
+import rh.maparthelper.painter.history.action.PaintedPixelsState;
+import rh.maparthelper.painter.surface.PixelSurface;
+
+import java.awt.*;
+
+public class Rasterizer {
+
+    public static PixelConsumer drawingPixelConsumer(DrawingContext drawingContext, Selection selection,
+                                                     PixelSurface surface, PaintedPixelsState paintedPixelsState, int color
+    ) {
+        return (x, y) -> setPixel(drawingContext, selection, surface, paintedPixelsState, x, y, color);
+    }
+
+    public static void setPixel(DrawingContext drawingContext, Selection selection, PixelSurface surface,
+                                PaintedPixelsState paintedPixelsState, int x, int y, int color
+    ) {
+        if (!selection.allows(x, y)) return;
+
+        int index = x + y * surface.getWidth();
+        int prevColor = surface.getPixel(x, y);
+        if (drawingContext.visitPixel(index) && surface.setPixel(x, y, color)) {
+            paintedPixelsState.indices().add(index);
+            paintedPixelsState.before().add(prevColor);
+            paintedPixelsState.after().add(color);
+        }
+    }
+
+
+    public static void drawLine(PixelConsumer pixelConsumer,
+                                @Nullable Rectangle changedArea,
+                                boolean circleShape,
+                                int thickness,
+                                int x0, int y0, int x1, int y1
+    ) {
+        int minX = Math.min(x0, x1);
+        int minY = Math.min(y0, y1);
+        int width = Math.abs(x1 - x0) + 1;
+        int height = Math.abs(y1 - y0) + 1;
+
+        int deltaX = Math.abs(x1 - x0);
+        int deltaY = Math.abs(y1 - y0);
+        int signX = x0 < x1 ? 1 : -1;
+        int signY = y0 < y1 ? 1 : -1;
+        int d = deltaX - deltaY;
+
+        drawFigureFromCenter(pixelConsumer, changedArea, circleShape, thickness, x1, y1);
+        while (x0 != x1 || y0 != y1) {
+            drawFigureFromCenter(pixelConsumer, changedArea, circleShape, thickness, x0, y0);
+
+            int d2 = d * 2;
+            if (d2 > -deltaY) {
+                d -= deltaY;
+                x0 += signX;
+            }
+            if (d2 < deltaX) {
+                d += deltaX;
+                y0 += signY;
+            }
+        }
+        if (changedArea != null) {
+            changedArea.setBounds(minX - thickness / 2, minY - thickness / 2, width + thickness, height + thickness);
+        }
+    }
+
+    public static void drawFigureFromCenter(PixelConsumer pixelConsumer,
+                                            @Nullable Rectangle changedArea,
+                                            boolean circleShape,
+                                            int thickness,
+                                            int xCenter, int yCenter
+    ) {
+        if (circleShape)
+            drawCircle(pixelConsumer, changedArea, xCenter, yCenter, thickness, true);
+        else {
+            int x = xCenter - thickness / 2;
+            int y = yCenter - thickness / 2;
+            drawRect(
+                    pixelConsumer, changedArea,
+                    x, y,
+                    x + thickness - 1, y + thickness - 1,
+                    true
+            );
+        }
+    }
+
+    public static void drawRect(PixelConsumer pixelConsumer, @Nullable Rectangle changedArea,
+                                int x0, int y0, int x1, int y1, boolean fill
+    ) {
+        int minX = Math.min(x0, x1);
+        int minY = Math.min(y0, y1);
+        int maxX = Math.max(x0, x1);
+        int maxY = Math.max(y0, y1);
+
+        if (fill) {
+            fillRectByCoords(pixelConsumer, minX, minY, maxX, maxY);
+        } else {
+            fillRectByCoords(pixelConsumer, minX, minY, maxX, minY);
+            fillRectByCoords(pixelConsumer, minX, minY, minX, maxY);
+            fillRectByCoords(pixelConsumer, maxX, maxY, maxX, minY);
+            fillRectByCoords(pixelConsumer, maxX, maxY, minX, maxY);
+        }
+
+        if (changedArea != null) {
+            changedArea.setBounds(minX, minY, maxX - minX + 1, maxY - minY + 1);
+        }
+    }
+
+    public static void drawCircle(PixelConsumer pixelConsumer, @Nullable Rectangle changedArea,
+                                  int x0, int y0, int diameter, boolean fill
+    ) {
+        int dx = 0;
+        int dy = diameter / 2;
+        int delta = 3 - 2 * dy;
+
+        int evenLenError = diameter % 2 == 0 ? 1 : 0;
+
+        if (dy == 0) {
+            pixelConsumer.accept(x0, y0);
+            if (changedArea != null) changedArea.setBounds(x0, y0, 1, 1);
+            return;
+        }
+
+        while (dx <= dy) {
+            if (fill) {
+                fillRectBySize(pixelConsumer, x0 - dx, y0 + dy - evenLenError, dx * 2 + 1 - evenLenError, 1);
+                fillRectBySize(pixelConsumer, x0 - dx, y0 - dy, dx * 2 + 1 - evenLenError, 1);
+                fillRectBySize(pixelConsumer, x0 - dy, y0 + dx - evenLenError, dy * 2 + 1 - evenLenError, 1);
+                fillRectBySize(pixelConsumer, x0 - dy, y0 - dx, dy * 2 + 1 - evenLenError, 1);
+            } else {
+                drawCircleFragment(pixelConsumer, x0, y0, dx, dy);
+                drawCircleFragment(pixelConsumer, x0, y0, dy, dx);
+            }
+
+            delta += delta < 0 ? 4 * dx + 6 : 4 * (dx - dy--) + 10;
+            ++dx;
+        }
+
+        if (changedArea != null) {
+            changedArea.setBounds(x0 - diameter, y0 - diameter, 2 * diameter + 1, 2 * diameter + 1);
+        }
+    }
+
+    private static void drawCircleFragment(PixelConsumer pixelConsumer,
+                                           int x0, int y0, int dx, int dy
+    ) {
+        pixelConsumer.accept(x0 + dx, y0 + dy);
+        pixelConsumer.accept(x0 + dx, y0 - dy);
+        pixelConsumer.accept(x0 - dx, y0 + dy);
+        pixelConsumer.accept(x0 - dx, y0 - dy);
+    }
+
+    private static void fillRectByCoords(PixelConsumer pixelConsumer, int x0, int y0, int x1, int y1) {
+        for (int x = x0; x <= x1; x++) {
+            for (int y = y0; y <= y1; y++) {
+                pixelConsumer.accept(x, y);
+            }
+        }
+    }
+
+    private static void fillRectBySize(PixelConsumer pixelConsumer, int x, int y, int width, int height) {
+        fillRectByCoords(pixelConsumer, x, y, x + width - 1, y + height - 1);
+    }
+
+    @FunctionalInterface
+    public interface PixelConsumer {
+        void accept(int a, int b);
+    }
+}

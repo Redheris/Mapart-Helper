@@ -2,12 +2,14 @@ package rh.maparthelper;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rh.maparthelper.command.ServerCommands;
 import rh.maparthelper.config.CommonConfiguration;
 import rh.maparthelper.config.ConversionConfiguration;
-import rh.maparthelper.config.palette.PaletteColors;
+import rh.maparthelper.event.PaletteLoader;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.nio.file.Path;
 
@@ -18,11 +20,16 @@ public class MapartHelper implements ModInitializer {
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(CONFIG_DIR);
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
+    public static Identifier identifier(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
+    }
+
     @Override
     public void onInitialize() {
         CommonConfiguration.HANDLER.load();
         ConversionConfiguration.load();
         PaletteColors.initMapColorsCache();
+        PaletteLoader.load();
 
         ServerCommands.registerCommands();
     }

@@ -14,7 +14,7 @@ import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.command.FakeMapsPreview;
-import rh.maparthelper.gui.screen.MapartEditorScreen;
+import rh.maparthelper.state.ActiveModScreenManager;
 import rh.maparthelper.util.MapUtils;
 
 //? if <=1.21.8 {
@@ -35,7 +35,7 @@ public class ClientTickHandler {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openScreen.consumeClick()) {
-                client.setScreen(new MapartEditorScreen());
+                ActiveModScreenManager.getInstance().openModScreen();
             }
             if (client.level != null && ClientCommandsContext.showFakeItemFrames()) {
                 long liveTime = client.level.getGameTime() - ClientCommandsContext.getFakeFramesBornTime();

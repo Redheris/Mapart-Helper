@@ -6,8 +6,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector2i;
-import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.config.palette.PaletteGenerator;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.PaletteGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,7 @@ public class MapUtils {
         int startX = startPos.x;
         int startZ = startPos.y;
 
-        Map<Integer, List<Block>> palette = PaletteConfigManager.completePalette.palette;
+        Map<Integer, List<Block>> palette = PaletteDataManager.getInstance().getCompletePalette().palette;
 
         int maxLen = palette.values().stream().mapToInt(List::size).max().orElse(0);
 

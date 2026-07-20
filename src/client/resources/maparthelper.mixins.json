@@ -5,7 +5,10 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "CustomUniformsBind"
+    "AbstractWidgetAccessor",
+    "CustomUniformsBind",
+    "NativeImageAccessor",
+    "WidgetTooltipHolderMixin"
   ],
   "server": [],
   "injectors": {

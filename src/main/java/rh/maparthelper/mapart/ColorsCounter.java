@@ -1,11 +1,12 @@
 package rh.maparthelper.mapart;
 
 import net.minecraft.world.level.material.MapColor;
-import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.palette.PaletteDataManager;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class ColorsCounter {
@@ -65,7 +66,8 @@ public class ColorsCounter {
         Comparator<MapColorCount> cmp = Comparator.comparingInt(MapColorCount::amount);
         List<MapColorCount> counts = new ArrayList<>();
 
-        for (MapColor color : PaletteConfigManager.presetsConfig.getCurrentPresetColors()) {
+        Set<MapColor> colors = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset().getMapColors();
+        for (MapColor color : colors) {
             int amount = counter.get(color.id - 1);
             if (amount > 0)
                 counts.add(new MapColorCount(color.id, amount));

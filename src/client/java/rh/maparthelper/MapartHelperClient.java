@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry;
 import rh.maparthelper.command.ClientCommands;
 import rh.maparthelper.command.MapartToFile;
 import rh.maparthelper.event.ModEventsHandler;
-import rh.maparthelper.event.PaletteLoader;
 import rh.maparthelper.render.ScaledItemGuiElementRenderer;
 
 public class MapartHelperClient implements ClientModInitializer {
@@ -17,14 +16,11 @@ public class MapartHelperClient implements ClientModInitializer {
         ClientCommands.registerCommands();
         ModEventsHandler.registerAll();
 
-        PaletteLoader.load();
-
         SpecialGuiElementRegistry.register(ctx -> new ScaledItemGuiElementRenderer(
                 //? if <26.1 {
                 ctx.vertexConsumers()
-                //?} else {
-                /*ctx.bufferSource()
-                *///?}
+                //?} else if 26.1
+                //ctx.bufferSource()
         ));
     }
 }

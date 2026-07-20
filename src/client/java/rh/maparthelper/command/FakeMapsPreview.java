@@ -14,22 +14,22 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import rh.maparthelper.colors.MapColorEntry;
-import rh.maparthelper.config.palette.PaletteColors;
-import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.NativeImageUtils;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteColors;
 
 @Environment(EnvType.CLIENT)
 public class FakeMapsPreview {
     public static boolean createFakeFramesFromMapart(MapartProcessing mapart, LocalPlayer player) {
-        if (CurrentConversionSettings.guiMapartImage == null)
-            return false;
+        if (mapart.getNativeImage() == null) return false;
+
         removeFakeItemFrames((ClientLevel) player.level());
-        int[][] maps = NativeImageUtils.divideImageByMaps(mapart.getWidth(), mapart.getHeight(), mapart.getNativeImage());
-        if (maps == null) return false;
+        int[][] maps = NativeImageUtils.divideImageByMaps(mapart.getNativeImage());
+
         for (int[] map : maps) {
             addFakeItemFrame(map, player);
         }
+
         return true;
     }
 
@@ -54,6 +54,8 @@ public class FakeMapsPreview {
         mapItem.set(DataComponents.MAP_ID, mapId);
 
         ItemFrame itemFrame = new ItemFrame(clientLevel, player.blockPosition(), player.getMotionDirection().getOpposite());
+        //? >=26.2
+        //itemFrame.setId(mapId.id());
         itemFrame.setItem(mapItem);
         itemFrame.setInvisible(true);
 

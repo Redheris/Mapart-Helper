@@ -1,0 +1,70 @@
+#version 150
+
+#moj_import <minecraft:dynamictransforms.glsl>
+
+layout(std140) uniform MapartImageGrid {
+    ivec2 ScreenSize;
+    vec2 ScaledSize;
+    vec2 StartPos;
+    vec4 ColorMapGridLine;
+    bool PixelsGrid;
+    bool MapsGrid;
+};
+
+uniform sampler2D Sampler0;
+
+in vec2 texCoord0;
+in vec4 vertexColor;
+
+out vec4 fragColor;
+
+void main() {
+    vec4 originalColor = texture(Sampler0, texCoord0) * vertexColor;
+    ivec2 originalSize = textureSize(Sampler0, 0);
+
+    float texelW = ScaledSize.x / float(originalSize.x);
+    float texelH = ScaledSize.y / float(originalSize.y);
+
+    float localX = gl_FragCoord.x - StartPos.x;
+    float localY = ScreenSize.y - gl_FragCoord.y - StartPos.y;
+
+    if (MapsGrid) {
+        float mapWidth  = 128 * ScaledSize.x / float(originalSize.x);
+        float mapHeight = 128 * ScaledSize.y / float(originalSize.y);
+
+        bool verticalMapLine   = fract(localX / mapWidth)  * mapWidth < 2;
+        bool horizontalMapLine = fract(localY / mapHeight) * mapHeight < 2;
+
+        bool nonBorderVerticalMapLine   = verticalMapLine   && (localX > mapWidth / 2  && localX < ScaledSize.x - mapWidth / 2);
+        bool nonBorderHorizontalMapLine = horizontalMapLine && (localY > mapHeight / 2 && localY < ScaledSize.y - mapHeight / 2);
+
+        if (nonBorderVerticalMapLine || nonBorderHorizontalMapLine) {
+            fragColor = mix(originalColor, ColorMapGridLine, ColorMapGridLine.a);
+            return;
+        }
+    }
+
+    if (PixelsGrid) {
+        // I didn't manage to fix rare 2px lines with math
+        bool raceCheckX = fract((localX - 1) / texelW) * texelW < 1;
+        bool raceCheckY = fract((localY - 1) / texelH) * texelH < 1;
+
+        float distToLineX = fract(localX / texelW) * texelW;
+        float distToLineY = fract(localY / texelH) * texelH;
+
+        if ((!raceCheckX && distToLineX < 1 || !raceCheckY && distToLineY < 1)) {
+            if (mod(localX + localY, 2) < 1) {
+                fragColor = mix(originalColor, vec4(1.0, 1.0, 1.0, 0.6), 0.6);
+            } else {
+                fragColor = mix(originalColor, vec4(0.0, 0.0, 0.0, 0.5), 0.5);
+            }
+            fragColor.a = 1;
+            return;
+        }
+    }
+
+    if (originalColor.a == 0.0) {
+        discard;
+    }
+    fragColor = originalColor * ColorModulator;
+}

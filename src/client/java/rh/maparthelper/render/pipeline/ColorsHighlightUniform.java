@@ -4,10 +4,11 @@ import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderSystem;
-import org.joml.Vector4f;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;
+
+import static rh.maparthelper.colors.ColorUtils.intToVec4;
 
 public class ColorsHighlightUniform {
     public static final int SIZE = new Std140SizeCalculator()
@@ -28,13 +29,5 @@ public class ColorsHighlightUniform {
                     .get();
             RenderSystem.getDevice().createCommandEncoder().writeToBuffer(BUFFER.slice(), byteBuffer);
         }
-    }
-
-    private static Vector4f intToVec4(int colorARGB) {
-        int a = (colorARGB >> 24) & 0xFF;
-        int r = (colorARGB >> 16) & 0xFF;
-        int g = (colorARGB >> 8) & 0xFF;
-        int b = (colorARGB) & 0xFF;
-        return new Vector4f(r / 255f, g / 255f, b / 255f, a / 255f);
     }
 }

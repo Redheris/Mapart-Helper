@@ -10,9 +10,9 @@ import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
 import rh.maparthelper.config.adapter.BlockTypeAdapter;
 import rh.maparthelper.config.adapter.MapColorEntryAdapter;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverters;
 import rh.maparthelper.conversion.staircases.StaircaseStyles;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.io.FileReader;
 import java.io.FileWriter;

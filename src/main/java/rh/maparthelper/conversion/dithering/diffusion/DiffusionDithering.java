@@ -3,10 +3,10 @@ package rh.maparthelper.conversion.dithering.diffusion;
 import net.minecraft.world.level.material.MapColor;
 import rh.maparthelper.colors.ColorUtils;
 import rh.maparthelper.colors.DitherEntry;
-import rh.maparthelper.config.palette.PaletteColors;
 import rh.maparthelper.conversion.dithering.ColorConverter;
 import rh.maparthelper.conversion.dithering.ConversionContext;
 import rh.maparthelper.mapart.ColorsCounter;
+import rh.maparthelper.palette.PaletteColors;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -126,9 +126,9 @@ public abstract class DiffusionDithering extends ColorConverter {
     private void putError(int width, int x, int y, float r, float g, float b) {
         if (x < 0 || x >= width || y < 0 || y >= rowsNumber) return;
         int ind = (y * width + x) * 3;
-        errorsArray[ind] += Math.round(r);
-        errorsArray[ind + 1] += Math.round(g);
-        errorsArray[ind + 2] += Math.round(b);
+        errorsArray[ind] += Math.round(r * redPropagationWeight);
+        errorsArray[ind + 1] += Math.round(g * greenPropagationWeight);
+        errorsArray[ind + 2] += Math.round(b * bluePropagationWeight);
     }
 
     protected static float[] createKernelFromWeights(int... weights) {

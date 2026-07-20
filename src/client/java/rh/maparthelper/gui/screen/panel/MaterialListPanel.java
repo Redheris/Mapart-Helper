@@ -3,9 +3,9 @@ package rh.maparthelper.gui.screen.panel;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.AbstractLayout;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -21,17 +21,17 @@ import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.config.UseAuxBlocks;
-import rh.maparthelper.config.palette.PaletteConfigManager;
-import rh.maparthelper.config.palette.PalettePresetsConfig;
 import rh.maparthelper.conversion.CurrentConversionSettings;
 import rh.maparthelper.conversion.MapartImageUpdater;
 import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 import rh.maparthelper.gui.screen.MapartEditorScreen;
 import rh.maparthelper.gui.widget.BlockItemWidget;
 import rh.maparthelper.gui.widget.MapartPreviewWidget;
-import rh.maparthelper.gui.widget.ScrollableGridWidget;
+import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.mapart.ColorsCounter;
 import rh.maparthelper.mapart.MapartProcessing;
+import rh.maparthelper.palette.PaletteDataManager;
+import rh.maparthelper.palette.RegisteredPalettePreset;
 import rh.maparthelper.util.InventoryItemsCounter;
 import rh.maparthelper.util.RenderUtils;
 
@@ -45,11 +45,12 @@ import java.util.function.Consumer;
 public class MaterialListPanel extends AbstractLayout {
     private final MapartEditorScreen screen;
     private final MapartProcessing mapart;
-    private ScrollableGridWidget materialList;
+    private GridLayout materialListContent;
+    private AdjScrollableLayoutWidget materialListScrollable;
 
     private int auxBlockCount = 0;
-    private boolean materialsAscendingOrder = false;
-    private boolean displayRemainingAmount = false;
+    private static boolean materialsAscendingOrder = false;
+    private static boolean displayRemainingAmount = false;
     private final InventoryItemsCounter inventoryItemsCounter;
     private boolean displayTotalCount = true;
 
@@ -75,16 +76,23 @@ public class MaterialListPanel extends AbstractLayout {
 
     @Override
     public void visitChildren(@NotNull Consumer<LayoutElement> consumer) {
-        if (materialList != null)
-            consumer.accept(materialList);
+        if (materialListScrollable != null)
+            consumer.accept(materialListScrollable);
     }
+
+    //? if >=26.2 {
+    /*@Override
+    public void removeChildren() {
+        materialListScrollable.removeChildren();
+    }
+    *///?}
 
     public boolean isMaterialsAscendingOrder() {
         return materialsAscendingOrder;
     }
 
     public void toggleMaterialsAscendingOrder() {
-        this.materialsAscendingOrder = !materialsAscendingOrder;
+        materialsAscendingOrder = !materialsAscendingOrder;
     }
 
     public boolean isDisplayRemainingAmount() {
@@ -94,29 +102,24 @@ public class MaterialListPanel extends AbstractLayout {
     public void toggleDisplayRemainingAmount() {
         if (inventoryItemsCounter == null)
             return;
-        this.displayRemainingAmount = !displayRemainingAmount;
+        displayRemainingAmount = !displayRemainingAmount;
     }
 
-    public void updateMaterialList(Consumer<ScrollableGridWidget> childAdder, Consumer<GuiEventListener> childRemover) {
+    public void updateMaterialList(Consumer<AbstractWidget> childAdder, Consumer<AbstractWidget> childRemover) {
         MaterialListBlockWidget.fixedHighlight = null;
         MaterialListBlockWidget.selectedForExcluding.clear();
 
-        childRemover.accept(materialList);
+        if (materialListScrollable != null)
+            materialListScrollable.visitWidgets(childRemover);
         int listTop = getY();
-        materialList = new ScrollableGridWidget(
-                null,
-                getX() - 6, listTop,
-                screen.width - getX() - 5, screen.height - listTop, 6
-        );
+
+        materialListContent = new GridLayout();
+        materialListContent.defaultCellSetting().alignVerticallyMiddle();
 
         if (!CurrentConversionSettings.isMapartConverted() || MapartHelper.conversionConfig().useUnobtainable()) return;
 
-        materialList.setLeftScroll(true);
-        materialList.grid.columnSpacing(0);
-        materialList.grid.defaultCellSetting().alignVerticallyMiddle();
-
-        GridLayout.RowHelper materialListAdder = materialList.grid.createRowHelper(2);
-        PalettePresetsConfig palette = PaletteConfigManager.presetsConfig;
+        GridLayout.RowHelper materialListAdder = materialListContent.createRowHelper(2);
+        RegisteredPalettePreset preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
 
         ColorsCounter colorsCounter = mapart.getTotalColorsCounter(MapartHelper.conversionConfig().getMaterialsCountMode());
         ColorsCounter.MapColorCount[] colorCounts = colorsCounter.getColorCounts(materialsAscendingOrder);
@@ -127,7 +130,7 @@ public class MaterialListPanel extends AbstractLayout {
             auxBlockItemWidget.insertToTooltip(1, Component.translatable("maparthelper.aux_block").withStyle(ChatFormatting.GRAY));
 
             StringWidget auxAmountText = new StringWidget(Component.empty(), screen.getFont());
-            materialListAdder.addChild(auxBlockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
+            materialListAdder.addChild(auxBlockItemWidget, materialListContent.newCellSettings().paddingLeft(6));
             materialListAdder.addChild(auxAmountText);
 
             boolean hasAuxBlockInColors = false;
@@ -135,7 +138,7 @@ public class MaterialListPanel extends AbstractLayout {
                 hasAuxBlockInColors = calculateRemainingCounts(colorCounts);
 
             for (ColorsCounter.MapColorCount colorCount : colorCounts) {
-                addBlockToMaterialList(materialListAdder, palette, colorCount);
+                addBlockToMaterialList(materialListAdder, preset, colorCount);
             }
 
             if (displayRemainingAmount && !hasAuxBlockInColors)
@@ -151,21 +154,27 @@ public class MaterialListPanel extends AbstractLayout {
             calculateRemainingCounts(colorCounts);
 
             for (ColorsCounter.MapColorCount colorCount : colorCounts) {
-                addBlockToMaterialList(materialListAdder, palette, colorCount);
+                addBlockToMaterialList(materialListAdder, preset, colorCount);
             }
         }
 
-        materialList.arrangeElements();
-        childAdder.accept(materialList);
+        materialListScrollable = new AdjScrollableLayoutWidget(
+                materialListContent, screen.height - listTop
+        );
+        materialListScrollable.setLeftScrollBar(true);
+        materialListScrollable.setPosition(getX() - 6, listTop);
+
+        materialListScrollable.arrangeElements();
+        materialListScrollable.visitWidgets(childAdder);
     }
 
-    private void addBlockToMaterialList(GridLayout.RowHelper adder, PalettePresetsConfig palette, ColorsCounter.MapColorCount color) {
+    private void addBlockToMaterialList(GridLayout.RowHelper adder, RegisteredPalettePreset preset, ColorsCounter.MapColorCount color) {
         MapColor mapColor = MapColor.byId(color.id());
-        Block block = palette.getBlockOfMapColor(mapColor);
+        Block block = preset.getBlockOfMapColor(mapColor);
         if (block == null) return;
 
         MaterialListBlockWidget blockItemWidget = new MaterialListBlockWidget(0, 0, 24, block, mapColor);
-        adder.addChild(blockItemWidget, materialList.grid.newCellSettings().paddingLeft(6));
+        adder.addChild(blockItemWidget, materialListContent.newCellSettings().paddingLeft(6));
         MutableComponent text = Component.literal(getAmountString(color.amount(), block.asItem().getDefaultMaxStackSize()));
         if (color.amount() == 0)
             text.withStyle(ChatFormatting.GREEN);
@@ -185,11 +194,11 @@ public class MaterialListPanel extends AbstractLayout {
         if (player == null) return false;
         boolean hasAuxBlock = false;
 
-        PalettePresetsConfig paletteConfig = PaletteConfigManager.presetsConfig;
+        RegisteredPalettePreset preset = PaletteDataManager.getInstance().getPresetsHandler().getSelectedPreset();
 
         List<Item> countingBlocks = Arrays.stream(colors)
                 .map(c -> {
-                    Block block = paletteConfig.getBlockOfMapColor(MapColor.byId(c.id()));
+                    Block block = preset.getBlockOfMapColor(MapColor.byId(c.id()));
                     if (block instanceof LiquidBlock)
                         return BuiltInRegistries.FLUID.getValue(BuiltInRegistries.BLOCK.getKey(block)).getBucket();
                     return block.asItem();
@@ -263,19 +272,19 @@ public class MaterialListPanel extends AbstractLayout {
 
         //~ gui_rendering
         @Override
-        protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(context, mouseX, mouseY, partialTick);
+        protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+            super.renderWidget(graphics, mouseX, mouseY, partialTick);
             if (fixedHighlight == this) {
-                context.nextStratum();
-                RenderUtils.renderOutline(context, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
+                graphics.nextStratum();
+                RenderUtils.renderOutline(graphics, getX(), getY(), this.width, this.height, MapartHelper.commonConfig().previewHighlightingColor.getRGB());
             } else if (MapartHelper.commonConfig().previewHighlightOnHover
-                    && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+                    && graphics.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
                 screen.setHighlightingColor(mapColor);
                 hoveringAny = true;
             }
             if (confirmRemoving) {
                 RenderUtils.renderItemStack(
-                        context,
+                        graphics,
                         Blocks.BARRIER.asItem().getDefaultInstance(),
                         "RemoveColor",
                         getX(), getY(),

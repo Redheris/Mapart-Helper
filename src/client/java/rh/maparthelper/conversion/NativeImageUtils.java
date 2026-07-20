@@ -4,48 +4,56 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 public class NativeImageUtils {
+    private static final Object mapartTextureUploadLock = new Object();
 
-    public synchronized static void updateMapartImageTexture(NativeImage image) {
-        DynamicTexture backedTexture = new DynamicTexture(
-                () -> "mapart_gui_texture",
-                image
-        );
-        TextureManager textureManager = Minecraft.getInstance().getTextureManager();
-        textureManager.register(CurrentConversionSettings.guiMapartId, backedTexture);
-        CurrentConversionSettings.guiMapartImage = backedTexture;
+    public static void updateMapartImageTexture(NativeImage image) {
+        synchronized (mapartTextureUploadLock) {
+            DynamicTexture texture = CurrentConversionSettings.guiMapartImage;
+            NativeImage currentImage = texture == null ? null : texture.getPixels();
+            if (texture == null || currentImage == null || currentImage.getWidth() != image.getWidth() || currentImage.getHeight() != image.getHeight()) {
+                texture = new DynamicTexture(
+                        CurrentConversionSettings.guiMapartId::getPath,
+                        image
+                );
+                TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+                textureManager.register(CurrentConversionSettings.guiMapartId, texture);
+                CurrentConversionSettings.guiMapartImage = texture;
+            } else {
+                texture.setPixels(image);
+                texture.upload();
+            }
+        }
     }
 
-    public static int[][] divideImageByMaps(int width, int height, NativeImage image) {
-        if (CurrentConversionSettings.guiMapartImage == null)
-            return null;
-        //? if <26.1
-        if (CurrentConversionSettings.guiMapartImage.getPixels() == null) return null;
-
-        int imageWidth = width * 128;
+    public static int[][] divideImageByMaps(@NotNull NativeImage image) {
+        int imageWidth = image.getWidth();
+        int mapsWidth = imageWidth / 128;
+        int mapsHeight = image.getHeight() / 128;
 
         int[] pixels = image.getPixels();
-        int[][] maps = new int[width * height][];
+        int[][] maps = new int[mapsWidth * mapsHeight][];
         for (int i = 0; i < maps.length; i++) {
             maps[i] = new int[16384];
         }
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
+        for (int x = 0; x < mapsWidth; x++) {
+            for (int y = 0; y < mapsHeight; y++) {
                 for (int i = 0; i < 128; i++) {
                     int rowStart = x * 128 + (y * 128 + i) * imageWidth;
-                    System.arraycopy(pixels, rowStart, maps[x + y * width], i * 128, 128);
+                    System.arraycopy(pixels, rowStart, maps[x + y * mapsWidth], i * 128, 128);
                 }
             }
         }
         return maps;
     }
 
-    public static NativeImage convertBufferedImageToNativeImage(BufferedImage image, int bgColor, boolean useTranslucent) {
+    public static NativeImage convertBufferedImageToNativeImage(@NotNull BufferedImage image, int bgColor, boolean useTranslucent) {
         int width = image.getWidth();
         int height = image.getHeight();
 

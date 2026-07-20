@@ -16,6 +16,10 @@ public abstract class ColorConverter {
     protected final int[] topLineBright;
     protected final int[] topLineCorrect;
 
+    protected final float redPropagationWeight;
+    protected final float greenPropagationWeight;
+    protected final float bluePropagationWeight;
+
     protected final AtomicDouble progress;
 
     public ColorConverter(ConversionContext context) {
@@ -27,6 +31,9 @@ public abstract class ColorConverter {
         this.topLineBright = context.topLineBright();
         this.topLineCorrect = context.topLineCorrect();
         this.progress = context.progress();
+        this.redPropagationWeight = context.redPropagationWeight();
+        this.greenPropagationWeight = context.greenPropagationWeight();
+        this.bluePropagationWeight = context.bluePropagationWeight();
     }
 
     public abstract BufferedImage convertColors(boolean useUnobtainableColors, boolean useMultithreading);

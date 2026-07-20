@@ -51,20 +51,9 @@ public class ConfigScreenFactory {
                                         value -> config.previewHighlightingColor = value
                                 )
                                 .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Component.translatable("maparthelper.config.common.createDirsForSchematic"))
-                                .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.createDirsForSchematic")))
-                                .customController(TickBoxController::new)
-                                .binding(
-                                        defaults.createDirsForSchematic,
-                                        () -> config.createDirsForSchematic,
-                                        value -> config.createDirsForSchematic = value
-                                )
-                                .build())
-
                         .option(Option.<Integer>createBuilder()
                                 .name(Component.translatable("maparthelper.config.common.fakeItemFramesLiveTime"))
-                                .customController(IntegerFieldController::new)
+                                .customController(opt -> new IntegerFieldController(opt, 0, 1200))
                                 .binding(
                                         defaults.fakeItemFramesLiveTime,
                                         () -> config.fakeItemFramesLiveTime,
@@ -73,6 +62,16 @@ public class ConfigScreenFactory {
                                 .build())
                         .group(OptionGroup.createBuilder()
                                 .name(Component.translatable("maparthelper.config.common.group.conversionSettings"))
+                                .option(Option.<Integer>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.common.maxMapartSize"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.maxMapartSize")))
+                                        .customController(opt -> new IntegerFieldController(opt, 1, 10000))
+                                        .binding(
+                                                defaults.maxMapartSize,
+                                                () -> config.maxMapartSize,
+                                                value -> config.maxMapartSize = value
+                                        )
+                                        .build())
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Component.translatable("maparthelper.config.common.logConversionTime"))
                                         .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.logConversionTime")))
@@ -115,6 +114,29 @@ public class ConfigScreenFactory {
                                                 defaults.multithreadColorConversion,
                                                 () -> config.multithreadColorConversion,
                                                 value -> config.multithreadColorConversion = value
+                                        )
+                                        .build())
+                                .build())
+                        .group(OptionGroup.createBuilder()
+                                .name(Component.translatable("maparthelper.config.common.group.schematicSettings"))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.common.createDirsForSchematic"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.createDirsForSchematic")))
+                                        .customController(TickBoxController::new)
+                                        .binding(
+                                                defaults.createDirsForSchematic,
+                                                () -> config.createDirsForSchematic,
+                                                value -> config.createDirsForSchematic = value
+                                        )
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.translatable("maparthelper.config.common.addPlatformLayerAuxBlocks"))
+                                        .description(OptionDescription.of(Component.translatable("maparthelper.config.common.description.addPlatformLayerAuxBlocks")))
+                                        .customController(TickBoxController::new)
+                                        .binding(
+                                                defaults.addPlatformLayerAuxBlocks,
+                                                () -> config.addPlatformLayerAuxBlocks,
+                                                value -> config.addPlatformLayerAuxBlocks = value
                                         )
                                         .build())
                                 .build())
@@ -164,6 +186,16 @@ public class ConfigScreenFactory {
                         .option(LabelOption.create(Component.translatable("maparthelper.config.paletteGenerator.regenerationWarningLabel")
                                 .withStyle(ChatFormatting.GOLD)))
                         .option(LabelOption.create(Component.translatable("maparthelper.config.paletteGenerator.headLabel")))
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Component.translatable("maparthelper.config.paletteGenerator.onlyVanillaBlocks"))
+                                .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.onlyVanillaBlocks")))
+                                .customController(TickBoxController::new)
+                                .binding(paletteGenFilterBinding(
+                                        defaults.useInPalette.onlyVanillaBlocks,
+                                        () -> config.useInPalette.onlyVanillaBlocks,
+                                        value -> config.useInPalette.onlyVanillaBlocks = value,
+                                        requestPaletteRegenerate))
+                                .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Component.translatable("maparthelper.config.paletteGenerator.anyBlocks"))
                                 .description(OptionDescription.of(Component.translatable("maparthelper.config.description.paletteGenerator.anyBlocks")))

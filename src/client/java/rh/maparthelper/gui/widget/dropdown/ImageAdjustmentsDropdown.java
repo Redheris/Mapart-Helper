@@ -1,0 +1,60 @@
+package rh.maparthelper.gui.widget.dropdown;
+
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.NotNull;
+import rh.maparthelper.gui.widget.ImageAdjustmentSliderWidget;
+
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+public abstract class ImageAdjustmentsDropdown extends DropdownOverlayButton {
+    protected boolean isDefaultState = true;
+
+    public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
+                                    int overlayWidth, int overlayHeight, Component message) {
+        super(screen, null, width, height, message, true);
+        initOverlay(overlayHeight, overlayWidth);
+        updateStateAndMessage();
+    }
+
+    public ImageAdjustmentsDropdown(@NotNull Screen screen, int width, int height,
+                                    int overlayWidth, int overlayHeight, WidgetSprites widgetSprites) {
+        super(screen, null, width, height, true, true, widgetSprites);
+        initOverlay(overlayHeight, overlayWidth);
+        updateStateAndMessage();
+    }
+
+    protected abstract void initOverlay(int overlayHeight, int overlayWidth);
+
+    protected abstract void updateDefaultState();
+
+    protected void updateStateAndMessage() {
+        updateDefaultState();
+        this.setMessage(getMessage().plainCopy().withColor(isDefaultState ? -1 : 0xFF_ffaa00));
+        this.setTextureColor(isDefaultState ? -1 : 0xFF_ffaa00);
+    }
+
+    protected ImageAdjustmentSliderWidget createDecimalSliderSetting(
+            int width, Component text, Supplier<Double> getter, Consumer<Double> setter
+    ) {
+        return new ImageAdjustmentSliderWidget(
+                width, 15, 0.f, 2.f, true,
+                getter.get(),
+                setter,
+                value -> String.format(text.getString() + ": %.2f", value)
+        );
+    }
+
+    protected ImageAdjustmentSliderWidget createIntegerSliderSetting(
+            int width, Component text, Supplier<Double> getter, Consumer<Double> setter
+    ) {
+        return new ImageAdjustmentSliderWidget(
+                width, 15, -255, 255, false,
+                getter.get(),
+                setter,
+                value -> String.format(text.getString() + ": %.0f", value)
+        );
+    }
+}

@@ -54,7 +54,9 @@ repositories {
     maven("https://maven.isxander.dev/releases") {
         name = "Xander Maven"
     }
-    maven("https://maven.terraformersmc.com/releases/")
+    maven("https://maven.gnomecraft.net/releases") {
+        name = "GniftyGnome"
+    }
 }
 
 dependencies {
@@ -73,7 +75,9 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
 
     modImplementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
+    // Terraformers' maven feels bad
     modApi("com.terraformersmc:modmenu:${property("modmenu")}")
+
 }
 
 loom {
@@ -88,16 +92,17 @@ loom {
 
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
 // For mods with access wideners
-//    accessWidenerPath = rootProject.file("src/main/resources/aw/${sc.current.version}.classtweaker")
+    accessWidenerPath = rootProject.file("src/main/resources/aw/${sc.current.version}.classtweaker")
 
     decompilerOptions.named("vineflower") {
         options.put("mark-corresponding-synthetics", "1") // Adds names to lambdas - useful for mixins
     }
 
     runConfigs.all {
-        ideConfigGenerated(true)
-        vmArgs("-Dmixin.debug.export=true") // Exports transformed classes for debugging
-        runDir = "../../run" // Shares the run directory between versions
+        preferGradleTask = true
+        generateRunConfig = true
+        runDirectory = rootProject.file("run") // Shares the run directory between versions
+        jvmArguments.add("-Dmixin.debug.export=true") // Exports transformed classes for debugging
     }
 }
 
@@ -111,14 +116,14 @@ tasks {
     val mixinJava = "JAVA_${requiredJava.majorVersion}"
     processResources {
         // Excluding unnecessary AW files from adding to the jar
-//        exclude("aw/**")
-//        val awFile = loom.accessWidenerPath.asFile.orNull
-//        if (awFile != null) {
-//            from(awFile.parentFile) {
-//                include(awFile.name)
-//                rename(awFile.name, "${project.property("mod.id")}.classtweaker")
-//            }
-//        }
+        exclude("aw/**")
+        val awFile = loom.accessWidenerPath.asFile.orNull
+        if (awFile != null) {
+            from(awFile.parentFile) {
+                include(awFile.name)
+                rename(awFile.name, "${project.property("mod.id")}.classtweaker")
+            }
+        }
 
         // Add LICENSE file into the jar
         from(rootProject.file("LICENSE")) {
@@ -151,8 +156,8 @@ tasks {
         filesMatching("*.mixins.json") { expand("java" to mixinJava) }
     }
 
-    // Builds the version into a shared folder in `build/libs/${mod version}/`
     register<Copy>("buildAndCollect") {
+        description = $$"Builds the version into a shared folder in `build/libs/${mod version}/`"
         group = "build"
         from(loomx.modJar.map { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))

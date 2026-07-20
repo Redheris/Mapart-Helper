@@ -60,14 +60,14 @@ public class MapColorWidget extends AbstractWidget {
 
     @Override
     //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int x = getX();
         int y = getY();
         if (color == MapColor.NONE) {
-            context.fill(x, y, x + width, y + height, MapColor.COLOR_LIGHT_GRAY.calculateARGBColor(MapColor.Brightness.NORMAL));
+            graphics.fill(x, y, x + width, y + height, MapColor.COLOR_LIGHT_GRAY.calculateARGBColor(MapColor.Brightness.NORMAL));
             //? if <=1.21.8 {
             renderScrollingString(
-                    context,
+                    graphics,
                     Minecraft.getInstance().font,
                     Component.translatable("maparthelper.gui.background_color_clear"),
                     getX() + 2,
@@ -77,7 +77,7 @@ public class MapColorWidget extends AbstractWidget {
                     CommonColors.SOFT_RED
             );
             //?} else {
-            /*context.textRenderer().acceptScrollingWithDefaultCenter(
+            /*graphics.textRenderer().acceptScrollingWithDefaultCenter(
                     Component.translatable("maparthelper.gui.background_color_clear").withColor(CommonColors.SOFT_RED),
                     getX() + 2,
                     getRight() - 2,
@@ -88,27 +88,27 @@ public class MapColorWidget extends AbstractWidget {
         } else if (onlyNormalBrightness || color == MapColor.WATER) {
             MapColor.Brightness brightness = color == MapColor.WATER ? MapColor.Brightness.HIGH : MapColor.Brightness.NORMAL;
             int waterColor = ARGB.color(alpha, color.calculateARGBColor(brightness));
-            context.fill(x, y, x + width, y + height, waterColor);
+            graphics.fill(x, y, x + width, y + height, waterColor);
         } else {
             int low = ARGB.color(alpha, color.calculateARGBColor(MapColor.Brightness.LOW));
             int normal = ARGB.color(alpha, color.calculateARGBColor(MapColor.Brightness.NORMAL));
             int high = ARGB.color(alpha, color.calculateARGBColor(MapColor.Brightness.HIGH));
             if (!isHorizontal) {
                 int segHeight = height / 3;
-                context.fill(x, y, x + width, y + segHeight, low);
-                context.fill(x, y + segHeight, x + width, y + segHeight * 2, normal);
-                context.fill(x, y + segHeight * 2, x + width, y + height, high);
+                graphics.fill(x, y, x + width, y + segHeight, low);
+                graphics.fill(x, y + segHeight, x + width, y + segHeight * 2, normal);
+                graphics.fill(x, y + segHeight * 2, x + width, y + height, high);
             } else {
                 int segWidth = width / 3;
-                context.fill(x, y, x + segWidth, y + height, low);
-                context.fill(x + segWidth, y, x + segWidth * 2, y + height, normal);
-                context.fill(x + segWidth * 2, y, x + width, y + height, high);
+                graphics.fill(x, y, x + segWidth, y + height, low);
+                graphics.fill(x + segWidth, y, x + segWidth * 2, y + height, normal);
+                graphics.fill(x + segWidth * 2, y, x + width, y + height, high);
             }
         }
-        RenderUtils.renderOutline(context, x, y, width, height, ARGB.color(alpha, 0xFF555555));
+        RenderUtils.renderOutline(graphics, x, y, width, height, ARGB.color(alpha, 0xFF555555));
 
-        if (tooltipColorName != null && context.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
-            context.setTooltipForNextFrame(tooltipColorName, mouseX, mouseY);
+        if (tooltipColorName != null && graphics.containsPointInScissor(mouseX, mouseY) && isMouseOver(mouseX, mouseY)) {
+            graphics.setTooltipForNextFrame(tooltipColorName, mouseX, mouseY);
         }
     }
 }

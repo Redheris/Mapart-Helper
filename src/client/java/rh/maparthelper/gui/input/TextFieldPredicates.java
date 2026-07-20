@@ -2,6 +2,7 @@ package rh.maparthelper.gui.input;
 
 import java.util.function.Predicate;
 
+/// Predicates for filtering input
 public class TextFieldPredicates {
     public static Predicate<String> positiveInt() {
         return integer(1, null);
@@ -11,7 +12,7 @@ public class TextFieldPredicates {
         return integer(min, max);
     }
 
-    private static Predicate<String> integer(Integer min, Integer max) {
+    public static Predicate<String> integer(Integer min, Integer max) {
         return s -> {
             if (s.isEmpty()) return true;
             if (s.equals("-")) return min == null || min < 0;

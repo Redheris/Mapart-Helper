@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.palette.PaletteDataManager;
 import rh.maparthelper.state.FramesAreaSelectionState;
 import rh.maparthelper.util.CompatUtils;
 
@@ -71,7 +71,7 @@ public class ClientCommands {
                         .then(literal("regenerate")
                             .executes(ctx -> {
                                 // Regenerates blocks palette to correspond to the configs and game's blocks list
-                                PaletteConfigManager.regenerateCompletePalette();
+                                PaletteDataManager.getInstance().updatePaletteGameVersion(true);
                                 CompatUtils.sendMessage(ctx.getSource().getPlayer(), Component.translatable(
                                         "maparthelper.blocks_palette_generated").withStyle(ChatFormatting.GREEN),
                                         true
@@ -80,8 +80,7 @@ public class ClientCommands {
                             }))
                         .then(literal("update")
                             .executes(ctx -> {
-                                PaletteConfigManager.updateCompletePalette();
-                                PaletteConfigManager.readPresetsConfigFile();
+                                PaletteDataManager.getInstance().updatePaletteAndPresets();
                                 CompatUtils.sendMessage(ctx.getSource().getPlayer(), Component.translatable(
                                                 "maparthelper.presets_config_updated").withStyle(ChatFormatting.GREEN),
                                         true

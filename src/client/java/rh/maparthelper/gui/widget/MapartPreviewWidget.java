@@ -71,7 +71,7 @@ public class MapartPreviewWidget extends AbstractWidget {
 
     @Override
     //~ if >=26.1 'renderWidget' -> 'extractWidgetRenderState'
-    protected void renderWidget(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
+    protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         int x = getImageX();
         int y = getY();
 
@@ -92,7 +92,7 @@ public class MapartPreviewWidget extends AbstractWidget {
             if (!MapartHelper.conversionConfig().isShowOriginalImage() && highlightingColor != MapColor.NONE) {
                 pipeline = CustomPipelines.PREVIEW_COLOR_HIGHLIGHT;
             }
-            context.blit(
+            graphics.blit(
                     pipeline,
                     CurrentConversionSettings.guiMapartId,
                     x, y,
@@ -107,7 +107,7 @@ public class MapartPreviewWidget extends AbstractWidget {
             List<FormattedCharSequence> lines = textRenderer.split(dropFileText, width - 5);
             for (int i = 0; i < lines.size(); i++) {
                 RenderUtils.centeredText(
-                        context,
+                        graphics,
                         textRenderer,
                         lines.get(i),
                         centerX, y + 5 + i * 9,
@@ -119,20 +119,20 @@ public class MapartPreviewWidget extends AbstractWidget {
         if (CurrentConversionSettings.doShowGrid) {
             for (int mapX = 1; mapX < mapartWidth / 128; mapX++) {
                 int lineX = (int) (x + mapX * 128 * scale);
-                context.fill(lineX, y, lineX + 1, y + height, CommonColors.HIGH_CONTRAST_DIAMOND);
+                graphics.fill(lineX, y, lineX + 1, y + height, CommonColors.HIGH_CONTRAST_DIAMOND);
             }
             for (int mapY = 1; mapY < mapartHeight / 128; mapY++) {
                 int lineY = (int) (y + mapY * 128 * scale);
-                context.fill(x, lineY, x + width, lineY + 1, CommonColors.HIGH_CONTRAST_DIAMOND);
+                graphics.fill(x, lineY, x + width, lineY + 1, CommonColors.HIGH_CONTRAST_DIAMOND);
             }
         }
 
         if (MapartImageConverter.isConverting()) {
             double conversionProgress = MapartImageConverter.getConversionProgress();
             Font textRenderer = Minecraft.getInstance().font;
-            context.fill(x, y, (int) (x + width * conversionProgress), getBottom(), 0x3000FF00);
+            graphics.fill(x, y, (int) (x + width * conversionProgress), getBottom(), 0x3000FF00);
             RenderUtils.centeredText(
-                    context,
+                    graphics,
                     textRenderer,
                     (int) (conversionProgress * 100) + "%",
                     x + width / 2, y + 14,
@@ -140,15 +140,15 @@ public class MapartPreviewWidget extends AbstractWidget {
             );
         }
 
-        if (CurrentConversionSettings.doShowManualCroppingButtons
+        if (CurrentConversionSettings.doShowCroppingControls
                 && CurrentConversionSettings.guiMapartImage != null
                 && CurrentConversionSettings.cropMode == CroppingMode.USER_CROP) {
-            renderManualCroppingButtons(context, mouseX, mouseY);
+            renderManualCroppingButtons(graphics, mouseX, mouseY);
         } else {
             setHoveredAction(null);
         }
 
-        RenderUtils.renderOutline(context, x - 1, y - 1, width + 2, height + 2, CommonColors.HIGH_CONTRAST_DIAMOND);
+        RenderUtils.renderOutline(graphics, x - 1, y - 1, width + 2, height + 2, CommonColors.HIGH_CONTRAST_DIAMOND);
     }
 
     public int getImageX() {
@@ -202,7 +202,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (mapart.isReset() || mapart.getScaledImage() == null)
             return false;
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
@@ -224,8 +224,8 @@ public class MapartPreviewWidget extends AbstractWidget {
         else
             scaleY = (double) mapart.getCroppingFrame().getHeight() / height;
 
-        offsetXCumulative += deltaX * scaleX;
-        offsetYCumulative += deltaY * scaleY;
+        offsetXCumulative += dragX * scaleX;
+        offsetYCumulative += dragY * scaleY;
 
         int imageDeltaX = (int) offsetXCumulative;
         int imageDeltaY = (int) offsetYCumulative;

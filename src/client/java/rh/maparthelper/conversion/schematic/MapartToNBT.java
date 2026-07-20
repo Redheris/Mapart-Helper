@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.network.chat.ClickEvent;
@@ -38,10 +39,15 @@ public class MapartToNBT {
     );
 
     private static void saveNBT(boolean asSingleFile, ZipOutputStream zipOut, File zipFile) {
-        NativeImage mapartImage = CurrentConversionSettings.guiMapartImage.getPixels();
+        DynamicTexture mapartTexture = CurrentConversionSettings.guiMapartImage;
+        NativeImage mapartImage;
+        if (mapartTexture == null || (mapartImage = mapartTexture.getPixels()) == null) {
+            MapartHelper.LOGGER.error("Cannot create a schematic for an empty mapart");
+            return;
+        }
         int mapsWidth = CurrentConversionSettings.getMapartWidth();
         int mapsHeight = CurrentConversionSettings.getMapartHeight();
-        assert mapartImage != null;
+        boolean addPlatformLayerAuxBlocks = MapartHelper.commonConfig().addPlatformLayerAuxBlocks;
 
         String mapartName = CurrentConversionSettings.mapart.mapartName;
         Path savingPath;
@@ -62,20 +68,17 @@ public class MapartToNBT {
         if (asSingleFile) {
             maps = new int[][]{mapartImage.getPixels()};
         } else {
-            maps = NativeImageUtils.divideImageByMaps(
-                    CurrentConversionSettings.getMapartWidth(), CurrentConversionSettings.getMapartHeight(), mapartImage
-            );
+            maps = NativeImageUtils.divideImageByMaps(mapartImage);
         }
-        assert maps != null;
 
         for (int i = 0; i < maps.length; i++) {
             String filename = CurrentConversionSettings.mapart.mapartName;
 
             CompoundTag mapartNbt;
             if (asSingleFile)
-                mapartNbt = new MapartSchematicBuilder(maps[0], mapsWidth, mapsHeight).build();
+                mapartNbt = new MapartSchematicBuilder(maps[0], mapsWidth, mapsHeight, addPlatformLayerAuxBlocks).build();
             else {
-                mapartNbt = new MapartSchematicBuilder(maps[i], 1, 1).build();
+                mapartNbt = new MapartSchematicBuilder(maps[i], 1, 1, addPlatformLayerAuxBlocks).build();
                 filename += " (" + (i % mapsWidth) + "_" + (i / mapsWidth) + ")";
             }
 

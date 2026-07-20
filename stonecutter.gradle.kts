@@ -2,8 +2,7 @@ import me.modmuss50.mpp.ReleaseType
 
 plugins {
     id("dev.kikugie.stonecutter")
-    id("net.fabricmc.fabric-loom-remap") version "1.15-SNAPSHOT" apply false
-    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
+    id("me.modmuss50.mod-publish-plugin") version "2.0.0"
     id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
 
@@ -33,33 +32,11 @@ publishMods {
     }
 }
 
-val announceVersion = property("publish.announce_for") as String
-
-tasks.register("publishAnnouncementVersion") {
-    group = "publishing"
-    description = "Publishes the version accompanied by a Discord announcement if set"
-
-    if (announceVersion != "none") {
-        val publishTask = stonecutter.tasks.named("publishMods") {
-            metadata.version == announceVersion
-        }
-        dependsOn(publishTask)
-    }
+stonecutter tasks {
+    order("publishModrinth")
+    order("publishCurseforge")
+    order("publishGithub")
 }
-
-tasks.register("publishModsAndAnnounce") {
-    group = "publishing"
-    description = "Publishes all versions from stonecutter and announce in Discord if set"
-
-    dependsOn("publishMods")
-    // This is a lazy collection containing all `publishMods` tasks from registered versions
-    // DO NOT use `.get()` on it!
-    dependsOn(stonecutter.tasks.named("publishMods") {
-        metadata.version != announceVersion
-    })
-    dependsOn("publishAnnouncementVersion")
-}
-
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {
@@ -84,6 +61,13 @@ stonecutter parameters {
             replace("net.minecraft.client.gui.render.state.", "net.minecraft.client.renderer.state.gui.")
             replace(".command.v2.ClientCommandManager", ".command.v2.ClientCommands")
             replace("SpecialGuiElementRegistry", "PictureInPictureRendererRegistry")
+            replace("Screens.getButtons(", "Screens.getWidgets(")
+        }
+
+        string(current.parsed >= "26.2") {
+            replace("Minecraft.getInstance().screen", "Minecraft.getInstance().gui.screen()")
+            replace("Minecraft.getInstance().setScreen(", "Minecraft.getInstance().gui.setScreen(")
+            replace("client.setScreen(", "client.gui.setScreen(")
         }
 
         string(current.parsed >= "1.21.10", "widget_events") {
@@ -96,26 +80,39 @@ stonecutter parameters {
                 "onRelease(@NotNull MouseButtonEvent mouseEvent)"
             )
             replace(
-                "mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY)",
-                "mouseDragged(@NotNull MouseButtonEvent mouseEvent, double deltaX, double deltaY)"
+                "mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY)",
+                "mouseDragged(@NotNull MouseButtonEvent mouseEvent, double dragX, double dragY)"
             )
             replace(
                 "onClick(double mouseX, double mouseY)",
-                "onClick(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
+                "onClick(@NotNull MouseButtonEvent mouseEvent, boolean isDoubleClick)"
             )
             replace(
-                "(double mouseX, double mouseY, int button)",
-                "(@NotNull MouseButtonEvent mouseEvent, boolean doubleClick)"
+                "updateScrolling(double mouseX, double mouseY, int button)",
+                "updateScrolling(@NotNull MouseButtonEvent mouseEvent)"
             )
-            replace("mouseClicked(mouseX, mouseY, button)", "mouseClicked(mouseEvent, doubleClick)")
+            replace(
+                "double mouseX, double mouseY, int button)",
+                "@NotNull MouseButtonEvent mouseEvent, boolean isDoubleClick)"
+            )
+            replace("mouseClicked(mouseX, mouseY, button)", "mouseClicked(mouseEvent, isDoubleClick)")
             replace("mouseReleased(mouseX, mouseY, button)", "mouseReleased(mouseEvent)")
+            replace("mouseDragged(mouseX, mouseY, button, dragX, dragY)", "mouseDragged(mouseEvent, dragX, dragY)")
             replace("mouseX", "mouseEvent.x()")
             replace("mouseY", "mouseEvent.y()")
+            replace("isValidClickButton(button)", "isValidClickButton(mouseEvent.buttonInfo())")
             replace("button", "mouseEvent.button()")
             replace("(int keyCode, int scanCode, int modifiers)", "(@NotNull KeyEvent keyEvent)")
             replace("(keyCode, scanCode, modifiers)", "(keyEvent)")
             replace("keyCode == 257 || keyCode == 335", "keyEvent.isConfirmation()")
             replace("keyCode", "keyEvent.key()")
+        }
+
+        string(current.parsed >= "26.1", "render_button_contents") {
+            replace("renderContents", "extractContents")
+        }
+        string(current.parsed >= "1.21.10", "render_button_contents") {
+            replace("renderWidget", "renderContents")
         }
 
         // gui_rendering
@@ -131,8 +128,8 @@ stonecutter parameters {
 
             replace("render(", "extractRenderState(")
 
-            replace("context.hLine(", "context.horizontalLine(")
-            replace("context.hLine(", "context.horizontalLine(")
+            replace("graphics.hLine(", "graphics.horizontalLine(")
+            replace("graphics.vLine(", "graphics.verticalLine(")
             replace("scrollbarVisible()", "scrollable()")
         }
     }

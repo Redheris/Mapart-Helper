@@ -7,6 +7,7 @@ import rh.maparthelper.conversion.schematic.MapartSchematicBuilder;
 
 import java.util.function.Predicate;
 
+/// Predicates for checking whether the input is valid
 public class TextFieldValidators {
     public static Predicate<String> anyBlockIdentifier() {
         return blockIdentifier(false);

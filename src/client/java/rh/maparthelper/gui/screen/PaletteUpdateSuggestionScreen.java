@@ -9,10 +9,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.jetbrains.annotations.NotNull;
-import rh.maparthelper.config.palette.PaletteConfigManager;
+import rh.maparthelper.palette.PaletteDataManager;
 import rh.maparthelper.util.RenderUtils;
 
 public class PaletteUpdateSuggestionScreen extends Screen {
+    private final PaletteDataManager paletteDataManager = PaletteDataManager.getInstance();
     private final Screen parent;
     private int boxX;
     private int boxY;
@@ -20,13 +21,13 @@ public class PaletteUpdateSuggestionScreen extends Screen {
     private final int boxHeight = 100;
 
     public PaletteUpdateSuggestionScreen(Screen parent) {
-        super(Component.nullToEmpty("Palette update suggestion"));
+        super(Component.translatable("maparthelper.gui.screen.palette_update_suggestion"));
         this.parent = parent;
     }
 
     @Override
     protected void init() {
-        String paletteGameVersion = PaletteConfigManager.completePalette.getGameVersion();
+        String paletteGameVersion = paletteDataManager.getCompletePalette().getGameVersion();
         MutableComponent unknownLabel = Component.translatable("maparthelper.gui.for_unknown_game_version");
         MutableComponent gameVersionName;
         if (paletteGameVersion == null)
@@ -55,7 +56,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         Button deny = Button.builder(
                         keepOption,
                         btn -> {
-                            PaletteConfigManager.bumpPaletteGameVersion();
+                            paletteDataManager.updatePaletteGameVersion(false);
                             Minecraft.getInstance().setScreen(new MapartEditorScreen());
                         }
                 )
@@ -67,7 +68,7 @@ public class PaletteUpdateSuggestionScreen extends Screen {
         Button update = Button.builder(
                         regenerateOption,
                         btn -> {
-                            PaletteConfigManager.regenerateCompletePalette();
+                            paletteDataManager.updatePaletteGameVersion(true);
                             Minecraft.getInstance().setScreen(new MapartEditorScreen());
                         }
                 )
@@ -80,11 +81,11 @@ public class PaletteUpdateSuggestionScreen extends Screen {
 
     //~ gui_rendering
     @Override
-    public void renderBackground(@NotNull GuiGraphics context, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(context, mouseX, mouseY, partialTick);
+    public void renderBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
 
-        context.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x77000000);
-        RenderUtils.renderOutline(context, boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
+        graphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, 0x77000000);
+        RenderUtils.renderOutline(graphics, boxX - 1, boxY - 1, boxWidth + 2, boxHeight + 2, 0x22FFFFFF);
     }
     //~ !gui_rendering
 

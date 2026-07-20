@@ -13,7 +13,10 @@ public record ConversionContext(
         int backgroundMapColorId,
         int[] topLineBright,
         int[] topLineCorrect,
-        AtomicDouble progress
+        AtomicDouble progress,
+        float redPropagationWeight,
+        float greenPropagationWeight,
+        float bluePropagationWeight
 ) {
 
 }

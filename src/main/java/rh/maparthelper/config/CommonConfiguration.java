@@ -4,7 +4,6 @@ import com.google.gson.FieldNamingPolicy;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.colors.MapColorEntry;
@@ -16,7 +15,7 @@ import java.awt.*;
 public class CommonConfiguration {
     public static ConfigClassHandler<CommonConfiguration> HANDLER =
             ConfigClassHandler.createBuilder(CommonConfiguration.class)
-                    .id(Identifier.fromNamespaceAndPath(MapartHelper.MOD_ID, "yacl_try"))
+                    .id(MapartHelper.identifier("yacl_config_screen"))
                     .serializer(config ->
                             GsonConfigSerializerBuilder.create(config)
                                     .setPath(MapartHelper.CONFIG_PATH.resolve("mapart-helper.json"))
@@ -32,8 +31,10 @@ public class CommonConfiguration {
     @SerialEntry
     public Color previewHighlightingColor = new Color(0xFF9900ff, true);
 
+    // Conversion settings
+
     @SerialEntry
-    public boolean createDirsForSchematic = true;
+    public int maxMapartSize = 30;
     @SerialEntry
     public boolean logConversionTime = false;
     @SerialEntry
@@ -44,6 +45,13 @@ public class CommonConfiguration {
     public int colorsCacheLiveTimeMs = 5000;
     @SerialEntry("multithreadColorConversion_experimental")
     public boolean multithreadColorConversion = false;
+
+    // Schematic Settings
+
+    @SerialEntry
+    public boolean createDirsForSchematic = true;
+    @SerialEntry
+    public boolean addPlatformLayerAuxBlocks = false;
 
     // Elements display settings
 
@@ -62,6 +70,7 @@ public class CommonConfiguration {
     public UseInPalette useInPalette = new UseInPalette();
 
     public static class UseInPalette {
+        public boolean onlyVanillaBlocks = true;
         // Limiters
         public boolean anyBlocks = false;
         public boolean onlySolid = false;
