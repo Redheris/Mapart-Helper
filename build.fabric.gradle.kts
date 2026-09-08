@@ -75,9 +75,7 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api")}")
 
     modImplementation("dev.isxander:yet-another-config-lib:${property("yacl")}")
-    // Terraformers' maven feels bad
     modApi("com.terraformersmc:modmenu:${property("modmenu")}")
-
 }
 
 loom {
@@ -204,6 +202,7 @@ publishMods {
             projectSlug = property("publish.curseforge_slug") as String
             accessToken = env.CURSEFORGE_TOKEN.orElse("")
             minecraftVersions.addAll(property("mc_targets").toString().split(' '))
+            client = true
 
             requires("fabric-api", "yacl")
             optional("modmenu")

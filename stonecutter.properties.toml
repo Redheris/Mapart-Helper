@@ -44,10 +44,10 @@ parchment = "1.21.11:2025.12.20"
 mc_dep = "26.1"
 mc_dep_fabric = "~26.1"
 release_title = "26.1"
-mc_targets = "26.1"
+mc_targets = "26.1 26.1.1 26.1.2"
 # Dependencies
 fabric_api = "0.145.1+26.1"
-yacl = "3.9.5+26.1-fabric"
+yacl = "3.9.6+26.1-fabric"
 modmenu = "18.0.0"
 
 ["26.2"]
@@ -57,5 +57,5 @@ release_title = "26.2"
 mc_targets = "26.2"
 # Dependencies
 fabric_api = "0.155.2+26.2"
-yacl = "3.9.5+26.2-fabric"
+yacl = "3.9.6+26.2-fabric"
 modmenu = "20.0.0"
