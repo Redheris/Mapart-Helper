@@ -246,8 +246,9 @@ public class NativeImageViewWidget extends AbstractWidget {
     protected void renderWidget(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (imageId == null) return;
 
-        if (!Minecraft.getInstance().isWindowActive() && !Minecraft.getInstance().getWindow().isMinimized()
-                && mouseX != -1 && mouseY != -1) {
+        Minecraft mc = Minecraft.getInstance();
+        boolean windowIsInactive = !mc.isWindowActive() && !mc.getWindow().isIconified();
+        if (windowIsInactive && mouseX != -1 && mouseY != -1) {
             calculatePixelPos(mouseX, mouseY);
         }
 

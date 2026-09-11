@@ -1,7 +1,7 @@
 package rh.maparthelper.gui.painter.hotkey;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.painter.PainterProject;
 import rh.maparthelper.painter.drawing.DrawingEngine;
 import rh.maparthelper.painter.drawing.tool.*;
@@ -54,7 +54,7 @@ public class ShortcutKeysHandler {
         if (drawingEngine.isProcessing() && (quickToolSelector.isInUse() || quickSelectionModeSelector.isApplied()))
             return HotkeyActionType.NONE;
 
-        if (CompatUtils.hasControlDown() && keyCode == GLFW.GLFW_KEY_Z) {
+        if (CompatUtils.hasControlDown() && keyCode == InputConstants.KEY_Z) {
             if (CompatUtils.hasShiftDown()) {
                 this.redo.run();
             } else {
@@ -63,12 +63,12 @@ public class ShortcutKeysHandler {
             return HotkeyActionType.HISTORY;
         }
 
-        if (keyCode == GLFW.GLFW_KEY_ESCAPE && drawingEngine.selection.isActive()) {
+        if (keyCode == InputConstants.KEY_ESCAPE && drawingEngine.selection.isActive()) {
             drawingEngine.clearSelection();
             return HotkeyActionType.SELECTION_CHANGE;
         }
 
-        if (keyCode == GLFW.GLFW_KEY_SPACE) {
+        if (keyCode == InputConstants.KEY_SPACE) {
             quickToolSelector.use(handTool);
             return HotkeyActionType.QUICK_TOOL;
         }
@@ -89,14 +89,14 @@ public class ShortcutKeysHandler {
             }
         }
         PainterTool nextTool = switch (keyCode) {
-            case GLFW.GLFW_KEY_S -> rectangleSelectionTool;
-            case GLFW.GLFW_KEY_H -> handTool;
-            case GLFW.GLFW_KEY_F -> floodFillTool;
-            case GLFW.GLFW_KEY_B -> brushTool;
-            case GLFW.GLFW_KEY_Q -> eyedropperTool;
-            case GLFW.GLFW_KEY_E -> eraserTool;
-            case GLFW.GLFW_KEY_W -> magicWandTool;
-            case GLFW.GLFW_KEY_A -> selectionBrushTool;
+            case InputConstants.KEY_S -> rectangleSelectionTool;
+            case InputConstants.KEY_H -> handTool;
+            case InputConstants.KEY_F -> floodFillTool;
+            case InputConstants.KEY_B -> brushTool;
+            case InputConstants.KEY_Q -> eyedropperTool;
+            case InputConstants.KEY_E -> eraserTool;
+            case InputConstants.KEY_W -> magicWandTool;
+            case InputConstants.KEY_A -> selectionBrushTool;
             default -> null;
         };
         if (nextTool != null) {

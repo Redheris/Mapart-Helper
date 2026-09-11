@@ -70,6 +70,15 @@ stonecutter parameters {
             replace("client.setScreen(", "client.gui.setScreen(")
         }
 
+        string(current.parsed >= "26.3-pre") {
+            replace("com.mojang.blaze3d.shaders", "com.mojang.renderpearl.api.pipeline")
+            replace("com.mojang.blaze3d.pipeline.RenderPipeline", "com.mojang.renderpearl.api.pipeline.RenderPipeline")
+            replace("com.mojang.blaze3d.pipeline.BindGroupLayout", "com.mojang.renderpearl.api.pipeline.BindGroupLayout")
+            replace("com.mojang.blaze3d.buffers.GpuBuffer", "com.mojang.renderpearl.api.buffers.GpuBuffer")
+            replace("com.mojang.blaze3d.buffers.GpuBufferSlice", "com.mojang.renderpearl.api.buffers.GpuBufferSlice")
+            replace("com.mojang.blaze3d.systems.RenderPass", "com.mojang.renderpearl.api.commands.RenderPass")
+        }
+
         string(current.parsed >= "1.21.10", "widget_events") {
             replace(
                 "mouseReleased(double mouseX, double mouseY, int button)",

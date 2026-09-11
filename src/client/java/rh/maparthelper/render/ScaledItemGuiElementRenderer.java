@@ -1,6 +1,7 @@
 package rh.maparthelper.render;
 
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -55,7 +56,7 @@ public class ScaledItemGuiElementRenderer extends PictureInPictureRenderer<Scale
                 OverlayTexture.NO_OVERLAY, 0
         );
 
-        renderDispatcher.renderAllFeatures((SubmitNodeStorage) submitNodeCollector);
+//        renderDispatcher.renderAllFeatures((SubmitNodeStorage) submitNodeCollector);
     }
     *///?} else {
     @Override

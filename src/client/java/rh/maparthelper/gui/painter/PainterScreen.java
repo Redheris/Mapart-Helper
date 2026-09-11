@@ -8,7 +8,6 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 import org.jetbrains.annotations.NotNull;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.gui.painter.cursor.PainterCursorManager;
@@ -31,6 +30,7 @@ import rh.maparthelper.painter.surface.NativeImageSurface;
 import rh.maparthelper.render.pipeline.PainterSelectionUniform;
 import rh.maparthelper.state.ActiveModScreenManager;
 import rh.maparthelper.state.painter.MapartPainterState;
+import rh.maparthelper.util.CompatUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -187,7 +187,7 @@ public class PainterScreen extends FullscreenImageViewScreen {
                 OPEN_FOLDER_ICON,
                 btn -> {
                     MapartPainterState.getInstance().initOutputFolder();
-                    Util.getPlatform().openPath(MapartPainterState.PAINTER_PNG_OUTPUT_DIR);
+                    CompatUtils.openPath(MapartPainterState.PAINTER_PNG_OUTPUT_DIR);
                 }
         ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
         openFolder.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.mapart_painter.open_painter_folder")));

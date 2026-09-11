@@ -1,5 +1,7 @@
-#version 150
+#version 330
+#extension GL_ARB_separate_shader_objects : require
 
+//~ if >=26.3-pre 'moj_import' -> 'include'
 #moj_import <minecraft:dynamictransforms.glsl>
 
 layout(std140) uniform MapartImageGrid {
@@ -13,10 +15,10 @@ layout(std140) uniform MapartImageGrid {
 
 uniform sampler2D Sampler0;
 
-in vec2 texCoord0;
-in vec4 vertexColor;
+layout(location = 0) in vec2 texCoord0;
+layout(location = 1) in vec4 vertexColor;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     vec4 originalColor = texture(Sampler0, texCoord0) * vertexColor;

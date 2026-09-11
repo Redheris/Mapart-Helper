@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.painter.widget.overlay;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -384,7 +385,7 @@ public class ColorPickerOverlay extends OverlayLayout {
         //~ widget_events
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (selectingSecondary ^ button == 1) {
+            if (selectingSecondary ^ button == InputConstants.MOUSE_BUTTON_RIGHT) {
                 drawingEngine.setSecondaryColor(color);
             } else {
                 drawingEngine.setMainColor(color);

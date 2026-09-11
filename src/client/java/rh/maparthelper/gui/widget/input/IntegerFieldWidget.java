@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.widget.input;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import org.jetbrains.annotations.Nullable;
 import rh.maparthelper.gui.input.TextFieldPredicates;
@@ -72,13 +73,13 @@ public class IntegerFieldWidget extends AdjEditBox {
     //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 1) {
+        if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
             setValue("");
             setSuggestion(Integer.toString(intValue));
             //? if <=1.21.8 {
-            return super.mouseClicked(mouseX, mouseY, 0);
+            return super.mouseClicked(mouseX, mouseY, InputConstants.MOUSE_BUTTON_LEFT);
             //?} else {
-            /*MouseButtonInfo mouseButtonInfo = new MouseButtonInfo(0, mouseEvent.modifiers());
+            /*MouseButtonInfo mouseButtonInfo = new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, mouseEvent.modifiers());
             mouseEvent = new MouseButtonEvent(mouseX, mouseY, mouseButtonInfo);
             return super.mouseClicked(mouseX, mouseY, button);
             *///?}

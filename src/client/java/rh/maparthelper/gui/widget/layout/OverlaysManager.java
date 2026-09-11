@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.widget.layout;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
@@ -27,7 +28,7 @@ public class OverlaysManager {
             boolean clickResult = activeOverlay.mouseClicked(mouseX, mouseY, button);
             if (clickResult) {
                 screen.setFocused(container);
-                if (button == 0) screen.setDragging(true);
+                if (button == InputConstants.MOUSE_BUTTON_LEFT) screen.setDragging(true);
             }
             return clickResult;
         }
@@ -38,7 +39,7 @@ public class OverlaysManager {
                 boolean clickResult = overlay.mouseClicked(mouseX, mouseY, button);
                 if (clickResult) {
                     screen.setFocused(overlay.getLayout().container);
-                    if (button == 0) screen.setDragging(true);
+                    if (button == InputConstants.MOUSE_BUTTON_LEFT) screen.setDragging(true);
                 }
                 return clickResult;
             }

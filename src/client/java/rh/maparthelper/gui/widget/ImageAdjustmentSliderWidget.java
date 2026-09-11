@@ -1,9 +1,9 @@
 package rh.maparthelper.gui.widget;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -79,7 +79,7 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
             this.setFocused(!this.isFocused());
             return true;
         } else {
-            if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT)
+            if (keyCode == InputConstants.KEY_LSHIFT)
                 shiftPressed = true;
             else if (this.isFocused()) {
                 boolean bl = keyCode == 263;
@@ -96,7 +96,7 @@ public class ImageAdjustmentSliderWidget extends AbstractSliderButton {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+        if (keyCode == InputConstants.KEY_LSHIFT) {
             shiftPressed = false;
             return true;
         }

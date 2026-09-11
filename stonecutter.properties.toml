@@ -59,3 +59,13 @@ mc_targets = "26.2"
 fabric_api = "0.155.2+26.2"
 yacl = "3.9.6+26.2-fabric"
 modmenu = "20.0.0"
+
+["26.3-pre-3"]
+mc_dep = "26.3-pre"
+mc_dep_fabric = "~26.3-pre"
+release_title = "26.3"
+mc_targets = "26.3-pre"
+# Dependencies
+fabric_api = "0.160.1+26.3"
+yacl = "3.9.6+26.3-fabric"
+modmenu = "21.0.0-alpha.1"

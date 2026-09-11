@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.screen.panel;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -297,7 +298,7 @@ public class MaterialListPanel extends AbstractLayout {
         //~ widget_events
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (button == 0) {
+            if (button == InputConstants.MOUSE_BUTTON_LEFT) {
                 if (confirmRemoving) {
                     MapartImageUpdater.excludeColorsFromMapart(mapart, selectedForExcluding);
                     screen.updateResetExcludedColorsButton(true);
@@ -312,7 +313,7 @@ public class MaterialListPanel extends AbstractLayout {
                 }
                 return true;
             }
-            if (button == 1) {
+            if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
                 if (fixedHighlight == this) {
                     fixedHighlight = null;
                 }

@@ -1,15 +1,15 @@
 package rh.maparthelper.mixin;
 
-import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.systems.RenderPass;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rh.maparthelper.render.pipeline.ColorsHighlightUniform;
 import rh.maparthelper.render.pipeline.MapartImageGridUniform;
-import rh.maparthelper.render.pipeline.PainterToolAreaUniform;
 import rh.maparthelper.render.pipeline.PainterSelectionUniform;
+import rh.maparthelper.render.pipeline.PainterToolAreaUniform;
 
 @Mixin(RenderSystem.class)
 public class CustomUniformsBind {

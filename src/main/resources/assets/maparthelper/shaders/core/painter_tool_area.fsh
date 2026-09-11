@@ -1,5 +1,7 @@
-#version 150
+#version 330
+#extension GL_ARB_separate_shader_objects : require
 
+//~ if >=26.3-pre 'moj_import' -> 'include'
 #moj_import <minecraft:globals.glsl>
 
 layout(std140) uniform PainterToolArea {
@@ -9,8 +11,8 @@ layout(std140) uniform PainterToolArea {
 
 uniform sampler2D Sampler0;
 
-in vec2 texCoord0;
-out vec4 fragColor;
+layout(location = 0) in vec2 texCoord0;
+layout(location = 0) out vec4 fragColor;
 
 void main() {
     vec4 pixelColor = texture(Sampler0, texCoord0);

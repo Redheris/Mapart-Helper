@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.painter;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -24,10 +25,8 @@ import rh.maparthelper.state.fullscreen_view.NativeImageViewState;
 
 import java.util.BitSet;
 
-//? if >=1.21.10 {
-/*import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-*///?}
+//? if >=1.21.10
+//import net.minecraft.client.input.MouseButtonEvent;
 
 public class PainterViewWidget extends NativeImageViewWidget {
     private final DrawingEngine<NativeImageSurface> drawingEngine;
@@ -77,12 +76,14 @@ public class PainterViewWidget extends NativeImageViewWidget {
     //~ widget_events
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if ((button == 0 || button == 1) && !drawingEngine.isProcessing()) {
+        if ((button == InputConstants.MOUSE_BUTTON_LEFT || button == InputConstants.MOUSE_BUTTON_RIGHT)
+                && !drawingEngine.isProcessing()
+        ) {
             lastMouseButton = button;
             drawingEngine.start(
                     hoveredPixelPos.x, hoveredPixelPos.y,
                     closestHoveredLine.x, closestHoveredLine.y,
-                    lastMouseButton == 1
+                    lastMouseButton == InputConstants.MOUSE_BUTTON_RIGHT
             );
             if (drawingEngine.getSelectedTool() instanceof AbstractSelectionTool) {
                 updateSelectionMaskTexture();
@@ -93,11 +94,12 @@ public class PainterViewWidget extends NativeImageViewWidget {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if ((button == 0 || button == 1) && !(drawingEngine.getSelectedTool() instanceof HandTool)) {
+        if ((button == InputConstants.MOUSE_BUTTON_LEFT || button == InputConstants.MOUSE_BUTTON_RIGHT)
+                && !(drawingEngine.getSelectedTool() instanceof HandTool)) {
             drawingEngine.process(
                     hoveredPixelPos.x, hoveredPixelPos.y,
                     closestHoveredLine.x, closestHoveredLine.y,
-                    lastMouseButton == 1
+                    lastMouseButton == InputConstants.MOUSE_BUTTON_RIGHT
             );
             if (drawingEngine.getSelectedTool() instanceof AbstractSelectionTool) {
                 updateSelectionMaskTexture();
@@ -109,7 +111,7 @@ public class PainterViewWidget extends NativeImageViewWidget {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == 0 || button == 1) {
+        if (button == InputConstants.MOUSE_BUTTON_LEFT || button == InputConstants.MOUSE_BUTTON_RIGHT) {
             drawingEngine.submit();
             if (drawingEngine.getSelectedTool() instanceof AbstractSelectionTool) {
                 updateSelectionMaskTexture();

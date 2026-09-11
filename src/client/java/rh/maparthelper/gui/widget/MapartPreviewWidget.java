@@ -1,5 +1,6 @@
 package rh.maparthelper.gui.widget;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -13,7 +14,6 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.conversion.CroppingMode;
 import rh.maparthelper.conversion.CurrentConversionSettings;
@@ -185,7 +185,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     //~ widget_events
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+        if (keyCode == InputConstants.KEY_LSHIFT) {
             this.scaleToCursor = false;
             return true;
         }
@@ -194,7 +194,7 @@ public class MapartPreviewWidget extends AbstractWidget {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == GLFW.GLFW_KEY_LEFT_SHIFT) {
+        if (keyCode == InputConstants.KEY_LSHIFT) {
             this.scaleToCursor = true;
             return true;
         }
@@ -205,7 +205,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (mapart.isReset() || mapart.getScaledImage() == null)
             return false;
-        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != 0)
+        if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP || button != InputConstants.MOUSE_BUTTON_LEFT)
             return false;
         if (hoveredAction != null)
             return false;
@@ -249,7 +249,7 @@ public class MapartPreviewWidget extends AbstractWidget {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (CurrentConversionSettings.cropMode != CroppingMode.USER_CROP)
             return true;
-        if (hoveredAction != null && button == 0) {
+        if (hoveredAction != null && button == InputConstants.MOUSE_BUTTON_LEFT) {
             repeater.start(() -> hoveredAction.perform(mapart), 500, 100);
         }
         return true;

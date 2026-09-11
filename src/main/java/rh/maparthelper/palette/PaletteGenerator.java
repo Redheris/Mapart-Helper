@@ -185,10 +185,8 @@ public class PaletteGenerator {
                 FrostedIceBlock.class,
                 BubbleColumnBlock.class,
                 FrogspawnBlock.class,
-                //? <26.1
+                //~ if >=26.1 'WaterlilyBlock' -> 'LilyPadBlock'
                 WaterlilyBlock.class,
-                //? >=26.1
-                //LilyPadBlock.class,
                 SnifferEggBlock.class,
                 TurtleEggBlock.class,
                 FlowerPotBlock.class,
@@ -208,10 +206,9 @@ public class PaletteGenerator {
                 HangingRootsBlock.class,
                 LavaCauldronBlock.class,
                 LayeredCauldronBlock.class,
-                //? <26.1
+                //~ if >=26.1 'FarmBlock' -> 'FarmlandBlock'
                 FarmBlock.class,
-                //? >=26.1
-                //FarmlandBlock.class,
+                //~ if >=26.3-pre 'DirtPathBlock' -> 'PathBlock'
                 DirtPathBlock.class,
                 HeavyCoreBlock.class
         };

@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+//? if <=1.21.8
+import com.mojang.blaze3d.platform.InputConstants;
 //? if >=1.21.10 {
 /*import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -47,11 +49,11 @@ public class AdjEditBox extends EditBox {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         //? if <=1.21.8 {
         if (!overrideOnClick) return super.mouseClicked(mouseX, mouseY, button);
-        if (button == 1) {
+        if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
             this.setValue("");
-            return super.mouseClicked(mouseX, mouseY, 0);
+            return super.mouseClicked(mouseX, mouseY, InputConstants.MOUSE_BUTTON_LEFT);
         }
-        if (button == 0 && !isFocused()) {
+        if (button == InputConstants.MOUSE_BUTTON_LEFT && !isFocused()) {
             super.mouseClicked(mouseX, mouseY, button);
             setCursorPosition(0);
             setHighlightPos(getValue().length());

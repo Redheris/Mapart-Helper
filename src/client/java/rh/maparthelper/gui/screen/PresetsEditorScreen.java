@@ -1,6 +1,5 @@
 package rh.maparthelper.gui.screen;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -12,7 +11,6 @@ import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.Util;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MapColor;
@@ -29,11 +27,14 @@ import rh.maparthelper.gui.widget.layout.AdjScrollableLayoutWidget;
 import rh.maparthelper.gui.widget.layout.OverlayLayout;
 import rh.maparthelper.mapart.MapartProcessing;
 import rh.maparthelper.palette.*;
+import rh.maparthelper.util.CompatUtils;
 import rh.maparthelper.util.FileUtils;
 import rh.maparthelper.util.RenderUtils;
 
 import java.util.*;
 
+//? if <=1.21.8
+import net.minecraft.client.Minecraft;
 //? >=1.21.10
 //import net.minecraft.client.input.MouseButtonEvent;
 
@@ -144,7 +145,7 @@ public class PresetsEditorScreen extends ScreenAdapted {
 
         DecorativeButtonWidget openFolder = DecorativeButtonWidget.builderSimpleTexture(
                 OPEN_FOLDER_ICON,
-                btn -> Util.getPlatform().openPath(PaletteDataManager.PRESETS_PATH)
+                btn -> CompatUtils.openPath(PaletteDataManager.PRESETS_PATH)
         ).size(20, 20).textureSize(16, 16).vanillaButtonBackground(true).build();
         openFolder.setTooltip(Tooltip.create(Component.translatable("maparthelper.gui.presets.open_presets_folder")));
 

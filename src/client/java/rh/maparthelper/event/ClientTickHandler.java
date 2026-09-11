@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 import rh.maparthelper.MapartHelper;
 import rh.maparthelper.command.ClientCommandsContext;
 import rh.maparthelper.command.FakeMapsPreview;
@@ -23,12 +22,15 @@ import net.minecraft.client.renderer.MultiBufferSource;
 //?} else >=1.21.10
 //import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 
+
+
 public class ClientTickHandler {
     public static void init() {
         KeyMapping openScreen = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.maparthelper.openScreen",
+                //~ if >=26.3-pre 'KEYSYM' -> 'KEYBOARD'
                 InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_Y,
+                InputConstants.KEY_Y,
                 //~ if >=1.21.10 'CATEGORY_MISC' -> 'Category.MISC'
                 KeyMapping.CATEGORY_MISC
         ));
