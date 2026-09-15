@@ -155,7 +155,7 @@ public class CreateNewProjectScreen extends Screen {
             xSizeField.setTextColor(CommonColors.LIGHT_GRAY);
             ySizeField.setTextColor(CommonColors.LIGHT_GRAY);
 
-            createProjectBtn.active = currentMapartImage != null;
+            createProjectBtn.active = CurrentConversionSettings.isMapartConverted();
             if (!createProjectBtn.active) {
                 createProjectBtn.setTooltip(Tooltip.create(
                         Component.translatable("maparthelper.gui.mapart_has_no_converted_image")
