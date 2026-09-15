@@ -28,7 +28,7 @@ public class ClientTickHandler {
     public static void init() {
         KeyMapping openScreen = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.maparthelper.openScreen",
-                //~ if >=26.3-pre 'KEYSYM' -> 'KEYBOARD'
+                //~ if >=26.3 'KEYSYM' -> 'KEYBOARD'
                 InputConstants.Type.KEYSYM,
                 InputConstants.KEY_Y,
                 //~ if >=1.21.10 'CATEGORY_MISC' -> 'Category.MISC'

@@ -208,7 +208,7 @@ public class PaletteGenerator {
                 LayeredCauldronBlock.class,
                 //~ if >=26.1 'FarmBlock' -> 'FarmlandBlock'
                 FarmBlock.class,
-                //~ if >=26.3-pre 'DirtPathBlock' -> 'PathBlock'
+                //~ if >=26.3 'DirtPathBlock' -> 'PathBlock'
                 DirtPathBlock.class,
                 HeavyCoreBlock.class
         };

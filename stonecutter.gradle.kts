@@ -70,7 +70,7 @@ stonecutter parameters {
             replace("client.setScreen(", "client.gui.setScreen(")
         }
 
-        string(current.parsed >= "26.3-pre") {
+        string(current.parsed >= "26.3") {
             replace("com.mojang.blaze3d.shaders", "com.mojang.renderpearl.api.pipeline")
             replace("com.mojang.blaze3d.pipeline.RenderPipeline", "com.mojang.renderpearl.api.pipeline.RenderPipeline")
             replace("com.mojang.blaze3d.pipeline.BindGroupLayout", "com.mojang.renderpearl.api.pipeline.BindGroupLayout")

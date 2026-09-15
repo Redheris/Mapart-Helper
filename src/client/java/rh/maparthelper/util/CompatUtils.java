@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.nio.file.Path;
 
-//? if >=26.3-pre
+//? if >=26.3
 //import com.mojang.blaze3d.Blaze3D;
 
 public class CompatUtils {
@@ -30,7 +30,7 @@ public class CompatUtils {
 
     public static boolean hasControlDown() {
         return ON_OSX ?
-                //? if >= 26.3-pre {
+                //? if >= 26.3 {
                 /*isKeyDown(InputConstants.KEY_LGUI) || isKeyDown(InputConstants.KEY_RGUI)
                 *///?} else if >=1.21.11 {
                 /*isKeyDown(InputConstants.KEY_LSUPER) || isKeyDown(InputConstants.KEY_RSUPER)
@@ -48,7 +48,7 @@ public class CompatUtils {
     }
 
     public static boolean isKeyDown(int key) {
-        //? if >=26.3-pre {
+        //? if >=26.3 {
         /*return InputConstants.isKeyDown(key);
          *///?} else {
         //~ if >=1.21.10 'getWindow().getWindow()' -> 'getWindow()'
@@ -57,7 +57,7 @@ public class CompatUtils {
     }
 
     public static void openPath(@NotNull Path path) {
-        //~ if >=26.3-pre 'Util.getPlatform()' -> 'Blaze3D'
+        //~ if >=26.3 'Util.getPlatform()' -> 'Blaze3D'
         Util.getPlatform().openPath(path);
     }
 

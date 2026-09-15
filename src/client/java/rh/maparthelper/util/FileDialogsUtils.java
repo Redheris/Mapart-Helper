@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 //? if <=26.2 {
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import org.lwjgl.PointerBuffer;
-//?} else if >=26.3-pre {
+//?} else if >=26.3 {
 /*import org.lwjgl.sdl.SDL_DialogFileFilter;
 import org.lwjgl.sdl.SDLDialog;
 import org.lwjgl.system.MemoryUtil;
@@ -18,13 +18,13 @@ import org.lwjgl.system.MemoryUtil;
 
 public class FileDialogsUtils {
     public static void openImageImportDialog(Consumer<String> pathConsumer) {
-        //? if >=26.3-pre {
+        //? if >=26.3 {
         /*sdl(pathConsumer);
         *///?} else
         tinyfd(pathConsumer);
     }
 
-    //? if >=26.3-pre {
+    //? if >=26.3 {
     /*private static void sdl(Consumer<String> pathConsumer) {
         try (MemoryStack stack = MemoryStack.stackPush()) {
             SDL_DialogFileFilter.Buffer filters = SDL_DialogFileFilter.malloc(1, stack);

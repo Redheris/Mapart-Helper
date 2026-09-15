@@ -1,7 +1,7 @@
 #version 330
 #extension GL_ARB_separate_shader_objects : require
 
-//~ if >=26.3-pre 'moj_import' -> 'include'
+//~ if >=26.3 'moj_import' -> 'include'
 #moj_import <minecraft:globals.glsl>
 
 layout(std140) uniform PainterToolArea {

@@ -1,7 +1,7 @@
 mod.id = "maparthelper"
 mod.name = "Mapart Helper"
 mod.group = "rh.maparthelper"
-mod.version = "0.14.0"
+mod.version = "0.14.1"
 mod.version_type = "STABLE"
 mod.fabric_loader = "0.18.4"
 loomx.loom_version = "1.17-SNAPSHOT"
@@ -60,12 +60,12 @@ fabric_api = "0.155.2+26.2"
 yacl = "3.9.6+26.2-fabric"
 modmenu = "20.0.0"
 
-["26.3-pre-3"]
-mc_dep = "26.3-pre"
-mc_dep_fabric = "~26.3-pre"
+["26.3"]
+mc_dep = "26.3"
+mc_dep_fabric = "~26.3"
 release_title = "26.3"
-mc_targets = "26.3-pre"
+mc_targets = "26.3"
 # Dependencies
-fabric_api = "0.160.1+26.3"
+fabric_api = "0.160.5+26.3"
 yacl = "3.9.6+26.3-fabric"
-modmenu = "21.0.0-alpha.1"
+modmenu = "21.0.0-beta.1"
